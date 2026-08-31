@@ -28,7 +28,7 @@
                         <label class="block text-sm font-medium mb-2">Penilaian</label>
                         <div class="flex gap-2 justify-center text-3xl" id="rating">
                             @for ($i = 1; $i <= 5; $i++)
-                                <button type="button" class="rating-star hover:scale-110 transition-transform" data-value="{{ $i }}">⭐</button>
+                                <button type="button" class="rating-star grayscale hover:scale-110 transition-transform" data-value="{{ $i }}">⭐</button>
                             @endfor
                         </div>
                     </div>
@@ -49,14 +49,26 @@
 @push('scripts')
 <script>
     let selected = 0;
-    document.querySelectorAll('.rating-star').forEach(star => {
+    const stars = document.querySelectorAll('.rating-star');
+
+    function render(hover) {
+        const active = hover || selected;
+        stars.forEach(s => {
+            s.classList.toggle('grayscale', +s.dataset.value > active);
+        });
+    }
+
+    stars.forEach(star => {
+        star.addEventListener('mouseenter', () => render(+star.dataset.value));
+        star.addEventListener('mouseleave', () => render(0));
         star.addEventListener('click', () => {
             selected = +star.dataset.value;
-            document.querySelectorAll('.rating-star').forEach(s => {
-                s.classList.toggle('grayscale', +s.dataset.value > selected);
-            });
+            render(0);
         });
     });
+
+    // Default kosong
+    render(0);
 
     document.getElementById('feedback-form').addEventListener('submit', function (e) {
         e.preventDefault();
