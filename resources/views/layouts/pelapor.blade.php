@@ -46,7 +46,10 @@
     {{-- Top Navigation --}}
     <header class="bg-white border-b border-slate-200 sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-            <a href="/" class="font-headline font-bold text-xl text-brand-600">SIPRAJA</a>
+            <a href="/" class="flex items-center gap-1">
+                <img src="{{ asset('images/logo-sipraja.png') }}" alt="Logo SIPRAJA" class="h-10 w-auto">
+                <span class="font-headline font-bold text-xl text-brand-600">SIPRAJA</span>
+            </a>
 
             <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
                 <a href="{{ route('pelapor.lapor') }}" class="hover:text-brand-600">Buat Laporan</a>
