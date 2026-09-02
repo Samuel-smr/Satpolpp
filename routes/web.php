@@ -31,6 +31,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 // Super Admin Routes (Tampilan Sementara / Prototyping)
 Route::prefix('super-admin')->name('super_admin.')->group(function () {
     Route::get('/dashboard', [SuperAdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/kegiatan', [SuperAdminController::class, 'kegiatan'])->name('kegiatan');
     Route::get('/user', [SuperAdminController::class, 'user'])->name('user');
     Route::get('/organisasi', [SuperAdminController::class, 'organisasi'])->name('organisasi');
     Route::get('/petugas', [SuperAdminController::class, 'petugas'])->name('petugas');

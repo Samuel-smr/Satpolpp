@@ -68,6 +68,12 @@
                 <span>Dashboard</span>
             </a>
 
+            <a href="{{ route('super_admin.kegiatan') }}"
+               class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all {{ request()->routeIs('super_admin.kegiatan') ? 'bg-super-active text-white shadow-md font-semibold' : 'text-slate-300 hover:bg-super-hover hover:text-white' }}">
+                <span class="material-symbols-outlined text-[20px]">event</span>
+                <span>Kegiatan</span>
+            </a>
+
             <a href="{{ route('super_admin.user') }}"
                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all {{ request()->routeIs('super_admin.user') ? 'bg-super-active text-white shadow-md font-semibold' : 'text-slate-300 hover:bg-super-hover hover:text-white' }}">
                 <span class="material-symbols-outlined text-[20px]">group</span>

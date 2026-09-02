@@ -9,6 +9,11 @@ class SuperAdminController extends Controller
         return view('super_admin.dashboard');
     }
 
+    public function kegiatan()
+    {
+        return view('super_admin.kegiatan');
+    }
+
     public function user()
     {
         return view('super_admin.user');

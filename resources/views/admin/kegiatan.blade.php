@@ -40,6 +40,14 @@
                         <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Sampai Tanggal</label>
                         <input type="date" x-model="filterDateEnd" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm">
                     </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Jenis Kegiatan</label>
+                        <select x-model="filterJenis" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm">
+                            <option value="">Semua</option>
+                            <option value="Internal">Internal</option>
+                            <option value="Eksternal">Eksternal</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="w-full md:w-auto">
                     <button @click="resetFilter()" class="w-full md:w-auto px-4 py-2.5 border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-800 rounded-xl font-semibold text-sm transition-colors flex items-center justify-center gap-2 shadow-sm bg-white">
@@ -57,6 +65,7 @@
                             <tr>
                                 <th class="px-6 py-4 font-bold">Nama Kegiatan</th>
                                 <th class="px-6 py-4 font-bold">Tanggal</th>
+                                <th class="px-6 py-4 font-bold">Jenis</th>
                                 <th class="px-6 py-4 font-bold">Lokasi</th>
                                 <th class="px-6 py-4 font-bold text-center">Peserta</th>
                                 <th class="px-6 py-4 font-bold text-center">Aksi</th>
@@ -71,6 +80,11 @@
                                             <span class="material-symbols-outlined text-[16px]">calendar_month</span>
                                             <span x-text="item.tanggal + ' ' + (item.waktu || '')"></span>
                                         </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold border"
+                                              :class="item.jenis === 'Eksternal' ? 'bg-orange-50 text-orange-600 border-orange-100' : 'bg-indigo-50 text-indigo-600 border-indigo-100'"
+                                              x-text="item.jenis"></span>
                                     </td>
                                     <td class="px-6 py-4 truncate max-w-[200px]" x-text="item.lokasi"></td>
                                     <td class="px-6 py-4 text-center">
@@ -280,6 +294,14 @@
                                 <div>
                                     <label class="block text-sm font-semibold text-slate-700 mb-2">Waktu Pelaksanaan</label>
                                     <input type="time" x-model="formWaktu" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-2">Jenis Kegiatan <span class="text-red-500">*</span></label>
+                                    <select x-model="formJenis" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm">
+                                        <option value="Internal">Internal</option>
+                                        <option value="Eksternal">Eksternal</option>
+                                    </select>
                                 </div>
 
                                 <div class="md:col-span-2">
@@ -502,6 +524,7 @@
                 // Filter States
                 filterDateStart: '',
                 filterDateEnd: '',
+                filterJenis: '',
                 selectedKegiatan: null,
                 mapDetailInstance: null,
                 
@@ -513,6 +536,7 @@
                 formLokasi: '',
                 formLat: '',
                 formLng: '',
+                formJenis: 'Eksternal',
                 
                 isEdit: false,
                 editId: null,
@@ -527,7 +551,8 @@
                         lokasi: 'Terminal Kampung Rambutan', 
                         lat: '-6.309325', 
                         lng: '106.883447',
-                        peserta: [1, 3, 5]
+                        peserta: [1, 3, 5],
+                        jenis: 'Eksternal'
                     },
                     { 
                         id: 2, 
@@ -538,7 +563,8 @@
                         lokasi: 'Jl. Kebon Jati, Tanah Abang', 
                         lat: '-6.187310', 
                         lng: '106.816000',
-                        peserta: [2, 4, 6]
+                        peserta: [2, 4, 6],
+                        jenis: 'Eksternal'
                     },
                     { 
                         id: 3, 
@@ -549,7 +575,8 @@
                         lokasi: 'Taman Suropati, Menteng', 
                         lat: '-6.199732', 
                         lng: '106.832626',
-                        peserta: [1, 2, 7]
+                        peserta: [1, 2, 7],
+                        jenis: 'Internal'
                     },
                 ],
                 
@@ -615,20 +642,24 @@
 
                 filteredKegiatans() {
                     return this.kegiatanList.filter(item => {
-                        let matchDate = true;
+                        let match = true;
                         if (this.filterDateStart) {
-                            matchDate = matchDate && (item.tanggal >= this.filterDateStart);
+                            match = match && (item.tanggal >= this.filterDateStart);
                         }
                         if (this.filterDateEnd) {
-                            matchDate = matchDate && (item.tanggal <= this.filterDateEnd);
+                            match = match && (item.tanggal <= this.filterDateEnd);
                         }
-                        return matchDate;
+                        if (this.filterJenis) {
+                            match = match && (item.jenis === this.filterJenis);
+                        }
+                        return match;
                     }).sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
                 },
 
                 resetFilter() {
                     this.filterDateStart = '';
                     this.filterDateEnd = '';
+                    this.filterJenis = '';
                 },
 
                 openDetail(item) {
@@ -670,6 +701,7 @@
                     this.formLokasi = '';
                     this.formLat = '';
                     this.formLng = '';
+                    this.formJenis = 'Eksternal';
                     this.searchAnggota = '';
                     this.selectedAnggota = [];
                     this.showMap = false;
@@ -699,6 +731,7 @@
                     this.formLokasi = item.lokasi || '';
                     this.formLat = item.lat || '';
                     this.formLng = item.lng || '';
+                    this.formJenis = item.jenis || 'Eksternal';
                     
                     this.selectedAnggota = this.allAnggota.filter(a => item.peserta.includes(a.id));
                     
@@ -854,6 +887,7 @@
                             this.kegiatanList[index].lokasi = this.formLokasi;
                             this.kegiatanList[index].lat = this.formLat;
                             this.kegiatanList[index].lng = this.formLng;
+                            this.kegiatanList[index].jenis = this.formJenis;
                             this.kegiatanList[index].peserta = this.selectedAnggota.map(a => a.id);
                         }
                         alert('Kegiatan berhasil diperbarui (Prototype).');
@@ -868,6 +902,7 @@
                             lokasi: this.formLokasi,
                             lat: this.formLat,
                             lng: this.formLng,
+                            jenis: this.formJenis,
                             peserta: this.selectedAnggota.map(a => a.id)
                         });
                         alert('Kegiatan berhasil dijadwalkan (Prototype).');
