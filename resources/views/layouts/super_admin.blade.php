@@ -129,10 +129,26 @@
             </div>
 
             <!-- Header Action Icons -->
-            <div class="flex items-center gap-2">
-                <button class="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors relative" title="Notifikasi">
-                    <span class="material-symbols-outlined text-[20px]">notifications</span>
-                </button>
+            <div class="flex items-center gap-2 relative">
+                <!-- Notifikasi -->
+                <div class="relative">
+                    <button onclick="toggleNotif(event)" class="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors relative" title="Notifikasi">
+                        <span class="material-symbols-outlined text-[20px]">notifications</span>
+                        <span id="notif-badge" class="hidden absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
+                    </button>
+
+                    <div id="notif-panel" class="hidden absolute right-0 top-12 w-80 sm:w-96 bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden z-50">
+                        <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+                            <h3 class="font-headline font-bold text-slate-800">Notifikasi</h3>
+                            <button onclick="markAllRead()" class="text-xs font-medium text-super-active hover:text-brand-600">Tandai semua dibaca</button>
+                        </div>
+                        <div id="notif-list" class="max-h-96 overflow-y-auto divide-y divide-slate-50"></div>
+                        <div id="notif-empty" class="hidden px-4 py-10 text-center text-slate-400">
+                            <div class="text-3xl mb-2">🔔</div>
+                            <p class="text-sm">Tidak ada notifikasi.</p>
+                        </div>
+                    </div>
+                </div>
 
                 <button class="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors" title="Bantuan">
                     <span class="material-symbols-outlined text-[20px]">help_outline</span>
@@ -154,5 +170,104 @@
     </div>
 
     @stack('scripts')
+
+    <script>
+        const NOTIF_KODE = 'sipraja_notifikasi';
+
+        function getNotif() {
+            let data = JSON.parse(localStorage.getItem(NOTIF_KODE) || '[]');
+            if (data.length === 0) {
+                data = [
+                    { id: 1, jenis: 'laporan', pesan: 'Laporan baru diterima dari masyarakat (SPJ-584100).', waktu: 'Baru saja', dibaca: false },
+                    { id: 2, jenis: 'petugas', pesan: 'Petugas Bambang Sutrisno ditambahkan ke Regu A.', waktu: '10 menit lalu', dibaca: false },
+                    { id: 3, jenis: 'aset', pesan: 'Aset baru ditambahkan: Mobil Patroli Dalmas.', waktu: '1 jam lalu', dibaca: false },
+                    { id: 4, jenis: 'organisasi', pesan: 'Data unit kerja diperbarui oleh Admin.', waktu: '3 jam lalu', dibaca: true },
+                    { id: 5, jenis: 'evaluasi', pesan: 'Penilaian kinerja petugas bulan ini telah diperbarui.', waktu: '1 hari lalu', dibaca: true },
+                ];
+                localStorage.setItem(NOTIF_KODE, JSON.stringify(data));
+            }
+            return data;
+        }
+
+        function saveNotif(data) { localStorage.setItem(NOTIF_KODE, JSON.stringify(data)); }
+
+        function notifIcon(j) {
+            return { laporan: 'description', petugas: 'badge', aset: 'inventory_2', organisasi: 'account_balance', evaluasi: 'assessment' }[j] || 'notifications';
+        }
+        function notifClass(j) {
+            return { laporan: 'bg-blue-100 text-blue-600', petugas: 'bg-emerald-100 text-emerald-600', aset: 'bg-amber-100 text-amber-600', organisasi: 'bg-slate-200 text-slate-600', evaluasi: 'bg-purple-100 text-purple-600' }[j] || 'bg-slate-100 text-slate-600';
+        }
+
+        function unreadCount() {
+            return getNotif().filter(n => !n.dibaca).length;
+        }
+
+        function updateBadge() {
+            const badge = document.getElementById('notif-badge');
+            const count = unreadCount();
+            badge.classList.toggle('hidden', count === 0);
+        }
+
+        function renderNotif() {
+            const data = getNotif();
+            const list = document.getElementById('notif-list');
+            const empty = document.getElementById('notif-empty');
+
+            if (data.length === 0) {
+                list.innerHTML = '';
+                empty.classList.remove('hidden');
+            } else {
+                empty.classList.add('hidden');
+                list.innerHTML = data.map(n => `
+                    <div class="flex items-start gap-3 px-4 py-3 cursor-pointer hover:bg-slate-50 transition-colors ${n.dibaca ? '' : 'bg-super-active/5'}" onclick="readNotif(${n.id})">
+                        <div class="w-9 h-9 rounded-full ${notifClass(n.jenis)} flex items-center justify-center flex-shrink-0">
+                            <span class="material-symbols-outlined text-[18px]">${notifIcon(n.jenis)}</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm text-slate-700 leading-snug">${n.pesan}</p>
+                            <span class="text-xs text-slate-400">${n.waktu}</span>
+                        </div>
+                        ${!n.dibaca ? '<span class="w-2 h-2 mt-1.5 bg-super-active rounded-full flex-shrink-0"></span>' : ''}
+                    </div>
+                `).join('');
+            }
+            updateBadge();
+        }
+
+        function toggleNotif(e) {
+            e.stopPropagation();
+            const panel = document.getElementById('notif-panel');
+            panel.classList.toggle('hidden');
+            renderNotif();
+        }
+
+        function readNotif(id) {
+            const data = getNotif();
+            const n = data.find(x => x.id === id);
+            if (n) n.dibaca = true;
+            saveNotif(data);
+            renderNotif();
+        }
+
+        function markAllRead() {
+            const data = getNotif();
+            data.forEach(n => n.dibaca = true);
+            saveNotif(data);
+            renderNotif();
+        }
+
+        // Tutup panel saat klik di luar
+        document.addEventListener('click', function (e) {
+            const panel = document.getElementById('notif-panel');
+            if (panel && !panel.classList.contains('hidden')) {
+                const btn = document.querySelector('[onclick="toggleNotif(event)"]');
+                if (btn && !btn.contains(e.target) && !panel.contains(e.target)) {
+                    panel.classList.add('hidden');
+                }
+            }
+        });
+
+        renderNotif();
+    </script>
 </body>
 </html>
