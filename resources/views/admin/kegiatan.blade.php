@@ -267,6 +267,22 @@
                                 Informasi Dasar
                             </h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="md:col-span-2" x-show="!isEdit">
+                                    <label class="block text-sm font-semibold text-slate-700 mb-2">
+                                        <span class="inline-flex items-center gap-1.5">
+                                            <span class="material-symbols-outlined text-sidebar-active text-[18px]">description</span>
+                                            Pilih Template Kegiatan
+                                        </span>
+                                    </label>
+                                    <select x-model="formTemplate" @change="applyTemplate()" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm appearance-none">
+                                        <option value="">-- Pilih dari template --</option>
+                                        <template x-for="tpl in templates" :key="tpl.id">
+                                            <option :value="tpl.id" x-text="tpl.nama"></option>
+                                        </template>
+                                    </select>
+                                    <p class="text-xs text-slate-400 mt-1.5">Pilih template untuk mengisi nama kegiatan secara otomatis (opsional).</p>
+                                </div>
+
                                 <div class="md:col-span-2">
                                     <label class="block text-sm font-semibold text-slate-700 mb-2">Nama Acara / Kegiatan <span class="text-red-500">*</span></label>
                                     <input type="text" x-model="formNama" placeholder="Contoh: Operasi Penertiban PKL Tanah Abang" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm">
@@ -513,6 +529,19 @@
                 formLokasi: '',
                 formLat: '',
                 formLng: '',
+                formTemplate: '',
+                
+                templates: [
+                    { id: 1, nama: 'Permintaan Data dan Informasi terkait Ketertiban Umum dan Ketentraman Masyarakat' },
+                    { id: 2, nama: 'Pelayanan Surat Menyurat' },
+                    { id: 3, nama: 'Patroli Ketentraman, Ketertiban Umum dan Perlindungan Masyarakat' },
+                    { id: 4, nama: 'Permohonan Bantuan Pengamanan Unjuk Rasa' },
+                    { id: 5, nama: 'Permohonan Bantuan Pengamanan Kegiatan' },
+                    { id: 6, nama: 'Penanganan Pengaduan Pelanggaran Ketertiban Umum/Masyarakat' },
+                    { id: 7, nama: 'Penegakan Peraturan Daerah dan Peraturan Kepala Daerah' },
+                    { id: 8, nama: 'Pembinaan dan Pengawasan Kepatuhan terhadap Perda dan Perkada' },
+                    { id: 9, nama: 'Pembinaan Perlindungan Masyarakat' },
+                ],
                 
                 isEdit: false,
                 editId: null,
@@ -670,6 +699,7 @@
                     this.formLokasi = '';
                     this.formLat = '';
                     this.formLng = '';
+                    this.formTemplate = '';
                     this.searchAnggota = '';
                     this.selectedAnggota = [];
                     this.showMap = false;
@@ -686,6 +716,14 @@
 
                     this.view = 'create';
                     window.scrollTo(0,0);
+                },
+
+                applyTemplate() {
+                    if (!this.formTemplate) return;
+                    const tpl = this.templates.find(t => t.id === Number(this.formTemplate));
+                    if (!tpl) return;
+                    this.formNama = tpl.nama;
+                    this.formDeskripsi = 'Pelaksanaan kegiatan: ' + tpl.nama + '.';
                 },
 
                 editKegiatan(item) {
