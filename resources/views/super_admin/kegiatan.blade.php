@@ -22,7 +22,7 @@
                     <p class="text-sm text-slate-500 mt-1">Kelola agenda operasional, sosialisasi, dan penertiban berkala.</p>
                 </div>
                 <div>
-                    <button @click="openCreate()" type="button" class="px-4 py-2.5 bg-sidebar-active hover:bg-sidebar-hover rounded-xl text-sm font-semibold text-white shadow-md transition-all flex items-center gap-2">
+                    <button @click="openCreate()" type="button" class="px-4 py-2.5 bg-super-active hover:bg-super-hover rounded-xl text-sm font-semibold text-white shadow-md transition-all flex items-center gap-2">
                         <span class="material-symbols-outlined text-[18px]">add</span>
                         <span>Tambah Kegiatan</span>
                     </button>
@@ -34,15 +34,15 @@
                 <div class="flex-1 w-full grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Mulai Tanggal</label>
-                        <input type="date" x-model="filterDateStart" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm">
+                        <input type="date" x-model="filterDateStart" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-super-active/20 focus:border-super-active outline-none transition-all text-sm">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Sampai Tanggal</label>
-                        <input type="date" x-model="filterDateEnd" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm">
+                        <input type="date" x-model="filterDateEnd" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-super-active/20 focus:border-super-active outline-none transition-all text-sm">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Jenis Kegiatan</label>
-                        <select x-model="filterJenis" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm">
+                        <select x-model="filterJenis" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-super-active/20 focus:border-super-active outline-none transition-all text-sm">
                             <option value="">Semua</option>
                             <option value="Internal">Internal</option>
                             <option value="Eksternal">Eksternal</option>
@@ -95,7 +95,7 @@
                                             <button @click="openDetail(item)" class="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors tooltip" title="Detail">
                                                 <span class="material-symbols-outlined text-[20px]">visibility</span>
                                             </button>
-                                            <button @click="editKegiatan(item)" class="p-1.5 text-slate-400 hover:text-sidebar-active hover:bg-sidebar-active/10 rounded-lg transition-colors tooltip" title="Edit">
+                                            <button @click="editKegiatan(item)" class="p-1.5 text-slate-400 hover:text-super-active hover:bg-super-active/10 rounded-lg transition-colors tooltip" title="Edit">
                                                 <span class="material-symbols-outlined text-[20px]">edit</span>
                                             </button>
                                             <button @click="deleteKegiatan(item.id)" class="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors tooltip" title="Hapus">
@@ -211,7 +211,7 @@
                                 Lokasi Kejadian
                             </h3>
                             <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-start gap-3 mb-4">
-                                <span class="material-symbols-outlined text-sidebar-active mt-0.5">pin_drop</span>
+                                <span class="material-symbols-outlined text-super-active mt-0.5">pin_drop</span>
                                 <div>
                                     <div class="font-semibold text-slate-800 text-sm leading-relaxed" x-text="selectedKegiatan?.lokasi"></div>
                                 </div>
@@ -242,7 +242,7 @@
                             <div class="max-h-64 overflow-y-auto pr-2 space-y-3">
                                 <template x-for="pid in (selectedKegiatan?.peserta || [])" :key="pid">
                                     <div class="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg transition-colors border border-transparent hover:border-slate-100">
-                                        <div class="w-8 h-8 bg-sidebar-active/10 text-sidebar-active rounded-full flex items-center justify-center font-bold text-xs">
+                                        <div class="w-8 h-8 bg-super-active/10 text-super-active rounded-full flex items-center justify-center font-bold text-xs">
                                             <span x-text="allAnggota.find(a => a.id === pid)?.nama.substring(0,2).toUpperCase()"></span>
                                         </div>
                                         <div>
@@ -277,28 +277,28 @@
                         <!-- Informasi Dasar -->
                         <div>
                             <h3 class="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4 flex items-center gap-2">
-                                <span class="material-symbols-outlined text-sidebar-active">info</span>
+                                <span class="material-symbols-outlined text-super-active">info</span>
                                 Informasi Dasar
                             </h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div class="md:col-span-2">
                                     <label class="block text-sm font-semibold text-slate-700 mb-2">Nama Acara / Kegiatan <span class="text-red-500">*</span></label>
-                                    <input type="text" x-model="formNama" placeholder="Contoh: Operasi Penertiban PKL Tanah Abang" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm">
+                                    <input type="text" x-model="formNama" placeholder="Contoh: Operasi Penertiban PKL Tanah Abang" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-super-active/20 focus:border-super-active outline-none transition-all text-sm">
                                 </div>
                                 
                                 <div>
                                     <label class="block text-sm font-semibold text-slate-700 mb-2">Tanggal Pelaksanaan <span class="text-red-500">*</span></label>
-                                    <input type="date" x-model="formTanggal" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm">
+                                    <input type="date" x-model="formTanggal" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-super-active/20 focus:border-super-active outline-none transition-all text-sm">
                                 </div>
 
                                 <div>
                                     <label class="block text-sm font-semibold text-slate-700 mb-2">Waktu Pelaksanaan</label>
-                                    <input type="time" x-model="formWaktu" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm">
+                                    <input type="time" x-model="formWaktu" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-super-active/20 focus:border-super-active outline-none transition-all text-sm">
                                 </div>
                                 
                                 <div>
                                     <label class="block text-sm font-semibold text-slate-700 mb-2">Jenis Kegiatan <span class="text-red-500">*</span></label>
-                                    <select x-model="formJenis" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm">
+                                    <select x-model="formJenis" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-super-active/20 focus:border-super-active outline-none transition-all text-sm">
                                         <option value="Internal">Internal</option>
                                         <option value="Eksternal">Eksternal</option>
                                     </select>
@@ -306,7 +306,7 @@
 
                                 <div class="md:col-span-2">
                                     <label class="block text-sm font-semibold text-slate-700 mb-2">Deskripsi / Detail Acara</label>
-                                    <textarea x-model="formDeskripsi" rows="3" placeholder="Tuliskan tujuan kegiatan, sasaran, atau keterangan tambahan lainnya..." class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm resize-y"></textarea>
+                                    <textarea x-model="formDeskripsi" rows="3" placeholder="Tuliskan tujuan kegiatan, sasaran, atau keterangan tambahan lainnya..." class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-super-active/20 focus:border-super-active outline-none transition-all text-sm resize-y"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -314,7 +314,7 @@
                         <!-- Peserta / Anggota -->
                         <div>
                             <h3 class="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4 flex items-center gap-2">
-                                <span class="material-symbols-outlined text-sidebar-active">group</span>
+                                <span class="material-symbols-outlined text-super-active">group</span>
                                 Penugasan Anggota
                             </h3>
                             
@@ -326,15 +326,15 @@
                                     <!-- Search Input -->
                                     <div class="relative mb-3">
                                         <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-[20px]">search</span>
-                                        <input type="text" x-model="searchAnggota" placeholder="Cari nama, jabatan, atau seksi..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm">
+                                        <input type="text" x-model="searchAnggota" placeholder="Cari nama, jabatan, atau seksi..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-super-active/20 focus:border-super-active outline-none transition-all text-sm">
                                     </div>
                                     
                                     <!-- List Anggota -->
                                     <div class="border border-slate-200 rounded-xl overflow-hidden h-[240px] flex flex-col bg-slate-50">
                                         <div class="flex-1 overflow-y-auto p-2 space-y-1">
                                             <template x-for="anggota in filteredAnggota" :key="anggota.id">
-                                                <label class="flex items-center gap-3 p-2.5 hover:bg-white rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200" :class="isAnggotaSelected(anggota.id) ? 'bg-white border-sidebar-active/30 shadow-sm' : ''">
-                                                    <input type="checkbox" :value="anggota.id" @change="toggleAnggota(anggota)" :checked="isAnggotaSelected(anggota.id)" class="w-4 h-4 text-sidebar-active rounded border-slate-300 focus:ring-sidebar-active">
+                                                <label class="flex items-center gap-3 p-2.5 hover:bg-white rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200" :class="isAnggotaSelected(anggota.id) ? 'bg-white border-super-active/30 shadow-sm' : ''">
+                                                    <input type="checkbox" :value="anggota.id" @change="toggleAnggota(anggota)" :checked="isAnggotaSelected(anggota.id)" class="w-4 h-4 text-super-active rounded border-slate-300 focus:ring-super-active">
                                                     <div>
                                                         <div class="text-sm font-semibold text-slate-800" x-text="anggota.nama"></div>
                                                         <div class="text-xs text-slate-500 mt-0.5">
@@ -363,7 +363,7 @@
                                             <div class="flex flex-wrap gap-2">
                                                 <template x-for="(sel, idx) in selectedAnggota" :key="sel.id">
                                                     <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg p-2 pr-1 shadow-sm w-full">
-                                                        <div class="w-8 h-8 rounded bg-sidebar-active text-white flex justify-center items-center font-bold text-xs shrink-0">
+                                                        <div class="w-8 h-8 rounded bg-super-active text-white flex justify-center items-center font-bold text-xs shrink-0">
                                                             <span x-text="sel.nama.substring(0,2).toUpperCase()"></span>
                                                         </div>
                                                         <div class="flex-1 min-w-0">
@@ -385,7 +385,7 @@
                         <!-- Lokasi & Map -->
                         <div>
                             <h3 class="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4 flex items-center gap-2">
-                                <span class="material-symbols-outlined text-sidebar-active">location_on</span>
+                                <span class="material-symbols-outlined text-super-active">location_on</span>
                                 Lokasi Kejadian
                             </h3>
                             
@@ -393,7 +393,7 @@
                                 <label class="block text-sm font-semibold text-slate-700 mb-2">Alamat Lengkap <span class="text-red-500">*</span></label>
                                 <div class="relative">
                                     <span class="material-symbols-outlined absolute left-3 top-3 text-slate-400">pin_drop</span>
-                                    <input type="text" x-model="formLokasi" placeholder="Tulis alamat atau deskripsi lokasi manual secara detail..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm">
+                                    <input type="text" x-model="formLokasi" placeholder="Tulis alamat atau deskripsi lokasi manual secara detail..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-super-active/20 focus:border-super-active outline-none transition-all text-sm">
                                 </div>
                             </div>
 
@@ -404,7 +404,7 @@
                                 </div>
                                 <label class="relative inline-flex items-center cursor-pointer">
                                     <input type="checkbox" x-model="showMap" class="sr-only peer" @change="toggleMap()">
-                                    <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-sidebar-active"></div>
+                                    <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-super-active"></div>
                                 </label>
                             </div>
 
@@ -422,7 +422,7 @@
                                 </div>
                                 
                                 <div class="flex justify-end mb-2">
-                                    <button type="button" @click="getCurrentLocation()" class="text-xs font-medium text-sidebar-active hover:text-sidebar-hover flex items-center gap-1 bg-sidebar-active/10 px-2.5 py-1.5 rounded-lg transition-colors">
+                                    <button type="button" @click="getCurrentLocation()" class="text-xs font-medium text-super-active hover:text-super-hover flex items-center gap-1 bg-super-active/10 px-2.5 py-1.5 rounded-lg transition-colors">
                                         <span class="material-symbols-outlined text-[16px]">my_location</span>
                                         Gunakan lokasi saat ini
                                     </button>
@@ -443,7 +443,7 @@
                         <!-- Dokumentasi -->
                         <div>
                             <h3 class="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4 flex items-center gap-2">
-                                <span class="material-symbols-outlined text-sidebar-active">perm_media</span>
+                                <span class="material-symbols-outlined text-super-active">perm_media</span>
                                 Dokumentasi
                             </h3>
                             
@@ -502,7 +502,7 @@
                         <button @click="view = 'list'" class="px-6 py-2.5 border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 rounded-xl font-semibold text-sm transition-colors">
                             Batal
                         </button>
-                        <button @click="saveKegiatan()" class="px-6 py-2.5 bg-sidebar-active hover:bg-sidebar-hover text-white rounded-xl font-semibold text-sm transition-colors shadow-md flex items-center gap-2">
+                        <button @click="saveKegiatan()" class="px-6 py-2.5 bg-super-active hover:bg-super-hover text-white rounded-xl font-semibold text-sm transition-colors shadow-md flex items-center gap-2">
                             <span class="material-symbols-outlined text-[18px]">save</span>
                             <span x-text="isEdit ? 'Perbarui Kegiatan' : 'Simpan Kegiatan'"></span>
                         </button>
