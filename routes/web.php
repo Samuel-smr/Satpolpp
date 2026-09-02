@@ -26,6 +26,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/arsip', [AdminController::class, 'arsip'])->name('arsip');
     Route::get('/aset', [AdminController::class, 'aset'])->name('aset');
     Route::get('/peta', [AdminController::class, 'peta'])->name('peta');
+    Route::get('/profile', [AdminController::class, 'profile'])->name('profile');
 });
 
 // Super Admin Routes (Tampilan Sementara / Prototyping)
