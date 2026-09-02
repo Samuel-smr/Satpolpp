@@ -70,7 +70,7 @@
 
             <a href="{{ route('admin.pengaduan') }}"
                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all {{ request()->routeIs('admin.pengaduan') ? 'bg-sidebar-active text-white shadow-md font-semibold' : 'text-slate-300 hover:bg-sidebar-hover hover:text-white' }}">
-                <span class="material-symbols-outlined text-[20px]">error_outline</span>
+                <span class="material-symbols-outlined text-[20px]">campaign</span>
                 <span>Pengaduan</span>
             </a>
 

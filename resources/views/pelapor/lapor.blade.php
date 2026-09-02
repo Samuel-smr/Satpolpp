@@ -118,7 +118,7 @@
 
             <div class="flex justify-between mt-6">
                 <button type="button" onclick="goStep(1)" class="border border-slate-300 text-slate-600 px-6 py-2.5 rounded-lg font-medium hover:bg-slate-50 transition-colors">← Sebelumnya</button>
-                <button type="button" onclick="goStep(3)" class="bg-brand-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-brand-700 transition-colors">Selanjutnya →</button>
+                <button type="button" onclick="nextFromDetail()" class="bg-brand-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-brand-700 transition-colors">Selanjutnya →</button>
             </div>
         </div>
 
@@ -233,6 +233,33 @@
         document.getElementById('jenis').value = jen.value;
         markStep(1); // pastikan step 1 ter-trigger
         goStep(2);
+    }
+
+    // Validasi step 2 (field wajib): telepon, kategori, deskripsi, lokasi
+    function nextFromDetail() {
+        const required = ['telepon', 'kategori', 'deskripsi', 'lokasi'];
+        const labels = {
+            telepon: 'Nomor WhatsApp / Telepon',
+            kategori: 'Judul / Jenis Kejadian',
+            deskripsi: 'Deskripsi Singkat',
+            lokasi: 'Lokasi Kejadian',
+        };
+
+        const empty = required.find(name => {
+            const el = document.querySelector(`[name="${name}"]`);
+            return !el || !el.value.trim();
+        });
+
+        if (empty) {
+            const el = document.querySelector(`[name="${empty}"]`);
+            el.focus();
+            el.classList.add('border-red-500');
+            alert('Mohon lengkapi: ' + labels[empty]);
+            setTimeout(() => el.classList.remove('border-red-500'), 2000);
+            return;
+        }
+
+        goStep(3);
     }
 
     // Recalc saat layout berubah
