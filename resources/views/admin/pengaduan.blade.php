@@ -170,7 +170,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium mb-1">Nomor Telepon (Opsional)</label>
+                    <label class="block text-sm font-medium mb-1">Nomor Telepon <span class="text-red-500">*</span></label>
                     <input type="tel" name="telepon" placeholder="08123456789"
                         class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none">
                 </div>
