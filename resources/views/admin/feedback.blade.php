@@ -13,22 +13,22 @@
     {{-- Ringkasan Kepuasan --}}
     @php
         $summaries = [
-            ['label' => 'Total Feedback', 'value' => '128', 'icon' => 'chat', 'color' => 'text-brand-600 bg-brand-50'],
-            ['label' => 'Rata-rata Rating', 'value' => '4,6 / 5', 'icon' => 'star', 'color' => 'text-amber-600 bg-amber-50'],
-            ['label' => 'Sangat Puas (5★)', 'value' => '86', 'icon' => 'sentiment_very_satisfied', 'color' => 'text-emerald-600 bg-emerald-50'],
-            ['label' => 'Perlu Perbaikan (&lt;3★)', 'value' => '9', 'icon' => 'sentiment_dissatisfied', 'color' => 'text-red-600 bg-red-50'],
+            ['label' => 'Total Feedback', 'value' => '128', 'icon' => 'chat', 'color' => 'text-orange-600 bg-orange-100/70'],
+            ['label' => 'Rata-rata Rating', 'value' => '4,6 / 5', 'icon' => 'star', 'color' => 'text-amber-600 bg-amber-100/70'],
+            ['label' => 'Sangat Puas (5★)', 'value' => '86', 'icon' => 'sentiment_very_satisfied', 'color' => 'text-emerald-600 bg-emerald-100/70'],
+            ['label' => 'Perlu Perbaikan (&lt;3★)', 'value' => '9', 'icon' => 'sentiment_dissatisfied', 'color' => 'text-red-600 bg-red-100/70'],
         ];
     @endphp
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
         @foreach ($summaries as $s)
             <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm">
-                <div class="flex items-center gap-3">
-                    <div class="w-11 h-11 rounded-xl {{ $s['color'] }} flex items-center justify-center">
-                        <span class="material-symbols-outlined text-[24px]">{{ $s['icon'] }}</span>
-                    </div>
+                <div class="flex items-start justify-between">
                     <div>
-                        <p class="text-xs text-slate-500 font-medium">{{ $s['label'] }}</p>
-                        <p class="font-headline text-2xl font-bold text-slate-900">{{ $s['value'] }}</p>
+                        <p class="text-xs font-semibold text-slate-600 leading-snug">{{ $s['label'] }}</p>
+                        <p class="font-headline text-3xl font-bold text-slate-900 mt-1">{{ $s['value'] }}</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-xl {{ $s['color'] }} flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-[22px]">{{ $s['icon'] }}</span>
                     </div>
                 </div>
             </div>
