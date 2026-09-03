@@ -62,7 +62,7 @@
 =======
                 <img src="{{ asset('images/logo-sipraja.png') }}" alt="Logo SIGAP Satpol PP"
                     class="w-full h-full object-contain">
->>>>>>> 49628515161ab630bc3a33aad964a77d77e41246
+                </img>
             </div>
             <div>
                 <h1 class="font-headline font-bold text-lg text-white leading-tight tracking-wide">SIPRAJA</h1>
