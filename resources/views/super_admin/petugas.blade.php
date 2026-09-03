@@ -158,7 +158,8 @@
         </div>
     </div>
 
-    <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-5 py-3 rounded-xl shadow-lg text-sm z-50"></div>
+
+
 @endsection
 
 @push('scripts')
@@ -277,10 +278,10 @@
         const idx = document.querySelector('[name=edit_index]').value;
         if (idx !== '') {
             all[idx] = data;
-            tampilToast('Data petugas berhasil diperbarui.');
+            tampilToast('Edit berhasil! Data petugas telah diperbarui.');
         } else {
             all.unshift(data);
-            tampilToast('Petugas berhasil ditambahkan.');
+            tampilToast('Berhasil menambah data petugas.');
         }
         saveAll(all);
         renderList();
@@ -293,7 +294,7 @@
         all[i].status = order[all[i].status] || 'aktif';
         saveAll(all);
         renderList();
-        tampilToast('Status petugas diubah menjadi ' + all[i].status + '.');
+        tampilToast('Edit berhasil! Status petugas diubah menjadi ' + all[i].status + '.');
     }
 
     function hapusPetugas(i) {
@@ -311,12 +312,7 @@
         });
     }
 
-    function tampilToast(msg) {
-        const t = document.getElementById('toast');
-        t.textContent = msg;
-        t.classList.remove('hidden');
-        setTimeout(() => t.classList.add('hidden'), 2500);
-    }
+
 
     renderList();
 </script>

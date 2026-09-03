@@ -205,7 +205,8 @@
         </div>
     </div>
 
-    <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-5 py-3 rounded-xl shadow-lg text-sm z-50"></div>
+
+
 @endsection
 
 @push('scripts')
@@ -332,7 +333,7 @@
         rec.statusIdx = newIdx;
         saveAll(all);
         renderDetail();
-        tampilToast('Status diperbarui menjadi: ' + labelStatus(newIdx));
+        tampilToast('Edit berhasil! Status diperbarui menjadi: ' + labelStatus(newIdx));
     }
 
     function hapusLaporan() {
@@ -472,15 +473,11 @@
         saveAll(all);
         tutupModalBukti();
         renderDetail();
-        tampilToast('Laporan diselesaikan dengan bukti penanganan.');
+        tampilToast('Edit berhasil! Laporan diselesaikan dengan bukti penanganan.');
     }
 
-    function tampilToast(msg) {
-        const t = document.getElementById('toast');
-        t.textContent = msg;
-        t.classList.remove('hidden');
-        setTimeout(() => t.classList.add('hidden'), 2500);
-    }
+
+
 
     renderDetail();
 </script>

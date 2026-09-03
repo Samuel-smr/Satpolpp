@@ -243,7 +243,8 @@
         </div>
     </div>
 
-    <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-5 py-3 rounded-xl shadow-lg text-sm z-50"></div>
+
+
 @endsection
 
 @push('scripts')
@@ -522,15 +523,11 @@
         saveAll(all);
         renderList();
         tutupTambah();
-        tampilToast('Laporan ' + kode + ' berhasil ditambahkan.');
+        tampilToast('Berhasil menambah data laporan baru (' + kode + ').');
     }
 
-    function tampilToast(msg) {
-        const t = document.getElementById('toast');
-        t.textContent = msg;
-        t.classList.remove('hidden');
-        setTimeout(() => t.classList.add('hidden'), 2500);
-    }
+
+
 
     setTab('semua');
 </script>

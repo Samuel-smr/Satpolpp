@@ -489,7 +489,7 @@
 
                 deleteArsip(id) {
                     const item = this.arsipList.find(a => a.id === id);
-                    const nama = item ? `arsip "${item.judul}"` : 'arsip ini';
+                    const nama = item ? `arsip "${item.nama || item.judul}"` : 'arsip ini';
                     window.konfirmasiHapus({
                         title: 'Hapus Arsip',
                         message: `Apakah Anda yakin ingin menghapus ${nama}? Data yang dihapus tidak dapat dipulihkan.`,
@@ -498,6 +498,7 @@
                             if (this.view === 'detail') {
                                 this.view = 'list';
                             }
+                            window.tampilToast('Data arsip berhasil dihapus.');
                         }
                     });
                 },
@@ -525,6 +526,8 @@
                                 this.arsipList[index].size = (this.formFile.size / 1024 / 1024).toFixed(2) + ' MB';
                             }
                         }
+                        this.showModal = false;
+                        window.tampilToast('Edit berhasil! Data arsip telah diperbarui.');
                     } else {
                         if (!this.formFile) {
                             alert('Silakan unggah file terlebih dahulu.');
@@ -548,9 +551,9 @@
                             uploader: 'Admin System',
                             deskripsi: this.formDeskripsi
                         });
+                        this.showModal = false;
+                        window.tampilToast('Berhasil menambah data arsip baru.');
                     }
-
-                    this.showModal = false;
                 }
             }
         }
