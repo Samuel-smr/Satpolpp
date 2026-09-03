@@ -106,90 +106,6 @@
         </div>
     </div>
 
-    {{-- Detail & tindak lanjut --}}
-    <div id="detail" class="hidden mt-8">
-        <button type="button" onclick="tutupDetail()" class="mb-4 inline-flex items-center gap-2 text-sidebar-active font-medium hover:underline">
-            ← <span>Kembali ke daftar</span>
-        </button>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-2 space-y-6">
-                <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm">
-                    <div class="flex items-center justify-between gap-4 mb-5">
-                        <h2 class="font-headline font-bold text-lg text-slate-800" id="d-kode">--</h2>
-                        <span class="text-sm font-semibold px-3 py-1 rounded-full" id="d-badge">--</span>
-                    </div>
-
-                    <div class="grid sm:grid-cols-2 gap-3 text-sm bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
-                        <div>
-                            <span class="text-slate-400">Jenis:</span>
-                            <span class="font-medium" id="d-jenis">--</span>
-                        </div>
-                        <div>
-                            <span class="text-slate-400">Kategori:</span>
-                            <span class="font-medium" id="d-kategori">--</span>
-                        </div>
-                        <div>
-                            <span class="text-slate-400">Sumber:</span>
-                            <span class="font-medium" id="d-sumber">--</span>
-                        </div>
-                        <div>
-                            <span class="text-slate-400">Identitas:</span>
-                            <span class="font-medium" id="d-identitas">--</span>
-                        </div>
-                        <div>
-                            <span class="text-slate-400">Nomor Telepon:</span>
-                            <span class="font-medium" id="d-telepon">--</span>
-                        </div>
-                        <div>
-                            <span class="text-slate-400">Koordinat:</span>
-                            <span class="font-medium" id="d-koordinat">--</span>
-                        </div>
-                        <div>
-                            <span class="text-slate-400">Lokasi:</span>
-                            <span class="font-medium" id="d-lokasi">--</span>
-                        </div>
-                        <div>
-                            <span class="text-slate-400">Waktu lapor:</span>
-                            <span class="font-medium" id="d-waktu">--</span>
-                        </div>
-                        <div class="sm:col-span-2">
-                            <span class="text-slate-400">Deskripsi:</span>
-                            <span class="font-medium" id="d-deskripsi">--</span>
-                        </div>
-                    </div>
-
-                    {{-- Lampiran Foto & Video --}}
-                    <div id="d-files-wrap" class="hidden mb-6">
-                        <h3 class="font-headline font-bold text-slate-800 mb-3">Lampiran Foto &amp; Video</h3>
-                        <div id="d-files" class="grid grid-cols-2 md:grid-cols-3 gap-3"></div>
-                    </div>
-
-                    <h3 class="font-headline font-bold text-slate-800 mb-5">Pelacakan Laporan</h3>
-                    <ol class="relative ml-1" id="tracking-list"></ol>
-                </div>
-            </div>
-
-            <div>
-                <div class="bg-slate-800 text-white border rounded-2xl p-6 shadow-sm sticky top-24">
-                    <h3 class="font-headline font-bold mb-4">Tindak Lanjut</h3>
-                    <p class="text-sm text-slate-300 mb-4">Perbarui status penanganan laporan ini.</p>
-
-                    <div class="space-y-3">
-                        <button type="button" onclick="majuStatus(1)" class="w-full bg-sidebar-active hover:bg-sidebar-hover text-white py-2.5 rounded-xl font-medium transition-colors">Tandai Diterima</button>
-                        <button type="button" onclick="majuStatus(2)" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl font-medium transition-colors">Mulai Verifikasi</button>
-                        <button type="button" onclick="majuStatus(4)" class="w-full bg-amber-600 hover:bg-amber-700 text-white py-2.5 rounded-xl font-medium transition-colors">Tandai Ditindaklanjuti</button>
-                        <button type="button" onclick="majuStatus(5)" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl font-medium transition-colors">Selesaikan Laporan</button>
-                    </div>
-
-                    <div class="mt-5 pt-5 border-t border-white/10">
-                        <button type="button" onclick="hapusLaporan()" class="w-full border border-red-400/50 text-red-300 hover:bg-red-500/10 py-2.5 rounded-xl font-medium transition-colors">Hapus Laporan</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     {{-- Modal tambah laporan --}}
     <div id="modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/40" onclick="tutupTambah()"></div>
@@ -300,6 +216,17 @@
                                 class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-600 outline-none cursor-not-allowed">
                         </div>
                     </div>
+                    <div class="flex gap-2 mb-3">
+                        <div class="flex-1 relative">
+                            <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-[18px]">search</span>
+                            <input type="text" id="cari-lokasi-input" placeholder="Cari lokasi / alamat..." onkeydown="if(event.key==='Enter'){event.preventDefault();geocodeCariLokasi();}"
+                                class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm">
+                        </div>
+                        <button type="button" onclick="geocodeCariLokasi()" class="inline-flex items-center justify-center gap-1.5 bg-sidebar-active hover:bg-sidebar-hover text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-sm transition-colors">
+                            <span class="material-symbols-outlined text-[18px]">search</span>
+                            Cari
+                        </button>
+                    </div>
                     <div class="relative">
                         <div id="map-picker" class="w-full h-64 bg-slate-100 rounded-xl border border-slate-200 overflow-hidden z-10"></div>
                         <span class="absolute top-3 right-3 z-[1000] bg-white/90 backdrop-blur text-xs font-medium px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 text-slate-600">
@@ -346,7 +273,6 @@
     ];
     const KODE = 'sipraja_reports';
     let tab = 'semua';
-    let currentIndex = null;
 
     function getReports() {
         let data = JSON.parse(localStorage.getItem(KODE) || '[]');
@@ -408,7 +334,7 @@
         kosong.classList.add('hidden');
 
         tbody.innerHTML = list.map((r, i) => `
-            <tr class="border-b border-slate-50 hover:bg-slate-50/50 cursor-pointer" onclick="bukaDetail(${i})">
+            <tr class="border-b border-slate-50 hover:bg-slate-50/50 cursor-pointer" onclick="bukaDetail('${r.kode}')">
                 <td class="px-6 py-3.5 font-medium text-slate-800">${r.kode}</td>
                 <td class="px-6 py-3.5">
                     <span class="text-xs font-semibold px-2.5 py-1 rounded-full ${jenisClass(r.jenis)}">${labelJenis(r.jenis)}</span>
@@ -425,7 +351,7 @@
                     <span class="text-xs font-semibold px-2.5 py-1 rounded-full ${badgeClass(r.statusIdx)}">${labelStatus(r.statusIdx)}</span>
                 </td>
                 <td class="px-6 py-3.5 text-right">
-                    <button type="button" onclick="event.stopPropagation(); bukaDetail(${i})" class="text-sidebar-active hover:text-sidebar-hover" title="Detail">
+                    <button type="button" onclick="event.stopPropagation(); bukaDetail('${r.kode}')" class="text-sidebar-active hover:text-sidebar-hover" title="Detail">
                         <span class="material-symbols-outlined text-[20px]">visibility</span>
                     </button>
                     <button type="button" onclick="event.stopPropagation(); hapus(${i})" class="text-red-500 hover:text-red-700 ml-2" title="Hapus">
@@ -436,80 +362,14 @@
         `).join('');
     }
 
+    function bukaDetail(kode) {
+        window.location.href = '{{ url('admin/pengaduan') }}/' + encodeURIComponent(kode);
+    }
+
     function findGlobalIndex(detailIdx) {
         const list = filtered(getReports());
         const item = list[detailIdx];
         return getReports().findIndex(r => r.kode === item.kode);
-    }
-
-    function bukaDetail(detailIdx) {
-        const all = getReports();
-        const gi = findGlobalIndex(detailIdx);
-        currentIndex = gi;
-        const r = all[gi];
-        const idx = r.statusIdx != null ? r.statusIdx : 0;
-
-        document.getElementById('d-kode').textContent = r.kode;
-        document.getElementById('d-badge').textContent = labelStatus(idx);
-        document.getElementById('d-badge').className = 'text-sm font-semibold px-3 py-1 rounded-full ' + badgeClass(idx);
-        document.getElementById('d-jenis').textContent = labelJenis(r.jenis);
-        document.getElementById('d-kategori').textContent = r.kategori || '-';
-        document.getElementById('d-sumber').textContent = (r.sumber_asal === 'offline') ? 'Offline (Langsung)' : 'Online (' + (r.platform || 'Medsos') + ')';
-        document.getElementById('d-identitas').textContent = (r.sumber_asal === 'offline') ? (r.nama + (r.nik ? ' • ' + r.nik : '')) : '-';
-        document.getElementById('d-telepon').textContent = r.telepon || '-';
-        document.getElementById('d-koordinat').textContent = (r.lat && r.lng) ? r.lat + ', ' + r.lng : '-';
-        document.getElementById('d-lokasi').textContent = r.lokasi || '-';
-        document.getElementById('d-waktu').textContent = r.dibuat || r.waktu || '-';
-        document.getElementById('d-deskripsi').textContent = r.deskripsi || '-';
-
-        // Lampiran foto & video
-        const filesWrap = document.getElementById('d-files-wrap');
-        const filesBox = document.getElementById('d-files');
-        if (r.files && r.files.length > 0) {
-            filesWrap.classList.remove('hidden');
-            filesBox.innerHTML = r.files.map(f => `
-                <figure class="${f.isVideo ? 'aspect-video' : 'aspect-square'} rounded-xl overflow-hidden border border-slate-200 bg-slate-100 relative group">
-                    ${f.isVideo ? '<video src="' + f.url + '" class="w-full h-full object-cover"></video><span class="absolute inset-0 flex items-center justify-center text-white/80"><span class="material-symbols-outlined text-3xl bg-black/40 rounded-full p-1.5">play_circle</span></span>' : '<img src="' + f.url + '" class="w-full h-full object-cover">'}
-                    <figcaption class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/50 to-transparent px-2 py-1 text-[10px] text-white truncate">${f.name}</figcaption>
-                </figure>
-            `).join('');
-        } else {
-            filesWrap.classList.add('hidden');
-            filesBox.innerHTML = '';
-        }
-
-        const total = STATUSES.length;
-        document.getElementById('tracking-list').innerHTML = STATUSES.map(([title, desc], i) => {
-            const done = i <= idx;
-            const isLast = i === total - 1;
-            return `
-                <li class="relative pl-8 ${isLast ? '' : 'pb-6'}">
-                    ${isLast ? '' : '<span class="absolute left-0 top-6 bottom-0 w-0.5 bg-slate-200"></span>'}
-                    <span class="absolute left-0 top-1 w-4 h-4 -translate-x-1/2 rounded-full border-2 border-white ring-2 ${done ? 'bg-emerald-500 ring-emerald-500' : 'bg-slate-300 ring-slate-300'}"></span>
-                    <h4 class="font-semibold ${done ? 'text-slate-800' : 'text-slate-400'}">${title}</h4>
-                    <p class="text-sm ${done ? 'text-slate-500' : 'text-slate-400'}">${desc}</p>
-                </li>
-            `;
-        }).join('');
-
-        document.getElementById('detail').classList.remove('hidden');
-        document.getElementById('detail').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    function tutupDetail() {
-        document.getElementById('detail').classList.add('hidden');
-        renderList();
-    }
-
-    function majuStatus(newIdx) {
-        if (currentIndex == null) return;
-        const all = getReports();
-        const cur = all[currentIndex].statusIdx != null ? all[currentIndex].statusIdx : 0;
-        if (newIdx <= cur) { alert('Status tidak bisa mundur.'); return; }
-        all[currentIndex].statusIdx = newIdx;
-        saveAll(all);
-        bukaDetail(currentIndex);
-        tampilToast('Status diperbarui menjadi: ' + labelStatus(newIdx));
     }
 
     function hapus(detailIdx) {
@@ -519,16 +379,6 @@
         all.splice(gi, 1);
         saveAll(all);
         renderList();
-        tampilToast('Laporan berhasil dihapus.');
-    }
-
-    function hapusLaporan() {
-        if (currentIndex == null) return;
-        const all = getReports();
-        if (!confirm('Yakin ingin menghapus laporan ' + all[currentIndex].kode + '?')) return;
-        all.splice(currentIndex, 1);
-        saveAll(all);
-        tutupDetail();
         tampilToast('Laporan berhasil dihapus.');
     }
 
@@ -588,6 +438,30 @@
             if (markerInstance) markerInstance.setLatLng(e.latlng);
             else markerInstance = L.marker(e.latlng).addTo(mapInstance);
         });
+    }
+
+    async function geocodeCariLokasi() {
+        const input = document.getElementById('cari-lokasi-input');
+        const q = (input.value || '').trim();
+        if (!q) { alert('Masukkan alamat / nama lokasi terlebih dahulu.'); return; }
+        const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q);
+        try {
+            const res = await fetch(url, { headers: { 'Accept-Language': 'id' } });
+            const data = await res.json();
+            if (!data || data.length === 0) {
+                alert('Lokasi tidak ditemukan. Coba alamat yang lebih spesifik.');
+                return;
+            }
+            const lat = parseFloat(data[0].lat);
+            const lng = parseFloat(data[0].lon);
+            document.querySelector('[name=lat]').value = lat.toFixed(6);
+            document.querySelector('[name=lng]').value = lng.toFixed(6);
+            if (markerInstance) markerInstance.setLatLng([lat, lng]);
+            else markerInstance = L.marker([lat, lng]).addTo(mapInstance);
+            mapInstance.setView([lat, lng], 15, { animate: true });
+        } catch (e) {
+            alert('Gagal mencari lokasi. Periksa koneksi internet.');
+        }
     }
 
     // ===== Upload Foto & Video =====

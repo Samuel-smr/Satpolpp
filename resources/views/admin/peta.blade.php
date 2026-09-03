@@ -111,6 +111,19 @@
                 </div>
             </div>
 
+            <!-- Search Lokasi -->
+            <div class="p-3 border-b border-slate-200 bg-white flex flex-col sm:flex-row gap-2 sm:items-center">
+                <div class="flex-1 relative">
+                    <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-[18px]">search</span>
+                    <input type="text" x-model="searchQuery" @keyup.enter="searchLocation()" placeholder="Cari lokasi / alamat... mis. Pasar Wates, Kulon Progo"
+                        class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm">
+                </div>
+                <button type="button" @click="searchLocation()" class="inline-flex items-center justify-center gap-2 bg-sidebar-active hover:bg-sidebar-hover text-white px-5 py-2 rounded-xl text-sm font-semibold shadow-sm transition-colors">
+                    <span class="material-symbols-outlined text-[18px]">search</span>
+                    Cari Lokasi
+                </button>
+            </div>
+
             <!-- The Map -->
             <div id="mainMap" class="w-full flex-1 map-container z-10 relative rounded-b-2xl"></div>
         </div>
@@ -174,6 +187,7 @@
                 markers: [],
                 hotspots: [],
                 selectedItem: null,
+                searchQuery: '',
                 
                 filters: {
                     laporan: true,
@@ -183,15 +197,6 @@
 
                 // Mock Data for Map
                 mapData: [
-                    // Laporan (Hotspot area 1 - Tanah Abang)
-                    { id: 'L1', type: 'laporan', title: 'PKL Liar Mengganggu Jalan', desc: 'Banyak PKL yang memakan bahu jalan hingga menyebabkan kemacetan parah.', location: 'Kawasan Tanah Abang', lat: -6.1873, lng: 106.8143, status: 'Menunggu', date: 'Hari ini, 08:30' },
-                    { id: 'L2', type: 'laporan', title: 'Parkir Sembarangan', desc: 'Kendaraan parkir di trotoar mengganggu pejalan kaki.', location: 'Jl. Kebon Jati', lat: -6.1880, lng: 106.8150, status: 'Diproses', date: 'Hari ini, 09:15' },
-                    { id: 'L3', type: 'laporan', title: 'Tumpukan Sampah', desc: 'Sampah pasar belum diangkut sejak kemarin.', location: 'Blok G Tanah Abang', lat: -6.1890, lng: 106.8160, status: 'Menunggu', date: 'Hari ini, 10:00' },
-                    
-                    // Laporan (Area lain)
-                    { id: 'L4', type: 'laporan', title: 'Gelandangan di JPO', desc: 'Ada oknum yang tidur di JPO membuat warga tidak nyaman.', location: 'JPO Sudirman', lat: -6.2043, lng: 106.8225, status: 'Selesai', date: 'Kemarin, 14:00' },
-                    { id: 'L5', type: 'laporan', title: 'Pelanggaran Perda Reklame', desc: 'Spanduk ilegal menutupi rambu lalu lintas.', location: 'Perempatan Kuningan', lat: -6.2300, lng: 106.8280, status: 'Diproses', date: 'Hari ini, 11:20' },
-
                     // Kegiatan Eksternal
                     { id: 'K1', type: 'kegiatan_eksternal', title: 'Operasi Yustisi KTP', desc: 'Pemeriksaan identitas pendatang baru pasca libur panjang.', location: 'Terminal Kampung Rambutan', lat: -6.3093, lng: 106.8834, status: 'Berlangsung', date: 'Hari ini, 08:00' },
                     { id: 'K2', type: 'kegiatan_eksternal', title: 'Sosialisasi Kawasan Tanpa Rokok', desc: 'Edukasi masyarakat di fasilitas umum.', location: 'Taman Suropati', lat: -6.1997, lng: 106.8326, status: 'Dijadwalkan', date: 'Besok, 09:00' },
@@ -209,6 +214,9 @@
                 ],
 
                 initPeta() {
+                    // Muat laporan real (yang sudah selesai + punya lokasi penandaan)
+                    this.loadLaporanFromStorage();
+
                     // Center roughly in Jakarta
                     this.map = L.map('mainMap', {
                         zoomControl: false
@@ -225,6 +233,30 @@
 
                     this.renderMap();
                     this.initCharts();
+                },
+
+                // Muat laporan yang sudah selesai + menandai titik lokasi kejadian
+                loadLaporanFromStorage() {
+                    let reports = [];
+                    try {
+                        reports = JSON.parse(localStorage.getItem('sipraja_reports') || '[]');
+                    } catch (e) { reports = []; }
+
+                    const laporanItems = reports
+                        .filter(r => (r.statusIdx != null ? r.statusIdx : 0) >= 5 && r.lokasiSelesai && r.lokasiSelesai.lat && r.lokasiSelesai.lng)
+                        .map((r, i) => ({
+                            id: 'L-' + r.kode,
+                            type: 'laporan',
+                            title: r.kategori || r.kode,
+                            desc: r.deskripsi || '-',
+                            location: r.lokasi || 'Lokasi kejadian',
+                            lat: parseFloat(r.lokasiSelesai.lat),
+                            lng: parseFloat(r.lokasiSelesai.lng),
+                            status: 'Selesai',
+                            date: r.dibuat || '-'
+                        }));
+
+                    this.mapData = laporanItems.concat(this.mapData);
                 },
 
                 renderMap() {
@@ -313,6 +345,26 @@
 
                         this.markers.push(marker);
                     });
+                },
+
+                // ===== Pencarian Lokasi (Geocoding via Nominatim OSM) =====
+                async searchLocation() {
+                    const q = (this.searchQuery || '').trim();
+                    if (!q) return;
+                    const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q);
+                    try {
+                        const res = await fetch(url, { headers: { 'Accept-Language': 'id' } });
+                        const data = await res.json();
+                        if (!data || data.length === 0) {
+                            alert('Lokasi tidak ditemukan. Coba alamat yang lebih spesifik.');
+                            return;
+                        }
+                        const lat = parseFloat(data[0].lat);
+                        const lng = parseFloat(data[0].lon);
+                        this.map.setView([lat, lng], 15, { animate: true });
+                    } catch (e) {
+                        alert('Gagal mencari lokasi. Periksa koneksi internet.');
+                    }
                 },
 
                 // Formatting Helpers

@@ -21,6 +21,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/pengaduan', [AdminController::class, 'pengaduan'])->name('pengaduan');
+    Route::get('/pengaduan/{kode}', [AdminController::class, 'pengaduanDetail'])->name('pengaduan.detail');
     Route::get('/kegiatan', [AdminController::class, 'kegiatan'])->name('kegiatan');
     Route::get('/feedback', [AdminController::class, 'feedback'])->name('feedback');
     Route::get('/arsip', [AdminController::class, 'arsip'])->name('arsip');

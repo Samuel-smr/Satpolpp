@@ -57,12 +57,7 @@
         <!-- Logo Section -->
         <div class="px-6 py-6 flex items-center gap-3">
             <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center p-1.5 flex-shrink-0">
-<<<<<<< HEAD
                 <img src="{{ asset('images/logo-sipraja.png') }}" alt="Logo SIPRAJA Satpol PP" class="w-full h-full object-contain">
-=======
-                <img src="{{ asset('images/logo-sipraja.png') }}" alt="Logo SIGAP Satpol PP"
-                    class="w-full h-full object-contain">
-                </img>
             </div>
             <div>
                 <h1 class="font-headline font-bold text-lg text-white leading-tight tracking-wide">SIPRAJA</h1>
