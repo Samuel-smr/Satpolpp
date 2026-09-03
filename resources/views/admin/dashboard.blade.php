@@ -16,7 +16,7 @@
             </button>
             <button type="button" class="px-4 py-2.5 bg-accent-600 hover:bg-accent-500 rounded-xl text-sm font-semibold text-white shadow-md transition-all flex items-center gap-2">
                 <span class="material-symbols-outlined text-[18px]">add</span>
-                <span>+ Buat Tugas</span>
+                <span>Buat Tugas</span>
             </button>
         </div>
     </div>
