@@ -3,7 +3,7 @@
 @section('title', 'Pengaduan & Informasi')
 
 @push('styles')
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
 @endpush
 
 @section('content')
@@ -28,8 +28,7 @@
                     <p class="text-xs font-semibold text-slate-600 leading-snug">Total Masuk</p>
                     <p class="font-headline text-3xl font-bold text-slate-900 mt-1" id="stat-total">0</p>
                 </div>
-                <div
-                    class="w-10 h-10 rounded-xl bg-orange-100/70 text-orange-600 flex items-center justify-center flex-shrink-0">
+                <div class="w-10 h-10 rounded-xl bg-orange-100/70 text-orange-600 flex items-center justify-center flex-shrink-0">
                     <span class="material-symbols-outlined text-[22px]">inbox</span>
                 </div>
             </div>
@@ -51,8 +50,7 @@
                     <p class="text-xs font-semibold text-slate-600 leading-snug">Informasi & Pengaduan</p>
                     <p class="font-headline text-3xl font-bold text-slate-900 mt-1" id="stat-informasi">0</p>
                 </div>
-                <div
-                    class="w-10 h-10 rounded-xl bg-blue-100/70 text-brand-600 flex items-center justify-center flex-shrink-0">
+                <div class="w-10 h-10 rounded-xl bg-blue-100/70 text-brand-600 flex items-center justify-center flex-shrink-0">
                     <span class="material-symbols-outlined text-[22px]">info</span>
                 </div>
             </div>
@@ -63,8 +61,7 @@
                     <p class="text-xs font-semibold text-slate-600 leading-snug">Selesai</p>
                     <p class="font-headline text-3xl font-bold text-slate-900 mt-1" id="stat-selesai">0</p>
                 </div>
-                <div
-                    class="w-10 h-10 rounded-xl bg-emerald-100/70 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                <div class="w-10 h-10 rounded-xl bg-emerald-100/70 text-emerald-600 flex items-center justify-center flex-shrink-0">
                     <span class="material-symbols-outlined text-[22px]">task_alt</span>
                 </div>
             </div>
@@ -78,14 +75,11 @@
                 <button type="button" data-tab="semua" onclick="setTab('semua')"
                     class="tab-btn text-sm font-semibold px-4 py-2 rounded-xl border transition-colors">Semua</button>
                 <button type="button" data-tab="darurat" onclick="setTab('darurat')"
-                    class="tab-btn text-sm font-semibold px-4 py-2 rounded-xl border transition-colors">Laporan
-                    Darurat</button>
+                    class="tab-btn text-sm font-semibold px-4 py-2 rounded-xl border transition-colors">Laporan Darurat</button>
                 <button type="button" data-tab="informasi" onclick="setTab('informasi')"
-                    class="tab-btn text-sm font-semibold px-4 py-2 rounded-xl border transition-colors">Informasi &
-                    Pengaduan</button>
+                    class="tab-btn text-sm font-semibold px-4 py-2 rounded-xl border transition-colors">Informasi & Pengaduan</button>
             </div>
-            <span class="text-xs bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-1 rounded-full font-medium">Data
-                Tersinkron dari Pelapor</span>
+            <span class="text-xs bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-1 rounded-full font-medium">Data Tersinkron dari Pelapor</span>
         </div>
 
         <div class="overflow-x-auto">
@@ -112,101 +106,6 @@
         </div>
     </div>
 
-    {{-- Detail & tindak lanjut --}}
-    <div id="detail" class="hidden mt-8">
-        <button type="button" onclick="tutupDetail()"
-            class="mb-4 inline-flex items-center gap-2 text-sidebar-active font-medium hover:underline">
-            ← <span>Kembali ke daftar</span>
-        </button>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-2 space-y-6">
-                <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm">
-                    <div class="flex items-center justify-between gap-4 mb-5">
-                        <h2 class="font-headline font-bold text-lg text-slate-800" id="d-kode">--</h2>
-                        <span class="text-sm font-semibold px-3 py-1 rounded-full" id="d-badge">--</span>
-                    </div>
-
-                    <div class="grid sm:grid-cols-2 gap-3 text-sm bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
-                        <div>
-                            <span class="text-slate-400">Jenis:</span>
-                            <span class="font-medium" id="d-jenis">--</span>
-                        </div>
-                        <div>
-                            <span class="text-slate-400">Kategori:</span>
-                            <span class="font-medium" id="d-kategori">--</span>
-                        </div>
-                        <div>
-                            <span class="text-slate-400">Sumber:</span>
-                            <span class="font-medium" id="d-sumber">--</span>
-                        </div>
-                        <div>
-                            <span class="text-slate-400">Identitas:</span>
-                            <span class="font-medium" id="d-identitas">--</span>
-                        </div>
-                        <div>
-                            <span class="text-slate-400">Nomor Telepon:</span>
-                            <span class="font-medium" id="d-telepon">--</span>
-                        </div>
-                        <div>
-                            <span class="text-slate-400">Koordinat:</span>
-                            <span class="font-medium" id="d-koordinat">--</span>
-                        </div>
-                        <div>
-                            <span class="text-slate-400">Lokasi:</span>
-                            <span class="font-medium" id="d-lokasi">--</span>
-                        </div>
-                        <div>
-                            <span class="text-slate-400">Waktu lapor:</span>
-                            <span class="font-medium" id="d-waktu">--</span>
-                        </div>
-                        <div class="sm:col-span-2">
-                            <span class="text-slate-400">Deskripsi:</span>
-                            <span class="font-medium" id="d-deskripsi">--</span>
-                        </div>
-                    </div>
-
-                    {{-- Lampiran Foto & Video --}}
-                    <div id="d-files-wrap" class="hidden mb-6">
-                        <h3 class="font-headline font-bold text-slate-800 mb-3">Lampiran Foto &amp; Video</h3>
-                        <div id="d-files" class="grid grid-cols-2 md:grid-cols-3 gap-3"></div>
-                    </div>
-
-                    <h3 class="font-headline font-bold text-slate-800 mb-5">Pelacakan Laporan</h3>
-                    <ol class="relative ml-1" id="tracking-list"></ol>
-                </div>
-            </div>
-
-            <div>
-                <div class="bg-slate-800 text-white border rounded-2xl p-6 shadow-sm sticky top-24">
-                    <h3 class="font-headline font-bold mb-4">Tindak Lanjut</h3>
-                    <p class="text-sm text-slate-300 mb-4">Perbarui status penanganan laporan ini.</p>
-
-                    <div class="space-y-3">
-                        <button type="button" onclick="majuStatus(1)"
-                            class="w-full bg-sidebar-active hover:bg-sidebar-hover text-white py-2.5 rounded-xl font-medium transition-colors">Tandai
-                            Diterima</button>
-                        <button type="button" onclick="majuStatus(2)"
-                            class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl font-medium transition-colors">Mulai
-                            Verifikasi</button>
-                        <button type="button" onclick="majuStatus(4)"
-                            class="w-full bg-amber-600 hover:bg-amber-700 text-white py-2.5 rounded-xl font-medium transition-colors">Tandai
-                            Ditindaklanjuti</button>
-                        <button type="button" onclick="majuStatus(5)"
-                            class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl font-medium transition-colors">Selesaikan
-                            Laporan</button>
-                    </div>
-
-                    <div class="mt-5 pt-5 border-t border-white/10">
-                        <button type="button" onclick="hapusLaporan()"
-                            class="w-full border border-red-400/50 text-red-300 hover:bg-red-500/10 py-2.5 rounded-xl font-medium transition-colors">Hapus
-                            Laporan</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     {{-- Modal tambah laporan --}}
     <div id="modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/40" onclick="tutupTambah()"></div>
@@ -221,8 +120,7 @@
             <form id="tambah-form" class="p-6 space-y-4 overflow-y-auto" onsubmit="simpanLaporan(event)">
                 <div>
                     <label class="block text-sm font-medium mb-1">Jenis <span class="text-red-500">*</span></label>
-                    <select name="jenis" required
-                        class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none bg-white">
+                    <select name="jenis" required class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none bg-white">
                         <option value="">Pilih Jenis</option>
                         <option value="darurat">Lapor Darurat</option>
                         <option value="informasi">Informasi & Pengaduan</option>
@@ -245,10 +143,8 @@
 
                 {{-- Platform (Online) --}}
                 <div id="sumber-online" class="hidden">
-                    <label class="block text-sm font-medium mb-1">Platform Media Sosial <span
-                            class="text-red-500">*</span></label>
-                    <select name="platform"
-                        class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none bg-white">
+                    <label class="block text-sm font-medium mb-1">Platform Media Sosial <span class="text-red-500">*</span></label>
+                    <select name="platform" class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none bg-white">
                         <option value="">Pilih Platform</option>
                         <option>WhatsApp</option>
                         <option>Instagram</option>
@@ -260,24 +156,36 @@
                 </div>
 
                 {{-- Nama + NIK (Offline) --}}
-                <div id="sumber-offline" class="hidden space-y-4">
+                <div id="sumber-offline" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium mb-1">Nama Pelapor <span
-                                class="text-red-500">*</span></label>
+                        <label class="block text-sm font-medium mb-1">Nama Pelapor <span class="text-red-500">*</span></label>
                         <input type="text" name="nama_offline" placeholder="Nama lengkap pelapor"
                             class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none">
                     </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium mb-1">NIK <span class="text-red-500">*</span></label>
                         <input type="text" name="nik_offline" maxlength="16" placeholder="16 digit NIK"
                             class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none">
                     </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium mb-1">Nomor Telepon <span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-medium mb-1">Nomor Telepon (Opsional)</label>
                         <input type="tel" name="telepon" placeholder="08123456789"
                             class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Kategori <span class="text-red-500">*</span></label>
+                        <select name="kategori" required class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none bg-white">
+                            <option value="">Pilih Kategori</option>
+                            <option>Ketertiban Umum</option>
+                            <option>Keamanan</option>
+                            <option>Patroli</option>
+                            <option>Pengawalan</option>
+                            <option>Kebersihan Lingkungan</option>
+                            <option>Lainnya</option>
+                        </select>
                     </div>
                 </div>
 
@@ -288,8 +196,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium mb-1">Lokasi Kejadian <span
-                            class="text-red-500">*</span></label>
+                    <label class="block text-sm font-medium mb-1">Lokasi Kejadian <span class="text-red-500">*</span></label>
                     <input type="text" name="lokasi" required placeholder="Alamat / detail lokasi"
                         class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none">
                 </div>
@@ -321,10 +228,8 @@
                         </button>
                     </div>
                     <div class="relative">
-                        <div id="map-picker"
-                            class="w-full h-64 bg-slate-100 rounded-xl border border-slate-200 overflow-hidden z-10"></div>
-                        <span
-                            class="absolute top-3 right-3 z-[1000] bg-white/90 backdrop-blur text-xs font-medium px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 text-slate-600">
+                        <div id="map-picker" class="w-full h-64 bg-slate-100 rounded-xl border border-slate-200 overflow-hidden z-10"></div>
+                        <span class="absolute top-3 right-3 z-[1000] bg-white/90 backdrop-blur text-xs font-medium px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 text-slate-600">
                             Klik peta untuk tentukan titik
                         </span>
                     </div>
@@ -333,10 +238,8 @@
                 {{-- Upload Foto & Video --}}
                 <div>
                     <label class="block text-sm font-medium mb-2">Foto &amp; Video Bukti (Opsional)</label>
-                    <label
-                        class="block border-2 border-dashed border-slate-300 bg-slate-50 rounded-xl p-6 text-center cursor-pointer hover:border-brand-500 hover:bg-slate-100 transition-colors">
-                        <input type="file" id="file-input" multiple accept="image/*,video/*"
-                            class="absolute opacity-0 w-0 h-0" onchange="handleFiles(this.files)">
+                    <label class="block border-2 border-dashed border-slate-300 bg-slate-50 rounded-xl p-6 text-center cursor-pointer hover:border-brand-500 hover:bg-slate-100 transition-colors">
+                        <input type="file" id="file-input" multiple accept="image/*,video/*" class="absolute opacity-0 w-0 h-0" onchange="handleFiles(this.files)">
                         <span class="material-symbols-outlined text-3xl text-slate-400">cloud_upload</span>
                         <p class="text-sm font-medium text-slate-600 mt-1">Klik untuk pilih Foto / Video</p>
                         <p class="text-xs text-slate-400 mt-0.5">Bisa pilih lebih dari 1 file (JPG, PNG, MP4)</p>
@@ -347,353 +250,295 @@
                 <input type="hidden" name="sumber" value="online">
 
                 <div class="flex justify-end gap-3 pt-2">
-                    <button type="button" onclick="tutupTambah()"
-                        class="border border-slate-300 text-slate-600 px-5 py-2 rounded-xl font-medium hover:bg-slate-50 transition-colors">Batal</button>
-                    <button type="submit"
-                        class="bg-sidebar-active text-white px-6 py-2 rounded-xl font-medium hover:bg-sidebar-hover transition-colors">Simpan
-                        Laporan</button>
+                    <button type="button" onclick="tutupTambah()" class="border border-slate-300 text-slate-600 px-5 py-2 rounded-xl font-medium hover:bg-slate-50 transition-colors">Batal</button>
+                    <button type="submit" class="bg-sidebar-active text-white px-6 py-2 rounded-xl font-medium hover:bg-sidebar-hover transition-colors">Simpan Laporan</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="toast"
-        class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-5 py-3 rounded-xl shadow-lg text-sm z-50">
-    </div>
+    <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-5 py-3 rounded-xl shadow-lg text-sm z-50"></div>
 @endsection
 
 @push('scripts')
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-    <script>
-        const STATUSES = [
-            ['Laporan dibuat', 'Laporan telah kami terima.'],
-            ['Laporan diterima', 'Tim kami telah menerima laporan.'],
-            ['Sedang diverifikasi', 'Sedang memeriksa kebenaran laporan.'],
-            ['Ditindaklanjuti', 'Laporan sedang ditangani petugas.'],
-            ['Penanganan selesai', 'Penanganan di lokasi selesai.'],
-            ['Laporan selesai', 'Laporan telah selesai ditangani.'],
-        ];
-        const KODE = 'sipraja_reports';
-        let tab = 'semua';
-        let currentIndex = null;
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script>
+    const STATUSES = [
+        ['Laporan dibuat', 'Laporan telah kami terima.'],
+        ['Laporan diterima', 'Tim kami telah menerima laporan.'],
+        ['Sedang diverifikasi', 'Sedang memeriksa kebenaran laporan.'],
+        ['Ditindaklanjuti', 'Laporan sedang ditangani petugas.'],
+        ['Penanganan selesai', 'Penanganan di lokasi selesai.'],
+        ['Laporan selesai', 'Laporan telah selesai ditangani.'],
+    ];
+    const KODE = 'sipraja_reports';
+    let tab = 'semua';
 
-        function getReports() {
-            let data = JSON.parse(localStorage.getItem(KODE) || '[]');
-            if (data.length === 0) {
-                data = [
-                    { kode: 'SPJ-584021', jenis: 'darurat', kategori: 'Ketertiban Umum', deskripsi: 'Kerumunan massa di alun-alun yang berpotensi gangguan.', lokasi: 'Alun-alun Kulon Progo', telepon: '081234567890', nik: '', dibuat: '31/08/2026 09.12', statusIdx: 3 },
-                    { kode: 'SPJ-583990', jenis: 'informasi', kategori: 'Kebersihan Lingkungan', deskripsi: 'Tumpukan sampah di pinggir jalan utama.', lokasi: 'Jl. Sugiman, Pengasih', telepon: '082134567890', nik: '', dibuat: '30/08/2026 16.45', statusIdx: 5 },
-                    { kode: 'SPJ-583772', jenis: 'informasi', kategori: 'Keamanan', deskripsi: 'Orang mabuk berkeliaran di area pasar.', lokasi: 'Pasar Wates', telepon: '083145678901', nik: '', dibuat: '29/08/2026 20.03', statusIdx: 1 },
-                ];
-                localStorage.setItem(KODE, JSON.stringify(data));
-            }
-            return data;
+    function getReports() {
+        let data = JSON.parse(localStorage.getItem(KODE) || '[]');
+        if (data.length === 0) {
+            data = [
+                { kode: 'SPJ-584021', jenis: 'darurat', kategori: 'Ketertiban Umum', deskripsi: 'Kerumunan massa di alun-alun yang berpotensi gangguan.', lokasi: 'Alun-alun Kulon Progo', telepon: '081234567890', nik: '', dibuat: '31/08/2026 09.12', statusIdx: 3 },
+                { kode: 'SPJ-583990', jenis: 'informasi', kategori: 'Kebersihan Lingkungan', deskripsi: 'Tumpukan sampah di pinggir jalan utama.', lokasi: 'Jl. Sugiman, Pengasih', telepon: '082134567890', nik: '', dibuat: '30/08/2026 16.45', statusIdx: 5 },
+                { kode: 'SPJ-583772', jenis: 'informasi', kategori: 'Keamanan', deskripsi: 'Orang mabuk berkeliaran di area pasar.', lokasi: 'Pasar Wates', telepon: '083145678901', nik: '', dibuat: '29/08/2026 20.03', statusIdx: 1 },
+            ];
+            localStorage.setItem(KODE, JSON.stringify(data));
         }
+        return data;
+    }
 
-        function saveAll(data) { localStorage.setItem(KODE, JSON.stringify(data)); }
+    function saveAll(data) { localStorage.setItem(KODE, JSON.stringify(data)); }
 
-        function labelJenis(j) { return j === 'darurat' ? 'Lapor Darurat' : 'Informasi & Pengaduan'; }
-        function labelStatus(idx) { return STATUSES[idx] ? STATUSES[idx][0] : 'Dikirim'; }
-        function jenisClass(j) { return j === 'darurat' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'; }
-        function badgeClass(idx) {
-            if (idx >= 5) return 'bg-emerald-100 text-emerald-700';
-            if (idx >= 3) return 'bg-amber-100 text-amber-700';
-            if (idx >= 1) return 'bg-blue-100 text-blue-700';
-            return 'bg-slate-100 text-slate-600';
+    function labelJenis(j) { return j === 'darurat' ? 'Lapor Darurat' : 'Informasi & Pengaduan'; }
+    function labelStatus(idx) { return STATUSES[idx] ? STATUSES[idx][0] : 'Dikirim'; }
+    function jenisClass(j) { return j === 'darurat' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'; }
+    function badgeClass(idx) {
+        if (idx >= 5) return 'bg-emerald-100 text-emerald-700';
+        if (idx >= 3) return 'bg-amber-100 text-amber-700';
+        if (idx >= 1) return 'bg-blue-100 text-blue-700';
+        return 'bg-slate-100 text-slate-600';
+    }
+
+    function filtered(data) {
+        if (tab === 'darurat') return data.filter(r => r.jenis === 'darurat');
+        if (tab === 'informasi') return data.filter(r => r.jenis !== 'darurat');
+        return data;
+    }
+
+    function setTab(t) {
+        tab = t;
+        document.querySelectorAll('.tab-btn').forEach(b => {
+            const active = b.dataset.tab === t;
+            b.className = 'tab-btn text-sm font-semibold px-4 py-2 rounded-xl border transition-colors ' +
+                (active ? 'bg-sidebar-active text-white border-sidebar-active' : 'border-slate-200 text-slate-600 hover:bg-slate-50');
+        });
+        renderList();
+    }
+
+    function renderList() {
+        const all = getReports();
+        document.getElementById('stat-total').textContent = all.length;
+        document.getElementById('stat-darurat').textContent = all.filter(r => r.jenis === 'darurat').length;
+        document.getElementById('stat-informasi').textContent = all.filter(r => r.jenis !== 'darurat').length;
+        document.getElementById('stat-selesai').textContent = all.filter(r => (r.statusIdx != null ? r.statusIdx : 0) >= 5).length;
+
+        const list = filtered(all);
+        const tbody = document.getElementById('report-list');
+        const kosong = document.getElementById('kosong');
+
+        if (list.length === 0) {
+            tbody.innerHTML = '';
+            kosong.classList.remove('hidden');
+            return;
         }
+        kosong.classList.add('hidden');
 
-        function filtered(data) {
-            if (tab === 'darurat') return data.filter(r => r.jenis === 'darurat');
-            if (tab === 'informasi') return data.filter(r => r.jenis !== 'darurat');
-            return data;
-        }
+        tbody.innerHTML = list.map((r, i) => `
+            <tr class="border-b border-slate-50 hover:bg-slate-50/50 cursor-pointer" onclick="bukaDetail('${r.kode}')">
+                <td class="px-6 py-3.5 font-medium text-slate-800">${r.kode}</td>
+                <td class="px-6 py-3.5">
+                    <span class="text-xs font-semibold px-2.5 py-1 rounded-full ${jenisClass(r.jenis)}">${labelJenis(r.jenis)}</span>
+                </td>
+                <td class="px-6 py-3.5">
+                    ${r.sumber_asal === 'offline'
+                        ? '<span class="text-xs font-semibold px-2.5 py-1 rounded-full border bg-slate-100 text-slate-600 border-slate-200">Offline</span>'
+                        : '<span class="text-xs font-medium text-slate-500"><span class="material-symbols-outlined text-[14px] align-middle">public</span> ' + (r.platform || 'Online') + '</span>'}
+                </td>
+                <td class="px-6 py-3.5 text-slate-500">${r.kategori || '-'}</td>
+                <td class="px-6 py-3.5 text-slate-500">${r.lokasi || '-'}</td>
+                <td class="px-6 py-3.5 text-slate-500">${r.telepon || '-'}</td>
+                <td class="px-6 py-3.5">
+                    <span class="text-xs font-semibold px-2.5 py-1 rounded-full ${badgeClass(r.statusIdx)}">${labelStatus(r.statusIdx)}</span>
+                </td>
+                <td class="px-6 py-3.5 text-right">
+                    <button type="button" onclick="event.stopPropagation(); bukaDetail('${r.kode}')" class="text-sidebar-active hover:text-sidebar-hover" title="Detail">
+                        <span class="material-symbols-outlined text-[20px]">visibility</span>
+                    </button>
+                    <button type="button" onclick="event.stopPropagation(); hapus(${i})" class="text-red-500 hover:text-red-700 ml-2" title="Hapus">
+                        <span class="material-symbols-outlined text-[20px]">delete</span>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
 
-        function setTab(t) {
-            tab = t;
-            document.querySelectorAll('.tab-btn').forEach(b => {
-                const active = b.dataset.tab === t;
-                b.className = 'tab-btn text-sm font-semibold px-4 py-2 rounded-xl border transition-colors ' +
-                    (active ? 'bg-sidebar-active text-white border-sidebar-active' : 'border-slate-200 text-slate-600 hover:bg-slate-50');
-            });
-            renderList();
-        }
+    function bukaDetail(kode) {
+        window.location.href = '{{ url('admin/pengaduan') }}/' + encodeURIComponent(kode);
+    }
 
-        function renderList() {
-            const all = getReports();
-            document.getElementById('stat-total').textContent = all.length;
-            document.getElementById('stat-darurat').textContent = all.filter(r => r.jenis === 'darurat').length;
-            document.getElementById('stat-informasi').textContent = all.filter(r => r.jenis !== 'darurat').length;
-            document.getElementById('stat-selesai').textContent = all.filter(r => (r.statusIdx != null ? r.statusIdx : 0) >= 5).length;
+    function findGlobalIndex(detailIdx) {
+        const list = filtered(getReports());
+        const item = list[detailIdx];
+        return getReports().findIndex(r => r.kode === item.kode);
+    }
 
-            const list = filtered(all);
-            const tbody = document.getElementById('report-list');
-            const kosong = document.getElementById('kosong');
+    function hapus(detailIdx) {
+        const all = getReports();
+        const gi = findGlobalIndex(detailIdx);
+        if (!confirm('Yakin ingin menghapus laporan ' + all[gi].kode + '?')) return;
+        all.splice(gi, 1);
+        saveAll(all);
+        renderList();
+        tampilToast('Laporan berhasil dihapus.');
+    }
 
-            if (list.length === 0) {
-                tbody.innerHTML = '';
-                kosong.classList.remove('hidden');
+    function bukaTambah() {
+        document.getElementById('modal').classList.remove('hidden');
+        document.getElementById('tambah-form').reset();
+        currentFiles = [];
+        renderPreviews();
+        setSumber('online');
+        initMap();
+    }
+    function tutupTambah() {
+        document.getElementById('modal').classList.add('hidden');
+        if (mapInstance) mapInstance.remove();
+        mapInstance = null;
+        markerInstance = null;
+    }
+
+    // ===== Sumber Online / Offline =====
+    let sumber = 'online';
+    function setSumber(s) {
+        sumber = s;
+        const on = document.getElementById('sumber-btn-online');
+        const off = document.getElementById('sumber-btn-offline');
+        const base = 'flex items-center justify-center gap-2 p-3 border-2 rounded-xl text-sm font-medium transition-colors ';
+        on.className = base + (s === 'online' ? 'border-sidebar-active bg-orange-50 text-sidebar-active' : 'border-slate-200 text-slate-600 hover:bg-slate-50');
+        off.className = base + (s === 'offline' ? 'border-sidebar-active bg-orange-50 text-sidebar-active' : 'border-slate-200 text-slate-600 hover:bg-slate-50');
+        document.querySelector('[name=sumber]').value = s;
+
+        const mrOnline = document.getElementById('sumber-online');
+        const mrOffline = document.getElementById('sumber-offline');
+        mrOnline.classList.toggle('hidden', s !== 'online');
+        mrOffline.classList.toggle('hidden', s !== 'offline');
+
+        const platform = document.querySelector('[name=platform]');
+        const nama = document.querySelector('[name=nama_offline]');
+        const nik = document.querySelector('[name=nik_offline]');
+        platform.required = s === 'online';
+        nama.required = s === 'offline';
+        nik.required = s === 'offline';
+    }
+
+    // ===== Peta =====
+    let mapInstance = null;
+    let markerInstance = null;
+    function initMap() {
+        if (mapInstance) { mapInstance.remove(); mapInstance = null; markerInstance = null; }
+        mapInstance = L.map('map-picker').setView([-7.7971, 110.1646], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(mapInstance);
+        mapInstance.on('click', function (e) {
+            const lat = e.latlng.lat.toFixed(6);
+            const lng = e.latlng.lng.toFixed(6);
+            document.querySelector('[name=lat]').value = lat;
+            document.querySelector('[name=lng]').value = lng;
+            if (markerInstance) markerInstance.setLatLng(e.latlng);
+            else markerInstance = L.marker(e.latlng).addTo(mapInstance);
+        });
+    }
+
+    async function geocodeCariLokasi() {
+        const input = document.getElementById('cari-lokasi-input');
+        const q = (input.value || '').trim();
+        if (!q) { alert('Masukkan alamat / nama lokasi terlebih dahulu.'); return; }
+        const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q);
+        try {
+            const res = await fetch(url, { headers: { 'Accept-Language': 'id' } });
+            const data = await res.json();
+            if (!data || data.length === 0) {
+                alert('Lokasi tidak ditemukan. Coba alamat yang lebih spesifik.');
                 return;
             }
-            kosong.classList.add('hidden');
-
-            tbody.innerHTML = list.map((r, i) => `
-                <tr class="border-b border-slate-50 hover:bg-slate-50/50 cursor-pointer" onclick="bukaDetail(${i})">
-                    <td class="px-6 py-3.5 font-medium text-slate-800">${r.kode}</td>
-                    <td class="px-6 py-3.5">
-                        <span class="text-xs font-semibold px-2.5 py-1 rounded-full ${jenisClass(r.jenis)}">${labelJenis(r.jenis)}</span>
-                    </td>
-                    <td class="px-6 py-3.5">
-                        ${r.sumber_asal === 'offline'
-                    ? '<span class="text-xs font-semibold px-2.5 py-1 rounded-full border bg-slate-100 text-slate-600 border-slate-200">Offline</span>'
-                    : '<span class="text-xs font-medium text-slate-500"><span class="material-symbols-outlined text-[14px] align-middle">public</span> ' + (r.platform || 'Online') + '</span>'}
-                    </td>
-                    <td class="px-6 py-3.5 text-slate-500">${r.kategori || '-'}</td>
-                    <td class="px-6 py-3.5 text-slate-500">${r.lokasi || '-'}</td>
-                    <td class="px-6 py-3.5 text-slate-500">${r.telepon || '-'}</td>
-                    <td class="px-6 py-3.5">
-                        <span class="text-xs font-semibold px-2.5 py-1 rounded-full ${badgeClass(r.statusIdx)}">${labelStatus(r.statusIdx)}</span>
-                    </td>
-                    <td class="px-6 py-3.5 text-right">
-                        <button type="button" onclick="event.stopPropagation(); bukaDetail(${i})" class="text-sidebar-active hover:text-sidebar-hover" title="Detail">
-                            <span class="material-symbols-outlined text-[20px]">visibility</span>
-                        </button>
-                        <button type="button" onclick="event.stopPropagation(); hapus(${i})" class="text-red-500 hover:text-red-700 ml-2" title="Hapus">
-                            <span class="material-symbols-outlined text-[20px]">delete</span>
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
+            const lat = parseFloat(data[0].lat);
+            const lng = parseFloat(data[0].lon);
+            document.querySelector('[name=lat]').value = lat.toFixed(6);
+            document.querySelector('[name=lng]').value = lng.toFixed(6);
+            if (markerInstance) markerInstance.setLatLng([lat, lng]);
+            else markerInstance = L.marker([lat, lng]).addTo(mapInstance);
+            mapInstance.setView([lat, lng], 15, { animate: true });
+        } catch (e) {
+            alert('Gagal mencari lokasi. Periksa koneksi internet.');
         }
+    }
 
-        function findGlobalIndex(detailIdx) {
-            const list = filtered(getReports());
-            const item = list[detailIdx];
-            return getReports().findIndex(r => r.kode === item.kode);
+    // ===== Upload Foto & Video =====
+    let currentFiles = [];
+    async function handleFiles(files) {
+        for (const file of files) {
+            if (file.size > 8 * 1024 * 1024) { alert('File ' + file.name + ' terlalu besar. Maks 8MB.'); continue; }
+            const isVideo = file.type.startsWith('video/');
+            const url = await readFile(file);
+            currentFiles.push({ name: file.name, url: url, isVideo: isVideo });
         }
-
-        function bukaDetail(detailIdx) {
-            const all = getReports();
-            const gi = findGlobalIndex(detailIdx);
-            currentIndex = gi;
-            const r = all[gi];
-            const idx = r.statusIdx != null ? r.statusIdx : 0;
-
-            document.getElementById('d-kode').textContent = r.kode;
-            document.getElementById('d-badge').textContent = labelStatus(idx);
-            document.getElementById('d-badge').className = 'text-sm font-semibold px-3 py-1 rounded-full ' + badgeClass(idx);
-            document.getElementById('d-jenis').textContent = labelJenis(r.jenis);
-            document.getElementById('d-kategori').textContent = r.kategori || '-';
-            document.getElementById('d-sumber').textContent = (r.sumber_asal === 'offline') ? 'Offline (Langsung)' : 'Online (' + (r.platform || 'Medsos') + ')';
-            document.getElementById('d-identitas').textContent = (r.sumber_asal === 'offline') ? (r.nama + (r.nik ? ' • ' + r.nik : '')) : '-';
-            document.getElementById('d-telepon').textContent = r.telepon || '-';
-            document.getElementById('d-koordinat').textContent = (r.lat && r.lng) ? r.lat + ', ' + r.lng : '-';
-            document.getElementById('d-lokasi').textContent = r.lokasi || '-';
-            document.getElementById('d-waktu').textContent = r.dibuat || r.waktu || '-';
-            document.getElementById('d-deskripsi').textContent = r.deskripsi || '-';
-
-            // Lampiran foto & video
-            const filesWrap = document.getElementById('d-files-wrap');
-            const filesBox = document.getElementById('d-files');
-            if (r.files && r.files.length > 0) {
-                filesWrap.classList.remove('hidden');
-                filesBox.innerHTML = r.files.map(f => `
-                    <figure class="${f.isVideo ? 'aspect-video' : 'aspect-square'} rounded-xl overflow-hidden border border-slate-200 bg-slate-100 relative group">
-                        ${f.isVideo ? '<video src="' + f.url + '" class="w-full h-full object-cover"></video><span class="absolute inset-0 flex items-center justify-center text-white/80"><span class="material-symbols-outlined text-3xl bg-black/40 rounded-full p-1.5">play_circle</span></span>' : '<img src="' + f.url + '" class="w-full h-full object-cover">'}
-                        <figcaption class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/50 to-transparent px-2 py-1 text-[10px] text-white truncate">${f.name}</figcaption>
-                    </figure>
-                `).join('');
-            } else {
-                filesWrap.classList.add('hidden');
-                filesBox.innerHTML = '';
-            }
-
-            const total = STATUSES.length;
-            document.getElementById('tracking-list').innerHTML = STATUSES.map(([title, desc], i) => {
-                const done = i <= idx;
-                const isLast = i === total - 1;
-                return `
-                    <li class="relative pl-8 ${isLast ? '' : 'pb-6'}">
-                        ${isLast ? '' : '<span class="absolute left-0 top-6 bottom-0 w-0.5 bg-slate-200"></span>'}
-                        <span class="absolute left-0 top-1 w-4 h-4 -translate-x-1/2 rounded-full border-2 border-white ring-2 ${done ? 'bg-emerald-500 ring-emerald-500' : 'bg-slate-300 ring-slate-300'}"></span>
-                        <h4 class="font-semibold ${done ? 'text-slate-800' : 'text-slate-400'}">${title}</h4>
-                        <p class="text-sm ${done ? 'text-slate-500' : 'text-slate-400'}">${desc}</p>
-                    </li>
-                `;
-            }).join('');
-
-            document.getElementById('detail').classList.remove('hidden');
-            document.getElementById('detail').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-
-        function tutupDetail() {
-            document.getElementById('detail').classList.add('hidden');
-            renderList();
-        }
-
-        function majuStatus(newIdx) {
-            if (currentIndex == null) return;
-            const all = getReports();
-            const cur = all[currentIndex].statusIdx != null ? all[currentIndex].statusIdx : 0;
-            if (newIdx <= cur) { alert('Status tidak bisa mundur.'); return; }
-            all[currentIndex].statusIdx = newIdx;
-            saveAll(all);
-            bukaDetail(currentIndex);
-            tampilToast('Status diperbarui menjadi: ' + labelStatus(newIdx));
-        }
-
-        function hapus(detailIdx) {
-            const all = getReports();
-            const gi = findGlobalIndex(detailIdx);
-            if (!confirm('Yakin ingin menghapus laporan ' + all[gi].kode + '?')) return;
-            all.splice(gi, 1);
-            saveAll(all);
-            renderList();
-            tampilToast('Laporan berhasil dihapus.');
-        }
-
-        function hapusLaporan() {
-            if (currentIndex == null) return;
-            const all = getReports();
-            if (!confirm('Yakin ingin menghapus laporan ' + all[currentIndex].kode + '?')) return;
-            all.splice(currentIndex, 1);
-            saveAll(all);
-            tutupDetail();
-            tampilToast('Laporan berhasil dihapus.');
-        }
-
-        function bukaTambah() {
-            document.getElementById('modal').classList.remove('hidden');
-            document.getElementById('tambah-form').reset();
-            currentFiles = [];
-            renderPreviews();
-            setSumber('online');
-            initMap();
-        }
-        function tutupTambah() {
-            document.getElementById('modal').classList.add('hidden');
-            if (mapInstance) mapInstance.remove();
-            mapInstance = null;
-            markerInstance = null;
-        }
-
-        // ===== Sumber Online / Offline =====
-        let sumber = 'online';
-        function setSumber(s) {
-            sumber = s;
-            const on = document.getElementById('sumber-btn-online');
-            const off = document.getElementById('sumber-btn-offline');
-            const base = 'flex items-center justify-center gap-2 p-3 border-2 rounded-xl text-sm font-medium transition-colors ';
-            on.className = base + (s === 'online' ? 'border-sidebar-active bg-orange-50 text-sidebar-active' : 'border-slate-200 text-slate-600 hover:bg-slate-50');
-            off.className = base + (s === 'offline' ? 'border-sidebar-active bg-orange-50 text-sidebar-active' : 'border-slate-200 text-slate-600 hover:bg-slate-50');
-            document.querySelector('[name=sumber]').value = s;
-
-            const mrOnline = document.getElementById('sumber-online');
-            const mrOffline = document.getElementById('sumber-offline');
-            mrOnline.classList.toggle('hidden', s !== 'online');
-            mrOffline.classList.toggle('hidden', s !== 'offline');
-
-            const platform = document.querySelector('[name=platform]');
-            const nama = document.querySelector('[name=nama_offline]');
-            const nik = document.querySelector('[name=nik_offline]');
-            platform.required = s === 'online';
-            nama.required = s === 'offline';
-            nik.required = s === 'offline';
-        }
-
-        // ===== Peta =====
-        let mapInstance = null;
-        let markerInstance = null;
-        function initMap() {
-            if (mapInstance) { mapInstance.remove(); mapInstance = null; markerInstance = null; }
-            mapInstance = L.map('map-picker').setView([-7.7971, 110.1646], 13);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap'
-            }).addTo(mapInstance);
-            mapInstance.on('click', function (e) {
-                const lat = e.latlng.lat.toFixed(6);
-                const lng = e.latlng.lng.toFixed(6);
-                document.querySelector('[name=lat]').value = lat;
-                document.querySelector('[name=lng]').value = lng;
-                if (markerInstance) markerInstance.setLatLng(e.latlng);
-                else markerInstance = L.marker(e.latlng).addTo(mapInstance);
-            });
-        }
-
-        // ===== Upload Foto & Video =====
-        let currentFiles = [];
-        async function handleFiles(files) {
-            for (const file of files) {
-                if (file.size > 8 * 1024 * 1024) { alert('File ' + file.name + ' terlalu besar. Maks 8MB.'); continue; }
-                const isVideo = file.type.startsWith('video/');
-                const url = await readFile(file);
-                currentFiles.push({ name: file.name, url: url, isVideo: isVideo });
-            }
-            renderPreviews();
-        }
-        function readFile(file) {
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onload = e => resolve(e.target.result);
-                reader.readAsDataURL(file);
-            });
-        }
-        function renderPreviews() {
-            const box = document.getElementById('file-preview');
-            box.innerHTML = currentFiles.map((f, i) => `
-                <div class="relative aspect-video rounded-xl border border-slate-200 overflow-hidden bg-slate-100 group">
-                    ${f.isVideo
+        renderPreviews();
+    }
+    function readFile(file) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = e => resolve(e.target.result);
+            reader.readAsDataURL(file);
+        });
+    }
+    function renderPreviews() {
+        const box = document.getElementById('file-preview');
+        box.innerHTML = currentFiles.map((f, i) => `
+            <div class="relative aspect-video rounded-xl border border-slate-200 overflow-hidden bg-slate-100 group">
+                ${f.isVideo
                     ? '<video src="' + f.url + '" class="w-full h-full object-cover"></video><span class="absolute inset-0 flex items-center justify-center text-white/80"><span class="material-symbols-outlined text-3xl bg-black/40 rounded-full p-1.5">play_circle</span></span>'
                     : '<img src="' + f.url + '" class="w-full h-full object-cover">'}
-                    <button type="button" onclick="hapusFile(${i})" class="absolute top-1.5 right-1.5 w-6 h-6 bg-white hover:bg-red-50 hover:text-red-600 text-slate-700 rounded-full flex items-center justify-center shadow-md transition-colors">
-                        <span class="material-symbols-outlined text-[14px]">close</span>
-                    </button>
-                    <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/50 to-transparent px-2 py-1 text-[10px] text-white truncate">${f.name}</div>
-                </div>
-            `).join('');
-        }
-        function hapusFile(i) { currentFiles.splice(i, 1); renderPreviews(); }
+                <button type="button" onclick="hapusFile(${i})" class="absolute top-1.5 right-1.5 w-6 h-6 bg-white hover:bg-red-50 hover:text-red-600 text-slate-700 rounded-full flex items-center justify-center shadow-md transition-colors">
+                    <span class="material-symbols-outlined text-[14px]">close</span>
+                </button>
+                <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/50 to-transparent px-2 py-1 text-[10px] text-white truncate">${f.name}</div>
+            </div>
+        `).join('');
+    }
+    function hapusFile(i) { currentFiles.splice(i, 1); renderPreviews(); }
 
-        function simpanLaporan(e) {
-            e.preventDefault();
-            const f = document.getElementById('tambah-form');
-            const all = getReports();
-            const now = new Date();
-            const pad = n => String(n).padStart(2, '0');
-            const dibuat = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()} ${pad(now.getHours())}.${pad(now.getMinutes())}`;
-            const kode = 'SPJ-' + String(100000 + Math.floor(Math.random() * 900000));
+    function simpanLaporan(e) {
+        e.preventDefault();
+        const f = document.getElementById('tambah-form');
+        const all = getReports();
+        const now = new Date();
+        const pad = n => String(n).padStart(2, '0');
+        const dibuat = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()} ${pad(now.getHours())}.${pad(now.getMinutes())}`;
+        const kode = 'SPJ-' + String(100000 + Math.floor(Math.random() * 900000));
 
-            const isOnline = sumber === 'online';
-            const record = {
-                kode: kode,
-                jenis: f.jenis.value,
-                sumber_asal: isOnline ? 'online' : 'offline',
-                platform: isOnline ? f.platform.value : '',
-                nama: isOnline ? '' : f.nama_offline.value.trim(),
-                nik: isOnline ? '' : f.nik_offline.value.trim(),
-                telepon: f.telepon.value.trim(),
-                kategori: f.kategori.value,
-                deskripsi: f.deskripsi.value.trim(),
-                lokasi: f.lokasi.value.trim(),
-                lat: f.lat.value,
-                lng: f.lng.value,
-                files: currentFiles.map(x => ({ name: x.name, url: x.url, isVideo: x.isVideo })),
-                dibuat: dibuat,
-                statusIdx: 0,
-            };
-            all.unshift(record);
-            saveAll(all);
-            renderList();
-            tutupTambah();
-            tampilToast('Laporan ' + kode + ' berhasil ditambahkan.');
-        }
+        const isOnline = sumber === 'online';
+        const record = {
+            kode: kode,
+            jenis: f.jenis.value,
+            sumber_asal: isOnline ? 'online' : 'offline',
+            platform: isOnline ? f.platform.value : '',
+            nama: isOnline ? '' : f.nama_offline.value.trim(),
+            nik: isOnline ? '' : f.nik_offline.value.trim(),
+            telepon: f.telepon.value.trim(),
+            kategori: f.kategori.value,
+            deskripsi: f.deskripsi.value.trim(),
+            lokasi: f.lokasi.value.trim(),
+            lat: f.lat.value,
+            lng: f.lng.value,
+            files: currentFiles.map(x => ({ name: x.name, url: x.url, isVideo: x.isVideo })),
+            dibuat: dibuat,
+            statusIdx: 0,
+        };
+        all.unshift(record);
+        saveAll(all);
+        renderList();
+        tutupTambah();
+        tampilToast('Laporan ' + kode + ' berhasil ditambahkan.');
+    }
 
-        function tampilToast(msg) {
-            const t = document.getElementById('toast');
-            t.textContent = msg;
-            t.classList.remove('hidden');
-            setTimeout(() => t.classList.add('hidden'), 2500);
-        }
+    function tampilToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.remove('hidden');
+        setTimeout(() => t.classList.add('hidden'), 2500);
+    }
 
-        setTab('semua');
-    </script>
+    setTab('semua');
+</script>
 @endpush
