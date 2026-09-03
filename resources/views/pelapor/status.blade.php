@@ -161,7 +161,7 @@
                             <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full ${jenisClass(r.jenis)}">${labelJenis(r.jenis)}</span>
                             <span class="text-xs text-slate-400">${r.waktu ? (r.dibuat || r.waktu) : ''}</span>
                         </div>
-                        <h3 class="font-headline font-bold text-slate-800">${r.kategori || 'Tanpa kategori'}</h3>
+                        <h3 class="font-headline font-bold text-slate-800">${r.kategori || r.lokasi || labelJenis(r.jenis)}</h3>
                         <p class="mt-1 text-sm text-slate-500 line-clamp-2">${r.deskripsi || '-'}</p>
                         <p class="mt-1 text-xs text-slate-400">${r.kode}</p>
                     </div>

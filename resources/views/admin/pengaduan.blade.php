@@ -169,24 +169,10 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Nomor Telepon (Opsional)</label>
-                        <input type="tel" name="telepon" placeholder="08123456789"
-                            class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Kategori <span class="text-red-500">*</span></label>
-                        <select name="kategori" required class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none bg-white">
-                            <option value="">Pilih Kategori</option>
-                            <option>Ketertiban Umum</option>
-                            <option>Keamanan</option>
-                            <option>Patroli</option>
-                            <option>Pengawalan</option>
-                            <option>Kebersihan Lingkungan</option>
-                            <option>Lainnya</option>
-                        </select>
-                    </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Nomor Telepon (Opsional)</label>
+                    <input type="tel" name="telepon" placeholder="08123456789"
+                        class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none">
                 </div>
 
                 <div>
@@ -516,7 +502,7 @@
             nama: isOnline ? '' : f.nama_offline.value.trim(),
             nik: isOnline ? '' : f.nik_offline.value.trim(),
             telepon: f.telepon.value.trim(),
-            kategori: f.kategori.value,
+            kategori: f.kategori ? f.kategori.value : '',
             deskripsi: f.deskripsi.value.trim(),
             lokasi: f.lokasi.value.trim(),
             lat: f.lat.value,
