@@ -305,11 +305,17 @@
 
     function hapusUser(gi) {
         const all = getUsers();
-        if (!confirm('Yakin ingin menghapus user ' + all[gi].nama + '?')) return;
-        all.splice(gi, 1);
-        saveAll(all);
-        renderList();
-        tampilToast('User berhasil dihapus.');
+        const nama = all[gi] ? `user "${all[gi].nama}"` : 'user ini';
+        window.konfirmasiHapus({
+            title: 'Hapus User',
+            message: `Apakah Anda yakin ingin menghapus ${nama}? Akun ini tidak akan dapat login kembali.`,
+            onConfirm: () => {
+                all.splice(gi, 1);
+                saveAll(all);
+                renderList();
+                tampilToast('User berhasil dihapus.');
+            }
+        });
     }
 
     function tampilToast(msg) {

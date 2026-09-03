@@ -172,6 +172,81 @@
         </main>
     </div>
 
+    <!-- Global Modal Konfirmasi Hapus Data -->
+    <div id="global-modal-konfirmasi-hapus" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <!-- Backdrop transparan tanpa blur -->
+        <div class="fixed inset-0 bg-black/40 transition-opacity" onclick="tutupKonfirmasiHapus()"></div>
+
+        <!-- Modal Box -->
+        <div class="relative w-full max-w-sm sm:max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden p-6 text-center border border-slate-100 transform transition-all">
+            <div class="w-14 h-14 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto mb-4">
+                <span class="material-symbols-outlined text-[32px]">delete</span>
+            </div>
+            
+            <h3 class="font-headline font-bold text-lg text-slate-800 mb-2" id="global-konfirmasi-judul">Konfirmasi Hapus Data</h3>
+            <p class="text-sm text-slate-500 mb-6 leading-relaxed" id="global-konfirmasi-pesan">Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.</p>
+            
+            <div class="flex items-center justify-center gap-3">
+                <button type="button" onclick="tutupKonfirmasiHapus()" 
+                    class="w-full py-2.5 px-4 rounded-xl border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
+                    Batal
+                </button>
+                <button type="button" id="global-konfirmasi-btn-ya"
+                    class="w-full py-2.5 px-4 rounded-xl bg-red-600 hover:bg-red-700 text-sm font-semibold text-white shadow-sm transition-colors">
+                    Ya, Hapus
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let _confirmResolve = null;
+
+        window.konfirmasiHapus = function(options) {
+            return new Promise((resolve) => {
+                let title = 'Konfirmasi Hapus Data';
+                let message = 'Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.';
+                let onConfirm = null;
+
+                if (typeof options === 'function') {
+                    onConfirm = options;
+                } else if (typeof options === 'string') {
+                    message = options;
+                } else if (options && typeof options === 'object') {
+                    if (options.title) title = options.title;
+                    if (options.message) message = options.message;
+                    if (options.onConfirm) onConfirm = options.onConfirm;
+                }
+
+                document.getElementById('global-konfirmasi-judul').textContent = title;
+                document.getElementById('global-konfirmasi-pesan').textContent = message;
+
+                _confirmResolve = resolve;
+
+                const btnYa = document.getElementById('global-konfirmasi-btn-ya');
+                btnYa.onclick = function() {
+                    tutupKonfirmasiHapus();
+                    if (typeof onConfirm === 'function') {
+                        onConfirm();
+                    }
+                    resolve(true);
+                };
+
+                const modal = document.getElementById('global-modal-konfirmasi-hapus');
+                if (modal) modal.classList.remove('hidden');
+            });
+        };
+
+        window.tutupKonfirmasiHapus = function() {
+            const modal = document.getElementById('global-modal-konfirmasi-hapus');
+            if (modal) modal.classList.add('hidden');
+            if (_confirmResolve) {
+                _confirmResolve(false);
+                _confirmResolve = null;
+            }
+        };
+    </script>
+
     @stack('scripts')
 </body>
 

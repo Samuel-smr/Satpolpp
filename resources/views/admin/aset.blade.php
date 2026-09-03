@@ -249,10 +249,17 @@
 
     function hapusAset(i) {
         const data = getAset();
-        data.splice(i, 1);
-        localStorage.setItem(KODE, JSON.stringify(data));
-        renderAset();
-        tampilToast('Aset berhasil dihapus.');
+        const nama = data[i] ? `aset "${data[i].nama}"` : 'aset ini';
+        window.konfirmasiHapus({
+            title: 'Hapus Aset',
+            message: `Apakah Anda yakin ingin menghapus ${nama}? Data yang dihapus tidak dapat dipulihkan.`,
+            onConfirm: () => {
+                data.splice(i, 1);
+                localStorage.setItem(KODE, JSON.stringify(data));
+                renderAset();
+                tampilToast('Aset berhasil dihapus.');
+            }
+        });
     }
 
     function tampilToast(msg) {

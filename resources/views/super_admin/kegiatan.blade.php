@@ -1127,10 +1127,16 @@
                 },
 
                 deleteKegiatan(id) {
-                    if (confirm('Yakin ingin menghapus kegiatan ini?')) {
-                        this.kegiatanList = this.kegiatanList.filter(k => k.id !== id);
-                        localStorage.setItem('sipraja_kegiatan', JSON.stringify(this.kegiatanList));
-                    }
+                    const item = this.kegiatanList.find(k => k.id === id);
+                    const nama = item ? `kegiatan "${item.nama}"` : 'kegiatan ini';
+                    window.konfirmasiHapus({
+                        title: 'Hapus Kegiatan',
+                        message: `Apakah Anda yakin ingin menghapus ${nama}? Data yang dihapus tidak dapat dipulihkan.`,
+                        onConfirm: () => {
+                            this.kegiatanList = this.kegiatanList.filter(k => k.id !== id);
+                            localStorage.setItem('sipraja_kegiatan', JSON.stringify(this.kegiatanList));
+                        }
+                    });
                 },
 
                 initMap() {

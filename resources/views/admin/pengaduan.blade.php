@@ -361,11 +361,18 @@
     function hapus(detailIdx) {
         const all = getReports();
         const gi = findGlobalIndex(detailIdx);
-        if (!confirm('Yakin ingin menghapus laporan ' + all[gi].kode + '?')) return;
-        all.splice(gi, 1);
-        saveAll(all);
-        renderList();
-        tampilToast('Laporan berhasil dihapus.');
+        if (gi === -1 || !all[gi]) return;
+        
+        window.konfirmasiHapus({
+            title: 'Hapus Laporan',
+            message: 'Apakah Anda yakin ingin menghapus laporan ' + all[gi].kode + '? Data yang dihapus tidak dapat dipulihkan.',
+            onConfirm: () => {
+                all.splice(gi, 1);
+                saveAll(all);
+                renderList();
+                tampilToast('Laporan berhasil dihapus.');
+            }
+        });
     }
 
     function bukaTambah() {

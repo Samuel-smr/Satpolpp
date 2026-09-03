@@ -347,11 +347,17 @@
 
     function hapus(i) {
         const all = getData();
-        if (!confirm('Yakin ingin menghapus evaluasi ' + all[i].nama + '?')) return;
-        all.splice(i, 1);
-        saveAll(all);
-        renderList();
-        tampilToast('Evaluasi berhasil dihapus.');
+        const nama = all[i] ? `evaluasi "${all[i].nama}"` : 'evaluasi ini';
+        window.konfirmasiHapus({
+            title: 'Hapus Evaluasi',
+            message: `Apakah Anda yakin ingin menghapus ${nama}? Data yang dihapus tidak dapat dipulihkan.`,
+            onConfirm: () => {
+                all.splice(i, 1);
+                saveAll(all);
+                renderList();
+                tampilToast('Evaluasi berhasil dihapus.');
+            }
+        });
     }
 
     function tampilToast(msg) {

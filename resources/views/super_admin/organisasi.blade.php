@@ -272,11 +272,17 @@
 
     function hapusUnit(i) {
         const all = getUnits();
-        if (!confirm('Yakin ingin menghapus unit ' + all[i].nama + '?')) return;
-        all.splice(i, 1);
-        saveAll(all);
-        renderList();
-        tampilToast('Unit berhasil dihapus.');
+        const nama = all[i] ? `unit "${all[i].nama}"` : 'unit ini';
+        window.konfirmasiHapus({
+            title: 'Hapus Unit Organisasi',
+            message: `Apakah Anda yakin ingin menghapus ${nama}? Data yang dihapus tidak dapat dipulihkan.`,
+            onConfirm: () => {
+                all.splice(i, 1);
+                saveAll(all);
+                renderList();
+                tampilToast('Unit berhasil dihapus.');
+            }
+        });
     }
 
     function tampilToast(msg) {

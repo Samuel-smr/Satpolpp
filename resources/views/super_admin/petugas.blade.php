@@ -298,11 +298,17 @@
 
     function hapusPetugas(i) {
         const all = getPetugas();
-        if (!confirm('Yakin ingin menghapus petugas ' + all[i].nama + '?')) return;
-        all.splice(i, 1);
-        saveAll(all);
-        renderList();
-        tampilToast('Data petugas berhasil dihapus.');
+        const nama = all[i] ? `petugas "${all[i].nama}"` : 'petugas ini';
+        window.konfirmasiHapus({
+            title: 'Hapus Petugas',
+            message: `Apakah Anda yakin ingin menghapus data ${nama}? Data yang dihapus tidak dapat dipulihkan.`,
+            onConfirm: () => {
+                all.splice(i, 1);
+                saveAll(all);
+                renderList();
+                tampilToast('Data petugas berhasil dihapus.');
+            }
+        });
     }
 
     function tampilToast(msg) {

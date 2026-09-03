@@ -336,11 +336,16 @@
     }
 
     function hapusLaporan() {
-        const all = getReports().filter(x => x.kode !== CURRENT_KODE);
-        if (!confirm('Yakin ingin menghapus laporan ' + CURRENT_KODE + '?')) return;
-        saveAll(all);
-        tampilToast('Laporan berhasil dihapus.');
-        setTimeout(() => window.location.href = '{{ route('admin.pengaduan') }}', 600);
+        window.konfirmasiHapus({
+            title: 'Hapus Laporan',
+            message: 'Apakah Anda yakin ingin menghapus laporan ' + CURRENT_KODE + '? Data yang dihapus tidak dapat dipulihkan.',
+            onConfirm: () => {
+                const all = getReports().filter(x => x.kode !== CURRENT_KODE);
+                saveAll(all);
+                tampilToast('Laporan berhasil dihapus.');
+                setTimeout(() => window.location.href = '{{ route('admin.pengaduan') }}', 600);
+            }
+        });
     }
 
     // ===== Foto bukti hasil penanganan (wajib saat selesaikan) =====

@@ -488,12 +488,18 @@
                 },
 
                 deleteArsip(id) {
-                    if(confirm('Apakah Anda yakin ingin menghapus arsip ini?')) {
-                        this.arsipList = this.arsipList.filter(a => a.id !== id);
-                        if (this.view === 'detail') {
-                            this.view = 'list';
+                    const item = this.arsipList.find(a => a.id === id);
+                    const nama = item ? `arsip "${item.judul}"` : 'arsip ini';
+                    window.konfirmasiHapus({
+                        title: 'Hapus Arsip',
+                        message: `Apakah Anda yakin ingin menghapus ${nama}? Data yang dihapus tidak dapat dipulihkan.`,
+                        onConfirm: () => {
+                            this.arsipList = this.arsipList.filter(a => a.id !== id);
+                            if (this.view === 'detail') {
+                                this.view = 'list';
+                            }
                         }
-                    }
+                    });
                 },
 
                 handleFileUpload(e) {
