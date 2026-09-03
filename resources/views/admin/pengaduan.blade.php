@@ -2,6 +2,10 @@
 
 @section('title', 'Pengaduan & Informasi')
 
+@push('styles')
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+@endpush
+
 @section('content')
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
@@ -10,55 +14,55 @@
         </div>
 
         <button type="button" onclick="bukaTambah()"
-            class="inline-flex items-center justify-center gap-2 bg-brand-600 text-white px-5 py-2.5 rounded-xl font-medium hover:bg-brand-700 transition-colors shadow-sm">
-            <span class="material-symbols-outlined text-[20px]">add</span>
+            class="inline-flex items-center justify-center gap-2 bg-sidebar-active text-white px-5 py-2.5 rounded-xl font-medium hover:bg-sidebar-hover transition-colors shadow-sm">
+            <span class="material-symbols-outlined text-[18px]">add</span>
             Tambah Laporan
         </button>
     </div>
 
     {{-- Ringkasan --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
         <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-[24px]">inbox</span>
-                </div>
+            <div class="flex items-start justify-between">
                 <div>
-                    <p class="text-xs text-slate-500 font-medium">Total Masuk</p>
-                    <p class="font-headline text-2xl font-bold text-slate-900" id="stat-total">0</p>
+                    <p class="text-xs font-semibold text-slate-600 leading-snug">Total Masuk</p>
+                    <p class="font-headline text-3xl font-bold text-slate-900 mt-1" id="stat-total">0</p>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-orange-100/70 text-orange-600 flex items-center justify-center flex-shrink-0">
+                    <span class="material-symbols-outlined text-[22px]">inbox</span>
                 </div>
             </div>
         </div>
         <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-[24px]">emergency</span>
-                </div>
+            <div class="flex items-start justify-between">
                 <div>
-                    <p class="text-xs text-slate-500 font-medium">Laporan Darurat</p>
-                    <p class="font-headline text-2xl font-bold text-slate-900" id="stat-darurat">0</p>
+                    <p class="text-xs font-semibold text-slate-600 leading-snug">Laporan Darurat</p>
+                    <p class="font-headline text-3xl font-bold text-slate-900 mt-1" id="stat-darurat">0</p>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-red-100/70 text-red-600 flex items-center justify-center flex-shrink-0">
+                    <span class="material-symbols-outlined text-[22px]">emergency</span>
                 </div>
             </div>
         </div>
         <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-[24px]">info</span>
-                </div>
+            <div class="flex items-start justify-between">
                 <div>
-                    <p class="text-xs text-slate-500 font-medium">Informasi & Pengaduan</p>
-                    <p class="font-headline text-2xl font-bold text-slate-900" id="stat-informasi">0</p>
+                    <p class="text-xs font-semibold text-slate-600 leading-snug">Informasi & Pengaduan</p>
+                    <p class="font-headline text-3xl font-bold text-slate-900 mt-1" id="stat-informasi">0</p>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-blue-100/70 text-brand-600 flex items-center justify-center flex-shrink-0">
+                    <span class="material-symbols-outlined text-[22px]">info</span>
                 </div>
             </div>
         </div>
         <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-[24px]">task_alt</span>
-                </div>
+            <div class="flex items-start justify-between">
                 <div>
-                    <p class="text-xs text-slate-500 font-medium">Selesai</p>
-                    <p class="font-headline text-2xl font-bold text-slate-900" id="stat-selesai">0</p>
+                    <p class="text-xs font-semibold text-slate-600 leading-snug">Selesai</p>
+                    <p class="font-headline text-3xl font-bold text-slate-900 mt-1" id="stat-selesai">0</p>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-emerald-100/70 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                    <span class="material-symbols-outlined text-[22px]">task_alt</span>
                 </div>
             </div>
         </div>
@@ -81,14 +85,15 @@
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
-                    <tr class="border-b border-slate-100 text-left text-xs text-slate-400 uppercase tracking-wider">
-                        <th class="px-6 py-3 font-semibold">No. Laporan</th>
-                        <th class="px-6 py-3 font-semibold">Jenis</th>
-                        <th class="px-6 py-3 font-semibold">Kategori</th>
-                        <th class="px-6 py-3 font-semibold">Lokasi</th>
-                        <th class="px-6 py-3 font-semibold">Telepon</th>
-                        <th class="px-6 py-3 font-semibold">Status</th>
-                        <th class="px-6 py-3 font-semibold text-right">Aksi</th>
+                    <tr class="bg-slate-50 border-b border-slate-200 text-slate-700">
+                        <th class="px-6 py-3.5 font-semibold text-left">No. Laporan</th>
+                        <th class="px-6 py-3.5 font-semibold text-left">Jenis</th>
+                        <th class="px-6 py-3.5 font-semibold text-left">Sumber</th>
+                        <th class="px-6 py-3.5 font-semibold text-left">Kategori</th>
+                        <th class="px-6 py-3.5 font-semibold text-left">Lokasi</th>
+                        <th class="px-6 py-3.5 font-semibold text-left">Telepon</th>
+                        <th class="px-6 py-3.5 font-semibold text-left">Status</th>
+                        <th class="px-6 py-3.5 font-semibold text-right">Aksi</th>
                     </tr>
                 </thead>
                 <tbody id="report-list"></tbody>
@@ -103,7 +108,7 @@
 
     {{-- Detail & tindak lanjut --}}
     <div id="detail" class="hidden mt-8">
-        <button type="button" onclick="tutupDetail()" class="mb-4 inline-flex items-center gap-2 text-brand-600 font-medium hover:underline">
+        <button type="button" onclick="tutupDetail()" class="mb-4 inline-flex items-center gap-2 text-sidebar-active font-medium hover:underline">
             ← <span>Kembali ke daftar</span>
         </button>
 
@@ -125,12 +130,20 @@
                             <span class="font-medium" id="d-kategori">--</span>
                         </div>
                         <div>
+                            <span class="text-slate-400">Sumber:</span>
+                            <span class="font-medium" id="d-sumber">--</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400">Identitas:</span>
+                            <span class="font-medium" id="d-identitas">--</span>
+                        </div>
+                        <div>
                             <span class="text-slate-400">Nomor Telepon:</span>
                             <span class="font-medium" id="d-telepon">--</span>
                         </div>
                         <div>
-                            <span class="text-slate-400">NIK:</span>
-                            <span class="font-medium" id="d-nik">--</span>
+                            <span class="text-slate-400">Koordinat:</span>
+                            <span class="font-medium" id="d-koordinat">--</span>
                         </div>
                         <div>
                             <span class="text-slate-400">Lokasi:</span>
@@ -146,6 +159,12 @@
                         </div>
                     </div>
 
+                    {{-- Lampiran Foto & Video --}}
+                    <div id="d-files-wrap" class="hidden mb-6">
+                        <h3 class="font-headline font-bold text-slate-800 mb-3">Lampiran Foto &amp; Video</h3>
+                        <div id="d-files" class="grid grid-cols-2 md:grid-cols-3 gap-3"></div>
+                    </div>
+
                     <h3 class="font-headline font-bold text-slate-800 mb-5">Pelacakan Laporan</h3>
                     <ol class="relative ml-1" id="tracking-list"></ol>
                 </div>
@@ -157,7 +176,7 @@
                     <p class="text-sm text-slate-300 mb-4">Perbarui status penanganan laporan ini.</p>
 
                     <div class="space-y-3">
-                        <button type="button" onclick="majuStatus(1)" class="w-full bg-brand-600 hover:bg-brand-700 text-white py-2.5 rounded-xl font-medium transition-colors">Tandai Diterima</button>
+                        <button type="button" onclick="majuStatus(1)" class="w-full bg-sidebar-active hover:bg-sidebar-hover text-white py-2.5 rounded-xl font-medium transition-colors">Tandai Diterima</button>
                         <button type="button" onclick="majuStatus(2)" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl font-medium transition-colors">Mulai Verifikasi</button>
                         <button type="button" onclick="majuStatus(4)" class="w-full bg-amber-600 hover:bg-amber-700 text-white py-2.5 rounded-xl font-medium transition-colors">Tandai Ditindaklanjuti</button>
                         <button type="button" onclick="majuStatus(5)" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl font-medium transition-colors">Selesaikan Laporan</button>
@@ -185,54 +204,127 @@
             <form id="tambah-form" class="p-6 space-y-4 overflow-y-auto" onsubmit="simpanLaporan(event)">
                 <div>
                     <label class="block text-sm font-medium mb-1">Jenis <span class="text-red-500">*</span></label>
-                    <select name="jenis" required class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none bg-white">
+                    <select name="jenis" required class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none bg-white">
                         <option value="">Pilih Jenis</option>
                         <option value="darurat">Lapor Darurat</option>
                         <option value="informasi">Informasi & Pengaduan</option>
                     </select>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Nomor Telepon <span class="text-red-500">*</span></label>
-                        <input type="tel" name="telepon" required placeholder="081234567890"
-                            class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">NIK (Opsional)</label>
-                        <input type="text" name="nik" placeholder="16 digit NIK"
-                            class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Sumber Laporan <span class="text-red-500">*</span></label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button type="button" onclick="setSumber('online')" id="sumber-btn-online"
+                            class="flex items-center justify-center gap-2 p-3 border-2 border-slate-200 rounded-xl text-sm font-medium transition-colors">
+                            <span class="material-symbols-outlined text-[20px]">public</span> Online
+                        </button>
+                        <button type="button" onclick="setSumber('offline')" id="sumber-btn-offline"
+                            class="flex items-center justify-center gap-2 p-3 border-2 border-slate-200 rounded-xl text-sm font-medium transition-colors">
+                            <span class="material-symbols-outlined text-[20px]">person_pin</span> Offline
+                        </button>
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium mb-1">Kategori <span class="text-red-500">*</span></label>
-                    <select name="kategori" required class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none bg-white">
-                        <option value="">Pilih Kategori</option>
-                        <option>Ketertiban Umum</option>
-                        <option>Keamanan</option>
-                        <option>Patroli</option>
-                        <option>Pengawalan</option>
-                        <option>Kebersihan Lingkungan</option>
+                {{-- Platform (Online) --}}
+                <div id="sumber-online" class="hidden">
+                    <label class="block text-sm font-medium mb-1">Platform Media Sosial <span class="text-red-500">*</span></label>
+                    <select name="platform" class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none bg-white">
+                        <option value="">Pilih Platform</option>
+                        <option>WhatsApp</option>
+                        <option>Instagram</option>
+                        <option>X (Twitter)</option>
+                        <option>Facebook</option>
+                        <option>TikTok</option>
                         <option>Lainnya</option>
                     </select>
+                </div>
+
+                {{-- Nama + NIK (Offline) --}}
+                <div id="sumber-offline" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Nama Pelapor <span class="text-red-500">*</span></label>
+                        <input type="text" name="nama_offline" placeholder="Nama lengkap pelapor"
+                            class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">NIK <span class="text-red-500">*</span></label>
+                        <input type="text" name="nik_offline" maxlength="16" placeholder="16 digit NIK"
+                            class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Nomor Telepon (Opsional)</label>
+                        <input type="tel" name="telepon" placeholder="08123456789"
+                            class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Kategori <span class="text-red-500">*</span></label>
+                        <select name="kategori" required class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none bg-white">
+                            <option value="">Pilih Kategori</option>
+                            <option>Ketertiban Umum</option>
+                            <option>Keamanan</option>
+                            <option>Patroli</option>
+                            <option>Pengawalan</option>
+                            <option>Kebersihan Lingkungan</option>
+                            <option>Lainnya</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium mb-1">Deskripsi <span class="text-red-500">*</span></label>
                     <textarea name="deskripsi" rows="3" required placeholder="Jelaskan kejadian..."
-                        class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none"></textarea>
+                        class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none"></textarea>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium mb-1">Lokasi <span class="text-red-500">*</span></label>
-                    <input type="text" name="lokasi" required placeholder="Alamat / titik lokasi"
-                        class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none">
+                    <label class="block text-sm font-medium mb-1">Lokasi Kejadian <span class="text-red-500">*</span></label>
+                    <input type="text" name="lokasi" required placeholder="Alamat / detail lokasi"
+                        class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none">
                 </div>
+
+                {{-- Peta --}}
+                <div>
+                    <label class="block text-sm font-medium mb-1">Titik Lokasi di Peta</label>
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <div>
+                            <label class="block text-xs text-slate-500 mb-1">Latitude</label>
+                            <input type="text" name="lat" readonly placeholder="Klik peta"
+                                class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-600 outline-none cursor-not-allowed">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-500 mb-1">Longitude</label>
+                            <input type="text" name="lng" readonly placeholder="Klik peta"
+                                class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-600 outline-none cursor-not-allowed">
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <div id="map-picker" class="w-full h-64 bg-slate-100 rounded-xl border border-slate-200 overflow-hidden z-10"></div>
+                        <span class="absolute top-3 right-3 z-[1000] bg-white/90 backdrop-blur text-xs font-medium px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 text-slate-600">
+                            Klik peta untuk tentukan titik
+                        </span>
+                    </div>
+                </div>
+
+                {{-- Upload Foto & Video --}}
+                <div>
+                    <label class="block text-sm font-medium mb-2">Foto &amp; Video Bukti (Opsional)</label>
+                    <label class="block border-2 border-dashed border-slate-300 bg-slate-50 rounded-xl p-6 text-center cursor-pointer hover:border-brand-500 hover:bg-slate-100 transition-colors">
+                        <input type="file" id="file-input" multiple accept="image/*,video/*" class="absolute opacity-0 w-0 h-0" onchange="handleFiles(this.files)">
+                        <span class="material-symbols-outlined text-3xl text-slate-400">cloud_upload</span>
+                        <p class="text-sm font-medium text-slate-600 mt-1">Klik untuk pilih Foto / Video</p>
+                        <p class="text-xs text-slate-400 mt-0.5">Bisa pilih lebih dari 1 file (JPG, PNG, MP4)</p>
+                    </label>
+                    <div id="file-preview" class="mt-3 grid grid-cols-3 gap-3"></div>
+                </div>
+
+                <input type="hidden" name="sumber" value="online">
 
                 <div class="flex justify-end gap-3 pt-2">
                     <button type="button" onclick="tutupTambah()" class="border border-slate-300 text-slate-600 px-5 py-2 rounded-xl font-medium hover:bg-slate-50 transition-colors">Batal</button>
-                    <button type="submit" class="bg-brand-600 text-white px-6 py-2 rounded-xl font-medium hover:bg-brand-700 transition-colors">Simpan Laporan</button>
+                    <button type="submit" class="bg-sidebar-active text-white px-6 py-2 rounded-xl font-medium hover:bg-sidebar-hover transition-colors">Simpan Laporan</button>
                 </div>
             </form>
         </div>
@@ -242,6 +334,7 @@
 @endsection
 
 @push('scripts')
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script>
     const STATUSES = [
         ['Laporan dibuat', 'Laporan telah kami terima.'],
@@ -291,7 +384,7 @@
         document.querySelectorAll('.tab-btn').forEach(b => {
             const active = b.dataset.tab === t;
             b.className = 'tab-btn text-sm font-semibold px-4 py-2 rounded-xl border transition-colors ' +
-                (active ? 'bg-brand-600 text-white border-brand-600' : 'border-slate-200 text-slate-600 hover:bg-slate-50');
+                (active ? 'bg-sidebar-active text-white border-sidebar-active' : 'border-slate-200 text-slate-600 hover:bg-slate-50');
         });
         renderList();
     }
@@ -320,6 +413,11 @@
                 <td class="px-6 py-3.5">
                     <span class="text-xs font-semibold px-2.5 py-1 rounded-full ${jenisClass(r.jenis)}">${labelJenis(r.jenis)}</span>
                 </td>
+                <td class="px-6 py-3.5">
+                    ${r.sumber_asal === 'offline'
+                        ? '<span class="text-xs font-semibold px-2.5 py-1 rounded-full border bg-slate-100 text-slate-600 border-slate-200">Offline</span>'
+                        : '<span class="text-xs font-medium text-slate-500"><span class="material-symbols-outlined text-[14px] align-middle">public</span> ' + (r.platform || 'Online') + '</span>'}
+                </td>
                 <td class="px-6 py-3.5 text-slate-500">${r.kategori || '-'}</td>
                 <td class="px-6 py-3.5 text-slate-500">${r.lokasi || '-'}</td>
                 <td class="px-6 py-3.5 text-slate-500">${r.telepon || '-'}</td>
@@ -327,7 +425,7 @@
                     <span class="text-xs font-semibold px-2.5 py-1 rounded-full ${badgeClass(r.statusIdx)}">${labelStatus(r.statusIdx)}</span>
                 </td>
                 <td class="px-6 py-3.5 text-right">
-                    <button type="button" onclick="event.stopPropagation(); bukaDetail(${i})" class="text-brand-600 hover:text-brand-700" title="Detail">
+                    <button type="button" onclick="event.stopPropagation(); bukaDetail(${i})" class="text-sidebar-active hover:text-sidebar-hover" title="Detail">
                         <span class="material-symbols-outlined text-[20px]">visibility</span>
                     </button>
                     <button type="button" onclick="event.stopPropagation(); hapus(${i})" class="text-red-500 hover:text-red-700 ml-2" title="Hapus">
@@ -356,11 +454,29 @@
         document.getElementById('d-badge').className = 'text-sm font-semibold px-3 py-1 rounded-full ' + badgeClass(idx);
         document.getElementById('d-jenis').textContent = labelJenis(r.jenis);
         document.getElementById('d-kategori').textContent = r.kategori || '-';
+        document.getElementById('d-sumber').textContent = (r.sumber_asal === 'offline') ? 'Offline (Langsung)' : 'Online (' + (r.platform || 'Medsos') + ')';
+        document.getElementById('d-identitas').textContent = (r.sumber_asal === 'offline') ? (r.nama + (r.nik ? ' • ' + r.nik : '')) : '-';
         document.getElementById('d-telepon').textContent = r.telepon || '-';
-        document.getElementById('d-nik').textContent = r.nik || '-';
+        document.getElementById('d-koordinat').textContent = (r.lat && r.lng) ? r.lat + ', ' + r.lng : '-';
         document.getElementById('d-lokasi').textContent = r.lokasi || '-';
         document.getElementById('d-waktu').textContent = r.dibuat || r.waktu || '-';
         document.getElementById('d-deskripsi').textContent = r.deskripsi || '-';
+
+        // Lampiran foto & video
+        const filesWrap = document.getElementById('d-files-wrap');
+        const filesBox = document.getElementById('d-files');
+        if (r.files && r.files.length > 0) {
+            filesWrap.classList.remove('hidden');
+            filesBox.innerHTML = r.files.map(f => `
+                <figure class="${f.isVideo ? 'aspect-video' : 'aspect-square'} rounded-xl overflow-hidden border border-slate-200 bg-slate-100 relative group">
+                    ${f.isVideo ? '<video src="' + f.url + '" class="w-full h-full object-cover"></video><span class="absolute inset-0 flex items-center justify-center text-white/80"><span class="material-symbols-outlined text-3xl bg-black/40 rounded-full p-1.5">play_circle</span></span>' : '<img src="' + f.url + '" class="w-full h-full object-cover">'}
+                    <figcaption class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/50 to-transparent px-2 py-1 text-[10px] text-white truncate">${f.name}</figcaption>
+                </figure>
+            `).join('');
+        } else {
+            filesWrap.classList.add('hidden');
+            filesBox.innerHTML = '';
+        }
 
         const total = STATUSES.length;
         document.getElementById('tracking-list').innerHTML = STATUSES.map(([title, desc], i) => {
@@ -419,8 +535,94 @@
     function bukaTambah() {
         document.getElementById('modal').classList.remove('hidden');
         document.getElementById('tambah-form').reset();
+        currentFiles = [];
+        renderPreviews();
+        setSumber('online');
+        initMap();
     }
-    function tutupTambah() { document.getElementById('modal').classList.add('hidden'); }
+    function tutupTambah() {
+        document.getElementById('modal').classList.add('hidden');
+        if (mapInstance) mapInstance.remove();
+        mapInstance = null;
+        markerInstance = null;
+    }
+
+    // ===== Sumber Online / Offline =====
+    let sumber = 'online';
+    function setSumber(s) {
+        sumber = s;
+        const on = document.getElementById('sumber-btn-online');
+        const off = document.getElementById('sumber-btn-offline');
+        const base = 'flex items-center justify-center gap-2 p-3 border-2 rounded-xl text-sm font-medium transition-colors ';
+        on.className = base + (s === 'online' ? 'border-sidebar-active bg-orange-50 text-sidebar-active' : 'border-slate-200 text-slate-600 hover:bg-slate-50');
+        off.className = base + (s === 'offline' ? 'border-sidebar-active bg-orange-50 text-sidebar-active' : 'border-slate-200 text-slate-600 hover:bg-slate-50');
+        document.querySelector('[name=sumber]').value = s;
+
+        const mrOnline = document.getElementById('sumber-online');
+        const mrOffline = document.getElementById('sumber-offline');
+        mrOnline.classList.toggle('hidden', s !== 'online');
+        mrOffline.classList.toggle('hidden', s !== 'offline');
+
+        const platform = document.querySelector('[name=platform]');
+        const nama = document.querySelector('[name=nama_offline]');
+        const nik = document.querySelector('[name=nik_offline]');
+        platform.required = s === 'online';
+        nama.required = s === 'offline';
+        nik.required = s === 'offline';
+    }
+
+    // ===== Peta =====
+    let mapInstance = null;
+    let markerInstance = null;
+    function initMap() {
+        if (mapInstance) { mapInstance.remove(); mapInstance = null; markerInstance = null; }
+        mapInstance = L.map('map-picker').setView([-7.7971, 110.1646], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(mapInstance);
+        mapInstance.on('click', function (e) {
+            const lat = e.latlng.lat.toFixed(6);
+            const lng = e.latlng.lng.toFixed(6);
+            document.querySelector('[name=lat]').value = lat;
+            document.querySelector('[name=lng]').value = lng;
+            if (markerInstance) markerInstance.setLatLng(e.latlng);
+            else markerInstance = L.marker(e.latlng).addTo(mapInstance);
+        });
+    }
+
+    // ===== Upload Foto & Video =====
+    let currentFiles = [];
+    async function handleFiles(files) {
+        for (const file of files) {
+            if (file.size > 8 * 1024 * 1024) { alert('File ' + file.name + ' terlalu besar. Maks 8MB.'); continue; }
+            const isVideo = file.type.startsWith('video/');
+            const url = await readFile(file);
+            currentFiles.push({ name: file.name, url: url, isVideo: isVideo });
+        }
+        renderPreviews();
+    }
+    function readFile(file) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = e => resolve(e.target.result);
+            reader.readAsDataURL(file);
+        });
+    }
+    function renderPreviews() {
+        const box = document.getElementById('file-preview');
+        box.innerHTML = currentFiles.map((f, i) => `
+            <div class="relative aspect-video rounded-xl border border-slate-200 overflow-hidden bg-slate-100 group">
+                ${f.isVideo
+                    ? '<video src="' + f.url + '" class="w-full h-full object-cover"></video><span class="absolute inset-0 flex items-center justify-center text-white/80"><span class="material-symbols-outlined text-3xl bg-black/40 rounded-full p-1.5">play_circle</span></span>'
+                    : '<img src="' + f.url + '" class="w-full h-full object-cover">'}
+                <button type="button" onclick="hapusFile(${i})" class="absolute top-1.5 right-1.5 w-6 h-6 bg-white hover:bg-red-50 hover:text-red-600 text-slate-700 rounded-full flex items-center justify-center shadow-md transition-colors">
+                    <span class="material-symbols-outlined text-[14px]">close</span>
+                </button>
+                <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/50 to-transparent px-2 py-1 text-[10px] text-white truncate">${f.name}</div>
+            </div>
+        `).join('');
+    }
+    function hapusFile(i) { currentFiles.splice(i, 1); renderPreviews(); }
 
     function simpanLaporan(e) {
         e.preventDefault();
@@ -431,17 +633,25 @@
         const dibuat = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()} ${pad(now.getHours())}.${pad(now.getMinutes())}`;
         const kode = 'SPJ-' + String(100000 + Math.floor(Math.random() * 900000));
 
-        all.unshift({
+        const isOnline = sumber === 'online';
+        const record = {
             kode: kode,
             jenis: f.jenis.value,
+            sumber_asal: isOnline ? 'online' : 'offline',
+            platform: isOnline ? f.platform.value : '',
+            nama: isOnline ? '' : f.nama_offline.value.trim(),
+            nik: isOnline ? '' : f.nik_offline.value.trim(),
             telepon: f.telepon.value.trim(),
-            nik: f.nik.value.trim(),
             kategori: f.kategori.value,
             deskripsi: f.deskripsi.value.trim(),
             lokasi: f.lokasi.value.trim(),
+            lat: f.lat.value,
+            lng: f.lng.value,
+            files: currentFiles.map(x => ({ name: x.name, url: x.url, isVideo: x.isVideo })),
             dibuat: dibuat,
             statusIdx: 0,
-        });
+        };
+        all.unshift(record);
         saveAll(all);
         renderList();
         tutupTambah();

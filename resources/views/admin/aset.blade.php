@@ -10,55 +10,55 @@
         </div>
 
         <button type="button" onclick="bukaForm()"
-            class="inline-flex items-center justify-center gap-2 bg-brand-600 text-white px-5 py-2.5 rounded-xl font-medium hover:bg-brand-700 transition-colors shadow-sm">
-            <span class="material-symbols-outlined text-[20px]">add</span>
+            class="inline-flex items-center justify-center gap-2 bg-sidebar-active text-white px-5 py-2.5 rounded-xl font-medium hover:bg-sidebar-hover transition-colors shadow-sm">
+            <span class="material-symbols-outlined text-[18px]">add</span>
             Tambah Aset
         </button>
     </div>
 
     {{-- Ringkasan Statistik --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
         <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-[24px]">inventory_2</span>
-                </div>
+            <div class="flex items-start justify-between">
                 <div>
-                    <p class="text-xs text-slate-500 font-medium">Total Aset</p>
-                    <p class="font-headline text-2xl font-bold text-slate-900" id="stat-total">0</p>
+                    <p class="text-xs font-semibold text-slate-600 leading-snug">Total Aset</p>
+                    <p class="font-headline text-3xl font-bold text-slate-900 mt-1" id="stat-total">0</p>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-orange-100/70 text-orange-600 flex items-center justify-center flex-shrink-0">
+                    <span class="material-symbols-outlined text-[22px]">inventory_2</span>
                 </div>
             </div>
         </div>
         <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-[24px]">check_circle</span>
-                </div>
+            <div class="flex items-start justify-between">
                 <div>
-                    <p class="text-xs text-slate-500 font-medium">Kondisi Baik</p>
-                    <p class="font-headline text-2xl font-bold text-slate-900" id="stat-baik">0</p>
+                    <p class="text-xs font-semibold text-slate-600 leading-snug">Kondisi Baik</p>
+                    <p class="font-headline text-3xl font-bold text-slate-900 mt-1" id="stat-baik">0</p>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-emerald-100/70 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                    <span class="material-symbols-outlined text-[22px]">check_circle</span>
                 </div>
             </div>
         </div>
         <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-[24px]">build</span>
-                </div>
+            <div class="flex items-start justify-between">
                 <div>
-                    <p class="text-xs text-slate-500 font-medium">Perlu Perbaikan</p>
-                    <p class="font-headline text-2xl font-bold text-slate-900" id="stat-perbaikan">0</p>
+                    <p class="text-xs font-semibold text-slate-600 leading-snug">Perlu Perbaikan</p>
+                    <p class="font-headline text-3xl font-bold text-slate-900 mt-1" id="stat-perbaikan">0</p>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-amber-100/70 text-amber-600 flex items-center justify-center flex-shrink-0">
+                    <span class="material-symbols-outlined text-[22px]">build</span>
                 </div>
             </div>
         </div>
         <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-xl bg-red-50 text-red-600 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-[24px]">directions_car</span>
-                </div>
+            <div class="flex items-start justify-between">
                 <div>
-                    <p class="text-xs text-slate-500 font-medium">Kendaraan Dinas</p>
-                    <p class="font-headline text-2xl font-bold text-slate-900" id="stat-kendaraan">0</p>
+                    <p class="text-xs font-semibold text-slate-600 leading-snug">Kendaraan Dinas</p>
+                    <p class="font-headline text-3xl font-bold text-slate-900 mt-1" id="stat-kendaraan">0</p>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-blue-100/70 text-brand-600 flex items-center justify-center flex-shrink-0">
+                    <span class="material-symbols-outlined text-[22px]">directions_car</span>
                 </div>
             </div>
         </div>
@@ -74,13 +74,13 @@
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
-                    <tr class="border-b border-slate-100 text-left text-xs text-slate-400 uppercase tracking-wider">
-                        <th class="px-6 py-3 font-semibold">Nama Aset</th>
-                        <th class="px-6 py-3 font-semibold">Kategori</th>
-                        <th class="px-6 py-3 font-semibold">Kondisi</th>
-                        <th class="px-6 py-3 font-semibold">Lokasi</th>
-                        <th class="px-6 py-3 font-semibold">Tahun</th>
-                        <th class="px-6 py-3 font-semibold text-right">Aksi</th>
+                    <tr class="bg-slate-50 border-b border-slate-200 text-slate-700">
+                        <th class="px-6 py-3.5 font-semibold text-left">Nama Aset</th>
+                        <th class="px-6 py-3.5 font-semibold text-left">Kategori</th>
+                        <th class="px-6 py-3.5 font-semibold text-left">Kondisi</th>
+                        <th class="px-6 py-3.5 font-semibold text-left">Lokasi</th>
+                        <th class="px-6 py-3.5 font-semibold text-left">Tahun</th>
+                        <th class="px-6 py-3.5 font-semibold text-right">Aksi</th>
                     </tr>
                 </thead>
                 <tbody id="aset-list"></tbody>
@@ -108,14 +108,14 @@
                 <div>
                     <label class="block text-sm font-medium mb-1">Nama Aset <span class="text-red-500">*</span></label>
                     <input type="text" name="nama" required placeholder="Contoh: Mobil Patroli"
-                        class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none">
+                        class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none">
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium mb-1">Kategori <span class="text-red-500">*</span></label>
                         <select name="kategori" required
-                            class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none bg-white">
+                            class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none bg-white">
                             <option value="">Pilih Kategori</option>
                             <option>Kendaraan</option>
                             <option>Perlengkapan</option>
@@ -127,7 +127,7 @@
                     <div>
                         <label class="block text-sm font-medium mb-1">Kondisi <span class="text-red-500">*</span></label>
                         <select name="kondisi" required
-                            class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none bg-white">
+                            class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none bg-white">
                             <option value="">Pilih Kondisi</option>
                             <option>Baik</option>
                             <option>Perlu Perbaikan</option>
@@ -140,18 +140,18 @@
                     <div>
                         <label class="block text-sm font-medium mb-1">Lokasi</label>
                         <input type="text" name="lokasi" placeholder="Contoh: Kantor Satpol PP"
-                            class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none">
+                            class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none">
                     </div>
                     <div>
                         <label class="block text-sm font-medium mb-1">Tahun Perolehan</label>
                         <input type="number" name="tahun" placeholder="Contoh: 2022"
-                            class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none">
+                            class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none">
                     </div>
                 </div>
 
                 <div class="flex justify-end gap-3 pt-2">
                     <button type="button" onclick="tutupForm()" class="border border-slate-300 text-slate-600 px-5 py-2 rounded-xl font-medium hover:bg-slate-50 transition-colors">Batal</button>
-                    <button type="submit" class="bg-brand-600 text-white px-6 py-2 rounded-xl font-medium hover:bg-brand-700 transition-colors">Simpan Aset</button>
+                    <button type="submit" class="bg-sidebar-active text-white px-6 py-2 rounded-xl font-medium hover:bg-sidebar-hover transition-colors">Simpan Aset</button>
                 </div>
             </form>
         </div>
