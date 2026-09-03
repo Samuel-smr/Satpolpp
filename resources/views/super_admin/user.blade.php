@@ -6,7 +6,7 @@
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
             <h1 class="font-headline text-3xl font-bold text-slate-900 tracking-tight">Manajemen User</h1>
-            <p class="text-sm text-slate-500 mt-1">Kelola akun pengguna, peranan, dan hak akses di seluruh platform.</p>
+            <p class="text-sm text-slate-500 mt-1">Kelola akun admin untuk mengakses seluruh platform.</p>
         </div>
 
         <button type="button" onclick="bukaTambah()"
@@ -35,19 +35,19 @@
                     <span class="material-symbols-outlined text-[24px]">admin_panel_settings</span>
                 </div>
                 <div>
-                    <p class="text-xs text-slate-500 font-medium">Admin Sapol PP</p>
+                    <p class="text-xs text-slate-500 font-medium">Admin Satpol PP</p>
                     <p class="font-headline text-2xl font-bold text-slate-900" id="stat-admin">0</p>
                 </div>
             </div>
         </div>
         <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm">
             <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-[24px]">badge</span>
+                <div class="w-11 h-11 rounded-xl bg-red-50 text-red-600 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[24px]">block</span>
                 </div>
                 <div>
-                    <p class="text-xs text-slate-500 font-medium">Petugas Lapangan</p>
-                    <p class="font-headline text-2xl font-bold text-slate-900" id="stat-petugas">0</p>
+                    <p class="text-xs text-slate-500 font-medium">Terblokir</p>
+                    <p class="font-headline text-2xl font-bold text-slate-900" id="stat-terblokir">0</p>
                 </div>
             </div>
         </div>
@@ -70,12 +70,6 @@
             <div class="flex gap-2 flex-wrap">
                 <button type="button" data-tab="semua" onclick="setTab('semua')"
                     class="tab-btn text-sm font-semibold px-4 py-2 rounded-xl border transition-colors">Semua</button>
-                <button type="button" data-tab="Super Admin" onclick="setTab('Super Admin')"
-                    class="tab-btn text-sm font-semibold px-4 py-2 rounded-xl border transition-colors">Super Admin</button>
-                <button type="button" data-tab="Admin" onclick="setTab('Admin')"
-                    class="tab-btn text-sm font-semibold px-4 py-2 rounded-xl border transition-colors">Admin Satpol PP</button>
-                <button type="button" data-tab="Petugas" onclick="setTab('Petugas')"
-                    class="tab-btn text-sm font-semibold px-4 py-2 rounded-xl border transition-colors">Petugas Lapangan</button>
             </div>
             <span class="text-xs bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-1 rounded-full font-medium">Data Dummy + Tambahan Admin</span>
         </div>
@@ -86,7 +80,6 @@
                     <tr class="border-b border-slate-100 text-left text-xs text-slate-400 uppercase tracking-wider">
                         <th class="px-6 py-3 font-semibold">User</th>
                         <th class="px-6 py-3 font-semibold">Username</th>
-                        <th class="px-6 py-3 font-semibold">Peranan</th>
                         <th class="px-6 py-3 font-semibold">Status</th>
                         <th class="px-6 py-3 font-semibold">Dibuat</th>
                         <th class="px-6 py-3 font-semibold text-right">Aksi</th>
@@ -135,17 +128,6 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium mb-1">Peranan / Role <span class="text-red-500">*</span></label>
-                    <select name="role" required
-                        class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none bg-white">
-                        <option value="">Pilih Peranan</option>
-                        <option value="Super Admin">Super Admin</option>
-                        <option value="Admin">Admin Satpol PP</option>
-                        <option value="Petugas">Petugas Lapangan</option>
-                    </select>
-                </div>
-
-                <div>
                     <label class="block text-sm font-medium mb-1">Kata Sandi <span class="text-red-500">*</span></label>
                     <input type="password" name="password" required placeholder="Minimal 6 karakter"
                         minlength="6" class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none">
@@ -172,11 +154,10 @@
         let data = JSON.parse(localStorage.getItem(KODE) || '[]');
         if (data.length === 0) {
             data = [
-                { nama: 'Budi Hartono', username: 'budi.hartono', email: 'budi@satpolpp.go.id', role: 'Admin', status: 'aktif', dibuat: '12/01/2026' },
-                { nama: 'Siti Nurhaliza', username: 'siti.nurhaliza', email: 'siti@satpolpp.go.id', role: 'Petugas', status: 'aktif', dibuat: '20/02/2026' },
-                { nama: 'Agus Salim', username: 'agus.salim', email: 'agus@satpolpp.go.id', role: 'Petugas', status: 'aktif', dibuat: '05/03/2026' },
-                { nama: 'Rina Wulandari', username: 'rina.wulandari', email: 'rina@satpolpp.go.id', role: 'Admin', status: 'terblokir', dibuat: '18/11/2025' },
-                { nama: 'Dedi Kurniawan', username: 'dedi.kurniawan', email: 'dedi@satpolpp.go.id', role: 'Super Admin', status: 'aktif', dibuat: '01/01/2026' },
+                { nama: 'Budi Hartono', username: 'budi.hartono', email: 'budi@satpolpp.go.id', status: 'aktif', dibuat: '12/01/2026' },
+                { nama: 'Siti Nurhaliza', username: 'siti.nurhaliza', email: 'siti@satpolpp.go.id', status: 'aktif', dibuat: '20/02/2026' },
+                { nama: 'Agus Salim', username: 'agus.salim', email: 'agus@satpolpp.go.id', status: 'aktif', dibuat: '05/03/2026' },
+                { nama: 'Rina Wulandari', username: 'rina.wulandari', email: 'rina@satpolpp.go.id', status: 'terblokir', dibuat: '18/11/2025' },
             ];
             localStorage.setItem(KODE, JSON.stringify(data));
         }
@@ -185,18 +166,12 @@
 
     function saveAll(data) { localStorage.setItem(KODE, JSON.stringify(data)); }
 
-    function roleClass(r) {
-        if (r === 'Super Admin') return 'bg-purple-50 text-purple-700 border-purple-200';
-        if (r === 'Admin') return 'bg-super-active/10 text-super-active border-super-active/20';
-        return 'bg-blue-50 text-blue-700 border-blue-200';
-    }
     function statusClass(s) {
         return s === 'aktif' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-red-50 text-red-700 border-red-200';
     }
 
     function filtered(data) {
-        if (tab === 'semua') return data;
-        return data.filter(u => u.role === tab);
+        return data;
     }
 
     function setTab(t) {
@@ -212,8 +187,8 @@
     function renderList() {
         const all = getUsers();
         document.getElementById('stat-total').textContent = all.length;
-        document.getElementById('stat-admin').textContent = all.filter(u => u.role === 'Admin').length;
-        document.getElementById('stat-petugas').textContent = all.filter(u => u.role === 'Petugas').length;
+        document.getElementById('stat-admin').textContent = all.length;
+        document.getElementById('stat-terblokir').textContent = all.filter(u => u.status === 'terblokir').length;
         document.getElementById('stat-aktif').textContent = all.filter(u => u.status === 'aktif').length;
 
         const list = filtered(all);
@@ -233,7 +208,7 @@
                 <tr class="border-b border-slate-50 hover:bg-slate-50/50">
                     <td class="px-6 py-3.5">
                         <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-full ${roleClass(u.role).split(' ')[0]} text-slate-700 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                            <div class="w-9 h-9 rounded-full bg-super-active/10 text-super-active flex items-center justify-center font-bold text-xs flex-shrink-0">
                                 ${u.nama.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()}
                             </div>
                             <div>
@@ -243,9 +218,6 @@
                         </div>
                     </td>
                     <td class="px-6 py-3.5 text-slate-500">${u.username}</td>
-                    <td class="px-6 py-3.5">
-                        <span class="text-xs font-semibold px-2.5 py-1 rounded-full border ${roleClass(u.role)}">${u.role}</span>
-                    </td>
                     <td class="px-6 py-3.5">
                         <span class="text-xs font-semibold px-2.5 py-1 rounded-full border ${statusClass(u.status)} capitalize">${u.status}</span>
                     </td>
@@ -284,7 +256,6 @@
         f.nama.value = u.nama;
         f.username.value = u.username;
         f.email.value = u.email || '';
-        f.role.value = u.role;
         f.password.required = false;
         document.getElementById('pw-hint').classList.remove('hidden');
         document.getElementById('modal').classList.remove('hidden');
@@ -305,7 +276,7 @@
             nama: f.nama.value.trim(),
             username: f.username.value.trim(),
             email: f.email.value.trim(),
-            role: f.role.value,
+            role: 'Admin',
             status: 'aktif',
             dibuat: dibuat,
         };
