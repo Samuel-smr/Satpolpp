@@ -89,21 +89,6 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium mb-1">Judul / Jenis Kejadian <span
-                                class="text-red-500">*</span></label>
-                        <select name="kategori" required
-                            class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none bg-white">
-                            <option value="">Pilih Kategori</option>
-                            <option>Ketertiban Umum</option>
-                            <option>Keamanan</option>
-                            <option>Patroli</option>
-                            <option>Pengawalan</option>
-                            <option>Kebersihan Lingkungan</option>
-                            <option>Lainnya</option>
-                        </select>
-                    </div>
-
-                    <div>
                         <label class="block text-sm font-medium mb-1">Deskripsi Singkat <span
                                 class="text-red-500">*</span></label>
                         <textarea name="deskripsi" rows="4" required
@@ -264,12 +249,11 @@
             goStep(2);
         }
 
-        // Validasi step 2 (field wajib): telepon, kategori, deskripsi, lokasi
+        // Validasi step 2 (field wajib): telepon, deskripsi, lokasi
         function nextFromDetail() {
-            const required = ['telepon', 'kategori', 'deskripsi', 'lokasi'];
+            const required = ['telepon', 'deskripsi', 'lokasi'];
             const labels = {
                 telepon: 'Nomor WhatsApp / Telepon',
-                kategori: 'Judul / Jenis Kejadian',
                 deskripsi: 'Deskripsi Singkat',
                 lokasi: 'Lokasi Kejadian',
             };
@@ -315,7 +299,6 @@
             const report = {
                 kode: kode,
                 jenis: document.getElementById('jenis').value || 'informasi',
-                kategori: document.querySelector('select[name="kategori"]').value,
                 deskripsi: document.querySelector('textarea[name="deskripsi"]').value,
                 lokasi: document.querySelector('input[name="lokasi"]').value,
                 telepon: document.querySelector('input[name="telepon"]').value,
