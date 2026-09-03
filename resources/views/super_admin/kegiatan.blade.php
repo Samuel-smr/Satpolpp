@@ -3,11 +3,11 @@
 @section('title', 'Acara & Kegiatan')
 
 @push('styles')
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 @endpush
 
 @push('scripts')
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 @endpush
 
@@ -21,7 +21,20 @@
                     <h1 class="font-headline text-3xl font-bold text-slate-900 tracking-tight">Acara &amp; Kegiatan</h1>
                     <p class="text-sm text-slate-500 mt-1">Kelola agenda operasional, sosialisasi, dan penertiban berkala.</p>
                 </div>
-                <div>
+                <div class="flex flex-wrap items-center gap-2.5">
+                    <!-- Tombol Ekspor Excel -->
+                    <button @click="exportExcel()" :disabled="isExportingExcel" type="button" class="px-3.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 rounded-xl text-sm font-semibold text-white shadow-sm transition-all flex items-center gap-2" title="Ekspor data kegiatan yang difilter ke Excel (.xlsx)">
+                        <span class="material-symbols-outlined text-[18px]" :class="isExportingExcel ? 'animate-spin' : ''" x-text="isExportingExcel ? 'progress_activity' : 'table_view'"></span>
+                        <span x-text="isExportingExcel ? 'Mengunduh...' : 'Ekspor Excel'"></span>
+                    </button>
+
+                    <!-- Tombol Ekspor PDF -->
+                    <button @click="exportPDF()" :disabled="isExportingPdf" type="button" class="px-3.5 py-2.5 bg-rose-600 hover:bg-rose-700 disabled:opacity-60 rounded-xl text-sm font-semibold text-white shadow-sm transition-all flex items-center gap-2" title="Ekspor data kegiatan yang difilter ke PDF (.pdf)">
+                        <span class="material-symbols-outlined text-[18px]" :class="isExportingPdf ? 'animate-spin' : ''" x-text="isExportingPdf ? 'progress_activity' : 'picture_as_pdf'"></span>
+                        <span x-text="isExportingPdf ? 'Membuat PDF...' : 'Ekspor PDF'"></span>
+                    </button>
+
+                    <!-- Tombol Tambah Kegiatan -->
                     <button @click="openCreate()" type="button" class="px-4 py-2.5 bg-super-active hover:bg-super-hover rounded-xl text-sm font-semibold text-white shadow-md transition-all flex items-center gap-2">
                         <span class="material-symbols-outlined text-[18px]">add</span>
                         <span>Tambah Kegiatan</span>
@@ -30,30 +43,49 @@
             </div>
 
             <!-- Filter Section -->
-            <div class="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-end">
-                <div class="flex-1 w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm mb-6 flex flex-col lg:flex-row gap-4 items-end">
+                <div class="flex-1 w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Filter Bulan -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Bulan Kegiatan</label>
+                        <input type="month" x-model="filterBulan" @change="onMonthChange()" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-super-active/20 focus:border-super-active outline-none transition-all text-sm text-slate-700">
+                    </div>
+                    <!-- Mulai Tanggal -->
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Mulai Tanggal</label>
-                        <input type="date" x-model="filterDateStart" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-super-active/20 focus:border-super-active outline-none transition-all text-sm">
+                        <input type="date" x-model="filterDateStart" @change="onDateChange()" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-super-active/20 focus:border-super-active outline-none transition-all text-sm text-slate-700">
                     </div>
+                    <!-- Sampai Tanggal -->
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Sampai Tanggal</label>
-                        <input type="date" x-model="filterDateEnd" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-super-active/20 focus:border-super-active outline-none transition-all text-sm">
+                        <input type="date" x-model="filterDateEnd" @change="onDateChange()" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-super-active/20 focus:border-super-active outline-none transition-all text-sm text-slate-700">
                     </div>
+                    <!-- Jenis Kegiatan -->
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Jenis Kegiatan</label>
-                        <select x-model="filterJenis" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-super-active/20 focus:border-super-active outline-none transition-all text-sm">
-                            <option value="">Semua</option>
+                        <select x-model="filterJenis" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-super-active/20 focus:border-super-active outline-none transition-all text-sm text-slate-700">
+                            <option value="">Semua Jenis</option>
                             <option value="Internal">Internal</option>
                             <option value="Eksternal">Eksternal</option>
                         </select>
                     </div>
                 </div>
-                <div class="w-full md:w-auto">
-                    <button @click="resetFilter()" class="w-full md:w-auto px-4 py-2.5 border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-800 rounded-xl font-semibold text-sm transition-colors flex items-center justify-center gap-2 shadow-sm bg-white">
+                <div class="w-full lg:w-auto shrink-0 flex items-center gap-2">
+                    <button @click="resetFilter()" class="w-full lg:w-auto px-4 py-2.5 border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-800 rounded-xl font-semibold text-sm transition-colors flex items-center justify-center gap-1.5 shadow-sm bg-white">
                         <span class="material-symbols-outlined text-[18px]">restart_alt</span>
                         Reset
                     </button>
+                </div>
+            </div>
+
+            <!-- Total Data & Filter Indicator -->
+            <div class="flex items-center justify-between mb-4 px-1">
+                <div class="flex items-center gap-2 text-sm text-slate-600">
+                    <span>Menampilkan <strong class="text-slate-800" x-text="filteredKegiatans().length"></strong> kegiatan</span>
+                    <span x-show="filterBulan || filterDateStart || filterDateEnd || filterJenis" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                        <span class="material-symbols-outlined text-[14px]">filter_alt</span>
+                        <span x-text="getFilterInfo()"></span>
+                    </span>
                 </div>
             </div>
 
@@ -258,21 +290,39 @@
             </div>
         </div>
 
-        <!-- ======================= VIEW: CREATE ======================= -->
-        <div x-show="view === 'create'" x-transition.opacity.duration.300ms style="display: none;">
-            <div class="max-w-5xl mx-auto">
-                <div class="flex items-center gap-4 mb-6">
-                    <button @click="view = 'list'" class="p-2 bg-white border border-slate-200 rounded-full text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-colors">
-                        <span class="material-symbols-outlined">arrow_back</span>
-                    </button>
+        <!-- ======================= MODAL: CREATE / EDIT ======================= -->
+        <div x-show="showModal" 
+             @keydown.escape.window="closeModal()" 
+             class="fixed inset-0 z-[100] flex items-center justify-center p-4" 
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             style="display: none;">
+            <div class="absolute inset-0 bg-black/40" @click="closeModal()"></div>
+            <div class="relative w-full max-w-xl bg-white rounded-2xl shadow-xl overflow-hidden max-h-[90vh] flex flex-col"
+                 x-show="showModal"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                 x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+                 
+                <!-- Modal Header -->
+                <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 shrink-0">
                     <div>
-                        <h2 class="text-2xl font-bold font-headline text-slate-900" x-text="isEdit ? 'Edit Acara / Kegiatan' : 'Tambah Acara / Kegiatan'"></h2>
-                        <p class="text-sm text-slate-500 mt-1" x-text="isEdit ? 'Ubah informasi kegiatan di bawah ini.' : 'Lengkapi form di bawah untuk menjadwalkan kegiatan baru.'"></p>
+                        <h2 class="font-headline font-bold text-lg text-slate-800" x-text="isEdit ? 'Edit Acara / Kegiatan' : 'Tambah Acara / Kegiatan'"></h2>
+                        <p class="text-sm text-slate-500 mt-0.5" x-text="isEdit ? 'Ubah informasi kegiatan di bawah ini.' : 'Lengkapi form di bawah untuk menjadwalkan kegiatan baru.'"></p>
                     </div>
+                    <button type="button" @click="closeModal()" class="text-slate-400 hover:text-slate-600 transition-colors p-2 rounded-full hover:bg-slate-100">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
                 </div>
 
-                <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden mb-8">
-                    <div class="p-6 md:p-8 space-y-8">
+                <div class="flex-1 overflow-y-auto p-6 md:p-8 space-y-8">
                         
                         <!-- Informasi Dasar -->
                         <div>
@@ -415,25 +465,23 @@
 
                             <div class="flex items-center justify-between mb-3 border-t border-slate-100 pt-4 mt-2">
                                 <div>
-                                    <label class="block text-sm font-semibold text-slate-700">Peta Digital (Opsional)</label>
-                                    <p class="text-xs text-slate-500 mt-0.5">Sematkan pin di peta untuk keakuratan data koordinat.</p>
+                                    <label class="block text-sm font-semibold text-slate-700">
+                                        Peta Digital <span class="text-red-500">*</span>
+                                    </label>
+                                    <p class="text-xs text-slate-500 mt-0.5">Sematkan pin di peta untuk keakuratan data koordinat lokasi (wajib).</p>
                                 </div>
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" x-model="showMap" class="sr-only peer" @change="toggleMap()">
-                                    <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-super-active"></div>
-                                </label>
                             </div>
 
-                            <!-- Peta Container (Bisa disembunyikan jika dimatikan) -->
-                            <div x-show="showMap" style="display: none;">
+                            <!-- Peta Container (Wajib) -->
+                            <div>
                                 <div class="grid grid-cols-2 gap-4 mb-3">
                                     <div>
-                                        <label class="block text-xs font-semibold text-slate-500 mb-1">Latitude</label>
-                                        <input type="text" x-model="formLat" readonly placeholder="Otomatis dari map" class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-600 outline-none cursor-not-allowed">
+                                        <label class="block text-xs font-semibold text-slate-500 mb-1">Latitude <span class="text-red-500">*</span></label>
+                                        <input type="text" x-model="formLat" readonly placeholder="Klik pada peta..." class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-600 outline-none cursor-not-allowed">
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-semibold text-slate-500 mb-1">Longitude</label>
-                                        <input type="text" x-model="formLng" readonly placeholder="Otomatis dari map" class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-600 outline-none cursor-not-allowed">
+                                        <label class="block text-xs font-semibold text-slate-500 mb-1">Longitude <span class="text-red-500">*</span></label>
+                                        <input type="text" x-model="formLng" readonly placeholder="Klik pada peta..." class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-600 outline-none cursor-not-allowed">
                                     </div>
                                 </div>
                                 
@@ -511,18 +559,17 @@
                             </div>
                         </div>
 
-                    </div>
-                    
-                    <!-- Form Actions -->
-                    <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-3 sticky bottom-0 z-50">
-                        <button @click="view = 'list'" class="px-6 py-2.5 border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 rounded-xl font-semibold text-sm transition-colors">
-                            Batal
-                        </button>
-                        <button @click="saveKegiatan()" class="px-6 py-2.5 bg-super-active hover:bg-super-hover text-white rounded-xl font-semibold text-sm transition-colors shadow-md flex items-center gap-2">
-                            <span class="material-symbols-outlined text-[18px]">save</span>
-                            <span x-text="isEdit ? 'Perbarui Kegiatan' : 'Simpan Kegiatan'"></span>
-                        </button>
-                    </div>
+                </div>
+                
+                <!-- Form Actions -->
+                <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-3 shrink-0">
+                    <button type="button" @click="closeModal()" class="px-6 py-2.5 border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 rounded-xl font-semibold text-sm transition-colors">
+                        Batal
+                    </button>
+                    <button @click="saveKegiatan()" class="px-6 py-2.5 bg-super-active hover:bg-super-hover text-white rounded-xl font-semibold text-sm transition-colors shadow-md flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">save</span>
+                        <span x-text="isEdit ? 'Perbarui Kegiatan' : 'Simpan Kegiatan'"></span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -535,14 +582,20 @@
     <script>
         function kegiatanManager() {
             return {
-                view: 'list', // 'list', 'detail', 'create'
+                view: 'list', // 'list', 'detail'
+                showModal: false,
                 
                 // Filter States
+                filterBulan: '',
                 filterDateStart: '',
                 filterDateEnd: '',
                 filterJenis: '',
                 selectedKegiatan: null,
                 mapDetailInstance: null,
+
+                // Export Loading States
+                isExportingExcel: false,
+                isExportingPdf: false,
                 
                 // Form Data
                 formNama: '',
@@ -623,7 +676,6 @@
                 ],
                 
                 // Map Options
-                showMap: false,
                 mapInstance: null,
                 markerInstance: null,
                 
@@ -632,12 +684,30 @@
                 previewVideo: null,
 
                 init() {
-                    // Watch for map toggle to initialize appropriately
-                    this.$watch('showMap', val => {
+                    this.$watch('showModal', val => {
                         if (val) {
                             setTimeout(() => {
                                 this.initMap();
-                            }, 100);
+                                if (this.mapInstance) {
+                                    this.mapInstance.invalidateSize();
+                                }
+                                if (this.isEdit && this.formLat && this.formLng && this.mapInstance) {
+                                    const latlng = [parseFloat(this.formLat), parseFloat(this.formLng)];
+                                    this.mapInstance.setView(latlng, 16);
+                                    if (this.markerInstance) {
+                                        this.markerInstance.setLatLng(latlng);
+                                    } else {
+                                        this.markerInstance = L.marker(latlng).addTo(this.mapInstance);
+                                    }
+                                } else if (!this.isEdit && this.mapInstance) {
+                                    this.mapInstance.setView([-6.175110, 106.827153], 13);
+                                }
+                            }, 150);
+                            setTimeout(() => {
+                                if (this.mapInstance) {
+                                    this.mapInstance.invalidateSize();
+                                }
+                            }, 350);
                         }
                     });
                 },
@@ -669,9 +739,25 @@
                     this.selectedAnggota.splice(index, 1);
                 },
 
+                onMonthChange() {
+                    if (this.filterBulan) {
+                        this.filterDateStart = '';
+                        this.filterDateEnd = '';
+                    }
+                },
+
+                onDateChange() {
+                    if (this.filterDateStart || this.filterDateEnd) {
+                        this.filterBulan = '';
+                    }
+                },
+
                 filteredKegiatans() {
                     return this.kegiatanList.filter(item => {
                         let match = true;
+                        if (this.filterBulan) {
+                            match = match && item.tanggal && item.tanggal.startsWith(this.filterBulan);
+                        }
                         if (this.filterDateStart) {
                             match = match && (item.tanggal >= this.filterDateStart);
                         }
@@ -686,9 +772,262 @@
                 },
 
                 resetFilter() {
+                    this.filterBulan = '';
                     this.filterDateStart = '';
                     this.filterDateEnd = '';
                     this.filterJenis = '';
+                },
+
+                getFilterInfo() {
+                    let parts = [];
+                    if (this.filterBulan) {
+                        const [year, month] = this.filterBulan.split('-');
+                        const monthNames = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+                        parts.push(`Bulan ${monthNames[parseInt(month)] || month} ${year}`);
+                    } else if (this.filterDateStart && this.filterDateEnd) {
+                        parts.push(`${this.filterDateStart} s/d ${this.filterDateEnd}`);
+                    } else if (this.filterDateStart) {
+                        parts.push(`Mulai ${this.filterDateStart}`);
+                    } else if (this.filterDateEnd) {
+                        parts.push(`Sampai ${this.filterDateEnd}`);
+                    } else {
+                        parts.push('Semua Periode');
+                    }
+
+                    if (this.filterJenis) {
+                        parts.push(`Jenis: ${this.filterJenis}`);
+                    }
+                    return parts.join(' • ');
+                },
+
+                getFilterFileSuffix() {
+                    let suffix = '';
+                    if (this.filterBulan) {
+                        suffix = this.filterBulan;
+                    } else if (this.filterDateStart || this.filterDateEnd) {
+                        suffix = `${this.filterDateStart || 'awal'}_sd_${this.filterDateEnd || 'akhir'}`;
+                    } else {
+                        suffix = 'Semua_Periode';
+                    }
+                    if (this.filterJenis) {
+                        suffix += `_${this.filterJenis}`;
+                    }
+                    return suffix;
+                },
+
+                loadScript(src) {
+                    return new Promise((resolve, reject) => {
+                        if (document.querySelector(`script[src="${src}"]`)) {
+                            resolve();
+                            return;
+                        }
+                        const script = document.createElement('script');
+                        script.src = src;
+                        script.onload = resolve;
+                        script.onerror = () => reject(new Error('Gagal memuat pustaka dari CDN: ' + src));
+                        document.head.appendChild(script);
+                    });
+                },
+
+                async exportExcel() {
+                    const list = this.filteredKegiatans();
+                    if (!list || list.length === 0) {
+                        alert('Tidak ada data kegiatan yang sesuai dengan filter untuk diekspor.');
+                        return;
+                    }
+
+                    this.isExportingExcel = true;
+                    try {
+                        if (typeof XLSX === 'undefined') {
+                            await this.loadScript('https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js');
+                        }
+
+                        const dataRows = list.map((item, index) => {
+                            let namaPeserta = '-';
+                            if (item.peserta && item.peserta.length > 0) {
+                                const members = this.allAnggota
+                                    .filter(a => item.peserta.includes(a.id))
+                                    .map(a => `${a.nama} (${a.jabatan})`);
+                                if (members.length > 0) {
+                                    namaPeserta = members.join(', ');
+                                }
+                            }
+
+                            return {
+                                'No': index + 1,
+                                'Nama Kegiatan': item.nama,
+                                'Tanggal': item.tanggal,
+                                'Waktu': item.waktu ? item.waktu + ' WIB' : '-',
+                                'Jenis': item.jenis,
+                                'Lokasi': item.lokasi,
+                                'Koordinat (Lat, Lng)': (item.lat && item.lng) ? `${item.lat}, ${item.lng}` : '-',
+                                'Jumlah Anggota': item.peserta ? item.peserta.length + ' Orang' : '0',
+                                'Daftar Anggota Bertugas': namaPeserta,
+                                'Deskripsi / Catatan': item.deskripsi || '-'
+                            };
+                        });
+
+                        const worksheet = XLSX.utils.json_to_sheet(dataRows);
+                        worksheet['!cols'] = [
+                            { wch: 6 },
+                            { wch: 35 },
+                            { wch: 14 },
+                            { wch: 12 },
+                            { wch: 12 },
+                            { wch: 35 },
+                            { wch: 25 },
+                            { wch: 16 },
+                            { wch: 45 },
+                            { wch: 45 },
+                        ];
+
+                        const workbook = XLSX.utils.book_new();
+                        XLSX.utils.book_append_sheet(workbook, worksheet, 'Data Kegiatan');
+                        const filename = `Laporan_Kegiatan_SatpolPP_${this.getFilterFileSuffix()}.xlsx`;
+                        XLSX.writeFile(workbook, filename);
+                    } catch (err) {
+                        alert('Terjadi kesalahan saat memproses ekspor Excel: ' + err.message);
+                    } finally {
+                        this.isExportingExcel = false;
+                    }
+                },
+
+                async exportPDF() {
+                    const list = this.filteredKegiatans();
+                    if (!list || list.length === 0) {
+                        alert('Tidak ada data kegiatan yang sesuai dengan filter untuk diekspor.');
+                        return;
+                    }
+
+                    this.isExportingPdf = true;
+                    try {
+                        if (!window.jspdf || !window.jspdf.jsPDF) {
+                            await this.loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+                        }
+                        if (!window.jspdf || !window.jspdf.jsPDF.prototype.autoTable) {
+                            await this.loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js');
+                        }
+
+                        const { jsPDF } = window.jspdf;
+                        const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+                        // Header Kop Surat
+                        doc.setFont('helvetica', 'bold');
+                        doc.setFontSize(13);
+                        doc.setTextColor(30, 41, 59);
+                        doc.text('PEMERINTAH PROVINSI DAERAH KHUSUS IBUKOTA JAKARTA', doc.internal.pageSize.getWidth() / 2, 14, { align: 'center' });
+                        
+                        doc.setFontSize(15);
+                        doc.text('SATUAN POLISI PAMONG PRAJA (SATPOL PP)', doc.internal.pageSize.getWidth() / 2, 21, { align: 'center' });
+                        
+                        doc.setFont('helvetica', 'normal');
+                        doc.setFontSize(10);
+                        doc.setTextColor(100, 116, 139);
+                        doc.text('LAPORAN REKAPITULASI AGENDA & KEGIATAN OPERASIONAL', doc.internal.pageSize.getWidth() / 2, 27, { align: 'center' });
+
+                        // Garis Pemisah Kop
+                        doc.setDrawColor(203, 213, 225);
+                        doc.setLineWidth(0.6);
+                        doc.line(14, 30, doc.internal.pageSize.getWidth() - 14, 30);
+
+                        // Metadata Filter & Waktu Cetak
+                        doc.setFontSize(8.5);
+                        doc.setTextColor(71, 85, 105);
+                        const filterText = `Kriteria Filter: ${this.getFilterInfo()}`;
+                        const dateText = `Dicetak: ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })} WIB`;
+                        doc.text(filterText, 14, 36);
+                        doc.text(dateText, doc.internal.pageSize.getWidth() - 14, 36, { align: 'right' });
+
+                        // Tabel Data
+                        const tableHeaders = [['No', 'Nama Kegiatan', 'Tanggal & Waktu', 'Jenis', 'Lokasi', 'Peserta', 'Keterangan']];
+                        const tableBody = list.map((item, index) => {
+                            let anggotaNames = '-';
+                            if (item.peserta && item.peserta.length > 0) {
+                                const members = this.allAnggota.filter(a => item.peserta.includes(a.id)).map(a => a.nama);
+                                if (members.length > 0) anggotaNames = members.join(', ');
+                            }
+                            const datetime = item.tanggal + (item.waktu ? '\n' + item.waktu + ' WIB' : '');
+                            return [
+                                index + 1,
+                                item.nama,
+                                datetime,
+                                item.jenis,
+                                item.lokasi,
+                                `${item.peserta ? item.peserta.length : 0} Anggota\n(${anggotaNames})`,
+                                item.deskripsi || '-'
+                            ];
+                        });
+
+                        doc.autoTable({
+                            head: tableHeaders,
+                            body: tableBody,
+                            startY: 40,
+                            theme: 'striped',
+                            headStyles: {
+                                fillColor: [43, 79, 124], // Warna Satpol Navy
+                                textColor: 255,
+                                fontSize: 9,
+                                fontStyle: 'bold',
+                                halign: 'center'
+                            },
+                            bodyStyles: {
+                                fontSize: 8,
+                                textColor: [30, 41, 59],
+                                cellPadding: 3
+                            },
+                            columnStyles: {
+                                0: { halign: 'center', cellWidth: 10 },
+                                1: { cellWidth: 50, fontStyle: 'bold' },
+                                2: { halign: 'center', cellWidth: 28 },
+                                3: { halign: 'center', cellWidth: 20 },
+                                4: { cellWidth: 55 },
+                                5: { cellWidth: 45 },
+                                6: { cellWidth: 'auto' }
+                            },
+                            alternateRowStyles: {
+                                fillColor: [248, 250, 252]
+                            },
+                            margin: { left: 14, right: 14 },
+                            didDrawPage: function (data) {
+                                const pageCount = doc.internal.getNumberOfPages();
+                                doc.setFontSize(8);
+                                doc.setTextColor(148, 163, 184);
+                                doc.text(`Halaman ${data.pageNumber} dari ${pageCount}`, doc.internal.pageSize.getWidth() - 14, doc.internal.pageSize.getHeight() - 10, { align: 'right' });
+                                doc.text('SIGAP Satpol PP - Dokumen Resmi Pemerintah Provinsi DKI Jakarta', 14, doc.internal.pageSize.getHeight() - 10);
+                            }
+                        });
+
+                        // Blok Tanda Tangan
+                        const finalY = doc.lastAutoTable.finalY || 40;
+                        const pageHeight = doc.internal.pageSize.getHeight();
+                        let signY = finalY + 12;
+
+                        if (signY + 36 > pageHeight) {
+                            doc.addPage();
+                            signY = 20;
+                        }
+
+                        const pageWidth = doc.internal.pageSize.getWidth();
+                        doc.setFontSize(9);
+                        doc.setTextColor(30, 41, 59);
+                        const todayStr = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+                        doc.text(`Jakarta, ${todayStr}`, pageWidth - 55, signY);
+                        doc.text('Mengetahui,', pageWidth - 55, signY + 5);
+                        doc.text('Kasubag Operasional Satpol PP', pageWidth - 55, signY + 10);
+                        
+                        doc.setFont('helvetica', 'bold');
+                        doc.text('( Budi Santoso, S.STP )', pageWidth - 55, signY + 28);
+                        doc.setFont('helvetica', 'normal');
+                        doc.setFontSize(8);
+                        doc.text('NIP. 19850315 200801 1 002', pageWidth - 55, signY + 32);
+
+                        const filename = `Laporan_Kegiatan_SatpolPP_${this.getFilterFileSuffix()}.pdf`;
+                        doc.save(filename);
+                    } catch (err) {
+                        alert('Terjadi kesalahan saat memproses ekspor PDF: ' + err.message);
+                    } finally {
+                        this.isExportingPdf = false;
+                    }
                 },
 
                 openDetail(item) {
@@ -734,7 +1073,6 @@
                     this.formTemplate = '';
                     this.searchAnggota = '';
                     this.selectedAnggota = [];
-                    this.showMap = false;
                     
                     this.previewPhotos.forEach(p => URL.revokeObjectURL(p.url));
                     this.previewPhotos = [];
@@ -746,8 +1084,11 @@
                         this.markerInstance = null;
                     }
 
-                    this.view = 'create';
-                    window.scrollTo(0,0);
+                    this.showModal = true;
+                },
+
+                closeModal() {
+                    this.showModal = false;
                 },
 
                 applyTemplate() {
@@ -774,20 +1115,13 @@
                     
                     this.selectedAnggota = this.allAnggota.filter(a => item.peserta.includes(a.id));
                     
-                    this.showMap = !!(this.formLat && this.formLng);
-                    
-                    this.view = 'create';
-                    window.scrollTo(0,0);
+                    this.showModal = true;
                 },
 
                 deleteKegiatan(id) {
                     if (confirm('Yakin ingin menghapus kegiatan ini?')) {
                         this.kegiatanList = this.kegiatanList.filter(k => k.id !== id);
                     }
-                },
-
-                toggleMap() {
-                    // Triggered by checkbox, handled by $watch in init()
                 },
 
                 initMap() {
@@ -908,7 +1242,11 @@
 
                 saveKegiatan() {
                     if (!this.formNama || !this.formLokasi || !this.formTanggal) {
-                        alert('Harap lengkapi nama kegiatan, tanggal, dan lokasi manual.');
+                        alert('Harap lengkapi nama kegiatan, tanggal, dan alamat lokasi.');
+                        return;
+                    }
+                    if (!this.formLat || !this.formLng) {
+                        alert('Harap tentukan titik pin lokasi pada peta digital (wajib).');
                         return;
                     }
                     if (this.selectedAnggota.length === 0) {
@@ -947,7 +1285,7 @@
                         alert('Kegiatan berhasil dijadwalkan (Prototype).');
                     }
                     
-                    this.view = 'list';
+                    this.showModal = false;
                 }
             }
         }
