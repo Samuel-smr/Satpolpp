@@ -95,7 +95,7 @@
             <a href="{{ route('super_admin.evaluasi') }}"
                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all {{ request()->routeIs('super_admin.evaluasi') ? 'bg-super-active text-white shadow-md font-semibold' : 'text-slate-300 hover:bg-super-hover hover:text-white' }}">
                 <span class="material-symbols-outlined text-[20px]">assessment</span>
-                <span>Evaluasi Petugas</span>
+                <span>Evaluasi Kegiatan</span>
             </a>
 
             <a href="{{ route('super_admin.monitoring') }}"
@@ -188,7 +188,7 @@
                     { id: 2, jenis: 'petugas', pesan: 'Petugas Bambang Sutrisno ditambahkan ke Regu A.', waktu: '10 menit lalu', dibaca: false },
                     { id: 3, jenis: 'aset', pesan: 'Aset baru ditambahkan: Mobil Patroli Dalmas.', waktu: '1 jam lalu', dibaca: false },
                     { id: 4, jenis: 'organisasi', pesan: 'Data unit kerja diperbarui oleh Admin.', waktu: '3 jam lalu', dibaca: true },
-                    { id: 5, jenis: 'evaluasi', pesan: 'Penilaian kinerja petugas bulan ini telah diperbarui.', waktu: '1 hari lalu', dibaca: true },
+                    { id: 5, jenis: 'evaluasi', pesan: 'Evaluasi kegiatan bulan ini telah diperbarui.', waktu: '1 hari lalu', dibaca: true },
                 ];
                 localStorage.setItem(NOTIF_KODE, JSON.stringify(data));
             }
