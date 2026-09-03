@@ -683,6 +683,14 @@
                 previewVideo: null,
 
                 init() {
+                    try {
+                        const saved = JSON.parse(localStorage.getItem('sipraja_kegiatan') || 'null');
+                        if (Array.isArray(saved) && saved.length) {
+                            this.kegiatanList = saved;
+                        } else {
+                            localStorage.setItem('sipraja_kegiatan', JSON.stringify(this.kegiatanList));
+                        }
+                    } catch (e) {}
                     this.$watch('showModal', val => {
                         if (val) {
                             setTimeout(() => {
@@ -1120,6 +1128,7 @@
                 deleteKegiatan(id) {
                     if (confirm('Yakin ingin menghapus kegiatan ini?')) {
                         this.kegiatanList = this.kegiatanList.filter(k => k.id !== id);
+                        localStorage.setItem('sipraja_kegiatan', JSON.stringify(this.kegiatanList));
                     }
                 },
 
@@ -1289,6 +1298,7 @@
                     }
                     
                     this.showModal = false;
+                    localStorage.setItem('sipraja_kegiatan', JSON.stringify(this.kegiatanList));
                 }
             }
         }
