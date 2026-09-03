@@ -38,4 +38,9 @@ class AdminController extends Controller
     {
         return view('admin.peta');
     }
+
+    public function profile()
+    {
+        return view('admin.profile');
+    }
 }
