@@ -309,6 +309,17 @@
                                 class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-600 outline-none cursor-not-allowed">
                         </div>
                     </div>
+                    <div class="flex gap-2 mb-3">
+                        <div class="flex-1 relative">
+                            <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-[18px]">search</span>
+                            <input type="text" id="cari-lokasi-input" placeholder="Cari lokasi / alamat..." onkeydown="if(event.key==='Enter'){event.preventDefault();geocodeCariLokasi();}"
+                                class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm">
+                        </div>
+                        <button type="button" onclick="geocodeCariLokasi()" class="inline-flex items-center justify-center gap-1.5 bg-sidebar-active hover:bg-sidebar-hover text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-sm transition-colors">
+                            <span class="material-symbols-outlined text-[18px]">search</span>
+                            Cari
+                        </button>
+                    </div>
                     <div class="relative">
                         <div id="map-picker"
                             class="w-full h-64 bg-slate-100 rounded-xl border border-slate-200 overflow-hidden z-10"></div>

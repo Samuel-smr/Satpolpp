@@ -61,18 +61,13 @@
                 <ol class="relative ml-1" id="tracking-list"></ol>
 
                 {{-- Bukti --}}
-                <div class="mt-8 border-t border-slate-200 pt-6">
+                <div id="bukti-section" class="hidden mt-8 border-t border-slate-200 pt-6">
                     <h3 class="font-headline font-bold text-slate-800 mb-3">📸 Bukti Penanganan</h3>
                     <p class="text-sm text-slate-500 mb-4">Dokumentasi dari petugas sebagai bukti laporan telah ditangani.</p>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="bukti-list">
-                        <figure class="relative aspect-video rounded-xl overflow-hidden border border-slate-200 bg-slate-100">
-                            <img src="{{ asset('images/bukti-satpol.jpg') }}" alt="Bukti penanganan laporan" class="w-full h-full object-cover">
-                            <figcaption class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent px-3 py-2 text-xs text-white">Bukti penanganan 1</figcaption>
-                        </figure>
-                        <figure class="relative aspect-video rounded-xl overflow-hidden border border-slate-200 bg-slate-100">
-                            <img src="{{ asset('images/bukti-satpol.jpg') }}" alt="Bukti penanganan laporan" class="w-full h-full object-cover">
-                            <figcaption class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent px-3 py-2 text-xs text-white">Bukti penanganan 2</figcaption>
-                        </figure>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="bukti-list"></div>
+                    <div id="bukti-keterangan" class="mt-4 bg-slate-50 border border-slate-200 rounded-xl p-4">
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Keterangan Hasil Penanganan</p>
+                        <p class="text-sm text-slate-700" id="bukti-keterangan-text">--</p>
                     </div>
                 </div>
 
@@ -221,6 +216,25 @@
             document.getElementById('rating-komentar').value = '';
             ratingPicked = 0;
             ratingRender(0);
+        }
+
+        // Bukti penanganan (foto + keterangan) — tanpa lokasi penandaan admin
+        const buktiSection = document.getElementById('bukti-section');
+        const buktiList = document.getElementById('bukti-list');
+        const adaBukti = r.buktiSelesai && r.buktiSelesai.length > 0;
+        if (idx >= 5 && adaBukti) {
+            buktiSection.classList.remove('hidden');
+            buktiList.innerHTML = r.buktiSelesai.map((f, i) => `
+                <figure class="relative aspect-video rounded-xl overflow-hidden border border-slate-200 bg-slate-100">
+                    <img src="${f.url}" alt="Bukti penanganan ${i + 1}" class="w-full h-full object-cover">
+                    <figcaption class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent px-3 py-2 text-xs text-white">Bukti penanganan ${i + 1}</figcaption>
+                </figure>
+            `).join('');
+            document.getElementById('bukti-keterangan-text').textContent = r.keteranganSelesai || '-';
+        } else {
+            buktiSection.classList.add('hidden');
+            buktiList.innerHTML = '';
+            document.getElementById('bukti-keterangan-text').textContent = '';
         }
 
         window.scrollTo({ top: 0, behavior: 'smooth' });

@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'Admin Dashboard') | SIGAP Satpol PP</title>
+    <title>@yield('title', 'Admin Dashboard') | SIPRAJA Satpol PP</title>
 
     {{-- Fonts --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -57,12 +57,10 @@
         <!-- Logo Section -->
         <div class="px-6 py-6 flex items-center gap-3">
             <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center p-1.5 flex-shrink-0">
-                <img src="{{ asset('images/logo-sipraja.png') }}" alt="Logo SIGAP Satpol PP"
-                    class="w-full h-full object-contain">
-                </img>
+                <img src="{{ asset('images/logo-sipraja.png') }}" alt="Logo SIPRAJA Satpol PP" class="w-full h-full object-contain">
             </div>
             <div>
-                <h1 class="font-headline font-bold text-lg text-white leading-tight tracking-wide">SIGAP</h1>
+                <h1 class="font-headline font-bold text-lg text-white leading-tight tracking-wide">SIPRAJA</h1>
                 <p class="text-xs text-slate-400 font-medium">Satpol PP Admin</p>
             </div>
         </div>

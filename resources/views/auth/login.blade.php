@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Login - SIGAP Satpol PP</title>
+    <title>Login - SIPRAJA Satpol PP</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
@@ -117,10 +117,10 @@
         <!-- Header Branding -->
         <div class="relative z-10 flex items-center gap-4">
             <div class="w-12 h-12 rounded-full bg-surface flex items-center justify-center shadow-md overflow-hidden p-1.5">
-                <img src="{{ asset('images/logo-sipraja.png') }}" alt="Logo SIGAP Satpol PP" class="w-full h-full object-contain">
+                <img src="{{ asset('images/logo-sipraja.png') }}" alt="Logo SIPRAJA Satpol PP" class="w-full h-full object-contain">
             </div>
             <div>
-                <h1 class="font-headline-md text-headline-md text-on-primary m-0 p-0 leading-tight">SIGAP</h1>
+                <h1 class="font-headline-md text-headline-md text-on-primary m-0 p-0 leading-tight">SIPRAJA</h1>
                 <p class="font-label-sm text-label-sm text-on-primary/80 m-0 p-0 tracking-wider">SATUAN POLISI PAMONG PRAJA</p>
             </div>
         </div>
@@ -136,10 +136,10 @@
         <!-- Mobile Header Logo -->
         <div class="md:hidden flex items-center gap-3 mb-10 justify-center">
             <div class="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center shadow-sm overflow-hidden p-1">
-                <img src="{{ asset('images/logo-sipraja.png') }}" alt="Logo SIGAP Satpol PP" class="w-full h-full object-contain">
+                <img src="{{ asset('images/logo-sipraja.png') }}" alt="Logo SIPRAJA Satpol PP" class="w-full h-full object-contain">
             </div>
             <div>
-                <h1 class="font-headline-md text-headline-md text-primary m-0 p-0 leading-tight">SIGAP</h1>
+                <h1 class="font-headline-md text-headline-md text-primary m-0 p-0 leading-tight">SIPRAJA</h1>
                 <p class="font-label-sm text-label-sm text-on-surface-variant m-0 p-0 tracking-wider uppercase">Satpol PP</p>
             </div>
         </div>
