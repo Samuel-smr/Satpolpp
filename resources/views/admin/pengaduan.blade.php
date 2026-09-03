@@ -349,7 +349,7 @@
     }
 
     function bukaDetail(kode) {
-        window.location.href = '{{ url('admin/pengaduan') }}/' + encodeURIComponent(kode);
+        window.location.href = "{{ url('admin/pengaduan') }}/" + encodeURIComponent(kode);
     }
 
     function findGlobalIndex(detailIdx) {
