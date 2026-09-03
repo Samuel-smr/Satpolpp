@@ -211,84 +211,100 @@
             </div>
         </div>
 
-        <!-- ======================= VIEW: CREATE / EDIT ======================= -->
-        <div x-show="view === 'create'" x-transition.opacity.duration.300ms style="display: none;">
-            <div class="max-w-4xl mx-auto">
-                <div class="flex items-center gap-4 mb-6">
-                    <button @click="view = 'list'" class="p-2 bg-white border border-slate-200 rounded-full text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-colors">
-                        <span class="material-symbols-outlined">arrow_back</span>
-                    </button>
+        <!-- ======================= MODAL: CREATE / EDIT ======================= -->
+        <div x-show="showModal" 
+             @keydown.escape.window="closeModal()" 
+             class="fixed inset-0 z-[100] flex items-center justify-center p-4" 
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             style="display: none;">
+            <div class="absolute inset-0 bg-black/40" @click="closeModal()"></div>
+            <div class="relative w-full max-w-xl bg-white rounded-2xl shadow-xl overflow-hidden max-h-[90vh] flex flex-col"
+                 x-show="showModal"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                 x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+                 
+                <!-- Modal Header -->
+                <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 shrink-0">
                     <div>
-                        <h2 class="text-2xl font-bold font-headline text-slate-900" x-text="isEdit ? 'Edit Arsip / Dokumen' : 'Unggah Arsip Baru'"></h2>
-                        <p class="text-sm text-slate-500 mt-1" x-text="isEdit ? 'Ubah informasi arsip di bawah ini.' : 'Lengkapi form untuk mengunggah dokumen arsip ke dalam sistem.'"></p>
+                        <h2 class="font-headline font-bold text-lg text-slate-800" x-text="isEdit ? 'Edit Arsip / Dokumen' : 'Unggah Arsip Baru'"></h2>
+                        <p class="text-sm text-slate-500 mt-0.5" x-text="isEdit ? 'Ubah informasi arsip di bawah ini.' : 'Lengkapi form untuk mengunggah dokumen arsip ke dalam sistem.'"></p>
+                    </div>
+                    <button type="button" @click="closeModal()" class="text-slate-400 hover:text-slate-600 transition-colors p-2 rounded-full hover:bg-slate-100">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="flex-1 overflow-y-auto p-6 md:p-8 space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Nama Arsip -->
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Nama Arsip / Dokumen <span class="text-red-500">*</span></label>
+                            <input type="text" x-model="formNama" placeholder="Contoh: BAP Penertiban PKL Tanah Abang" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm">
+                        </div>
+
+                        <!-- Kategori -->
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Kategori <span class="text-red-500">*</span></label>
+                            <select x-model="formKategori" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm appearance-none">
+                                <option value="" disabled selected>Pilih Kategori...</option>
+                                <option value="Penertiban">Penertiban</option>
+                                <option value="Pengaduan">Pengaduan</option>
+                                <option value="SOP">SOP &amp; Regulasi</option>
+                                <option value="Dokumen">Dokumen Umum</option>
+                                <option value="Media">Dokumentasi Media</option>
+                            </select>
+                        </div>
+
+                        <!-- Sifat -->
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Sifat Dokumen</label>
+                            <select class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm appearance-none">
+                                <option value="public">Biasa / Publik</option>
+                                <option value="confidential">Rahasia / Confidential</option>
+                            </select>
+                        </div>
+
+                        <!-- Deskripsi -->
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Keterangan / Deskripsi Ringkas</label>
+                            <textarea x-model="formDeskripsi" rows="3" placeholder="Tuliskan keterangan mengenai isi dokumen ini..." class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm resize-y"></textarea>
+                        </div>
+
+                        <!-- Dropzone File -->
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Unggah File <span class="text-red-500" x-show="!isEdit">*</span></label>
+                            <label class="block border-2 border-dashed border-slate-300 bg-slate-50 rounded-2xl p-6 flex flex-col items-center justify-center text-center hover:bg-slate-100 transition-colors cursor-pointer relative" :class="formFile ? 'border-sidebar-active/50 bg-sidebar-active/5' : ''">
+                                <span class="material-symbols-outlined text-4xl mb-2" :class="formFile ? 'text-sidebar-active' : 'text-slate-400'">cloud_upload</span>
+                                <p class="text-sm font-medium mb-1" :class="formFile ? 'text-sidebar-active' : 'text-slate-700'" x-text="formFile ? formFile.name : 'Drag and drop file arsip di sini'"></p>
+                                <p class="text-xs text-slate-500" x-text="formFile ? (formFile.size / 1024 / 1024).toFixed(2) + ' MB' : 'Format yang didukung: PDF, JPG, PNG, DOCX, ZIP. Maks: 50MB.'"></p>
+                                <input type="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" @change="handleFileUpload($event)">
+                            </label>
+                            <p class="text-xs text-amber-600 mt-2 flex items-center gap-1" x-show="isEdit">
+                                <span class="material-symbols-outlined text-[14px]">info</span> Abaikan bagian file jika tidak ingin mengubah file yang sudah ada.
+                            </p>
+                        </div>
                     </div>
                 </div>
 
-                <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-                    <div class="p-6 md:p-8 space-y-6">
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Nama Arsip -->
-                            <div class="md:col-span-2">
-                                <label class="block text-sm font-semibold text-slate-700 mb-2">Nama Arsip / Dokumen <span class="text-red-500">*</span></label>
-                                <input type="text" x-model="formNama" placeholder="Contoh: BAP Penertiban PKL Tanah Abang" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm">
-                            </div>
-
-                            <!-- Kategori -->
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-2">Kategori <span class="text-red-500">*</span></label>
-                                <select x-model="formKategori" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm appearance-none">
-                                    <option value="" disabled selected>Pilih Kategori...</option>
-                                    <option value="Penertiban">Penertiban</option>
-                                    <option value="Pengaduan">Pengaduan</option>
-                                    <option value="SOP">SOP & Regulasi</option>
-                                    <option value="Dokumen">Dokumen Umum</option>
-                                    <option value="Media">Dokumentasi Media</option>
-                                </select>
-                            </div>
-
-                            <!-- Sifat -->
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-2">Sifat Dokumen</label>
-                                <select class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm appearance-none">
-                                    <option value="public">Biasa / Publik</option>
-                                    <option value="confidential">Rahasia / Confidential</option>
-                                </select>
-                            </div>
-
-                            <!-- Deskripsi -->
-                            <div class="md:col-span-2">
-                                <label class="block text-sm font-semibold text-slate-700 mb-2">Keterangan / Deskripsi Ringkas</label>
-                                <textarea x-model="formDeskripsi" rows="3" placeholder="Tuliskan keterangan mengenai isi dokumen ini..." class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm resize-y"></textarea>
-                            </div>
-
-                            <!-- Dropzone File -->
-                            <div class="md:col-span-2 mt-2">
-                                <label class="block text-sm font-semibold text-slate-700 mb-2">Unggah File <span class="text-red-500" x-show="!isEdit">*</span></label>
-                                <label class="block border-2 border-dashed border-slate-300 bg-slate-50 rounded-2xl p-8 flex flex-col items-center justify-center text-center hover:bg-slate-100 transition-colors cursor-pointer relative" :class="formFile ? 'border-sidebar-active/50 bg-sidebar-active/5' : ''">
-                                    <span class="material-symbols-outlined text-4xl mb-2" :class="formFile ? 'text-sidebar-active' : 'text-slate-400'">cloud_upload</span>
-                                    <p class="text-sm font-medium mb-1" :class="formFile ? 'text-sidebar-active' : 'text-slate-700'" x-text="formFile ? formFile.name : 'Drag and drop file arsip di sini'"></p>
-                                    <p class="text-xs text-slate-500" x-text="formFile ? (formFile.size / 1024 / 1024).toFixed(2) + ' MB' : 'Format yang didukung: PDF, JPG, PNG, DOCX, ZIP. Maks: 50MB.'"></p>
-                                    <input type="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" @change="handleFileUpload($event)">
-                                </label>
-                                <p class="text-xs text-amber-600 mt-2 flex items-center gap-1" x-show="isEdit">
-                                    <span class="material-symbols-outlined text-[14px]">info</span> Abaikan bagian file jika tidak ingin mengubah file yang sudah ada.
-                                </p>
-                            </div>
-                        </div>
-
-                    </div>
-                    
-                    <!-- Form Actions -->
-                    <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-3 sticky bottom-0 z-50">
-                        <button @click="view = 'list'" class="px-6 py-2.5 border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 rounded-xl font-semibold text-sm transition-colors">
-                            Batal
-                        </button>
-                        <button @click="saveArsip()" class="px-6 py-2.5 bg-sidebar-active hover:bg-sidebar-hover text-white rounded-xl font-semibold text-sm transition-colors shadow-md flex items-center gap-2">
-                            <span class="material-symbols-outlined text-[18px]">save</span>
-                            <span x-text="isEdit ? 'Perbarui Arsip' : 'Simpan & Unggah'"></span>
-                        </button>
-                    </div>
+                <!-- Form Actions -->
+                <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-3 shrink-0">
+                    <button type="button" @click="closeModal()" class="px-6 py-2.5 border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 rounded-xl font-semibold text-sm transition-colors">
+                        Batal
+                    </button>
+                    <button @click="saveArsip()" class="px-6 py-2.5 bg-sidebar-active hover:bg-sidebar-hover text-white rounded-xl font-semibold text-sm transition-colors shadow-md flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">save</span>
+                        <span x-text="isEdit ? 'Perbarui Arsip' : 'Simpan & Unggah'"></span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -308,7 +324,8 @@
     <script>
         function arsipManager() {
             return {
-                view: 'list', // 'list', 'detail', 'create'
+                view: 'list', // 'list', 'detail'
+                showModal: false,
                 
                 isEdit: false,
                 editId: null,
@@ -451,8 +468,11 @@
                     this.formDeskripsi = '';
                     this.formFile = null;
                     
-                    this.view = 'create';
-                    window.scrollTo(0,0);
+                    this.showModal = true;
+                },
+
+                closeModal() {
+                    this.showModal = false;
                 },
 
                 editArsip(item) {
@@ -464,8 +484,7 @@
                     this.formDeskripsi = item.deskripsi;
                     this.formFile = null; // Don't preload file for edit usually
                     
-                    this.view = 'create';
-                    window.scrollTo(0,0);
+                    this.showModal = true;
                 },
 
                 deleteArsip(id) {
@@ -525,8 +544,7 @@
                         });
                     }
 
-                    this.view = 'list';
-                    window.scrollTo(0,0);
+                    this.showModal = false;
                 }
             }
         }
