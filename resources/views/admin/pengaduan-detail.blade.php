@@ -205,7 +205,8 @@
         </div>
     </div>
 
-    <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-5 py-3 rounded-xl shadow-lg text-sm z-50"></div>
+
+
 @endsection
 
 @push('scripts')
@@ -332,15 +333,20 @@
         rec.statusIdx = newIdx;
         saveAll(all);
         renderDetail();
-        tampilToast('Status diperbarui menjadi: ' + labelStatus(newIdx));
+        tampilToast('Edit berhasil! Status diperbarui menjadi: ' + labelStatus(newIdx));
     }
 
     function hapusLaporan() {
-        const all = getReports().filter(x => x.kode !== CURRENT_KODE);
-        if (!confirm('Yakin ingin menghapus laporan ' + CURRENT_KODE + '?')) return;
-        saveAll(all);
-        tampilToast('Laporan berhasil dihapus.');
-        setTimeout(() => window.location.href = '{{ route('admin.pengaduan') }}', 600);
+        window.konfirmasiHapus({
+            title: 'Hapus Laporan',
+            message: 'Apakah Anda yakin ingin menghapus laporan ' + CURRENT_KODE + '? Data yang dihapus tidak dapat dipulihkan.',
+            onConfirm: () => {
+                const all = getReports().filter(x => x.kode !== CURRENT_KODE);
+                saveAll(all);
+                tampilToast('Laporan berhasil dihapus.');
+                setTimeout(() => window.location.href = '{{ route('admin.pengaduan') }}', 600);
+            }
+        });
     }
 
     // ===== Foto bukti hasil penanganan (wajib saat selesaikan) =====
@@ -467,15 +473,11 @@
         saveAll(all);
         tutupModalBukti();
         renderDetail();
-        tampilToast('Laporan diselesaikan dengan bukti penanganan.');
+        tampilToast('Edit berhasil! Laporan diselesaikan dengan bukti penanganan.');
     }
 
-    function tampilToast(msg) {
-        const t = document.getElementById('toast');
-        t.textContent = msg;
-        t.classList.remove('hidden');
-        setTimeout(() => t.classList.add('hidden'), 2500);
-    }
+
+
 
     renderDetail();
 </script>

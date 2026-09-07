@@ -266,6 +266,7 @@
                     this.user = { ...this.formUser };
                     this.view = 'detail';
                     window.scrollTo(0, 0);
+                    window.tampilToast('Edit berhasil! Profil berhasil diperbarui.');
                 }
             }
         }

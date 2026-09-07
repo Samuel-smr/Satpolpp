@@ -142,7 +142,7 @@
         </div>
     </div>
 
-    <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-5 py-3 rounded-xl shadow-lg text-sm z-50"></div>
+
 @endsection
 
 @push('scripts')
@@ -285,10 +285,10 @@
             data.status = all[gi].status;
             data.dibuat = all[gi].dibuat;
             all[gi] = data;
-            tampilToast('User berhasil diperbarui.');
+            tampilToast('Edit berhasil! Data user telah diperbarui.');
         } else {
             all.unshift(data);
-            tampilToast('User berhasil ditambahkan.');
+            tampilToast('Berhasil menambah data user baru.');
         }
         saveAll(all);
         renderList();
@@ -300,24 +300,25 @@
         all[gi].status = all[gi].status === 'aktif' ? 'terblokir' : 'aktif';
         saveAll(all);
         renderList();
-        tampilToast('Status user diubah menjadi ' + all[gi].status + '.');
+        tampilToast('Edit berhasil! Status user diubah menjadi ' + all[gi].status + '.');
     }
 
     function hapusUser(gi) {
         const all = getUsers();
-        if (!confirm('Yakin ingin menghapus user ' + all[gi].nama + '?')) return;
-        all.splice(gi, 1);
-        saveAll(all);
-        renderList();
-        tampilToast('User berhasil dihapus.');
+        const nama = all[gi] ? `user "${all[gi].nama}"` : 'user ini';
+        window.konfirmasiHapus({
+            title: 'Hapus User',
+            message: `Apakah Anda yakin ingin menghapus ${nama}? Akun ini tidak akan dapat login kembali.`,
+            onConfirm: () => {
+                all.splice(gi, 1);
+                saveAll(all);
+                renderList();
+                tampilToast('User berhasil dihapus.');
+            }
+        });
     }
 
-    function tampilToast(msg) {
-        const t = document.getElementById('toast');
-        t.textContent = msg;
-        t.classList.remove('hidden');
-        setTimeout(() => t.classList.add('hidden'), 2500);
-    }
+
 
     setTab('semua');
 </script>
