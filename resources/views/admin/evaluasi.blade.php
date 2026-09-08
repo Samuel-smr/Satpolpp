@@ -1,4 +1,4 @@
-@extends('layouts.super_admin')
+@extends('layouts.admin')
 
 @section('title', 'Evaluasi Kegiatan')
 
@@ -10,7 +10,7 @@
         </div>
 
         <button type="button" onclick="bukaTambah()"
-            class="inline-flex items-center justify-center gap-2 bg-super-active text-white px-5 py-2.5 rounded-xl font-medium hover:bg-brand-600 transition-colors shadow-sm">
+            class="inline-flex items-center justify-center gap-2 bg-sidebar-active text-white px-5 py-2.5 rounded-xl font-medium hover:bg-sidebar-hover transition-colors shadow-sm">
             <span class="material-symbols-outlined text-[20px]">add</span>
             Tambah Evaluasi
         </button>
@@ -20,7 +20,7 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm">
             <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-xl bg-super-active/10 text-super-active flex items-center justify-center">
+                <div class="w-11 h-11 rounded-xl bg-sidebar-active/10 text-sidebar-active flex items-center justify-center">
                     <span class="material-symbols-outlined text-[24px]">assessment</span>
                 </div>
                 <div>
@@ -108,7 +108,7 @@
                 <div>
                     <label class="block text-sm font-medium mb-1">Sumber <span class="text-red-500">*</span></label>
                     <select name="sumber" id="select-sumber" onchange="loadOptions()"
-                        class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none bg-white">
+                        class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none bg-white">
                         <option value="">Pilih Sumber</option>
                         <option value="Internal">Internal (Kegiatan Satpol PP)</option>
                         <option value="Eksternal">Eksternal (Dari Laporan)</option>
@@ -118,7 +118,7 @@
                 <div>
                     <label class="block text-sm font-medium mb-1">Nama Kegiatan <span class="text-red-500">*</span></label>
                     <select name="nama" required id="select-kegiatan"
-                        class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none bg-white">
+                        class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none bg-white">
                         <option value="">Pilih Sumber Terlebih Dahulu</option>
                     </select>
                 </div>
@@ -127,12 +127,12 @@
                     <label class="block text-sm font-medium mb-1">Keterangan / Kendala</label>
                     <textarea name="keterangan" rows="4"
                         placeholder="Catat hasil kegiatan dan kendala yang dihadapi, mis. jumlah personel terbatas, koordinasi lintas sektor..."
-                        class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none"></textarea>
+                        class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none"></textarea>
                 </div>
 
                 <div class="flex justify-end gap-3 pt-2">
                     <button type="button" onclick="tutupModal()" class="border border-slate-300 text-slate-600 px-5 py-2 rounded-xl font-medium hover:bg-slate-50 transition-colors">Batal</button>
-                    <button type="submit" class="bg-super-active text-white px-6 py-2 rounded-xl font-medium hover:bg-brand-600 transition-colors">Simpan</button>
+                    <button type="submit" class="bg-sidebar-active text-white px-6 py-2 rounded-xl font-medium hover:bg-sidebar-hover transition-colors">Simpan</button>
                 </div>
             </form>
         </div>
@@ -271,7 +271,7 @@
                     </td>
                     <td class="px-6 py-3.5 text-slate-500">${e.dibuat || '-'}</td>
                     <td class="px-6 py-3.5 text-right whitespace-nowrap">
-                        <button type="button" onclick="bukaEdit(${gi})" class="p-1.5 text-slate-400 hover:text-super-active hover:bg-super-active/10 rounded-lg transition-colors" title="Edit">
+                        <button type="button" onclick="bukaEdit(${gi})" class="p-1.5 text-slate-400 hover:text-sidebar-active hover:bg-sidebar-active/10 rounded-lg transition-colors" title="Edit">
                             <span class="material-symbols-outlined text-[20px]">edit</span>
                         </button>
                         <button type="button" onclick="hapus(${gi})" class="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Hapus">

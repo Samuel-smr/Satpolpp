@@ -92,10 +92,10 @@
                 <span>Manajemen Petugas</span>
             </a>
 
-            <a href="{{ route('super_admin.evaluasi') }}"
-               class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all {{ request()->routeIs('super_admin.evaluasi') ? 'bg-super-active text-white shadow-md font-semibold' : 'text-slate-300 hover:bg-super-hover hover:text-white' }}">
-                <span class="material-symbols-outlined text-[20px]">assessment</span>
-                <span>Evaluasi Kegiatan</span>
+            <a href="{{ route('super_admin.peta') }}"
+               class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all {{ request()->routeIs('super_admin.peta') ? 'bg-super-active text-white shadow-md font-semibold' : 'text-slate-300 hover:bg-super-hover hover:text-white' }}">
+                <span class="material-symbols-outlined text-[20px]">map</span>
+                <span>Peta Persebaran</span>
             </a>
 
             <a href="{{ route('super_admin.monitoring') }}"
