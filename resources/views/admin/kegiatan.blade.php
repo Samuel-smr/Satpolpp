@@ -106,7 +106,15 @@
                         <tbody class="divide-y divide-slate-100">
                             <template x-for="item in filteredKegiatans()" :key="item.id">
                                 <tr class="hover:bg-slate-50/50 transition-colors">
-                                    <td class="px-6 py-4 font-semibold text-slate-800" x-text="item.nama"></td>
+                                    <td class="px-6 py-4 font-semibold text-slate-800">
+                                        <div class="flex items-center gap-2">
+                                            <span x-text="item.nama"></span>
+                                            <span x-show="item.dariLaporan" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 shrink-0">
+                                                <span class="material-symbols-outlined text-[12px]">link</span>
+                                                Dari Laporan
+                                            </span>
+                                        </div>
+                                    </td>
                                     <td class="px-6 py-4">
                                         <div class="flex items-center gap-1.5 text-slate-500">
                                             <span class="material-symbols-outlined text-[16px]">calendar_month</span>
@@ -167,6 +175,10 @@
                     <div>
                         <h2 class="text-2xl font-bold font-headline text-slate-900">Detail Acara &amp; Kegiatan</h2>
                         <p class="text-sm text-slate-500 mt-1" x-text="selectedKegiatan?.nama"></p>
+                        <span x-show="selectedKegiatan?.dariLaporan" class="mt-2 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100">
+                            <span class="material-symbols-outlined text-[14px]">link</span>
+                            Dicatat dari penyelesaian laporan <span x-text="selectedKegiatan?.kodeLaporan"></span>
+                        </span>
                     </div>
                 </div>
 
@@ -473,31 +485,31 @@
 
                             <!-- Peta Container (Wajib) -->
                             <div>
-                                <div class="grid grid-cols-2 gap-4 mb-3">
+                                <div class="rounded-xl border border-slate-200 overflow-hidden">
+                                    <div class="flex gap-2 p-2.5 bg-white border-b border-slate-200">
+                                        <div class="flex-1 relative">
+                                            <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-[18px]">search</span>
+                                            <input type="text" x-model="searchLokasi" placeholder="Cari lokasi / alamat..." @keydown.enter.prevent="cariLokasi()" class="w-full pl-10 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm">
+                                        </div>
+                                        <button type="button" @click="cariLokasi()" class="inline-flex items-center justify-center gap-1 bg-sidebar-active hover:bg-sidebar-hover text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm transition-colors shrink-0">
+                                            <span class="material-symbols-outlined text-[18px]">search</span>
+                                            Cari
+                                        </button>
+                                        <button type="button" @click="getCurrentLocation()" title="Gunakan lokasi saat ini" class="w-10 h-10 inline-flex items-center justify-center text-sidebar-active hover:text-white hover:bg-sidebar-active border border-sidebar-active/40 hover:border-sidebar-active rounded-lg transition-all shrink-0">
+                                            <span class="material-symbols-outlined text-[20px]">my_location</span>
+                                        </button>
+                                    </div>
+                                    <div id="map-kegiatan" class="w-full h-[320px] bg-slate-100 z-10"></div>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4 mt-3">
                                     <div>
                                         <label class="block text-xs font-semibold text-slate-500 mb-1">Latitude <span class="text-red-500">*</span></label>
-                                        <input type="text" x-model="formLat" readonly placeholder="Klik pada peta..." class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-600 outline-none cursor-not-allowed">
+                                        <input type="text" x-model="formLat" readonly placeholder="Klik peta..." class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-600 outline-none cursor-not-allowed">
                                     </div>
                                     <div>
                                         <label class="block text-xs font-semibold text-slate-500 mb-1">Longitude <span class="text-red-500">*</span></label>
-                                        <input type="text" x-model="formLng" readonly placeholder="Klik pada peta..." class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-600 outline-none cursor-not-allowed">
-                                    </div>
-                                </div>
-                                
-                                <div class="flex justify-end mb-2">
-                                    <button type="button" @click="getCurrentLocation()" class="text-xs font-medium text-sidebar-active hover:text-sidebar-hover flex items-center gap-1 bg-sidebar-active/10 px-2.5 py-1.5 rounded-lg transition-colors">
-                                        <span class="material-symbols-outlined text-[16px]">my_location</span>
-                                        Gunakan lokasi saat ini
-                                    </button>
-                                </div>
-                                
-                                <div class="border border-slate-200 rounded-xl overflow-hidden relative group">
-                                    <div id="map-kegiatan" class="w-full h-[400px] bg-slate-100 z-10"></div>
-                                    <div class="absolute top-3 right-3 z-[1000]">
-                                        <span class="bg-white/90 backdrop-blur text-xs font-medium px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 text-slate-600 flex items-center gap-1">
-                                            <span class="material-symbols-outlined text-[14px]">touch_app</span>
-                                            Klik peta untuk pin lokasi
-                                        </span>
+                                        <input type="text" x-model="formLng" readonly placeholder="Klik peta..." class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-600 outline-none cursor-not-allowed">
                                     </div>
                                 </div>
                             </div>
@@ -605,6 +617,7 @@
                 formLokasi: '',
                 formLat: '',
                 formLng: '',
+                searchLokasi: '',
                 formTemplate: '',
                 
                 templates: [
@@ -1076,6 +1089,7 @@
                     this.formLokasi = '';
                     this.formLat = '';
                     this.formLng = '';
+                    this.searchLokasi = '';
                     this.formJenis = 'Eksternal';
                     this.formTemplate = '';
                     this.searchAnggota = '';
@@ -1117,6 +1131,7 @@
                     this.formLokasi = item.lokasi || '';
                     this.formLat = item.lat || '';
                     this.formLng = item.lng || '';
+                    this.searchLokasi = '';
                     this.formJenis = item.jenis || 'Eksternal';
                     this.formTemplate = '';
                     
@@ -1167,6 +1182,37 @@
                             this.markerInstance = L.marker(e.latlng).addTo(this.mapInstance);
                         }
                     });
+                },
+
+                async cariLokasi() {
+                    const q = (this.searchLokasi || '').trim();
+                    if (!q) { alert('Masukkan alamat / nama lokasi terlebih dahulu.'); return; }
+                    const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q);
+                    try {
+                        const res = await fetch(url, { headers: { 'Accept-Language': 'id' } });
+                        const data = await res.json();
+                        if (!data || data.length === 0) {
+                            alert('Lokasi tidak ditemukan. Coba alamat yang lebih spesifik.');
+                            return;
+                        }
+                        const lat = parseFloat(data[0].lat);
+                        const lng = parseFloat(data[0].lon);
+                        this.formLat = lat.toFixed(6);
+                        this.formLng = lng.toFixed(6);
+                        if (!(this.formLokasi || '').trim()) {
+                            this.formLokasi = data[0].display_name;
+                        }
+                        if (this.mapInstance) {
+                            this.mapInstance.setView([lat, lng], 15, { animate: true });
+                            if (this.markerInstance) {
+                                this.markerInstance.setLatLng([lat, lng]);
+                            } else {
+                                this.markerInstance = L.marker([lat, lng]).addTo(this.mapInstance);
+                            }
+                        }
+                    } catch (e) {
+                        alert('Gagal mencari lokasi. Periksa koneksi internet.');
+                    }
                 },
 
                 getCurrentLocation() {
