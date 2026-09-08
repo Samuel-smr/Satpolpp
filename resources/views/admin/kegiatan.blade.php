@@ -235,18 +235,18 @@
                                 <span class="material-symbols-outlined text-[20px] text-slate-400">perm_media</span>
                                 Dokumentasi Media
                             </h3>
-                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                                <!-- Dummy Images -->
-                                <div class="aspect-square bg-slate-100 rounded-xl border border-slate-200 overflow-hidden cursor-pointer group">
-                                    <img src="https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&q=80&w=600" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                                </div>
-                                <div class="aspect-square bg-slate-100 rounded-xl border border-slate-200 overflow-hidden cursor-pointer group">
-                                    <img src="https://images.unsplash.com/photo-1577412647305-991150c7d163?auto=format&fit=crop&q=80&w=600" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                                </div>
-                                <!-- Dummy Video Placeholder -->
-                                <div class="aspect-square bg-slate-800 rounded-xl border border-slate-700 overflow-hidden relative cursor-pointer group flex items-center justify-center">
-                                    <span class="material-symbols-outlined text-white text-4xl bg-black/50 p-3 rounded-full group-hover:scale-110 transition-transform duration-300">play_arrow</span>
-                                </div>
+                            <!-- Galeri Foto dari data kegiatan -->
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4" x-show="selectedKegiatan?.foto && selectedKegiatan.foto.length > 0">
+                                <template x-for="(f, idx) in selectedKegiatan.foto" :key="idx">
+                                    <div class="aspect-square bg-slate-100 rounded-xl border border-slate-200 overflow-hidden cursor-pointer group">
+                                        <img :src="f.url" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" :alt="f.name || ''">
+                                    </div>
+                                </template>
+                            </div>
+                            <!-- Bila tidak ada foto -->
+                            <div x-show="!(selectedKegiatan?.foto && selectedKegiatan.foto.length > 0)" class="text-center py-10 text-slate-400">
+                                <span class="material-symbols-outlined text-4xl mb-2 block">perm_media</span>
+                                <p class="text-sm">Belum ada dokumentasi pada kegiatan ini.</p>
                             </div>
                         </div>
                     </div>
@@ -1084,7 +1084,7 @@
                             margin: { left: 14, right: 14 },
                             didParseCell: function (data) {
                                 if (data.section === 'body' && data.column.index === 7 && pdfImages[data.row.index]?.length) {
-                                    data.cell.styles.minCellHeight = (images.length * 20) + 6;
+                                    data.cell.styles.minCellHeight = (pdfImages[data.row.index].length * 20) + 6;
                                 }
                             },
                             didDrawCell: function (data) {
@@ -1186,7 +1186,6 @@
                     this.searchAnggota = '';
                     this.selectedAnggota = [];
                     
-                    this.previewPhotos.forEach(p => URL.revokeObjectURL(p.url));
                     this.previewPhotos = [];
                     if (this.previewVideo) URL.revokeObjectURL(this.previewVideo.url);
                     this.previewVideo = null;
@@ -1229,7 +1228,8 @@
                     this.formKategori = item.kategori || '';
                     
                     this.selectedAnggota = this.allAnggota.filter(a => item.peserta.includes(a.id));
-                    
+                    this.previewPhotos = (item.foto || []).map(f => ({ file: null, url: f.url, name: f.name }));
+
                     this.showModal = true;
                 },
 
@@ -1338,33 +1338,57 @@
                     );
                 },
 
-                handlePhotoUpload(event) {
+                async handlePhotoUpload(event) {
                     const files = event.target.files;
                     if (!files) return;
-                    
+
                     if (this.previewPhotos.length + files.length > 5) {
                         alert('Maksimal 5 foto dokumentasi.');
                         event.target.value = '';
                         return;
                     }
-                    
+
                     for (let i = 0; i < files.length; i++) {
                         const file = files[i];
                         if (file.size > 5 * 1024 * 1024) {
                             alert(`File ${file.name} terlalu besar (Maks 5MB).`);
                             continue;
                         }
+                        const url = await this.readFileAsDataURL(file);
                         this.previewPhotos.push({
                             file: file,
-                            url: URL.createObjectURL(file),
+                            url: url,
                             name: file.name
                         });
                     }
                     event.target.value = '';
                 },
 
+                readFileAsDataURL(file) {
+                    return new Promise((resolve, reject) => {
+                        const img = new Image();
+                        const url = URL.createObjectURL(file);
+                        img.onload = () => {
+                            const MAX = 1200;
+                            let { width, height } = img;
+                            if (width > MAX || height > MAX) {
+                                const ratio = Math.min(MAX / width, MAX / height);
+                                width = Math.round(width * ratio);
+                                height = Math.round(height * ratio);
+                            }
+                            const canvas = document.createElement('canvas');
+                            canvas.width = width;
+                            canvas.height = height;
+                            canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                            URL.revokeObjectURL(url);
+                            resolve(canvas.toDataURL('image/jpeg', 0.8));
+                        };
+                        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Gagal membaca foto')); };
+                        img.src = url;
+                    });
+                },
+
                 removePhoto(index) {
-                    URL.revokeObjectURL(this.previewPhotos[index].url);
                     this.previewPhotos.splice(index, 1);
                 },
 
@@ -1429,6 +1453,7 @@
                             this.kegiatanList[index].kategori = this.formKategori;
                             this.kegiatanList[index].template = this.formTemplate;
                             this.kegiatanList[index].peserta = this.selectedAnggota.map(a => a.id);
+                            this.kegiatanList[index].foto = this.previewPhotos.map(p => ({ name: p.name, url: p.url }));
                         }
                         window.tampilToast('Edit berhasil! Data kegiatan telah diperbarui.');
                     } else {
@@ -1443,9 +1468,8 @@
                             lat: this.formLat,
                             lng: this.formLng,
                             jenis: this.formJenis,
-                            kategori: this.formKategori,
-                            template: this.formTemplate,
-                            peserta: this.selectedAnggota.map(a => a.id)
+                            peserta: this.selectedAnggota.map(a => a.id),
+                            foto: this.previewPhotos.map(p => ({ name: p.name, url: p.url }))
                         });
                         window.tampilToast('Berhasil menambah data kegiatan baru.');
                     }

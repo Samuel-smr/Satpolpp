@@ -125,8 +125,10 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium mb-1">Pimpinan / Kepala</label>
-                        <input type="text" name="pimpinan" placeholder="Contoh: Kasat. Andi Saputra"
-                            class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none">
+                        <select name="pimpinan" id="pimpinan-select"
+                            class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none bg-white">
+                            <option value="">Pilih User</option>
+                        </select>
                     </div>
                 </div>
 
@@ -226,7 +228,28 @@
         document.getElementById('modal-judul').textContent = 'Tambah Unit';
         document.getElementById('unit-form').reset();
         document.querySelector('[name=edit_index]').value = '';
+        isiPimpinanOptions('');
         document.getElementById('modal').classList.remove('hidden');
+    }
+
+    function isiPimpinanOptions(selected) {
+        const select = document.getElementById('pimpinan-select');
+        let users = [];
+        try {
+            users = JSON.parse(localStorage.getItem('sipraja_users') || '[]');
+        } catch (e) { users = []; }
+        select.innerHTML = '';
+        const kosong = document.createElement('option');
+        kosong.value = '';
+        kosong.textContent = users.length ? 'Pilih User' : 'Belum ada user di Manajemen User';
+        select.appendChild(kosong);
+        users.forEach(u => {
+            const opt = document.createElement('option');
+            opt.value = u.nama;
+            opt.textContent = u.nama + (u.username ? ' (' + u.username + ')' : '');
+            select.appendChild(opt);
+        });
+        select.value = selected;
     }
 
     function bukaEdit(i) {
@@ -238,7 +261,7 @@
         document.querySelector('[name=edit_index]').value = i;
         f.nama.value = u.nama;
         f.jenis.value = u.jenis;
-        f.pimpinan.value = u.pimpinan || '';
+        isiPimpinanOptions(u.pimpinan || '');
         f.zona.value = u.zona || '';
         f.anggota.value = u.anggota || '';
         document.getElementById('modal').classList.remove('hidden');

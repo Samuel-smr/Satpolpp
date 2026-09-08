@@ -100,7 +100,7 @@
         <div class="absolute inset-0 bg-black/40" onclick="tutupForm()"></div>
         <div class="relative w-full max-w-lg bg-white rounded-2xl shadow-xl overflow-hidden">
             <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-                <h2 class="font-headline font-bold text-slate-800">Tambah Aset</h2>
+                <h2 class="font-headline font-bold text-slate-800" id="modal-title">Tambah Aset</h2>
                 <button type="button" onclick="tutupForm()" class="text-slate-400 hover:text-slate-600">
                     <span class="material-symbols-outlined">close</span>
                 </button>
@@ -167,7 +167,7 @@
 
                 <div class="flex justify-end gap-3 pt-2">
                     <button type="button" onclick="tutupForm()" class="border border-slate-300 text-slate-600 px-5 py-2 rounded-xl font-medium hover:bg-slate-50 transition-colors">Batal</button>
-                    <button type="submit" class="bg-sidebar-active text-white px-6 py-2 rounded-xl font-medium hover:bg-sidebar-hover transition-colors">Simpan Aset</button>
+                    <button type="submit" id="btn-simpan" class="bg-sidebar-active text-white px-6 py-2 rounded-xl font-medium hover:bg-sidebar-hover transition-colors">Simpan Aset</button>
                 </div>
             </form>
         </div>
@@ -180,6 +180,7 @@
 @push('scripts')
 <script>
     const KODE = 'sipraja_aset';
+    let editIndex = -1;
 
     function getAset() {
         let data = JSON.parse(localStorage.getItem(KODE) || '[]');
@@ -245,17 +246,43 @@
                 <td class="px-6 py-3.5 text-slate-500">${a.kategori === 'Kendaraan' && a.jatuhTempoPajak ? `${a.jatuhTempoPajak}${jikaHampir(a.jatuhTempoPajak)}` : '-'}</td>
                 <td class="px-6 py-3.5 text-slate-500">${a.kategori === 'Kendaraan' && a.servisOliKm ? `${a.servisOliKm} km` : '-'}</td>
                 <td class="px-6 py-3.5 text-right">
-                    <button type="button" onclick="hapusAset(${i})" class="text-red-500 hover:text-red-700" title="Hapus">
-                        <span class="material-symbols-outlined text-[20px]">delete</span>
-                    </button>
+                    <div class="flex items-center justify-end gap-1">
+                        <button type="button" onclick="editAset(${i})" class="text-slate-400 hover:text-sidebar-active hover:bg-sidebar-active/10 rounded-lg p-1.5" title="Edit">
+                            <span class="material-symbols-outlined text-[20px]">edit</span>
+                        </button>
+                        <button type="button" onclick="hapusAset(${i})" class="text-red-500 hover:text-red-700 p-1.5" title="Hapus">
+                            <span class="material-symbols-outlined text-[20px]">delete</span>
+                        </button>
+                    </div>
                 </td>
             </tr>
         `).join('');
     }
 
     function bukaForm() {
+        editIndex = -1;
+        document.getElementById('modal-title').textContent = 'Tambah Aset';
+        document.getElementById('btn-simpan').textContent = 'Simpan Aset';
         document.getElementById('modal-form').classList.remove('hidden');
         document.getElementById('aset-form').reset();
+        toggleKendaraanFields();
+    }
+
+    function editAset(index) {
+        const a = getAset()[index];
+        if (!a) return;
+        editIndex = index;
+        const f = document.getElementById('aset-form');
+        f.nama.value = a.nama || '';
+        f.kategori.value = a.kategori || '';
+        f.kondisi.value = a.kondisi || '';
+        f.lokasi.value = a.lokasi || '';
+        f.tahun.value = a.tahun || '';
+        f.jatuhTempoPajak.value = a.jatuhTempoPajak || '';
+        f.servisOliKm.value = a.servisOliKm || '';
+        document.getElementById('modal-title').textContent = 'Edit Aset';
+        document.getElementById('btn-simpan').textContent = 'Simpan Perubahan';
+        document.getElementById('modal-form').classList.remove('hidden');
         toggleKendaraanFields();
     }
 
@@ -276,7 +303,7 @@
         e.preventDefault();
         const f = document.getElementById('aset-form');
         const data = getAset();
-        data.unshift({
+        const payload = {
             nama: f.nama.value.trim(),
             kategori: f.kategori.value,
             kondisi: f.kondisi.value,
@@ -284,11 +311,21 @@
             tahun: f.tahun.value.trim(),
             jatuhTempoPajak: f.kategori.value === 'Kendaraan' ? f.jatuhTempoPajak.value : '',
             servisOliKm: f.kategori.value === 'Kendaraan' ? f.servisOliKm.value.trim() : '',
-        });
-        localStorage.setItem(KODE, JSON.stringify(data));
-        renderAset();
-        tutupForm();
-        tampilToast('Berhasil menambah data aset baru.');
+        };
+
+        if (editIndex >= 0) {
+            data[editIndex] = payload;
+            localStorage.setItem(KODE, JSON.stringify(data));
+            renderAset();
+            tutupForm();
+            tampilToast('Edit berhasil! Data aset telah diperbarui.');
+        } else {
+            data.unshift(payload);
+            localStorage.setItem(KODE, JSON.stringify(data));
+            renderAset();
+            tutupForm();
+            tampilToast('Berhasil menambah data aset baru.');
+        }
     }
 
     function hapusAset(i) {
