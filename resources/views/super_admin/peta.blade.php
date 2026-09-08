@@ -217,10 +217,10 @@
                     // Muat laporan real (yang sudah selesai + punya lokasi penandaan)
                     this.loadLaporanFromStorage();
 
-                    // Center roughly in Jakarta
                     this.map = L.map('mainMap', {
                         zoomControl: false
-                    }).setView([-6.2000, 106.8166], 12);
+                    });
+                    KulonProgoMap.setup(this.map);
 
                     L.control.zoom({
                         position: 'bottomright'
