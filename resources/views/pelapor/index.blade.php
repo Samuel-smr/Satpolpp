@@ -91,16 +91,16 @@
                 </div>
             </a>
 
-            {{-- Kepuasan Masyarakat --}}
+            {{-- Survey Kepuasan --}}
             <a href="{{ route('pelapor.feedback') }}"
                class="group relative bg-white border border-slate-200 rounded-2xl p-6 md:p-7 overflow-hidden hover:shadow-xl hover:-translate-y-1 hover:border-brand-300 transition-all duration-300">
                 <div class="absolute top-0 right-0 w-24 h-24 bg-brand-50 rounded-bl-full opacity-60 group-hover:opacity-100 transition-opacity"></div>
                 <div class="relative">
                     <div class="w-12 h-12 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center text-2xl mb-4">⭐</div>
-                    <h3 class="font-headline text-lg font-bold text-slate-800 group-hover:text-brand-600 transition-colors">Kepuasan Masyarakat</h3>
-                    <p class="mt-2 text-sm text-slate-500 leading-relaxed">Beri penilaian dan masukan terhadap layanan kami setelah laporan Anda selesai.</p>
+                    <h3 class="font-headline text-lg font-bold text-slate-800 group-hover:text-brand-600 transition-colors">Survey Kepuasan</h3>
+                    <p class="mt-2 text-sm text-slate-500 leading-relaxed">Isi survey kepuasan untuk membantu kami terus meningkatkan layanan.</p>
                     <span class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-brand-600">
-                        Beri penilaian
+                        Survey sekarang
                         <span class="group-hover:translate-x-1 transition-transform">→</span>
                     </span>
                 </div>
@@ -126,7 +126,7 @@
                         ['1', '📝', 'Pilih Jenis Laporan', 'Darurat atau Informasi & Pengaduan'],
                         ['2', '📍', 'Isi Detail & Lokasi', 'Sertakan foto/video bila ada'],
                         ['3', '📤', 'Kirim', 'Laporan Anda terkirim'],
-                        ['4', '📊', 'Pantau Status', 'Cek perkembangan & beri feedback'],
+                        ['4', '📊', 'Pantau Status', 'Cek perkembangan & isi survey kepuasan'],
                     ];
                 @endphp
 

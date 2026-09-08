@@ -502,7 +502,7 @@
                 const all = getReports().filter(x => x.kode !== CURRENT_KODE);
                 saveAll(all);
                 tampilToast('Laporan berhasil dihapus.');
-                setTimeout(() => window.location.href = '{{ route('admin.pengaduan') }}', 600);
+                setTimeout(() => window.location.href = "{{ route('admin.pengaduan') }}", 600);
             }
         });
     }
@@ -526,9 +526,9 @@
             templates: [
                 { id: 1, nama: 'Permintaan Data dan Informasi terkait Ketertiban Umum dan Ketentraman Masyarakat' },
                 { id: 2, nama: 'Pelayanan Surat Menyurat' },
-                { id: 3, nama: 'Patroli Ketentraman, Ketertiban Umum dan Perlindungan Masyarakat' },
-                { id: 4, nama: 'Permohonan Bantuan Pengamanan Unjuk Rasa' },
-                { id: 5, nama: 'Permohonan Bantuan Pengamanan Kegiatan' },
+                { id: 3, nama: 'Patroli Ketertiban Umum, Ketentraman dan Perlindungan Masyarakat' },
+                { id: 4, nama: 'Pelaksanaan Bantuan Pengamanan Unjuk Rasa' },
+                { id: 5, nama: 'Pelaksanaan Bantuan Pengamanan Kegiatan' },
                 { id: 6, nama: 'Penanganan Pengaduan Pelanggaran Ketertiban Umum/Masyarakat' },
                 { id: 7, nama: 'Penegakan Peraturan Daerah dan Peraturan Kepala Daerah' },
                 { id: 8, nama: 'Pembinaan dan Pengawasan Kepatuhan terhadap Perda dan Perkada' },
