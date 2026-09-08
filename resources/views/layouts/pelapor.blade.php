@@ -58,7 +58,7 @@
                 <nav class="flex items-center gap-6 text-sm font-medium text-slate-600">
                     <a href="{{ route('pelapor.lapor') }}" class="hover:text-brand-600">Buat Laporan</a>
                     <a href="{{ route('pelapor.status') }}" class="hover:text-brand-600">Cek Status</a>
-                    <a href="{{ route('pelapor.feedback') }}" class="hover:text-brand-600">Feedback</a>
+                    <a href="{{ route('pelapor.feedback') }}" class="hover:text-brand-600">Survey Kepuasan</a>
                 </nav>
                 <a href="{{ route('login') }}" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-brand-600 rounded-lg hover:bg-brand-700 transition-colors shadow-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -81,7 +81,7 @@
         <nav id="mobile-nav" class="hidden md:hidden border-t border-slate-200 bg-slate-100 px-4 py-3 space-y-3 text-sm font-medium text-slate-600">
             <a href="{{ route('pelapor.lapor') }}" class="block hover:text-brand-600">Buat Laporan</a>
             <a href="{{ route('pelapor.status') }}" class="block hover:text-brand-600">Cek Status</a>
-            <a href="{{ route('pelapor.feedback') }}" class="block hover:text-brand-600">Feedback</a>
+            <a href="{{ route('pelapor.feedback') }}" class="block hover:text-brand-600">Survey Kepuasan</a>
             <a href="{{ route('login') }}" class="flex items-center justify-center gap-2 w-full px-4 py-2.5 text-sm font-semibold text-white bg-brand-600 rounded-lg hover:bg-brand-700 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
