@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.super_admin')
 
 @section('title', 'Peta Persebaran')
 
@@ -116,9 +116,9 @@
                 <div class="flex-1 relative">
                     <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-[18px]">search</span>
                     <input type="text" x-model="searchQuery" @keyup.enter="searchLocation()" placeholder="Cari lokasi / alamat... mis. Pasar Wates, Kulon Progo"
-                        class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm">
+                        class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-super-active/20 focus:border-super-active outline-none transition-all text-sm">
                 </div>
-                <button type="button" @click="searchLocation()" class="inline-flex items-center justify-center gap-2 bg-sidebar-active hover:bg-sidebar-hover text-white px-5 py-2 rounded-xl text-sm font-semibold shadow-sm transition-colors">
+                <button type="button" @click="searchLocation()" class="inline-flex items-center justify-center gap-2 bg-super-active hover:bg-super-hover text-white px-5 py-2 rounded-xl text-sm font-semibold shadow-sm transition-colors">
                     <span class="material-symbols-outlined text-[18px]">search</span>
                     Cari Lokasi
                 </button>
@@ -325,7 +325,7 @@
                                         </div>
                                     </div>
                                     
-                                    <button class="w-full py-2 bg-sidebar-active hover:bg-sidebar-hover text-white font-semibold rounded-lg text-xs transition-colors shadow-sm">
+                                    <button class="w-full py-2 bg-super-active hover:bg-super-hover text-white font-semibold rounded-lg text-xs transition-colors shadow-sm">
                                         Lihat Detail Lengkap
                                     </button>
                                 </div>

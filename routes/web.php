@@ -24,9 +24,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/pengaduan/{kode}', [AdminController::class, 'pengaduanDetail'])->name('pengaduan.detail');
     Route::get('/kegiatan', [AdminController::class, 'kegiatan'])->name('kegiatan');
     Route::get('/feedback', [AdminController::class, 'feedback'])->name('feedback');
+    Route::get('/evaluasi', [AdminController::class, 'evaluasi'])->name('evaluasi');
     Route::get('/arsip', [AdminController::class, 'arsip'])->name('arsip');
     Route::get('/aset', [AdminController::class, 'aset'])->name('aset');
-    Route::get('/peta', [AdminController::class, 'peta'])->name('peta');
+
     Route::get('/profile', [AdminController::class, 'profile'])->name('profile');
 });
 
@@ -37,6 +38,7 @@ Route::prefix('super-admin')->name('super_admin.')->group(function () {
     Route::get('/user', [SuperAdminController::class, 'user'])->name('user');
     Route::get('/organisasi', [SuperAdminController::class, 'organisasi'])->name('organisasi');
     Route::get('/petugas', [SuperAdminController::class, 'petugas'])->name('petugas');
-    Route::get('/evaluasi', [SuperAdminController::class, 'evaluasi'])->name('evaluasi');
+
     Route::get('/monitoring', [SuperAdminController::class, 'monitoring'])->name('monitoring');
+    Route::get('/peta', [SuperAdminController::class, 'peta'])->name('peta');
 });

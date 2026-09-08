@@ -11,74 +11,32 @@
         <div class="absolute -top-24 -right-24 w-72 h-72 bg-white/10 rounded-full blur-3xl"></div>
         <div class="absolute -bottom-32 -left-16 w-80 h-80 bg-accent-500/20 rounded-full blur-3xl"></div>
 
-        <div class="relative max-w-6xl mx-auto px-4 py-16 md:py-24 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div class="relative max-w-6xl mx-auto px-4 py-16 md:py-24 grid grid-cols-1 gap-12 items-center">
             {{-- Teks hero --}}
-            <div class="lg:col-span-7">
-                <span class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-sm font-medium">
-                    <span class="w-2 h-2 rounded-full bg-accent-400 animate-pulse"></span>
+            <div class="lg:max-w-none">
+                <span class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-5 py-2 text-base font-medium">
+                    <span class="w-2.5 h-2.5 rounded-full bg-accent-400 animate-pulse"></span>
                     Layanan resmi Satuan Polisi Pamong Praja
                 </span>
 
-                <h1 class="mt-5 font-headline text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
+                <h1 class="mt-6 font-headline text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
                     Laporkan Gangguan Ketertiban <span class="text-accent-400">Dengan Cepat.</span>
                 </h1>
 
-                <p class="mt-5 text-brand-100 text-base md:text-lg max-w-xl leading-relaxed">
+                <p class="mt-6 text-brand-100 text-lg md:text-xl max-w-3xl leading-relaxed">
                     SIPRAJA mempermudah masyarakat melaporkan gangguan ketertiban umum dan keamanan.
                     Tanpa registrasi akun, langsung pantau perkembangan laporan Anda.
                 </p>
 
-                <div class="mt-8 flex flex-col sm:flex-row gap-3">
-                    <a href="{{ route('pelapor.lapor', ['jenis' => 'darurat']) }}"
-                       class="inline-flex items-center justify-center gap-2 bg-accent-500 text-white px-6 py-3 rounded-lg font-semibold shadow-lg shadow-accent-500/30 hover:bg-accent-600 hover:shadow-accent-600/30 transition-all">
-                        <span>🚨</span> Lapor Darurat
-                    </a>
-                    <a href="{{ route('pelapor.lapor', ['jenis' => 'informasi']) }}"
-                       class="inline-flex items-center justify-center gap-2 border border-white/30 bg-white/5 text-white px-6 py-3 rounded-lg font-semibold hover:bg-white/15 transition-colors">
-                        <span>📋</span> Informasi &amp; Pengaduan
+                <div class="mt-9">
+                    <a href="{{ route('pelapor.lapor') }}"
+                       class="inline-flex items-center justify-center gap-2 bg-accent-500 text-white px-9 py-4 rounded-lg font-semibold shadow-lg shadow-accent-500/30 hover:bg-accent-600 hover:shadow-accent-600/30 transition-all text-xl">
+                        <span class="text-2xl">🚨</span> Lapor Sekarang
                     </a>
                 </div>
             </div>
 
-            {{-- Panel status cepat --}}
-            <div class="lg:col-span-5">
-                <div class="bg-white rounded-2xl p-6 shadow-2xl text-slate-800">
-                    <div class="flex items-center justify-between mb-5">
-                        <div class="font-semibold text-slate-700">Laporan Terkini</div>
-                        <span class="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2.5 py-1">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Live
-                        </span>
-                    </div>
 
-                    <div class="space-y-4">
-                        <div class="flex gap-3">
-                            <span class="w-9 h-9 rounded-lg bg-orange-50 text-accent-600 flex items-center justify-center flex-shrink-0">🚨</span>
-                            <div class="min-w-0">
-                                <p class="text-xs text-slate-400">Baru saja</p>
-                                <p class="text-sm text-slate-700 truncate">Pelanggaran ketertiban — PKL liar di trotoar</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-3">
-                            <span class="w-9 h-9 rounded-lg bg-blue-50 text-brand-600 flex items-center justify-center flex-shrink-0">📢</span>
-                            <div class="min-w-0">
-                                <p class="text-xs text-slate-400">10 menit lalu</p>
-                                <p class="text-sm text-slate-700 truncate">Gangguan ketertiban — suara bising permukiman</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-3">
-                            <span class="w-9 h-9 rounded-lg bg-blue-50 text-brand-600 flex items-center justify-center flex-shrink-0">🛡️</span>
-                            <div class="min-w-0">
-                                <p class="text-xs text-slate-400">25 menit lalu</p>
-                                <p class="text-sm text-slate-700 truncate">Keamanan — orang mabuk di area publik</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <a href="{{ route('pelapor.status') }}" class="mt-6 flex items-center justify-center gap-1.5 bg-brand-50 text-brand-700 text-sm font-medium py-2.5 rounded-lg hover:bg-brand-100 transition-colors">
-                        Cek status laporan Anda <span>→</span>
-                    </a>
-                </div>
-            </div>
         </div>
     </section>
 
@@ -170,7 +128,7 @@
                     $steps = [
                         ['1', '📝', 'Pilih Jenis Laporan', 'Darurat atau Informasi & Pengaduan'],
                         ['2', '📍', 'Isi Detail & Lokasi', 'Sertakan foto/video bila ada'],
-                        ['3', '🔑', 'Kirim & Dapat Kode', 'Simpan kode laporan Anda'],
+                        ['3', '📤', 'Kirim', 'Laporan Anda terkirim'],
                         ['4', '📊', 'Pantau Status', 'Cek perkembangan & beri feedback'],
                     ];
                 @endphp
@@ -193,7 +151,7 @@
     <section class="py-16 md:py-20">
         <div class="max-w-5xl mx-auto px-4">
             <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-8 md:p-10">
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 divide-y sm:divide-y-0 sm:divide-x divide-slate-200">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 divide-y sm:divide-y-0 sm:divide-x divide-slate-200">
                     <div class="flex flex-col items-center text-center">
                         <div class="w-12 h-12 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center text-2xl mb-3">📝</div>
                         <div class="font-headline text-3xl md:text-4xl font-bold text-slate-800">12,450</div>
@@ -203,11 +161,6 @@
                         <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl mb-3">✅</div>
                         <div class="font-headline text-3xl md:text-4xl font-bold text-slate-800">98%</div>
                         <div class="mt-1 text-xs font-medium text-slate-500 uppercase tracking-wider">Tingkat Penyelesaian</div>
-                    </div>
-                    <div class="flex flex-col items-center text-center">
-                        <div class="w-12 h-12 rounded-xl bg-orange-50 text-accent-600 flex items-center justify-center text-2xl mb-3">⚡</div>
-                        <div class="font-headline text-3xl md:text-4xl font-bold text-slate-800">&lt; 15 Min</div>
-                        <div class="mt-1 text-xs font-medium text-slate-500 uppercase tracking-wider">Rata-rata Respon</div>
                     </div>
                 </div>
             </div>
