@@ -708,6 +708,7 @@
                         jenis: this.formJenis,
                         dariLaporan: true,
                         kodeLaporan: CURRENT_KODE,
+                        foto: (rec.buktiSelesai || []).map(p => ({ name: p.name, url: p.url })),
                     });
                     localStorage.setItem('sipraja_kegiatan', JSON.stringify(keg));
                 } catch (e) {}
