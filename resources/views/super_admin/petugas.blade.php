@@ -129,8 +129,10 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium mb-1">Regu / Unit</label>
-                        <input type="text" name="regu" placeholder="Contoh: Regu A - Patroli"
-                            class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none">
+                        <select name="regu" id="regu-select"
+                            class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none bg-white">
+                            <option value="">Pilih Unit / Regu</option>
+                        </select>
                     </div>
                     <div>
                         <label class="block text-sm font-medium mb-1">Zona Operasi</label>
@@ -242,7 +244,29 @@
         document.getElementById('modal-judul').textContent = 'Tambah Petugas';
         document.getElementById('petugas-form').reset();
         document.querySelector('[name=edit_index]').value = '';
+        isiReguOptions('');
         document.getElementById('modal').classList.remove('hidden');
+    }
+
+    function isiReguOptions(selected) {
+        const select = document.getElementById('regu-select');
+        let units = [];
+        try {
+            units = JSON.parse(localStorage.getItem('sipraja_organisasi') || '[]');
+        } catch (e) { units = []; }
+        const aktif = units.filter(u => u.jenis !== 'Divisi');
+        select.innerHTML = '';
+        const kosong = document.createElement('option');
+        kosong.value = '';
+        kosong.textContent = aktif.length ? 'Pilih Unit / Regu' : 'Belum ada unit di Manajemen Organisasi';
+        select.appendChild(kosong);
+        aktif.forEach(u => {
+            const opt = document.createElement('option');
+            opt.value = u.nama;
+            opt.textContent = u.nama + (u.zona ? ' (' + u.zona + ')' : '');
+            select.appendChild(opt);
+        });
+        select.value = selected;
     }
 
     function bukaEdit(i) {
@@ -254,7 +278,7 @@
         f.nama.value = p.nama;
         f.nip.value = p.nip;
         f.pangkat.value = p.pangkat || '';
-        f.regu.value = p.regu || '';
+        isiReguOptions(p.regu || '');
         f.zona.value = p.zona || '';
         f.status.value = p.status;
         document.getElementById('modal').classList.remove('hidden');
