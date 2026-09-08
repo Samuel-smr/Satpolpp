@@ -29,6 +29,11 @@ class AdminController extends Controller
         return view('admin.feedback');
     }
 
+    public function evaluasi()
+    {
+        return view('admin.evaluasi');
+    }
+
     public function arsip()
     {
         return view('admin.arsip');
@@ -37,11 +42,6 @@ class AdminController extends Controller
     public function aset()
     {
         return view('admin.aset');
-    }
-
-    public function peta()
-    {
-        return view('admin.peta');
     }
 
     public function profile()

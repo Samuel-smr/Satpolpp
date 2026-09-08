@@ -86,6 +86,12 @@
                 <span>Acara &amp; Kegiatan</span>
             </a>
 
+            <a href="{{ route('admin.evaluasi') }}"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all {{ request()->routeIs('admin.evaluasi') ? 'bg-sidebar-active text-white shadow-md font-semibold' : 'text-slate-300 hover:bg-sidebar-hover hover:text-white' }}">
+                <span class="material-symbols-outlined text-[20px]">assessment</span>
+                <span>Evaluasi Kegiatan</span>
+            </a>
+
             <a href="{{ route('admin.feedback') }}"
                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all {{ request()->routeIs('admin.feedback') ? 'bg-sidebar-active text-white shadow-md font-semibold' : 'text-slate-300 hover:bg-sidebar-hover hover:text-white' }}">
                 <span class="material-symbols-outlined text-[20px]">chat_bubble_outline</span>
@@ -102,12 +108,6 @@
                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all {{ request()->routeIs('admin.aset') ? 'bg-sidebar-active text-white shadow-md font-semibold' : 'text-slate-300 hover:bg-sidebar-hover hover:text-white' }}">
                 <span class="material-symbols-outlined text-[20px]">inventory_2</span>
                 <span>Aset</span>
-            </a>
-
-            <a href="{{ route('admin.peta') }}"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all {{ request()->routeIs('admin.peta') ? 'bg-sidebar-active text-white shadow-md font-semibold' : 'text-slate-300 hover:bg-sidebar-hover hover:text-white' }}">
-                <span class="material-symbols-outlined text-[20px]">map</span>
-                <span>Peta Persebaran</span>
             </a>
         </nav>
 

@@ -29,13 +29,13 @@ class SuperAdminController extends Controller
         return view('super_admin.petugas');
     }
 
-    public function evaluasi()
-    {
-        return view('super_admin.evaluasi');
-    }
-
     public function monitoring()
     {
         return view('super_admin.monitoring');
+    }
+
+    public function peta()
+    {
+        return view('super_admin.peta');
     }
 }
