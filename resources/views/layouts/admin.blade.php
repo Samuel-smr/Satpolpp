@@ -529,6 +529,7 @@
         };
     </script>
 
+    <script src="{{ asset('js/kulon-progo-map.js') }}"></script>
     @stack('scripts')
 </body>
 

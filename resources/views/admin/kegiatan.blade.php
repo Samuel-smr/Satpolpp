@@ -720,7 +720,7 @@
                                         this.markerInstance = L.marker(latlng).addTo(this.mapInstance);
                                     }
                                 } else if (!this.isEdit && this.mapInstance) {
-                                    this.mapInstance.setView([-6.175110, 106.827153], 13);
+                                    this.mapInstance.setView(KulonProgoMap.center, KulonProgoMap.defaultZoom);
                                 }
                             }, 150);
                             setTimeout(() => {
@@ -1067,6 +1067,7 @@
                                 dragging: true,
                                 scrollWheelZoom: false
                             }).setView(latlng, 16);
+                            KulonProgoMap.addBoundary(this.mapDetailInstance);
                             
                             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                                 maxZoom: 19,
@@ -1164,8 +1165,7 @@
                         return;
                     }
 
-                    const defaultCenter = [-6.175110, 106.827153];
-                    this.mapInstance = L.map('map-kegiatan').setView(defaultCenter, 13);
+                    this.mapInstance = KulonProgoMap.setup(L.map('map-kegiatan'));
                     
                     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                         maxZoom: 19,

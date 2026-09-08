@@ -592,7 +592,7 @@
 
             initMap() {
                 if (this.mapInstance) { this.mapInstance.remove(); this.mapInstance = null; this.markerInstance = null; }
-                this.mapInstance = L.map('map-selesai').setView([-7.7971, 110.1646], 13);
+                this.mapInstance = KulonProgoMap.setup(L.map('map-selesai'));
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(this.mapInstance);
                 this.mapInstance.on('click', (e) => {
                     this.formLat = e.latlng.lat.toFixed(6);
