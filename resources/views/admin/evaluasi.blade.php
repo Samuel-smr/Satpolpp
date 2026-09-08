@@ -119,23 +119,18 @@
 
                 <div>
                     <label class="block text-sm font-medium mb-1">Kategori <span class="text-red-500">*</span></label>
-                    <select name="kategori" id="select-kategori"
+                    <select name="kategori" id="select-kategori" onchange="loadOptions()"
                         class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none bg-white">
                         <option value="" disabled selected>Pilih Kategori...</option>
-                        <option value="Patroli ketertiban umum, ketentraman, dan perlindungan masyarakat">Patroli ketertiban
-                            umum, ketentraman, dan perlindungan masyarakat</option>
-                        <option value="Pengamanan dan pengawalan pejabat daerah">Pengamanan dan pengawalan pejabat daerah
-                        </option>
-                        <option value="Pengamanan acara atau event">Pengamanan acara atau event</option>
-                        <option value="Penanganan pengaduan pelanggaran ketertiban umum/masyarakat">Penanganan pengaduan
-                            pelanggaran ketertiban umum/masyarakat</option>
-                        <option value="Pembinaan dan pengawasan kepatuhan terhadap Perda dan Perkada">Pembinaan dan
-                            pengawasan kepatuhan terhadap Perda dan Perkada</option>
-                        <option value="Pembinaan dan pengawasan atribut">Pembinaan dan pengawasan atribut</option>
-                        <option value="Penegakan peraturan daerah dan peraturan kepala daerah yustisi">Penegakan peraturan
-                            daerah dan peraturan kepala daerah yustisi</option>
-                        <option value="Penegakan peraturan daerah dan peraturan kepala daerah non yustisi">Penegakan
-                            peraturan daerah dan peraturan kepala daerah non yustisi</option>
+                        <option value="Permintaan Data dan Informasi terkait Ketertiban Umum dan Ketentraman Masyarakat">Permintaan Data dan Informasi terkait Ketertiban Umum dan Ketentraman Masyarakat</option>
+                        <option value="Pelayanan Surat Menyurat">Pelayanan Surat Menyurat</option>
+                        <option value="Patroli Ketertiban Umum, Ketentraman dan Perlindungan Masyarakat">Patroli Ketertiban Umum, Ketentraman dan Perlindungan Masyarakat</option>
+                        <option value="Pelaksanaan Bantuan Pengamanan Unjuk Rasa">Pelaksanaan Bantuan Pengamanan Unjuk Rasa</option>
+                        <option value="Pelaksanaan Bantuan Pengamanan Kegiatan">Pelaksanaan Bantuan Pengamanan Kegiatan</option>
+                        <option value="Penanganan Pengaduan Pelanggaran Ketertiban Umum/Masyarakat">Penanganan Pengaduan Pelanggaran Ketertiban Umum/Masyarakat</option>
+                        <option value="Penegakan Peraturan Daerah dan Peraturan Kepala Daerah">Penegakan Peraturan Daerah dan Peraturan Kepala Daerah</option>
+                        <option value="Pembinaan dan Pengawasan Kepatuhan terhadap Perda dan Perkada">Pembinaan dan Pengawasan Kepatuhan terhadap Perda dan Perkada</option>
+                        <option value="Pembinaan Perlindungan Masyarakat">Pembinaan Perlindungan Masyarakat</option>
                     </select>
                 </div>
 
@@ -176,10 +171,10 @@
             let data = JSON.parse(localStorage.getItem(KODE) || '[]');
             if (data.length === 0) {
                 data = [
-                    { nama: 'Patroli rutin kawasan Pasar Wates', sumber: 'Internal', kategori: 'Patroli ketertiban umum, ketentraman, dan perlindungan masyarakat', keterangan: 'Jumlah personel terbatas saat jam ramai.', dibuat: '01/09/2026' },
-                    { nama: 'Penanganan laporan kerumunan di alun-alun', sumber: 'Eksternal', kategori: 'Penanganan pengaduan pelanggaran ketertiban umum/masyarakat', keterangan: 'Koordinasi dengan aparat desa membutuhkan waktu lebih.', dibuat: '02/09/2026' },
-                    { nama: 'Pengamanan acara pasar malam', sumber: 'Internal', kategori: 'Pengamanan acara atau event', keterangan: 'Berjalan lancar tanpa kendala.', dibuat: '28/08/2026' },
-                    { nama: 'Tindak lanjut laporan PKL liar', sumber: 'Eksternal', kategori: 'Pembinaan dan pengawasan kepatuhan terhadap Perda dan Perkada', keterangan: 'Butuh sosialisasi berulang kepada pedagang.', dibuat: '27/08/2026' },
+                    { nama: 'Patroli rutin kawasan Pasar Wates', sumber: 'Internal', kategori: 'Patroli Ketertiban Umum, Ketentraman dan Perlindungan Masyarakat', keterangan: 'Jumlah personel terbatas saat jam ramai.', dibuat: '01/09/2026' },
+                    { nama: 'Penanganan laporan kerumunan di alun-alun', sumber: 'Eksternal', kategori: 'Penanganan Pengaduan Pelanggaran Ketertiban Umum/Masyarakat', keterangan: 'Koordinasi dengan aparat desa membutuhkan waktu lebih.', dibuat: '02/09/2026' },
+                    { nama: 'Pengamanan acara pasar malam', sumber: 'Internal', kategori: 'Pelaksanaan Bantuan Pengamanan Kegiatan', keterangan: 'Berjalan lancar tanpa kendala.', dibuat: '28/08/2026' },
+                    { nama: 'Tindak lanjut laporan PKL liar', sumber: 'Eksternal', kategori: 'Pembinaan dan Pengawasan Kepatuhan terhadap Perda dan Perkada', keterangan: 'Butuh sosialisasi berulang kepada pedagang.', dibuat: '27/08/2026' },
                 ];
                 localStorage.setItem(KODE, JSON.stringify(data));
             }
@@ -219,13 +214,13 @@
 
             sel.innerHTML = '';
 
-           // 2. Logic kontrol field Kategori
             if (src === 'Eksternal') {
-                kat.value = '';        // Reset nilainya
-                kat.disabled = true;   // Kunci field-nya
+                kat.value = '';
+                kat.disabled = true;
             } else {
-                kat.disabled = false;  // Aktifkan kalau Internal / Kosong
+                kat.disabled = false;
             }
+
 
             if (!src) {
                 sel.innerHTML = '<option value="">Pilih Sumber Terlebih Dahulu</option>';
@@ -233,13 +228,23 @@
                 return;
             }
 
-            sel.disabled = false;
-
             if (src === 'Internal') {
-                const internal = ambilKegiatanInternal();
+                const kategoriDipilih = kat.value;
+
+                // Kunci 'Nama Kegiatan' kalau Kategori BELUM dipilih
+                if (!kategoriDipilih) {
+                    sel.innerHTML = '<option value="">Pilih Kategori Terlebih Dahulu</option>';
+                    sel.disabled = true;
+                    return;
+                }
+
+                sel.disabled = false;
+                let internal = ambilKegiatanInternal();
+                internal = internal.filter(k => k.kategori === kategoriDipilih);
+
                 if (internal.length) {
                     const og = document.createElement('optgroup');
-                    og.label = 'Internal (Kegiatan Satpol PP)';
+                    og.label = 'Kegiatan - ' + kategoriDipilih;
                     internal.forEach(k => {
                         const o = document.createElement('option');
                         o.value = k.nama;
@@ -248,42 +253,30 @@
                     });
                     sel.appendChild(og);
                 } else {
-                    sel.innerHTML = '<option value="">Belum ada kegiatan internal</option>';
+                    sel.innerHTML = '<option value="">Belum ada kegiatan untuk kategori ini</option>';
                 }
-                } else if (src === 'Eksternal') {
-                    const eksternal = ambilLaporanSelesai();
-                    if (eksternal.length) {
-                        const og = document.createElement('optgroup');
-                        og.label = 'Eksternal (Dari Laporan)';
-                        eksternal.forEach(r => {
-                            const o = document.createElement('option');
-                            o.value = r.kode + ' - ' + (r.deskripsi || 'Laporan');
-                            o.textContent = (r.deskripsi || 'Laporan') + ' (' + r.kode + ')';
-                            og.appendChild(o);
-                        });
-                        sel.appendChild(og);
-                    } else {
-                        sel.innerHTML = '<option value="">Belum ada laporan selesai</option>';
-                    }
+
+            } else if (src === 'Eksternal') {
+                sel.disabled = false;
+                const eksternal = ambilLaporanSelesai();
+                if (eksternal.length) {
+                    const og = document.createElement('optgroup');
+                    og.label = 'Eksternal (Dari Laporan)';
+                    eksternal.forEach(r => {
+                        const o = document.createElement('option');
+                        o.value = r.kode + ' - ' + (r.deskripsi || 'Laporan');
+                        o.textContent = (r.deskripsi || 'Laporan') + ' (' + r.kode + ')';
+                        og.appendChild(o);
+                    });
+                    sel.appendChild(og);
+                } else {
+                    sel.innerHTML = '<option value="">Belum ada laporan selesai</option>';
                 }
             }
+        }
 
         function sumberTerpilih() {
             return document.getElementById('select-sumber').value || 'Internal';
-        }
-
-        function getData() {
-            let data = JSON.parse(localStorage.getItem(KODE) || '[]');
-            if (data.length === 0) {
-                data = [
-                    { nama: 'Patroli rutin kawasan Pasar Wates', sumber: 'Internal', keterangan: 'Jumlah personel terbatas saat jam ramai.', dibuat: '01/09/2026' },
-                    { nama: 'Penanganan laporan kerumunan di alun-alun', sumber: 'Eksternal', keterangan: 'Koordinasi dengan aparat desa membutuhkan waktu lebih.', dibuat: '02/09/2026' },
-                    { nama: 'Pengamanan acara pasar malam', sumber: 'Internal', keterangan: 'Berjalan lancar tanpa kendala.', dibuat: '28/08/2026' },
-                    { nama: 'Tindak lanjut laporan PKL liar', sumber: 'Eksternal', keterangan: 'Butuh sosialisasi berulang kepada pedagang.', dibuat: '27/08/2026' },
-                ];
-                localStorage.setItem(KODE, JSON.stringify(data));
-            }
-            return data;
         }
 
         function saveAll(data) { localStorage.setItem(KODE, JSON.stringify(data)); }

@@ -114,6 +114,7 @@
                                                 Dari Laporan
                                             </span>
                                         </div>
+                                        <span class="text-[11px] text-slate-400 font-medium block mt-0.5" x-text="item.kategori || 'Tanpa Kategori'"></span>
                                     </td>
                                     <td class="px-6 py-4">
                                         <div class="flex items-center gap-1.5 text-slate-500">
@@ -197,6 +198,10 @@
                                     <div class="md:col-span-2">
                                         <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Nama Kegiatan</div>
                                         <div class="font-bold text-slate-800 text-lg" x-text="selectedKegiatan?.nama"></div>
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 mt-2 rounded-full text-[11px] font-semibold bg-orange-50 text-sidebar-active border border-orange-100">
+                                            <span class="material-symbols-outlined text-[14px]">category</span>
+                                            <span x-text="selectedKegiatan?.kategori || 'Tanpa Kategori'"></span>
+                                        </span>
                                     </div>
                                     
                                     <div>
@@ -361,6 +366,16 @@
                                 <div class="md:col-span-2">
                                     <label class="block text-sm font-semibold text-slate-700 mb-2">Nama Acara / Kegiatan <span class="text-red-500">*</span></label>
                                     <input type="text" x-model="formNama" placeholder="Contoh: Operasi Penertiban PKL Tanah Abang" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm">
+                                </div>
+
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-semibold text-slate-700 mb-2">Kategori Kegiatan <span class="text-red-500">*</span></label>
+                                    <select x-model="formKategori" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm">
+                                        <option value="">-- Pilih kategori kegiatan --</option>
+                                        <template x-for="tpl in templates" :key="tpl.id">
+                                            <option :value="tpl.nama" x-text="tpl.nama"></option>
+                                        </template>
+                                    </select>
                                 </div>
                                 
                                 <div>
@@ -619,6 +634,7 @@
                 formLng: '',
                 searchLokasi: '',
                 formTemplate: '',
+                formKategori: '',
                 
                 templates: [
                     { id: 1, nama: 'Permintaan Data dan Informasi terkait Ketertiban Umum dan Ketentraman Masyarakat' },
@@ -646,7 +662,9 @@
                         lat: '-6.309325', 
                         lng: '106.883447',
                         peserta: [1, 3, 5],
-                        jenis: 'Eksternal'
+                        jenis: 'Eksternal',
+                        template: 7,
+                        kategori: 'Penegakan Peraturan Daerah dan Peraturan Kepala Daerah'
                     },
                     { 
                         id: 2, 
@@ -658,7 +676,9 @@
                         lat: '-6.187310', 
                         lng: '106.816000',
                         peserta: [2, 4, 6],
-                        jenis: 'Eksternal'
+                        jenis: 'Eksternal',
+                        template: 8,
+                        kategori: 'Pembinaan dan Pengawasan Kepatuhan terhadap Perda dan Perkada'
                     },
                     { 
                         id: 3, 
@@ -670,7 +690,9 @@
                         lat: '-6.199732', 
                         lng: '106.832626',
                         peserta: [1, 2, 7],
-                        jenis: 'Internal'
+                        jenis: 'Internal',
+                        template: 8,
+                        kategori: 'Pembinaan dan Pengawasan Kepatuhan terhadap Perda dan Perkada'
                     },
                 ],
                 
@@ -1160,6 +1182,7 @@
                     this.searchLokasi = '';
                     this.formJenis = 'Eksternal';
                     this.formTemplate = '';
+                    this.formKategori = '';
                     this.searchAnggota = '';
                     this.selectedAnggota = [];
                     
@@ -1185,6 +1208,7 @@
                     const tpl = this.templates.find(t => t.id === Number(this.formTemplate));
                     if (!tpl) return;
                     this.formNama = tpl.nama;
+                    this.formKategori = tpl.nama;
                     this.formDeskripsi = 'Pelaksanaan kegiatan: ' + tpl.nama + '.';
                 },
 
@@ -1201,7 +1225,8 @@
                     this.formLng = item.lng || '';
                     this.searchLokasi = '';
                     this.formJenis = item.jenis || 'Eksternal';
-                    this.formTemplate = '';
+                    this.formTemplate = item.template || '';
+                    this.formKategori = item.kategori || '';
                     
                     this.selectedAnggota = this.allAnggota.filter(a => item.peserta.includes(a.id));
                     
@@ -1377,6 +1402,10 @@
                         alert('Harap lengkapi nama kegiatan, tanggal, dan alamat lokasi.');
                         return;
                     }
+                    if (!this.formKategori) {
+                        alert('Harap pilih kategori kegiatan.');
+                        return;
+                    }
                     if (!this.formLat || !this.formLng) {
                         alert('Harap tentukan titik pin lokasi pada peta digital (wajib).');
                         return;
@@ -1397,6 +1426,8 @@
                             this.kegiatanList[index].lat = this.formLat;
                             this.kegiatanList[index].lng = this.formLng;
                             this.kegiatanList[index].jenis = this.formJenis;
+                            this.kegiatanList[index].kategori = this.formKategori;
+                            this.kegiatanList[index].template = this.formTemplate;
                             this.kegiatanList[index].peserta = this.selectedAnggota.map(a => a.id);
                         }
                         window.tampilToast('Edit berhasil! Data kegiatan telah diperbarui.');
@@ -1412,6 +1443,8 @@
                             lat: this.formLat,
                             lng: this.formLng,
                             jenis: this.formJenis,
+                            kategori: this.formKategori,
+                            template: this.formTemplate,
                             peserta: this.selectedAnggota.map(a => a.id)
                         });
                         window.tampilToast('Berhasil menambah data kegiatan baru.');
