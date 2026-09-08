@@ -849,6 +849,49 @@
                     });
                 },
 
+                getPdfReport(item) {
+                    if (!item.kodeLaporan) return null;
+
+                    try {
+                        const reports = JSON.parse(localStorage.getItem('sipraja_reports') || '[]');
+                        return reports.find(report => report.kode === item.kodeLaporan) || null;
+                    } catch (error) {
+                        return null;
+                    }
+                },
+
+                getPdfDocumentation(item) {
+                    const report = this.getPdfReport(item);
+                    if (Array.isArray(item.dokumentasi) && item.dokumentasi.length > 0) return item.dokumentasi;
+                    if (Array.isArray(item.buktiSelesai) && item.buktiSelesai.length > 0) return item.buktiSelesai;
+                    if (Array.isArray(report?.buktiSelesai)) return report.buktiSelesai;
+                    return [];
+                },
+
+                getPdfAction(item) {
+                    const report = this.getPdfReport(item);
+                    return item.tindakan || item.keteranganSelesai || report?.keteranganSelesai || item.deskripsi || '-';
+                },
+
+                async imageToDataUrl(source) {
+                    if (!source) return null;
+                    if (source.startsWith('data:image/')) return source;
+
+                    try {
+                        const response = await fetch(source);
+                        const blob = await response.blob();
+
+                        return await new Promise((resolve) => {
+                            const reader = new FileReader();
+                            reader.onload = () => resolve(reader.result);
+                            reader.onerror = () => resolve(null);
+                            reader.readAsDataURL(blob);
+                        });
+                    } catch (error) {
+                        return null;
+                    }
+                },
+
                 async exportExcel() {
                     const list = this.filteredKegiatans();
                     if (!list || list.length === 0) {
@@ -959,14 +1002,21 @@
                         doc.text(dateText, doc.internal.pageSize.getWidth() - 14, 36, { align: 'right' });
 
                         // Tabel Data
-                        const tableHeaders = [['No', 'Nama Kegiatan', 'Tanggal & Waktu', 'Jenis', 'Lokasi', 'Peserta', 'Keterangan']];
-                        const tableBody = list.map((item, index) => {
+                        const tableHeaders = [['No', 'Nama Kegiatan', 'Tanggal & Waktu', 'Jenis', 'Lokasi', 'Peserta', 'Tindakan dan Hasil', 'Dokumentasi']];
+                        const pdfImages = [];
+                        const tableBody = await Promise.all(list.map(async (item, index) => {
                             let anggotaNames = '-';
                             if (item.peserta && item.peserta.length > 0) {
                                 const members = this.allAnggota.filter(a => item.peserta.includes(a.id)).map(a => a.nama);
                                 if (members.length > 0) anggotaNames = members.join(', ');
                             }
                             const datetime = item.tanggal + (item.waktu ? '\n' + item.waktu + ' WIB' : '');
+                            const images = (await Promise.all(
+                                this.getPdfDocumentation(item)
+                                    .slice(0, 4)
+                                    .map(photo => this.imageToDataUrl(photo.url || photo))
+                            )).filter(image => image && image.startsWith('data:image/'));
+                            pdfImages[index] = images;
                             return [
                                 index + 1,
                                 item.nama,
@@ -974,9 +1024,10 @@
                                 item.jenis,
                                 item.lokasi,
                                 `${item.peserta ? item.peserta.length : 0} Anggota\n(${anggotaNames})`,
-                                item.deskripsi || '-'
+                                this.getPdfAction(item),
+                                images.length > 0 ? '\n' : '-'
                             ];
-                        });
+                        }));
 
                         doc.autoTable({
                             head: tableHeaders,
@@ -997,17 +1048,33 @@
                             },
                             columnStyles: {
                                 0: { halign: 'center', cellWidth: 10 },
-                                1: { cellWidth: 50, fontStyle: 'bold' },
-                                2: { halign: 'center', cellWidth: 28 },
-                                3: { halign: 'center', cellWidth: 20 },
-                                4: { cellWidth: 55 },
-                                5: { cellWidth: 45 },
-                                6: { cellWidth: 'auto' }
+                                1: { cellWidth: 42, fontStyle: 'bold' },
+                                2: { halign: 'center', cellWidth: 25 },
+                                3: { halign: 'center', cellWidth: 18 },
+                                4: { cellWidth: 45 },
+                                5: { cellWidth: 38 },
+                                6: { cellWidth: 65 },
+                                7: { cellWidth: 26, halign: 'center' }
                             },
                             alternateRowStyles: {
                                 fillColor: [248, 250, 252]
                             },
                             margin: { left: 14, right: 14 },
+                            didParseCell: function (data) {
+                                if (data.section === 'body' && data.column.index === 7 && pdfImages[data.row.index]?.length) {
+                                    data.cell.styles.minCellHeight = (images.length * 20) + 6;
+                                }
+                            },
+                            didDrawCell: function (data) {
+                                if (data.section !== 'body' || data.column.index !== 7) return;
+
+                                const images = pdfImages[data.row.index] || [];
+                                const imageSize = Math.min(17, data.cell.width - 6);
+                                images.forEach((image, imageIndex) => {
+                                    const imageFormat = image.startsWith('data:image/png') ? 'PNG' : 'JPEG';
+                                    doc.addImage(image, imageFormat, data.cell.x + 3, data.cell.y + 3 + (imageIndex * 20), imageSize, imageSize);
+                                });
+                            },
                             didDrawPage: function (data) {
                                 const pageCount = doc.internal.getNumberOfPages();
                                 doc.setFontSize(8);
