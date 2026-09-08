@@ -170,7 +170,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium mb-1">Nomor Telepon (Opsional)</label>
+                    <label class="block text-sm font-medium mb-1">Nomor Telepon <span class="text-red-500">*</span></label>
                     <input type="tel" name="telepon" placeholder="08123456789"
                         class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none">
                 </div>
@@ -243,7 +243,8 @@
         </div>
     </div>
 
-    <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-5 py-3 rounded-xl shadow-lg text-sm z-50"></div>
+
+
 @endsection
 
 @push('scripts')
@@ -349,7 +350,7 @@
     }
 
     function bukaDetail(kode) {
-        window.location.href = '{{ url('admin/pengaduan') }}/' + encodeURIComponent(kode);
+        window.location.href = "{{ url('admin/pengaduan') }}/" + encodeURIComponent(kode);
     }
 
     function findGlobalIndex(detailIdx) {
@@ -361,11 +362,18 @@
     function hapus(detailIdx) {
         const all = getReports();
         const gi = findGlobalIndex(detailIdx);
-        if (!confirm('Yakin ingin menghapus laporan ' + all[gi].kode + '?')) return;
-        all.splice(gi, 1);
-        saveAll(all);
-        renderList();
-        tampilToast('Laporan berhasil dihapus.');
+        if (gi === -1 || !all[gi]) return;
+        
+        window.konfirmasiHapus({
+            title: 'Hapus Laporan',
+            message: 'Apakah Anda yakin ingin menghapus laporan ' + all[gi].kode + '? Data yang dihapus tidak dapat dipulihkan.',
+            onConfirm: () => {
+                all.splice(gi, 1);
+                saveAll(all);
+                renderList();
+                tampilToast('Laporan berhasil dihapus.');
+            }
+        });
     }
 
     function bukaTambah() {
@@ -515,15 +523,11 @@
         saveAll(all);
         renderList();
         tutupTambah();
-        tampilToast('Laporan ' + kode + ' berhasil ditambahkan.');
+        tampilToast('Berhasil menambah data laporan baru (' + kode + ').');
     }
 
-    function tampilToast(msg) {
-        const t = document.getElementById('toast');
-        t.textContent = msg;
-        t.classList.remove('hidden');
-        setTimeout(() => t.classList.add('hidden'), 2500);
-    }
+
+
 
     setTab('semua');
 </script>

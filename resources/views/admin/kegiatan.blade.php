@@ -1126,10 +1126,17 @@
                 },
 
                 deleteKegiatan(id) {
-                    if (confirm('Yakin ingin menghapus kegiatan ini?')) {
-                        this.kegiatanList = this.kegiatanList.filter(k => k.id !== id);
-                        localStorage.setItem('sipraja_kegiatan', JSON.stringify(this.kegiatanList));
-                    }
+                    const item = this.kegiatanList.find(k => k.id === id);
+                    const nama = item ? `kegiatan "${item.nama}"` : 'kegiatan ini';
+                    window.konfirmasiHapus({
+                        title: 'Hapus Kegiatan',
+                        message: `Apakah Anda yakin ingin menghapus ${nama}? Data yang dihapus tidak dapat dipulihkan.`,
+                        onConfirm: () => {
+                            this.kegiatanList = this.kegiatanList.filter(k => k.id !== id);
+                            localStorage.setItem('sipraja_kegiatan', JSON.stringify(this.kegiatanList));
+                            window.tampilToast('Data kegiatan berhasil dihapus.');
+                        }
+                    });
                 },
 
                 toggleMap() {
@@ -1279,7 +1286,7 @@
                             this.kegiatanList[index].jenis = this.formJenis;
                             this.kegiatanList[index].peserta = this.selectedAnggota.map(a => a.id);
                         }
-                        alert('Kegiatan berhasil diperbarui (Prototype).');
+                        window.tampilToast('Edit berhasil! Data kegiatan telah diperbarui.');
                     } else {
                         const newId = Date.now();
                         this.kegiatanList.push({
@@ -1294,7 +1301,7 @@
                             jenis: this.formJenis,
                             peserta: this.selectedAnggota.map(a => a.id)
                         });
-                        alert('Kegiatan berhasil dijadwalkan (Prototype).');
+                        window.tampilToast('Berhasil menambah data kegiatan baru.');
                     }
                     
                     this.showModal = false;

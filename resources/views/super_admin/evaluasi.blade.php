@@ -138,7 +138,8 @@
         </div>
     </div>
 
-    <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-5 py-3 rounded-xl shadow-lg text-sm z-50"></div>
+
+
 @endsection
 
 @push('scripts')
@@ -335,10 +336,10 @@
         if (idx !== '') {
             data.dibuat = all[idx].dibuat;
             all[idx] = data;
-            tampilToast('Evaluasi berhasil diperbarui.');
+            tampilToast('Edit berhasil! Data evaluasi telah diperbarui.');
         } else {
             all.unshift(data);
-            tampilToast('Evaluasi berhasil ditambahkan.');
+            tampilToast('Berhasil menambah data evaluasi kegiatan.');
         }
         saveAll(all);
         renderList();
@@ -347,19 +348,20 @@
 
     function hapus(i) {
         const all = getData();
-        if (!confirm('Yakin ingin menghapus evaluasi ' + all[i].nama + '?')) return;
-        all.splice(i, 1);
-        saveAll(all);
-        renderList();
-        tampilToast('Evaluasi berhasil dihapus.');
+        const nama = all[i] ? `evaluasi "${all[i].nama}"` : 'evaluasi ini';
+        window.konfirmasiHapus({
+            title: 'Hapus Evaluasi',
+            message: `Apakah Anda yakin ingin menghapus ${nama}? Data yang dihapus tidak dapat dipulihkan.`,
+            onConfirm: () => {
+                all.splice(i, 1);
+                saveAll(all);
+                renderList();
+                tampilToast('Evaluasi berhasil dihapus.');
+            }
+        });
     }
 
-    function tampilToast(msg) {
-        const t = document.getElementById('toast');
-        t.textContent = msg;
-        t.classList.remove('hidden');
-        setTimeout(() => t.classList.add('hidden'), 2500);
-    }
+
 
     renderList();
 </script>

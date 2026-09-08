@@ -157,7 +157,8 @@
         </div>
     </div>
 
-    <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-5 py-3 rounded-xl shadow-lg text-sm z-50"></div>
+
+
 @endsection
 
 @push('scripts')
@@ -244,23 +245,26 @@
         localStorage.setItem(KODE, JSON.stringify(data));
         renderAset();
         tutupForm();
-        tampilToast('Aset berhasil ditambahkan.');
+        tampilToast('Berhasil menambah data aset baru.');
     }
 
     function hapusAset(i) {
         const data = getAset();
-        data.splice(i, 1);
-        localStorage.setItem(KODE, JSON.stringify(data));
-        renderAset();
-        tampilToast('Aset berhasil dihapus.');
+        const nama = data[i] ? `aset "${data[i].nama}"` : 'aset ini';
+        window.konfirmasiHapus({
+            title: 'Hapus Aset',
+            message: `Apakah Anda yakin ingin menghapus ${nama}? Data yang dihapus tidak dapat dipulihkan.`,
+            onConfirm: () => {
+                data.splice(i, 1);
+                localStorage.setItem(KODE, JSON.stringify(data));
+                renderAset();
+                tampilToast('Aset berhasil dihapus.');
+            }
+        });
     }
 
-    function tampilToast(msg) {
-        const t = document.getElementById('toast');
-        t.textContent = msg;
-        t.classList.remove('hidden');
-        setTimeout(() => t.classList.add('hidden'), 2500);
-    }
+
+
 
     renderAset();
 </script>
