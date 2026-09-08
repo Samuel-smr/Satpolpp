@@ -57,7 +57,8 @@
         <!-- Logo Section -->
         <div class="px-6 py-6 flex items-center gap-3">
             <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center p-1.5 flex-shrink-0">
-                <img src="{{ asset('images/logo-sipraja.png') }}" alt="Logo SIPRAJA Satpol PP" class="w-full h-full object-contain">
+                <img src="{{ asset('images/logo-sipraja.png') }}" alt="Logo SIPRAJA Satpol PP"
+                    class="w-full h-full object-contain">
             </div>
             <div>
                 <h1 class="font-headline font-bold text-lg text-white leading-tight tracking-wide">SIPRAJA</h1>
@@ -136,17 +137,37 @@
             </div>
 
             <!-- Right Actions / Profile -->
-            <div class="flex items-center gap-4">
-                <button
-                    class="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors"
-                    title="Pengaturan">
-                    <span class="material-symbols-outlined text-[22px]">settings</span>
-                </button>
+            <div class="flex items-center gap-2 relative">
+                <!-- Notifikasi -->
+                <div class="relative">
+                    <button onclick="toggleNotif(event)"
+                        class="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors relative"
+                        title="Notifikasi">
+                        <span class="material-symbols-outlined text-[20px]">notifications</span>
+                        <span id="notif-badge"
+                            class="hidden absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
+                    </button>
+
+                    <div id="notif-panel"
+                        class="hidden absolute right-0 top-12 w-80 sm:w-96 bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden z-50">
+                        <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+                            <h3 class="font-headline font-bold text-slate-800">Notifikasi</h3>
+                            <button onclick="markAllRead()"
+                                class="text-xs font-medium text-super-active hover:text-brand-600">Tandai semua
+                                dibaca</button>
+                        </div>
+                        <div id="notif-list" class="max-h-96 overflow-y-auto divide-y divide-slate-50"></div>
+                        <div id="notif-empty" class="hidden px-4 py-10 text-center text-slate-400">
+                            <div class="text-3xl mb-2">🔔</div>
+                            <p class="text-sm">Tidak ada notifikasi.</p>
+                        </div>
+                    </div>
+                </div>
 
                 <button
                     class="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors"
                     title="Bantuan">
-                    <span class="material-symbols-outlined text-[22px]">help_outline</span>
+                    <span class="material-symbols-outlined text-[20px]">help_outline</span>
                 </button>
 
                 <!-- Avatar Profile -->
@@ -178,16 +199,19 @@
         <div class="fixed inset-0 bg-black/40 transition-opacity" onclick="tutupKonfirmasiHapus()"></div>
 
         <!-- Modal Box -->
-        <div class="relative w-full max-w-sm sm:max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden p-6 text-center border border-slate-100 transform transition-all">
+        <div
+            class="relative w-full max-w-sm sm:max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden p-6 text-center border border-slate-100 transform transition-all">
             <div class="w-14 h-14 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto mb-4">
                 <span class="material-symbols-outlined text-[32px]">delete</span>
             </div>
-            
-            <h3 class="font-headline font-bold text-lg text-slate-800 mb-2" id="global-konfirmasi-judul">Konfirmasi Hapus Data</h3>
-            <p class="text-sm text-slate-500 mb-6 leading-relaxed" id="global-konfirmasi-pesan">Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.</p>
-            
+
+            <h3 class="font-headline font-bold text-lg text-slate-800 mb-2" id="global-konfirmasi-judul">Konfirmasi
+                Hapus Data</h3>
+            <p class="text-sm text-slate-500 mb-6 leading-relaxed" id="global-konfirmasi-pesan">Apakah Anda yakin ingin
+                menghapus data ini? Tindakan ini tidak dapat dibatalkan.</p>
+
             <div class="flex items-center justify-center gap-3">
-                <button type="button" onclick="tutupKonfirmasiHapus()" 
+                <button type="button" onclick="tutupKonfirmasiHapus()"
                     class="w-full py-2.5 px-4 rounded-xl border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
                     Batal
                 </button>
@@ -200,9 +224,125 @@
     </div>
 
     <script>
+        const NOTIF_KODE_LAPORAN = 'sipraja_reports';
+        const NOTIF_KODE_BACA = 'sipraja_notif_baca';
+
+        function getReportsData() {
+            try {
+                return JSON.parse(localStorage.getItem(NOTIF_KODE_LAPORAN) || '[]');
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function getBacaSet() {
+            try {
+                return new Set(JSON.parse(localStorage.getItem(NOTIF_KODE_BACA) || '[]'));
+            } catch (e) {
+                return new Set();
+            }
+        }
+
+        function simpanBacaSet(set) {
+            localStorage.setItem(NOTIF_KODE_BACA, JSON.stringify([...set]));
+        }
+
+        function getNotif() {
+            return getReportsData().map((r, i) => {
+                const darurat = r.jenis === 'darurat';
+                return {
+                    id: i,
+                    kode: r.kode,
+                    jenis: darurat ? 'darurat' : 'laporan',
+                    pesan: (darurat ? 'Laporan Darurat: ' : 'Laporan Baru: ') + (r.deskripsi || 'Pengaduan baru dari masyarakat.'),
+                    waktu: r.dibuat || '-',
+                    dibaca: getBacaSet().has(r.kode),
+                };
+            });
+        }
+
+        function notifIcon(j) {
+            return { darurat: 'emergency', laporan: 'description', petugas: 'badge', aset: 'inventory_2', organisasi: 'account_balance', evaluasi: 'assessment' }[j] || 'notifications';
+        }
+        function notifClass(j) {
+            return { darurat: 'bg-red-100 text-red-600', laporan: 'bg-blue-100 text-blue-600', petugas: 'bg-emerald-100 text-emerald-600', aset: 'bg-amber-100 text-amber-600', organisasi: 'bg-slate-200 text-slate-600', evaluasi: 'bg-purple-100 text-purple-600' }[j] || 'bg-slate-100 text-slate-600';
+        }
+
+        function unreadCount() {
+            return getNotif().filter(n => !n.dibaca).length;
+        }
+
+        function updateBadge() {
+            const badge = document.getElementById('notif-badge');
+            const count = unreadCount();
+            badge.classList.toggle('hidden', count === 0);
+        }
+
+        function renderNotif() {
+            const data = getNotif();
+            const list = document.getElementById('notif-list');
+            const empty = document.getElementById('notif-empty');
+
+            if (data.length === 0) {
+                list.innerHTML = '';
+                empty.classList.remove('hidden');
+            } else {
+                empty.classList.add('hidden');
+                list.innerHTML = data.map(n => `
+                    <div class="flex items-start gap-3 px-4 py-3 cursor-pointer hover:bg-slate-50 transition-colors ${n.dibaca ? '' : 'bg-orange-50/60'}" onclick="readNotif('${n.kode}')">
+                        <div class="w-9 h-9 rounded-full ${notifClass(n.jenis)} flex items-center justify-center flex-shrink-0">
+                            <span class="material-symbols-outlined text-[18px]">${notifIcon(n.jenis)}</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm text-slate-700 leading-snug">${n.pesan}</p>
+                            <span class="text-xs text-slate-400">${n.waktu}</span>
+                        </div>
+                        ${!n.dibaca ? '<span class="w-2 h-2 mt-1.5 bg-red-500 rounded-full flex-shrink-0"></span>' : ''}
+                    </div>
+                `).join('');
+            }
+            updateBadge();
+        }
+
+        function toggleNotif(e) {
+            e.stopPropagation();
+            const panel = document.getElementById('notif-panel');
+            panel.classList.toggle('hidden');
+            renderNotif();
+        }
+
+        function readNotif(kode) {
+            if (kode) {
+                const set = getBacaSet();
+                set.add(kode);
+                simpanBacaSet(set);
+                renderNotif();
+                window.location.href = "{{ url('admin/pengaduan') }}/" + encodeURIComponent(kode);
+            }
+        }
+
+        function markAllRead() {
+            const set = new Set(getReportsData().map(r => r.kode));
+            simpanBacaSet(set);
+            renderNotif();
+        }
+
+        // Tutup panel saat klik di luar
+        document.addEventListener('click', function (e) {
+            const panel = document.getElementById('notif-panel');
+            if (panel && !panel.classList.contains('hidden')) {
+                const btn = document.querySelector('[onclick="toggleNotif(event)"]');
+                if (btn && !btn.contains(e.target) && !panel.contains(e.target)) {
+                    panel.classList.add('hidden');
+                }
+            }
+        });
+
+        renderNotif();
+
         let _confirmResolve = null;
 
-        window.konfirmasiHapus = function(options) {
+        window.konfirmasiHapus = function (options) {
             return new Promise((resolve) => {
                 let title = 'Konfirmasi Hapus Data';
                 let message = 'Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.';
@@ -224,7 +364,7 @@
                 _confirmResolve = resolve;
 
                 const btnYa = document.getElementById('global-konfirmasi-btn-ya');
-                btnYa.onclick = function() {
+                btnYa.onclick = function () {
                     tutupKonfirmasiHapus();
                     if (typeof onConfirm === 'function') {
                         onConfirm();
@@ -237,7 +377,7 @@
             });
         };
 
-        window.tutupKonfirmasiHapus = function() {
+        window.tutupKonfirmasiHapus = function () {
             const modal = document.getElementById('global-modal-konfirmasi-hapus');
             if (modal) modal.classList.add('hidden');
             if (_confirmResolve) {
@@ -250,14 +390,16 @@
     {{-- Global Success / Alert Popup Modal --}}
     <div id="global-toast-popup" class="hidden fixed inset-0 z-[120] flex items-center justify-center p-4">
         <!-- Backdrop -->
-        <div id="global-toast-backdrop" class="fixed inset-0 bg-slate-900/50 backdrop-blur-[2px] transition-opacity duration-300 opacity-0" onclick="tutupToastPopup()"></div>
+        <div id="global-toast-backdrop"
+            class="fixed inset-0 bg-slate-900/50 backdrop-blur-[2px] transition-opacity duration-300 opacity-0"
+            onclick="tutupToastPopup()"></div>
 
         <!-- Popup Card Box -->
         <div id="global-toast-box"
-             class="relative w-full max-w-sm bg-white rounded-3xl shadow-2xl border border-slate-100 p-6 sm:p-7 text-center transform transition-all duration-300 scale-90 opacity-0 z-10">
+            class="relative w-full max-w-sm bg-white rounded-3xl shadow-2xl border border-slate-100 p-6 sm:p-7 text-center transform transition-all duration-300 scale-90 opacity-0 z-10">
             {{-- Icon Badge --}}
             <div id="global-toast-icon-wrap"
-                 class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4 ring-8 ring-emerald-50 transition-colors duration-300">
+                class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4 ring-8 ring-emerald-50 transition-colors duration-300">
                 <span id="global-toast-icon" class="material-symbols-outlined text-[36px]">check_circle</span>
             </div>
             {{-- Title --}}
@@ -271,7 +413,8 @@
             </button>
             {{-- Progress bar --}}
             <div class="w-full h-1 bg-slate-100 rounded-full overflow-hidden mt-4">
-                <div id="global-toast-progress" class="h-full bg-emerald-500 rounded-full transition-all ease-linear" style="width: 100%;"></div>
+                <div id="global-toast-progress" class="h-full bg-emerald-500 rounded-full transition-all ease-linear"
+                    style="width: 100%;"></div>
             </div>
         </div>
     </div>
@@ -280,7 +423,7 @@
         let _toastTimer = null;
         let _toastProgressTimer = null;
 
-        window.tutupToastPopup = function() {
+        window.tutupToastPopup = function () {
             clearTimeout(_toastTimer);
             clearInterval(_toastProgressTimer);
             const popup = document.getElementById('global-toast-popup');
@@ -300,7 +443,7 @@
             }, 250);
         };
 
-        window.tampilToast = window.tampilPopup = function(msg, type = 'success', customTitle = null) {
+        window.tampilToast = window.tampilPopup = function (msg, type = 'success', customTitle = null) {
             clearTimeout(_toastTimer);
             clearInterval(_toastProgressTimer);
 
