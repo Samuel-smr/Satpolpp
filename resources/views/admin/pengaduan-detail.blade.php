@@ -290,29 +290,31 @@
                         </div>
                     </div>
                     <div>
-                        <div class="grid grid-cols-2 gap-4 mb-3">
+                        <div class="rounded-xl border border-slate-200 overflow-hidden">
+                            <div class="flex gap-2 p-2.5 bg-white border-b border-slate-200">
+                                <div class="flex-1 relative">
+                                    <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-[18px]">search</span>
+                                    <input type="text" x-model="searchLokasi" placeholder="Cari lokasi / alamat..." @keydown.enter.prevent="cariLokasi()" class="w-full pl-10 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm">
+                                </div>
+                                <button type="button" @click="cariLokasi()" class="inline-flex items-center justify-center gap-1 bg-sidebar-active hover:bg-sidebar-hover text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm transition-colors shrink-0">
+                                    <span class="material-symbols-outlined text-[18px]">search</span>
+                                    Cari
+                                </button>
+                                <button type="button" @click="getCurrentLocation()" title="Gunakan lokasi saat ini" class="w-10 h-10 inline-flex items-center justify-center text-sidebar-active hover:text-white hover:bg-sidebar-active border border-sidebar-active/40 hover:border-sidebar-active rounded-lg transition-all shrink-0">
+                                    <span class="material-symbols-outlined text-[20px]">my_location</span>
+                                </button>
+                            </div>
+                            <div id="map-selesai" class="w-full h-[320px] bg-slate-100 z-10"></div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 mt-3">
                             <div>
                                 <label class="block text-xs font-semibold text-slate-500 mb-1">Latitude <span class="text-red-500">*</span></label>
-                                <input type="text" x-model="formLat" readonly placeholder="Klik pada peta..." class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-600 outline-none cursor-not-allowed">
+                                <input type="text" x-model="formLat" readonly placeholder="Klik peta..." class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-600 outline-none cursor-not-allowed">
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-slate-500 mb-1">Longitude <span class="text-red-500">*</span></label>
-                                <input type="text" x-model="formLng" readonly placeholder="Klik pada peta..." class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-600 outline-none cursor-not-allowed">
-                            </div>
-                        </div>
-                        <div class="flex justify-end mb-2">
-                            <button type="button" @click="getCurrentLocation()" class="text-xs font-medium text-sidebar-active hover:text-sidebar-hover flex items-center gap-1 bg-sidebar-active/10 px-2.5 py-1.5 rounded-lg transition-colors">
-                                <span class="material-symbols-outlined text-[16px]">my_location</span>
-                                Gunakan lokasi saat ini
-                            </button>
-                        </div>
-                        <div class="border border-slate-200 rounded-xl overflow-hidden relative group">
-                            <div id="map-selesai" class="w-full h-[300px] bg-slate-100 z-10"></div>
-                            <div class="absolute top-3 right-3 z-[1000]">
-                                <span class="bg-white/90 backdrop-blur text-xs font-medium px-3 py-1.5 rounded-lg shadow-sm border border-slate-200 text-slate-600 flex items-center gap-1">
-                                    <span class="material-symbols-outlined text-[14px]">touch_app</span>
-                                    Klik peta untuk pin lokasi
-                                </span>
+                                <input type="text" x-model="formLng" readonly placeholder="Klik peta..." class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-600 outline-none cursor-not-allowed">
                             </div>
                         </div>
                     </div>
@@ -519,6 +521,7 @@
             formLokasi: '',
             formLat: '',
             formLng: '',
+            searchLokasi: '',
             formTindakan: '',
             templates: [
                 { id: 1, nama: 'Permintaan Data dan Informasi terkait Ketertiban Umum dan Ketentraman Masyarakat' },
@@ -589,7 +592,7 @@
 
             initMap() {
                 if (this.mapInstance) { this.mapInstance.remove(); this.mapInstance = null; this.markerInstance = null; }
-                this.mapInstance = L.map('map-selesai').setView([-7.7971, 110.1646], 13);
+                this.mapInstance = KulonProgoMap.setup(L.map('map-selesai'));
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(this.mapInstance);
                 this.mapInstance.on('click', (e) => {
                     this.formLat = e.latlng.lat.toFixed(6);
@@ -598,6 +601,29 @@
                     else this.markerInstance = L.marker(e.latlng).addTo(this.mapInstance);
                 });
             },
+            async cariLokasi() {
+                const q = (this.searchLokasi || '').trim();
+                if (!q) { alert('Masukkan alamat / nama lokasi terlebih dahulu.'); return; }
+                const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q);
+                try {
+                    const res = await fetch(url, { headers: { 'Accept-Language': 'id' } });
+                    const data = await res.json();
+                    if (!data || data.length === 0) { alert('Lokasi tidak ditemukan. Coba alamat yang lebih spesifik.'); return; }
+                    const lat = parseFloat(data[0].lat);
+                    const lng = parseFloat(data[0].lon);
+                    this.formLat = lat.toFixed(6);
+                    this.formLng = lng.toFixed(6);
+                    if (!(this.formLokasi || '').trim()) this.formLokasi = data[0].display_name;
+                    if (this.mapInstance) {
+                        this.mapInstance.setView([lat, lng], 15, { animate: true });
+                        if (this.markerInstance) this.markerInstance.setLatLng([lat, lng]);
+                        else this.markerInstance = L.marker([lat, lng]).addTo(this.mapInstance);
+                    }
+                } catch (e) {
+                    alert('Gagal mencari lokasi. Periksa koneksi internet.');
+                }
+            },
+
             getCurrentLocation() {
                 if (!navigator.geolocation) { alert('Geolocation tidak didukung browser.'); return; }
                 navigator.geolocation.getCurrentPosition((pos) => {
@@ -624,6 +650,7 @@
                 this.formLokasi = '';
                 this.formLat = '';
                 this.formLng = '';
+                this.searchLokasi = '';
                 this.formTindakan = '';
                 this.searchAnggota = '';
                 this.selectedAnggota = [];
@@ -679,6 +706,8 @@
                         lng: this.formLng,
                         peserta: this.selectedAnggota.map(a => a.id),
                         jenis: this.formJenis,
+                        dariLaporan: true,
+                        kodeLaporan: CURRENT_KODE,
                     });
                     localStorage.setItem('sipraja_kegiatan', JSON.stringify(keg));
                 } catch (e) {}

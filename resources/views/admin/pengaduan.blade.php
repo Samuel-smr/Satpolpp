@@ -420,7 +420,7 @@
     let markerInstance = null;
     function initMap() {
         if (mapInstance) { mapInstance.remove(); mapInstance = null; markerInstance = null; }
-        mapInstance = L.map('map-picker').setView([-7.7971, 110.1646], 13);
+        mapInstance = KulonProgoMap.setup(L.map('map-picker'));
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap'
         }).addTo(mapInstance);
