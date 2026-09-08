@@ -80,6 +80,8 @@
                         <th class="px-6 py-3.5 font-semibold text-left">Kondisi</th>
                         <th class="px-6 py-3.5 font-semibold text-left">Lokasi</th>
                         <th class="px-6 py-3.5 font-semibold text-left">Tahun</th>
+                        <th class="px-6 py-3.5 font-semibold text-left">Jatuh Tempo Pajak</th>
+                        <th class="px-6 py-3.5 font-semibold text-left">Servis Oli</th>
                         <th class="px-6 py-3.5 font-semibold text-right">Aksi</th>
                     </tr>
                 </thead>
@@ -114,7 +116,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium mb-1">Kategori <span class="text-red-500">*</span></label>
-                        <select name="kategori" required
+                        <select name="kategori" required onchange="toggleKendaraanFields()"
                             class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none bg-white">
                             <option value="">Pilih Kategori</option>
                             <option>Kendaraan</option>
@@ -145,6 +147,20 @@
                     <div>
                         <label class="block text-sm font-medium mb-1">Tahun Perolehan</label>
                         <input type="number" name="tahun" placeholder="Contoh: 2022"
+                            class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none">
+                    </div>
+                </div>
+
+                {{-- Khusus Kendaraan --}}
+                <div id="kendaraan-fields" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Jatuh Tempo Pajak</label>
+                        <input type="date" name="jatuhTempoPajak"
+                            class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Servis Oli Berikutnya (km)</label>
+                        <input type="number" name="servisOliKm" min="0" step="1" placeholder="Contoh: 10000"
                             class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none">
                     </div>
                 </div>
@@ -181,6 +197,19 @@
         return data;
     }
 
+    function diffHari(tanggal) {
+        const t = new Date(tanggal + 'T00:00:00');
+        return Math.ceil((t - new Date()) / (1000 * 60 * 60 * 24));
+    }
+
+    function jikaHampir(tanggal) {
+        const d = diffHari(tanggal);
+        if (d < 0) return ' <span class="inline-block ml-1 text-[10px] font-bold text-white bg-red-500 px-1.5 py-0.5 rounded-full">LEWAT</span>';
+        if (d === 0) return ' <span class="inline-block ml-1 text-[10px] font-bold text-white bg-red-500 px-1.5 py-0.5 rounded-full">HARI INI</span>';
+        if (d <= 30) return ` <span class="inline-block ml-1 text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full">${d} hari</span>`;
+        return '';
+    }
+
     function kondisiClass(k) {
         if (k === 'Baik') return 'bg-emerald-50 text-emerald-700 border-emerald-200';
         if (k === 'Perlu Perbaikan') return 'bg-amber-50 text-amber-700 border-amber-200';
@@ -213,6 +242,8 @@
                 </td>
                 <td class="px-6 py-3.5 text-slate-500">${a.lokasi || '-'}</td>
                 <td class="px-6 py-3.5 text-slate-500">${a.tahun || '-'}</td>
+                <td class="px-6 py-3.5 text-slate-500">${a.kategori === 'Kendaraan' && a.jatuhTempoPajak ? `${a.jatuhTempoPajak}${jikaHampir(a.jatuhTempoPajak)}` : '-'}</td>
+                <td class="px-6 py-3.5 text-slate-500">${a.kategori === 'Kendaraan' && a.servisOliKm ? `${a.servisOliKm} km` : '-'}</td>
                 <td class="px-6 py-3.5 text-right">
                     <button type="button" onclick="hapusAset(${i})" class="text-red-500 hover:text-red-700" title="Hapus">
                         <span class="material-symbols-outlined text-[20px]">delete</span>
@@ -225,6 +256,16 @@
     function bukaForm() {
         document.getElementById('modal-form').classList.remove('hidden');
         document.getElementById('aset-form').reset();
+        toggleKendaraanFields();
+    }
+
+    function toggleKendaraanFields() {
+        const f = document.getElementById('aset-form');
+        const wrap = document.getElementById('kendaraan-fields');
+        const isKendaraan = f.kategori.value === 'Kendaraan';
+        wrap.classList.toggle('hidden', !isKendaraan);
+        if (isKendaraan) wrap.classList.add('grid');
+        else wrap.classList.remove('grid');
     }
 
     function tutupForm() {
@@ -241,6 +282,8 @@
             kondisi: f.kondisi.value,
             lokasi: f.lokasi.value.trim(),
             tahun: f.tahun.value.trim(),
+            jatuhTempoPajak: f.kategori.value === 'Kendaraan' ? f.jatuhTempoPajak.value : '',
+            servisOliKm: f.kategori.value === 'Kendaraan' ? f.servisOliKm.value.trim() : '',
         });
         localStorage.setItem(KODE, JSON.stringify(data));
         renderAset();
