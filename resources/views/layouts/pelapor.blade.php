@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
 
     {{-- Tailwind CSS --}}
     <script src="https://cdn.tailwindcss.com"></script>
@@ -43,7 +44,7 @@
     @stack('styles')
 </head>
 
-<body class="bg-slate-100 text-slate-800 font-sans flex flex-col min-h-screen">
+<body class="bg-slate-100 text-slate-800 font-sans flex flex-col min-h-screen [overflow-x:clip]">
 
     {{-- Top Navigation --}}
     <header class="bg-slate-50 border-b border-slate-200 sticky top-0 z-20 shadow-lg">

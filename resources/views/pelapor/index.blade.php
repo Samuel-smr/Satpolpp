@@ -4,15 +4,14 @@
 
 @section('content')
     {{-- ===== HERO ===== --}}
-    <section class="relative overflow-hidden bg-brand-700 text-white" style="width:100vw; margin-left:calc(50% - 50vw); margin-right:calc(50% - 50vw);">
+    <section class="relative -mt-8 -mb-8 overflow-hidden bg-brand-700 text-white" style="width:100vw; margin-left:calc(50% - 50vw); margin-right:calc(50% - 50vw);">
         {{-- Dekorasi latar --}}
         <div class="absolute inset-0 bg-gradient-to-br from-brand-700 via-brand-600 to-brand-800"></div>
         <div class="absolute inset-0 opacity-[0.08]" style="background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0); background-size: 26px 26px;"></div>
         <div class="absolute -top-24 -right-24 w-72 h-72 bg-white/10 rounded-full blur-3xl"></div>
         <div class="absolute -bottom-32 -left-16 w-80 h-80 bg-accent-500/20 rounded-full blur-3xl"></div>
 
-        <div class="relative max-w-6xl mx-auto px-4 py-16 md:py-24 grid grid-cols-1 gap-12 items-center">
-            {{-- Teks hero --}}
+        <div class="relative max-w-6xl mx-auto px-4 py-16 md:py-24">
             <div class="lg:max-w-none">
                 <span class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-5 py-2 text-base font-medium">
                     <span class="w-2.5 h-2.5 rounded-full bg-accent-400 animate-pulse"></span>
@@ -35,8 +34,6 @@
                     </a>
                 </div>
             </div>
-
-
         </div>
     </section>
 

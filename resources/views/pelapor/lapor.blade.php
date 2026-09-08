@@ -83,8 +83,9 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium mb-1">NIK (Opsional)</label>
-                        <input type="text" name="nik" placeholder="16 digit NIK jika ada"
+                        <label class="block text-sm font-medium mb-1">NIK<span id="nik-required-star"
+                                class="text-red-500 hidden"> *</span></label>
+                        <input type="text" name="nik" id="nik" placeholder="16 digit NIK"
                             class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none">
                     </div>
 
@@ -228,9 +229,18 @@
         }
 
         // Radio Jenis: set hidden & trigger bulatan step 1 langsung aktif (tercentang)
+        function updateNikRequirement() {
+            const wajib = document.getElementById('jenis').value === 'darurat';
+            const star = document.getElementById('nik-required-star');
+            const nik = document.getElementById('nik');
+            if (star) star.classList.toggle('hidden', !wajib);
+            if (nik) nik.placeholder = wajib ? '16 digit NIK Anda' : '16 digit NIK jika ada';
+        }
+
         document.querySelectorAll('input[name="jenis_radio"]').forEach(radio => {
             radio.addEventListener('change', () => {
                 document.getElementById('jenis').value = radio.value;
+                updateNikRequirement();
                 // Step 1 dianggap selesai -> bulatan langsung ter-trigger
                 if (currentStep === 1) {
                     markStep(1);
@@ -249,11 +259,13 @@
             goStep(2);
         }
 
-        // Validasi step 2 (field wajib): telepon, deskripsi, lokasi
+        // Validasi step 2 (field wajib): telepon, deskripsi, lokasi (+ NIK jika darurat)
         function nextFromDetail() {
             const required = ['telepon', 'deskripsi', 'lokasi'];
+            if (document.getElementById('jenis').value === 'darurat') required.push('nik');
             const labels = {
                 telepon: 'Nomor WhatsApp / Telepon',
+                nik: 'NIK (wajib untuk laporan darurat)',
                 deskripsi: 'Deskripsi Singkat',
                 lokasi: 'Lokasi Kejadian',
             };
@@ -296,13 +308,21 @@
             e.preventDefault();
             const kode = 'SPJ-' + Date.now().toString().slice(-6);
 
+            const jenis = document.getElementById('jenis').value || 'informasi';
+            const nik = document.querySelector('input[name="nik"]').value;
+            if (jenis === 'darurat' && !nik.trim()) {
+                alert('NIK wajib diisikan untuk laporan darurat.');
+                goStep(2);
+                return;
+            }
+
             const report = {
                 kode: kode,
-                jenis: document.getElementById('jenis').value || 'informasi',
+                jenis: jenis,
                 deskripsi: document.querySelector('textarea[name="deskripsi"]').value,
                 lokasi: document.querySelector('input[name="lokasi"]').value,
                 telepon: document.querySelector('input[name="telepon"]').value,
-                nik: document.querySelector('input[name="nik"]').value,
+                nik: nik,
                 dibuat: new Date().toLocaleString('id-ID'),
                 statusIdx: 0, // baru dibuat -> "Laporan dibuat"
             };

@@ -9,6 +9,13 @@
             <p class="mt-2 text-slate-500">Berikut daftar laporan yang pernah Anda laporkan. Klik untuk melihat perkembangannya.</p>
         </div>
 
+        {{-- Pencarian --}}
+        <div class="relative mb-6">
+            <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-[20px]">search</span>
+            <input type="text" id="search-input" placeholder="Cari kode, kategori, lokasi, atau deskripsi..."
+                class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 rounded-xl shadow-sm focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all text-sm">
+        </div>
+
         {{-- Daftar laporan --}}
         <div id="report-list" class="space-y-4 mb-8"></div>
 
@@ -18,6 +25,13 @@
             <h2 class="font-headline font-bold text-lg text-slate-800">Belum Ada Laporan</h2>
             <p class="mt-2 text-slate-500">Anda belum pernah membuat laporan.</p>
             <a href="{{ route('pelapor.lapor') }}" class="inline-block mt-5 bg-brand-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-brand-700 transition-colors">Buat Laporan Sekarang</a>
+        </div>
+
+        {{-- Hasil pencarian tidak ditemukan --}}
+        <div id="empty-search" class="hidden bg-white border border-slate-200 rounded-xl p-10 text-center shadow-sm">
+            <div class="text-5xl mb-4">🔍</div>
+            <h2 class="font-headline font-bold text-lg text-slate-800">Laporan Tidak Ditemukan</h2>
+            <p class="mt-2 text-slate-500">Tidak ada laporan yang cocok dengan kata kunci pencarian Anda.</p>
         </div>
 
         {{-- Detail & tracking --}}
@@ -140,17 +154,36 @@
         return j === 'darurat' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700';
     }
 
+    function filterReports() {
+        const q = (document.getElementById('search-input').value || '').trim().toLowerCase();
+        const all = getReports();
+        if (!q) return all;
+        return all.filter(r => {
+            const haystack = [r.kode, r.kategori, r.lokasi, r.deskripsi, labelJenis(r.jenis), r.telepon, r.nik].join(' ').toLowerCase();
+            return haystack.includes(q);
+        });
+    }
+
     function renderList() {
-        const reports = getReports();
+        const reports = displayedReports = filterReports();
         const list = document.getElementById('report-list');
         const empty = document.getElementById('empty-state');
+        const emptySearch = document.getElementById('empty-search');
 
-        if (reports.length === 0) {
+        if (getReports().length === 0) {
             list.innerHTML = '';
             empty.classList.remove('hidden');
+            emptySearch.classList.add('hidden');
             return;
         }
         empty.classList.add('hidden');
+
+        if (reports.length === 0) {
+            list.innerHTML = '';
+            emptySearch.classList.remove('hidden');
+            return;
+        }
+        emptySearch.classList.add('hidden');
 
         list.innerHTML = reports.map((r, i) => `
             <button type="button" onclick="openDetail(${i})"
@@ -171,9 +204,9 @@
         `).join('');
     }
 
+    let displayedReports = [];
     function openDetail(index) {
-        const reports = getReports();
-        const r = reports[index];
+        const r = displayedReports[index];
         const idx = r.statusIdx != null ? r.statusIdx : 0;
 
         document.getElementById('d-kode').textContent = r.kode;
@@ -246,6 +279,15 @@
         renderList();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
+    // Search: filter daftar saat mengetik
+    document.getElementById('search-input').addEventListener('input', () => {
+        if (!document.getElementById('detail').classList.contains('hidden')) {
+            document.getElementById('report-list').classList.remove('hidden');
+            document.getElementById('detail').classList.add('hidden');
+        }
+        renderList();
+    });
 
     // ----- Penilaian kinerja -----
     let currentKode = null;
