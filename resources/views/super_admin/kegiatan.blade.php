@@ -34,11 +34,9 @@
                         <span x-text="isExportingPdf ? 'Membuat PDF...' : 'Ekspor PDF'"></span>
                     </button>
 
-                    <!-- Tombol Tambah Kegiatan -->
-                    <button @click="openCreate()" type="button" class="px-4 py-2.5 bg-super-active hover:bg-super-hover rounded-xl text-sm font-semibold text-white shadow-md transition-all flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[18px]">add</span>
-                        <span>Tambah Kegiatan</span>
-                    </button>
+                    <span class="inline-flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-semibold text-emerald-700">
+                        <span class="material-symbols-outlined text-[18px]">database</span> Data MySQL aktif
+                    </span>
                 </div>
             </div>
 
@@ -134,12 +132,6 @@
                                         <div class="flex items-center justify-center gap-2">
                                             <button @click="openDetail(item)" class="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors tooltip" title="Detail">
                                                 <span class="material-symbols-outlined text-[20px]">visibility</span>
-                                            </button>
-                                            <button @click="editKegiatan(item)" class="p-1.5 text-slate-400 hover:text-super-active hover:bg-super-active/10 rounded-lg transition-colors tooltip" title="Edit">
-                                                <span class="material-symbols-outlined text-[20px]">edit</span>
-                                            </button>
-                                            <button @click="deleteKegiatan(item.id)" class="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors tooltip" title="Hapus">
-                                                <span class="material-symbols-outlined text-[20px]">delete</span>
                                             </button>
                                         </div>
                                     </td>
@@ -636,57 +628,12 @@
                 isEdit: false,
                 editId: null,
 
-                kegiatanList: [
-                    { 
-                        id: 1, 
-                        nama: 'Operasi Yustisi KTP', 
-                        tanggal: '2023-11-15', 
-                        waktu: '08:00',
-                        deskripsi: 'Pemeriksaan kepemilikan dan masa berlaku KTP bagi pendatang baru.',
-                        lokasi: 'Terminal Kampung Rambutan', 
-                        lat: '-6.309325', 
-                        lng: '106.883447',
-                        peserta: [1, 3, 5],
-                        jenis: 'Eksternal'
-                    },
-                    { 
-                        id: 2, 
-                        nama: 'Penertiban PKL Pasar Tanah Abang', 
-                        tanggal: '2023-11-10', 
-                        waktu: '10:00',
-                        deskripsi: 'Penertiban pedagang kaki lima yang memakan badan jalan dan trotoar.',
-                        lokasi: 'Jl. Kebon Jati, Tanah Abang', 
-                        lat: '-6.187310', 
-                        lng: '106.816000',
-                        peserta: [2, 4, 6],
-                        jenis: 'Eksternal'
-                    },
-                    { 
-                        id: 3, 
-                        nama: 'Sosialisasi Perda Kawasan Tanpa Rokok', 
-                        tanggal: '2023-11-20', 
-                        waktu: '13:00',
-                        deskripsi: 'Memberikan pemahaman kepada warga terkait larangan merokok di fasilitas umum.',
-                        lokasi: 'Taman Suropati, Menteng', 
-                        lat: '-6.199732', 
-                        lng: '106.832626',
-                        peserta: [1, 2, 7],
-                        jenis: 'Internal'
-                    },
-                ],
+                kegiatanList: @json($activities),
                 
                 // Participants
                 searchAnggota: '',
                 selectedAnggota: [],
-                allAnggota: [
-                    { id: 1, nama: 'Budi Santoso', jabatan: 'Komandan Regu', seksi: 'Ketertiban Umum' },
-                    { id: 2, nama: 'Siti Aminah', jabatan: 'Anggota', seksi: 'Patroli' },
-                    { id: 3, nama: 'Ahmad Faisal', jabatan: 'Anggota', seksi: 'Ketertiban Umum' },
-                    { id: 4, nama: 'Rini Yulianti', jabatan: 'Penyidik', seksi: 'Penegakan Perda' },
-                    { id: 5, nama: 'Doni Pratama', jabatan: 'Anggota', seksi: 'Patroli' },
-                    { id: 6, nama: 'Eko Wibowo', jabatan: 'Wakil Komandan', seksi: 'Penegakan Perda' },
-                    { id: 7, nama: 'Tia Monica', jabatan: 'Staf Administrasi', seksi: 'Sekretariat' },
-                ],
+                allAnggota: @json($officers),
                 
                 // Map Options
                 mapInstance: null,
@@ -697,14 +644,6 @@
                 previewVideo: null,
 
                 init() {
-                    try {
-                        const saved = JSON.parse(localStorage.getItem('sipraja_kegiatan') || 'null');
-                        if (Array.isArray(saved) && saved.length) {
-                            this.kegiatanList = saved;
-                        } else {
-                            localStorage.setItem('sipraja_kegiatan', JSON.stringify(this.kegiatanList));
-                        }
-                    } catch (e) {}
                     this.$watch('showModal', val => {
                         if (val) {
                             setTimeout(() => {
@@ -851,14 +790,7 @@
                 },
 
                 getPdfReport(item) {
-                    if (!item.kodeLaporan) return null;
-
-                    try {
-                        const reports = JSON.parse(localStorage.getItem('sipraja_reports') || '[]');
-                        return reports.find(report => report.kode === item.kodeLaporan) || null;
-                    } catch (error) {
-                        return null;
-                    }
+                    return null;
                 },
 
                 getPdfDocumentation(item) {
@@ -874,23 +806,64 @@
                     return item.tindakan || item.keteranganSelesai || report?.keteranganSelesai || item.deskripsi || '-';
                 },
 
-                async imageToDataUrl(source) {
-                    if (!source) return null;
-                    if (source.startsWith('data:image/')) return source;
+                imageToDataUrl(source) {
+                    if (!source) return Promise.resolve(null);
 
-                    try {
-                        const response = await fetch(source);
-                        const blob = await response.blob();
+                    return fetch(source, { credentials: 'same-origin' })
+                        .then(response => {
+                            if (!response.ok) throw new Error('Dokumentasi tidak dapat dimuat.');
+                            return response.blob();
+                        })
+                        .then(blob => new Promise(resolve => {
+                            const objectUrl = URL.createObjectURL(blob);
+                            const image = new Image();
+                            image.onload = () => {
+                                const canvas = document.createElement('canvas');
+                                canvas.width = image.naturalWidth;
+                                canvas.height = image.naturalHeight;
+                                canvas.getContext('2d').drawImage(image, 0, 0);
+                                URL.revokeObjectURL(objectUrl);
+                                resolve(canvas.toDataURL('image/jpeg', 0.82));
+                            };
+                            image.onerror = () => {
+                                URL.revokeObjectURL(objectUrl);
+                                resolve(null);
+                            };
+                            image.src = objectUrl;
+                        }))
+                        .catch(() => null);
+                },
 
-                        return await new Promise((resolve) => {
-                            const reader = new FileReader();
-                            reader.onload = () => resolve(reader.result);
-                            reader.onerror = () => resolve(null);
-                            reader.readAsDataURL(blob);
-                        });
-                    } catch (error) {
-                        return null;
+                getOfficerNames(item, includePosition = false) {
+                    const officers = this.allAnggota.filter(officer => item.peserta?.includes(officer.id));
+                    if (officers.length === 0) return '-';
+
+                    return officers.map(officer => includePosition
+                        ? `${officer.nama} (${officer.jabatan})`
+                        : officer.nama
+                    ).join(', ');
+                },
+
+                formatIndonesianDate(date) {
+                    return new Date(`${date}T00:00:00`).toLocaleDateString('id-ID', {
+                        weekday: 'long', day: '2-digit', month: 'long', year: 'numeric'
+                    }).toUpperCase();
+                },
+
+                getExportPeriod(list) {
+                    if (this.filterBulan) {
+                        const [year, month] = this.filterBulan.split('-').map(Number);
+                        const start = `${year}-${String(month).padStart(2, '0')}-01`;
+                        const endDate = new Date(year, month, 0);
+                        const end = `${year}-${String(month).padStart(2, '0')}-${String(endDate.getDate()).padStart(2, '0')}`;
+                        return { start, end };
                     }
+
+                    const dates = list.map(item => item.tanggal).filter(Boolean).sort();
+                    return {
+                        start: this.filterDateStart || dates[0],
+                        end: this.filterDateEnd || dates[dates.length - 1],
+                    };
                 },
 
                 async exportExcel() {
@@ -907,43 +880,41 @@
                         }
 
                         const dataRows = list.map((item, index) => {
-                            let namaPeserta = '-';
-                            if (item.peserta && item.peserta.length > 0) {
-                                const members = this.allAnggota
-                                    .filter(a => item.peserta.includes(a.id))
-                                    .map(a => `${a.nama} (${a.jabatan})`);
-                                if (members.length > 0) {
-                                    namaPeserta = members.join(', ');
-                                }
-                            }
-
                             return {
-                                'No': index + 1,
+                                'Nomor': index + 1,
+                                'ID Kegiatan': item.id,
+                                'ID Laporan': item.idLaporan || '-',
+                                'Kode Laporan': item.kodeLaporan || '-',
+                                'ID Template Kegiatan': item.idTemplate || '-',
+                                'Nama Template Kegiatan': item.namaTemplate || '-',
+                                'Dibuat Oleh': item.dibuatOleh || '-',
+                                'Dievaluasi Oleh': item.dievaluasiOleh || '-',
                                 'Nama Kegiatan': item.nama,
                                 'Tanggal': item.tanggal,
                                 'Waktu': item.waktu ? item.waktu + ' WIB' : '-',
                                 'Jenis': item.jenis,
+                                'Kategori Operasional': item.kategoriOperasional || '-',
+                                'Deskripsi': item.deskripsi || '-',
+                                'Tindakan dan Hasil': item.hasil || '-',
                                 'Lokasi': item.lokasi,
-                                'Koordinat (Lat, Lng)': (item.lat && item.lng) ? `${item.lat}, ${item.lng}` : '-',
-                                'Jumlah Anggota': item.peserta ? item.peserta.length + ' Orang' : '0',
-                                'Daftar Anggota Bertugas': namaPeserta,
-                                'Deskripsi / Catatan': item.deskripsi || '-'
+                                'Lintang': item.lat || '-',
+                                'Bujur': item.lng || '-',
+                                'Jumlah Personel': item.peserta?.length || 0,
+                                'Daftar Personel': this.getOfficerNames(item, true),
+                                'Dokumentasi': item.dokumentasi?.map(photo => photo.nama).join(', ') || '-',
+                                'Catatan Evaluasi': item.catatanEvaluasi || '-',
+                                'Kendala Evaluasi': item.kendalaEvaluasi || '-',
+                                'Waktu Evaluasi': item.dievaluasiPada || '-',
+                                'Dibuat Pada': item.dibuatPada || '-',
+                                'Diperbarui Pada': item.diperbaruiPada || '-',
+                                'Dihapus Pada': item.dihapusPada || '-',
                             };
                         });
 
                         const worksheet = XLSX.utils.json_to_sheet(dataRows);
-                        worksheet['!cols'] = [
-                            { wch: 6 },
-                            { wch: 35 },
-                            { wch: 14 },
-                            { wch: 12 },
-                            { wch: 12 },
-                            { wch: 35 },
-                            { wch: 25 },
-                            { wch: 16 },
-                            { wch: 45 },
-                            { wch: 45 },
-                        ];
+                        worksheet['!cols'] = Object.keys(dataRows[0]).map(header => ({
+                            wch: Math.min(55, Math.max(12, header.length + 2))
+                        }));
 
                         const workbook = XLSX.utils.book_new();
                         XLSX.utils.book_append_sheet(workbook, worksheet, 'Data Kegiatan');
@@ -974,43 +945,25 @@
 
                         const { jsPDF } = window.jspdf;
                         const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+                        const period = this.getExportPeriod(list);
 
-                        // Header Kop Surat
                         doc.setFont('helvetica', 'bold');
-                        doc.setFontSize(13);
-                        doc.setTextColor(30, 41, 59);
-                        doc.text('PEMERINTAH PROVINSI DAERAH KHUSUS IBUKOTA JAKARTA', doc.internal.pageSize.getWidth() / 2, 14, { align: 'center' });
-                        
-                        doc.setFontSize(15);
-                        doc.text('SATUAN POLISI PAMONG PRAJA (SATPOL PP)', doc.internal.pageSize.getWidth() / 2, 21, { align: 'center' });
-                        
-                        doc.setFont('helvetica', 'normal');
-                        doc.setFontSize(10);
-                        doc.setTextColor(100, 116, 139);
-                        doc.text('LAPORAN REKAPITULASI AGENDA & KEGIATAN OPERASIONAL', doc.internal.pageSize.getWidth() / 2, 27, { align: 'center' });
+                        doc.setTextColor(0, 0, 0);
+                        doc.setFontSize(14);
+                        ['LAPORAN KEGIATAN', 'SATUAN POLISI PAMONG PRAJA', 'KABUPATEN KULON PROGO'].forEach((line, index) => {
+                            doc.text(line, doc.internal.pageSize.getWidth() / 2, 13 + (index * 6), { align: 'center' });
+                        });
+                        doc.setFontSize(11);
+                        doc.text(
+                            `${this.formatIndonesianDate(period.start)}-${this.formatIndonesianDate(period.end)}`,
+                            doc.internal.pageSize.getWidth() / 2,
+                            33,
+                            { align: 'center' }
+                        );
 
-                        // Garis Pemisah Kop
-                        doc.setDrawColor(203, 213, 225);
-                        doc.setLineWidth(0.6);
-                        doc.line(14, 30, doc.internal.pageSize.getWidth() - 14, 30);
-
-                        // Metadata Filter & Waktu Cetak
-                        doc.setFontSize(8.5);
-                        doc.setTextColor(71, 85, 105);
-                        const filterText = `Kriteria Filter: ${this.getFilterInfo()}`;
-                        const dateText = `Dicetak: ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })} WIB`;
-                        doc.text(filterText, 14, 36);
-                        doc.text(dateText, doc.internal.pageSize.getWidth() - 14, 36, { align: 'right' });
-
-                        // Tabel Data
-                        const tableHeaders = [['No', 'Nama Kegiatan', 'Tanggal & Waktu', 'Jenis', 'Lokasi', 'Peserta', 'Tindakan dan Hasil', 'Dokumentasi']];
+                        const tableHeaders = [['Nomor', 'Tanggal/Waktu', 'Personel', 'Tindakan dan Hasil', 'Dokumentasi']];
                         const pdfImages = [];
                         const tableBody = await Promise.all(list.map(async (item, index) => {
-                            let anggotaNames = '-';
-                            if (item.peserta && item.peserta.length > 0) {
-                                const members = this.allAnggota.filter(a => item.peserta.includes(a.id)).map(a => a.nama);
-                                if (members.length > 0) anggotaNames = members.join(', ');
-                            }
                             const datetime = item.tanggal + (item.waktu ? '\n' + item.waktu + ' WIB' : '');
                             const images = (await Promise.all(
                                 this.getPdfDocumentation(item)
@@ -1020,12 +973,9 @@
                             pdfImages[index] = images;
                             return [
                                 index + 1,
-                                item.nama,
                                 datetime,
-                                item.jenis,
-                                item.lokasi,
-                                `${item.peserta ? item.peserta.length : 0} Anggota\n(${anggotaNames})`,
-                                this.getPdfAction(item),
+                                this.getOfficerNames(item),
+                                `Kegiatan: ${item.nama}\nLokasi: ${item.lokasi}\nTindakan: ${item.deskripsi || '-'}\nHasil: ${item.hasil || '-'}`,
                                 images.length > 0 ? '\n' : '-'
                             ];
                         }));
@@ -1033,8 +983,9 @@
                         doc.autoTable({
                             head: tableHeaders,
                             body: tableBody,
-                            startY: 40,
-                            theme: 'striped',
+                            startY: 39,
+                            theme: 'grid',
+                            rowPageBreak: 'avoid',
                             headStyles: {
                                 fillColor: [43, 79, 124], // Warna Satpol Navy
                                 textColor: 255,
@@ -1048,32 +999,28 @@
                                 cellPadding: 3
                             },
                             columnStyles: {
-                                0: { halign: 'center', cellWidth: 10 },
-                                1: { cellWidth: 42, fontStyle: 'bold' },
-                                2: { halign: 'center', cellWidth: 25 },
-                                3: { halign: 'center', cellWidth: 18 },
-                                4: { cellWidth: 45 },
-                                5: { cellWidth: 38 },
-                                6: { cellWidth: 65 },
-                                7: { cellWidth: 26, halign: 'center' }
+                                0: { halign: 'center', cellWidth: 12 },
+                                1: { halign: 'center', cellWidth: 30 },
+                                2: { cellWidth: 48 },
+                                3: { cellWidth: 116 },
+                                4: { cellWidth: 62, halign: 'center' }
                             },
                             alternateRowStyles: {
                                 fillColor: [248, 250, 252]
                             },
                             margin: { left: 14, right: 14 },
                             didParseCell: function (data) {
-                                if (data.section === 'body' && data.column.index === 7 && pdfImages[data.row.index]?.length) {
-                                    data.cell.styles.minCellHeight = (images.length * 20) + 6;
+                                if (data.section === 'body' && data.column.index === 4 && pdfImages[data.row.index]?.length) {
+                                    data.cell.styles.minCellHeight = (pdfImages[data.row.index].length * 34) + 6;
                                 }
                             },
                             didDrawCell: function (data) {
-                                if (data.section !== 'body' || data.column.index !== 7) return;
+                                if (data.section !== 'body' || data.column.index !== 4) return;
 
                                 const images = pdfImages[data.row.index] || [];
-                                const imageSize = Math.min(17, data.cell.width - 6);
+                                const imageWidth = Math.min(52, data.cell.width - 6);
                                 images.forEach((image, imageIndex) => {
-                                    const imageFormat = image.startsWith('data:image/png') ? 'PNG' : 'JPEG';
-                                    doc.addImage(image, imageFormat, data.cell.x + 3, data.cell.y + 3 + (imageIndex * 20), imageSize, imageSize);
+                                    doc.addImage(image, 'JPEG', data.cell.x + 3, data.cell.y + 3 + (imageIndex * 34), imageWidth, 30);
                                 });
                             },
                             didDrawPage: function (data) {
@@ -1081,7 +1028,7 @@
                                 doc.setFontSize(8);
                                 doc.setTextColor(148, 163, 184);
                                 doc.text(`Halaman ${data.pageNumber} dari ${pageCount}`, doc.internal.pageSize.getWidth() - 14, doc.internal.pageSize.getHeight() - 10, { align: 'right' });
-                                doc.text('SIGAP Satpol PP - Dokumen Resmi Pemerintah Provinsi DKI Jakarta', 14, doc.internal.pageSize.getHeight() - 10);
+                                doc.text('Satuan Polisi Pamong Praja Kabupaten Kulon Progo', 14, doc.internal.pageSize.getHeight() - 10);
                             }
                         });
 
@@ -1099,7 +1046,7 @@
                         doc.setFontSize(9);
                         doc.setTextColor(30, 41, 59);
                         const todayStr = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-                        doc.text(`Jakarta, ${todayStr}`, pageWidth - 55, signY);
+                        doc.text(`Kulon Progo, ${todayStr}`, pageWidth - 55, signY);
                         doc.text('Mengetahui,', pageWidth - 55, signY + 5);
                         doc.text('Kasubag Operasional Satpol PP', pageWidth - 55, signY + 10);
                         
@@ -1207,20 +1154,6 @@
                     this.selectedAnggota = this.allAnggota.filter(a => item.peserta.includes(a.id));
                     
                     this.showModal = true;
-                },
-
-                deleteKegiatan(id) {
-                    const item = this.kegiatanList.find(k => k.id === id);
-                    const nama = item ? `kegiatan "${item.nama}"` : 'kegiatan ini';
-                    window.konfirmasiHapus({
-                        title: 'Hapus Kegiatan',
-                        message: `Apakah Anda yakin ingin menghapus ${nama}? Data yang dihapus tidak dapat dipulihkan.`,
-                        onConfirm: () => {
-                            this.kegiatanList = this.kegiatanList.filter(k => k.id !== id);
-                            localStorage.setItem('sipraja_kegiatan', JSON.stringify(this.kegiatanList));
-                            window.tampilToast('Data kegiatan berhasil dihapus.');
-                        }
-                    });
                 },
 
                 initMap() {
@@ -1369,54 +1302,6 @@
                     }
                 },
 
-                saveKegiatan() {
-                    if (!this.formNama || !this.formLokasi || !this.formTanggal) {
-                        alert('Harap lengkapi nama kegiatan, tanggal, dan alamat lokasi.');
-                        return;
-                    }
-                    if (!this.formLat || !this.formLng) {
-                        alert('Harap tentukan titik pin lokasi pada peta digital (wajib).');
-                        return;
-                    }
-                    if (this.selectedAnggota.length === 0) {
-                        alert('Harap tugaskan minimal 1 anggota.');
-                        return;
-                    }
-
-                    if (this.isEdit) {
-                        const index = this.kegiatanList.findIndex(k => k.id === this.editId);
-                        if (index > -1) {
-                            this.kegiatanList[index].nama = this.formNama;
-                            this.kegiatanList[index].tanggal = this.formTanggal;
-                            this.kegiatanList[index].waktu = this.formWaktu;
-                            this.kegiatanList[index].deskripsi = this.formDeskripsi;
-                            this.kegiatanList[index].lokasi = this.formLokasi;
-                            this.kegiatanList[index].lat = this.formLat;
-                            this.kegiatanList[index].lng = this.formLng;
-                            this.kegiatanList[index].jenis = this.formJenis;
-                            this.kegiatanList[index].peserta = this.selectedAnggota.map(a => a.id);
-                        }
-                        window.tampilToast('Edit berhasil! Data kegiatan telah diperbarui.');
-                    } else {
-                        const newId = Date.now();
-                        this.kegiatanList.push({
-                            id: newId,
-                            nama: this.formNama,
-                            tanggal: this.formTanggal,
-                            waktu: this.formWaktu,
-                            deskripsi: this.formDeskripsi,
-                            lokasi: this.formLokasi,
-                            lat: this.formLat,
-                            lng: this.formLng,
-                            jenis: this.formJenis,
-                            peserta: this.selectedAnggota.map(a => a.id)
-                        });
-                        window.tampilToast('Berhasil menambah data kegiatan baru.');
-                    }
-                    
-                    this.showModal = false;
-                    localStorage.setItem('sipraja_kegiatan', JSON.stringify(this.kegiatanList));
-                }
             }
         }
     </script>

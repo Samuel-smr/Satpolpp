@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Super Admin Dashboard') | SIPRAJA Satpol PP</title>
 
     {{-- Fonts --}}
@@ -105,18 +106,15 @@
             </a>
         </nav>
 
-        <!-- Bottom Actions (Settings & Logout) -->
+        <!-- Bottom Action -->
         <div class="px-4 py-4 border-t border-white/10">
-            <div class="space-y-1">
-                <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-lg text-xs font-medium text-slate-300 hover:bg-white/5 hover:text-white transition-colors">
-                    <span class="material-symbols-outlined text-[18px]">settings</span>
-                    <span>Settings</span>
-                </a>
-                <a href="{{ route('login') }}" class="flex items-center gap-3 px-4 py-2 rounded-lg text-xs font-medium text-slate-300 hover:bg-white/5 hover:text-white transition-colors">
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit" class="flex w-full items-center gap-3 px-4 py-2 rounded-lg text-xs font-medium text-slate-300 hover:bg-white/5 hover:text-white transition-colors">
                     <span class="material-symbols-outlined text-[18px]">logout</span>
                     <span>Logout</span>
-                </a>
-            </div>
+                </button>
+            </form>
         </div>
     </aside>
 
@@ -125,33 +123,34 @@
         <!-- Top Header Bar -->
         <header class="bg-white border-b border-slate-200/80 px-8 py-3.5 flex items-center justify-end sticky top-0 z-20 gap-4">
             <!-- Search Bar -->
-            <div class="w-72">
-                <div class="relative">
-                    <span class="material-symbols-outlined text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 text-[18px]">search</span>
-                    <input type="text"
-                           placeholder="Search..."
-                           class="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-full text-xs text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all" />
-                </div>
-            </div>
+            <div class="w-72"><x-global-search /></div>
 
             <!-- Header Action Icons -->
             <div class="flex items-center gap-2 relative">
                 <!-- Notifikasi -->
                 <div class="relative">
-                    <button onclick="toggleNotif(event)" class="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors relative" title="Notifikasi">
+                    <button onclick="toggleNotif(event)" data-notification-button data-notifications-url="{{ route('notifications.index') }}" class="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors relative" title="Notifikasi">
                         <span class="material-symbols-outlined text-[20px]">notifications</span>
-                        <span id="notif-badge" class="hidden absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
+                        @if ($layoutUnreadNotificationCount > 0)<span data-notification-badge class="absolute right-1 top-1 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>@endif
                     </button>
 
                     <div id="notif-panel" class="hidden absolute right-0 top-12 w-80 sm:w-96 bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden z-50">
                         <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100">
                             <h3 class="font-headline font-bold text-slate-800">Notifikasi</h3>
-                            <button onclick="markAllRead()" class="text-xs font-medium text-super-active hover:text-brand-600">Tandai semua dibaca</button>
+                            <form method="POST" action="{{ route('notifications.read-all') }}">@csrf<button class="text-xs font-medium text-super-active hover:text-brand-600">Tandai semua dibaca</button></form>
                         </div>
-                        <div id="notif-list" class="max-h-96 overflow-y-auto divide-y divide-slate-50"></div>
-                        <div id="notif-empty" class="hidden px-4 py-10 text-center text-slate-400">
-                            <div class="text-3xl mb-2">🔔</div>
-                            <p class="text-sm">Tidak ada notifikasi.</p>
+                        <div data-notification-list class="max-h-96 divide-y divide-slate-50 overflow-y-auto">
+                            @forelse ($layoutNotifications as $notification)
+                                <form method="POST" action="{{ route('notifications.read', $notification->id) }}">@csrf
+                                    <button class="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-slate-50 {{ $notification->read_at ? '' : 'bg-super-active/5' }}">
+                                        <span class="material-symbols-outlined flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 text-[18px] text-blue-600">notifications</span>
+                                        <span class="min-w-0 flex-1"><span class="block text-sm font-medium text-slate-700">{{ data_get($notification->data, 'title', 'Notifikasi') }}</span><span class="block text-xs text-slate-500">{{ data_get($notification->data, 'message', '-') }}</span><span class="text-xs text-slate-400">{{ $notification->created_at->diffForHumans() }}</span></span>
+                                        @if (!$notification->read_at)<span class="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-super-active"></span>@endif
+                                    </button>
+                                </form>
+                            @empty
+                                <div class="px-4 py-10 text-center text-slate-400"><div class="mb-2 text-3xl">🔔</div><p class="text-sm">Tidak ada notifikasi.</p></div>
+                            @endforelse
                         </div>
                     </div>
                 </div>
@@ -176,88 +175,10 @@
     </div>
 
     <script>
-        const NOTIF_KODE = 'sipraja_notifikasi';
-
-        function getNotif() {
-            let data = JSON.parse(localStorage.getItem(NOTIF_KODE) || '[]');
-            if (data.length === 0) {
-                data = [
-                    { id: 1, jenis: 'laporan', pesan: 'Laporan baru diterima dari masyarakat (SPJ-584100).', waktu: 'Baru saja', dibaca: false },
-                    { id: 2, jenis: 'petugas', pesan: 'Petugas Bambang Sutrisno ditambahkan ke Regu A.', waktu: '10 menit lalu', dibaca: false },
-                    { id: 3, jenis: 'aset', pesan: 'Aset baru ditambahkan: Mobil Patroli Dalmas.', waktu: '1 jam lalu', dibaca: false },
-                    { id: 4, jenis: 'organisasi', pesan: 'Data unit kerja diperbarui oleh Admin.', waktu: '3 jam lalu', dibaca: true },
-                    { id: 5, jenis: 'evaluasi', pesan: 'Evaluasi kegiatan bulan ini telah diperbarui.', waktu: '1 hari lalu', dibaca: true },
-                ];
-                localStorage.setItem(NOTIF_KODE, JSON.stringify(data));
-            }
-            return data;
-        }
-
-        function saveNotif(data) { localStorage.setItem(NOTIF_KODE, JSON.stringify(data)); }
-
-        function notifIcon(j) {
-            return { laporan: 'description', petugas: 'badge', aset: 'inventory_2', organisasi: 'account_balance', evaluasi: 'assessment' }[j] || 'notifications';
-        }
-        function notifClass(j) {
-            return { laporan: 'bg-blue-100 text-blue-600', petugas: 'bg-emerald-100 text-emerald-600', aset: 'bg-amber-100 text-amber-600', organisasi: 'bg-slate-200 text-slate-600', evaluasi: 'bg-purple-100 text-purple-600' }[j] || 'bg-slate-100 text-slate-600';
-        }
-
-        function unreadCount() {
-            return getNotif().filter(n => !n.dibaca).length;
-        }
-
-        function updateBadge() {
-            const badge = document.getElementById('notif-badge');
-            const count = unreadCount();
-            badge.classList.toggle('hidden', count === 0);
-        }
-
-        function renderNotif() {
-            const data = getNotif();
-            const list = document.getElementById('notif-list');
-            const empty = document.getElementById('notif-empty');
-
-            if (data.length === 0) {
-                list.innerHTML = '';
-                empty.classList.remove('hidden');
-            } else {
-                empty.classList.add('hidden');
-                list.innerHTML = data.map(n => `
-                    <div class="flex items-start gap-3 px-4 py-3 cursor-pointer hover:bg-slate-50 transition-colors ${n.dibaca ? '' : 'bg-super-active/5'}" onclick="readNotif(${n.id})">
-                        <div class="w-9 h-9 rounded-full ${notifClass(n.jenis)} flex items-center justify-center flex-shrink-0">
-                            <span class="material-symbols-outlined text-[18px]">${notifIcon(n.jenis)}</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm text-slate-700 leading-snug">${n.pesan}</p>
-                            <span class="text-xs text-slate-400">${n.waktu}</span>
-                        </div>
-                        ${!n.dibaca ? '<span class="w-2 h-2 mt-1.5 bg-super-active rounded-full flex-shrink-0"></span>' : ''}
-                    </div>
-                `).join('');
-            }
-            updateBadge();
-        }
-
         function toggleNotif(e) {
             e.stopPropagation();
             const panel = document.getElementById('notif-panel');
             panel.classList.toggle('hidden');
-            renderNotif();
-        }
-
-        function readNotif(id) {
-            const data = getNotif();
-            const n = data.find(x => x.id === id);
-            if (n) n.dibaca = true;
-            saveNotif(data);
-            renderNotif();
-        }
-
-        function markAllRead() {
-            const data = getNotif();
-            data.forEach(n => n.dibaca = true);
-            saveNotif(data);
-            renderNotif();
         }
 
         // Tutup panel saat klik di luar
@@ -271,7 +192,6 @@
             }
         });
 
-        renderNotif();
     </script>
 
     <!-- Global Modal Konfirmasi Hapus Data -->
@@ -308,6 +228,7 @@
             return new Promise((resolve) => {
                 let title = 'Konfirmasi Hapus Data';
                 let message = 'Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.';
+                let confirmText = 'Ya, Hapus';
                 let onConfirm = null;
 
                 if (typeof options === 'function') {
@@ -317,6 +238,7 @@
                 } else if (options && typeof options === 'object') {
                     if (options.title) title = options.title;
                     if (options.message) message = options.message;
+                    if (options.confirmText) confirmText = options.confirmText;
                     if (options.onConfirm) onConfirm = options.onConfirm;
                 }
 
@@ -326,6 +248,7 @@
                 _confirmResolve = resolve;
 
                 const btnYa = document.getElementById('global-konfirmasi-btn-ya');
+                btnYa.textContent = confirmText;
                 btnYa.onclick = function() {
                     tutupKonfirmasiHapus();
                     if (typeof onConfirm === 'function') {
@@ -486,9 +409,67 @@
                 window.tutupToastPopup();
             }, duration);
         };
+
+        window.tampilkanToastLaluMuatUlang = function(message, type = 'success') {
+            window.tampilToast(message, type);
+            setTimeout(() => window.location.reload(), type === 'success' ? 900 : 1800);
+        };
+
+        document.addEventListener('submit', function(event) {
+            const form = event.target.closest('form[data-confirm-delete]');
+
+            if (!form || form.dataset.confirmed === 'true') {
+                return;
+            }
+
+            event.preventDefault();
+            window.konfirmasiHapus({
+                title: 'Konfirmasi Hapus Data',
+                message: form.dataset.confirmDelete,
+                onConfirm: function() {
+                    form.dataset.confirmed = 'true';
+                    form.submit();
+                },
+            });
+        });
+
+        document.addEventListener('submit', function(event) {
+            if (event.defaultPrevented) {
+                return;
+            }
+
+            const form = event.target.closest('form');
+            const method = (form?.querySelector('[name="_method"]')?.value || form?.method || 'GET').toUpperCase();
+
+            if (!form || method === 'GET') {
+                return;
+            }
+
+            form.querySelectorAll('button[type="submit"], input[type="submit"]').forEach((button) => {
+                button.disabled = true;
+                button.classList.add('cursor-wait', 'opacity-70');
+            });
+        });
     </script>
 
+    @if (session('status'))
+        <script>
+            window.addEventListener('DOMContentLoaded', function() {
+                window.tampilToast(@json(session('status')), 'success');
+            });
+        </script>
+    @endif
+
+    @if (session('error'))
+        <script>
+            window.addEventListener('DOMContentLoaded', function() {
+                window.tampilToast(@json(session('error')), 'error');
+            });
+        </script>
+    @endif
+
     <script src="{{ asset('js/kulon-progo-map.js') }}"></script>
+    <script src="{{ asset('js/header-live.js') }}"></script>
     @stack('scripts')
 </body>
 </html>

@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Admin Dashboard') | SIPRAJA Satpol PP</title>
 
     {{-- Fonts --}}
@@ -75,13 +76,13 @@
             </a>
 
             <a href="{{ route('admin.pengaduan') }}"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all {{ request()->routeIs('admin.pengaduan') ? 'bg-sidebar-active text-white shadow-md font-semibold' : 'text-slate-300 hover:bg-sidebar-hover hover:text-white' }}">
+                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all {{ request()->routeIs('admin.pengaduan*') ? 'bg-sidebar-active text-white shadow-md font-semibold' : 'text-slate-300 hover:bg-sidebar-hover hover:text-white' }}">
                 <span class="material-symbols-outlined text-[20px]">campaign</span>
                 <span>Pengaduan</span>
             </a>
 
             <a href="{{ route('admin.kegiatan') }}"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all {{ request()->routeIs('admin.kegiatan') ? 'bg-sidebar-active text-white shadow-md font-semibold' : 'text-slate-300 hover:bg-sidebar-hover hover:text-white' }}">
+                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all {{ request()->routeIs('admin.kegiatan*') ? 'bg-sidebar-active text-white shadow-md font-semibold' : 'text-slate-300 hover:bg-sidebar-hover hover:text-white' }}">
                 <span class="material-symbols-outlined text-[20px]">calendar_month</span>
                 <span>Acara &amp; Kegiatan</span>
             </a>
@@ -118,6 +119,14 @@
                 <span class="material-symbols-outlined text-[18px]">arrow_back</span>
                 <span>Kembali ke Portal</span>
             </a>
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit"
+                    class="flex w-full items-center gap-3 px-4 py-2.5 rounded-lg text-xs font-medium text-slate-400 hover:bg-white/5 hover:text-slate-200 transition-colors">
+                    <span class="material-symbols-outlined text-[18px]">logout</span>
+                    <span>Logout</span>
+                </button>
+            </form>
         </div>
     </aside>
 
@@ -127,39 +136,47 @@
         <header
             class="bg-white border-b border-slate-200/80 px-8 py-4 flex items-center justify-between sticky top-0 z-20">
             <!-- Search Input -->
-            <div class="w-full max-w-md">
-                <div class="relative">
-                    <span
-                        class="material-symbols-outlined text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 text-[20px]">search</span>
-                    <input type="text" placeholder="Cari laporan, petugas, atau kegiatan..."
-                        class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all" />
-                </div>
-            </div>
+            <x-global-search />
 
             <!-- Right Actions / Profile -->
             <div class="flex items-center gap-2 relative">
                 <!-- Notifikasi -->
                 <div class="relative">
-                    <button onclick="toggleNotif(event)"
+                    <button onclick="toggleNotif(event)" data-notification-button data-notifications-url="{{ route('notifications.index') }}"
                         class="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors relative"
                         title="Notifikasi">
                         <span class="material-symbols-outlined text-[20px]">notifications</span>
-                        <span id="notif-badge"
-                            class="hidden absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
+                        @if ($layoutUnreadNotificationCount > 0)
+                            <span data-notification-badge class="absolute right-1 top-1 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
+                        @endif
                     </button>
 
                     <div id="notif-panel"
                         class="hidden absolute right-0 top-12 w-80 sm:w-96 bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden z-50">
                         <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100">
                             <h3 class="font-headline font-bold text-slate-800">Notifikasi</h3>
-                            <button onclick="markAllRead()"
-                                class="text-xs font-medium text-super-active hover:text-brand-600">Tandai semua
-                                dibaca</button>
+                            <form method="POST" action="{{ route('notifications.read-all') }}">
+                                @csrf
+                                <button class="text-xs font-medium text-super-active hover:text-brand-600">Tandai semua dibaca</button>
+                            </form>
                         </div>
-                        <div id="notif-list" class="max-h-96 overflow-y-auto divide-y divide-slate-50"></div>
-                        <div id="notif-empty" class="hidden px-4 py-10 text-center text-slate-400">
-                            <div class="text-3xl mb-2">🔔</div>
-                            <p class="text-sm">Tidak ada notifikasi.</p>
+                        <div data-notification-list class="max-h-96 divide-y divide-slate-50 overflow-y-auto">
+                            @forelse ($layoutNotifications as $notification)
+                                <form method="POST" action="{{ route('notifications.read', $notification->id) }}">
+                                    @csrf
+                                    <button class="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-slate-50 {{ $notification->read_at ? '' : 'bg-orange-50/60' }}">
+                                        <span class="material-symbols-outlined flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 text-[18px] text-blue-600">notifications</span>
+                                        <span class="min-w-0 flex-1">
+                                            <span class="block text-sm font-medium text-slate-700">{{ data_get($notification->data, 'title', 'Notifikasi') }}</span>
+                                            <span class="block text-xs leading-snug text-slate-500">{{ data_get($notification->data, 'message', '-') }}</span>
+                                            <span class="text-xs text-slate-400">{{ $notification->created_at->diffForHumans() }}</span>
+                                        </span>
+                                        @if (!$notification->read_at)<span class="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-red-500"></span>@endif
+                                    </button>
+                                </form>
+                            @empty
+                                <div class="px-4 py-10 text-center text-slate-400"><div class="mb-2 text-3xl">🔔</div><p class="text-sm">Tidak ada notifikasi.</p></div>
+                            @endforelse
                         </div>
                     </div>
                 </div>
@@ -179,8 +196,8 @@
                                 alt="Avatar Admin" class="w-full h-full object-cover">
                         </div>
                         <div class="hidden md:block text-left">
-                            <div class="text-xs font-bold text-slate-800 leading-tight">Budi Santoso</div>
-                            <div class="text-[10px] text-slate-500">Kasubag Operasional</div>
+                            <div class="text-xs font-bold text-slate-800 leading-tight">{{ auth()->user()->name }}</div>
+                            <div class="text-[10px] text-slate-500">Admin</div>
                         </div>
                     </div>
                 </a>
@@ -194,7 +211,7 @@
     </div>
 
     <!-- Global Modal Konfirmasi Hapus Data -->
-    <div id="global-modal-konfirmasi-hapus" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div id="global-modal-konfirmasi-hapus" class="hidden fixed inset-y-0 left-64 right-0 z-[100] flex items-center justify-center p-4">
         <!-- Backdrop transparan tanpa blur -->
         <div class="fixed inset-0 bg-black/40 transition-opacity" onclick="tutupKonfirmasiHapus()"></div>
 
@@ -224,107 +241,10 @@
     </div>
 
     <script>
-        const NOTIF_KODE_LAPORAN = 'sipraja_reports';
-        const NOTIF_KODE_BACA = 'sipraja_notif_baca';
-
-        function getReportsData() {
-            try {
-                return JSON.parse(localStorage.getItem(NOTIF_KODE_LAPORAN) || '[]');
-            } catch (e) {
-                return [];
-            }
-        }
-
-        function getBacaSet() {
-            try {
-                return new Set(JSON.parse(localStorage.getItem(NOTIF_KODE_BACA) || '[]'));
-            } catch (e) {
-                return new Set();
-            }
-        }
-
-        function simpanBacaSet(set) {
-            localStorage.setItem(NOTIF_KODE_BACA, JSON.stringify([...set]));
-        }
-
-        function getNotif() {
-            return getReportsData().map((r, i) => {
-                const darurat = r.jenis === 'darurat';
-                return {
-                    id: i,
-                    kode: r.kode,
-                    jenis: darurat ? 'darurat' : 'laporan',
-                    pesan: (darurat ? 'Laporan Darurat: ' : 'Laporan Baru: ') + (r.deskripsi || 'Pengaduan baru dari masyarakat.'),
-                    waktu: r.dibuat || '-',
-                    dibaca: getBacaSet().has(r.kode),
-                };
-            });
-        }
-
-        function notifIcon(j) {
-            return { darurat: 'emergency', laporan: 'description', petugas: 'badge', aset: 'inventory_2', organisasi: 'account_balance', evaluasi: 'assessment' }[j] || 'notifications';
-        }
-        function notifClass(j) {
-            return { darurat: 'bg-red-100 text-red-600', laporan: 'bg-blue-100 text-blue-600', petugas: 'bg-emerald-100 text-emerald-600', aset: 'bg-amber-100 text-amber-600', organisasi: 'bg-slate-200 text-slate-600', evaluasi: 'bg-purple-100 text-purple-600' }[j] || 'bg-slate-100 text-slate-600';
-        }
-
-        function unreadCount() {
-            return getNotif().filter(n => !n.dibaca).length;
-        }
-
-        function updateBadge() {
-            const badge = document.getElementById('notif-badge');
-            const count = unreadCount();
-            badge.classList.toggle('hidden', count === 0);
-        }
-
-        function renderNotif() {
-            const data = getNotif();
-            const list = document.getElementById('notif-list');
-            const empty = document.getElementById('notif-empty');
-
-            if (data.length === 0) {
-                list.innerHTML = '';
-                empty.classList.remove('hidden');
-            } else {
-                empty.classList.add('hidden');
-                list.innerHTML = data.map(n => `
-                    <div class="flex items-start gap-3 px-4 py-3 cursor-pointer hover:bg-slate-50 transition-colors ${n.dibaca ? '' : 'bg-orange-50/60'}" onclick="readNotif('${n.kode}')">
-                        <div class="w-9 h-9 rounded-full ${notifClass(n.jenis)} flex items-center justify-center flex-shrink-0">
-                            <span class="material-symbols-outlined text-[18px]">${notifIcon(n.jenis)}</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm text-slate-700 leading-snug">${n.pesan}</p>
-                            <span class="text-xs text-slate-400">${n.waktu}</span>
-                        </div>
-                        ${!n.dibaca ? '<span class="w-2 h-2 mt-1.5 bg-red-500 rounded-full flex-shrink-0"></span>' : ''}
-                    </div>
-                `).join('');
-            }
-            updateBadge();
-        }
-
         function toggleNotif(e) {
             e.stopPropagation();
             const panel = document.getElementById('notif-panel');
             panel.classList.toggle('hidden');
-            renderNotif();
-        }
-
-        function readNotif(kode) {
-            if (kode) {
-                const set = getBacaSet();
-                set.add(kode);
-                simpanBacaSet(set);
-                renderNotif();
-                window.location.href = "{{ url('admin/pengaduan') }}/" + encodeURIComponent(kode);
-            }
-        }
-
-        function markAllRead() {
-            const set = new Set(getReportsData().map(r => r.kode));
-            simpanBacaSet(set);
-            renderNotif();
         }
 
         // Tutup panel saat klik di luar
@@ -337,8 +257,6 @@
                 }
             }
         });
-
-        renderNotif();
 
         let _confirmResolve = null;
 
@@ -527,9 +445,62 @@
                 window.tutupToastPopup();
             }, duration);
         };
+
+        document.addEventListener('submit', function (event) {
+            const form = event.target.closest('form[data-confirm-delete]');
+
+            if (!form || form.dataset.confirmed === 'true') {
+                return;
+            }
+
+            event.preventDefault();
+            window.konfirmasiHapus({
+                title: 'Konfirmasi Hapus Data',
+                message: form.dataset.confirmDelete,
+                onConfirm: function () {
+                    form.dataset.confirmed = 'true';
+                    form.submit();
+                },
+            });
+        });
+
+        document.addEventListener('submit', function (event) {
+            if (event.defaultPrevented) {
+                return;
+            }
+
+            const form = event.target.closest('form');
+            const method = (form?.querySelector('[name="_method"]')?.value || form?.method || 'GET').toUpperCase();
+
+            if (!form || method === 'GET') {
+                return;
+            }
+
+            form.querySelectorAll('button[type="submit"], input[type="submit"]').forEach((button) => {
+                button.disabled = true;
+                button.classList.add('cursor-wait', 'opacity-70');
+            });
+        });
     </script>
 
+    @if (session('status'))
+        <script>
+            window.addEventListener('DOMContentLoaded', function () {
+                window.tampilToast(@json(session('status')), 'success');
+            });
+        </script>
+    @endif
+
+    @if (session('error'))
+        <script>
+            window.addEventListener('DOMContentLoaded', function () {
+                window.tampilToast(@json(session('error')), 'error');
+            });
+        </script>
+    @endif
+
     <script src="{{ asset('js/kulon-progo-map.js') }}"></script>
+    <script src="{{ asset('js/header-live.js') }}"></script>
     @stack('scripts')
 </body>
 

@@ -22,12 +22,10 @@
                 <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
                     <span class="material-symbols-outlined text-[22px]">group</span>
                 </div>
-                <span class="text-xs font-semibold text-slate-600 bg-slate-100 border border-slate-200 rounded-full px-2.5 py-0.5">
-                    +2.4%
-                </span>
+                <span class="text-xs font-semibold text-slate-600 bg-slate-100 border border-slate-200 rounded-full px-2.5 py-0.5">Database</span>
             </div>
             <div>
-                <h3 class="font-headline text-3xl font-bold text-slate-900">1,240</h3>
+                <h3 class="font-headline text-3xl font-bold text-slate-900">{{ $systemStats['users'] }}</h3>
                 <p class="text-xs font-medium text-slate-400 mt-1">Total User</p>
             </div>
         </div>
@@ -43,7 +41,7 @@
                 </span>
             </div>
             <div>
-                <h3 class="font-headline text-3xl font-bold text-slate-900">450</h3>
+                <h3 class="font-headline text-3xl font-bold text-slate-900">{{ $systemStats['active_officers'] }}</h3>
                 <p class="text-xs font-medium text-slate-400 mt-1">Total Petugas Aktif</p>
             </div>
         </div>
@@ -55,11 +53,11 @@
                     <span class="material-symbols-outlined text-[22px]">error</span>
                 </div>
                 <span class="text-xs font-semibold text-red-600 bg-red-50 border border-red-100 rounded-full px-2.5 py-0.5">
-                    +12%
+                    Database
                 </span>
             </div>
             <div>
-                <h3 class="font-headline text-3xl font-bold text-slate-900">892</h3>
+                <h3 class="font-headline text-3xl font-bold text-slate-900">{{ $systemStats['monthly_reports'] }}</h3>
                 <p class="text-xs font-medium text-slate-400 mt-1">Total Pengaduan Bulan Ini</p>
             </div>
         </div>
@@ -72,7 +70,7 @@
                 </div>
             </div>
             <div>
-                <h3 class="font-headline text-3xl font-bold text-slate-900">12</h3>
+                <h3 class="font-headline text-3xl font-bold text-slate-900">{{ $systemStats['monthly_activities'] }}</h3>
                 <p class="text-xs font-medium text-slate-400 mt-1">Total Kegiatan Berjalan</p>
             </div>
         </div>

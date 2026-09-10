@@ -165,7 +165,7 @@
                 </div>
             @endif
 
-            <form action="{{ route('login') }}" method="POST" class="space-y-6">
+            <form action="{{ route('login.store') }}" method="POST" class="space-y-6">
                 @csrf
                 <!-- Email/Username Field -->
                 <div>
@@ -198,9 +198,7 @@
                             Ingat saya
                         </label>
                     </div>
-                    <div class="text-sm">
-                        <a class="font-label-md text-label-md text-primary hover:text-primary-container hover:underline transition-all" href="#">Lupa sandi?</a>
-                    </div>
+                    <p class="text-right text-xs text-on-surface-variant">Lupa sandi? Hubungi super admin.</p>
                 </div>
                 <!-- Submit Button -->
                 <div>
@@ -220,9 +218,6 @@
                     </div>
                 </div>
                 <div class="mt-6 grid grid-cols-1 gap-3">
-                    <a class="w-full flex justify-center items-center py-2 px-4 border border-primary rounded-DEFAULT shadow-sm font-label-md text-label-md text-primary bg-transparent hover:bg-primary-fixed/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all" href="#">
-                        Daftar Akun Warga
-                    </a>
                     <a class="w-full flex justify-center items-center py-2 px-4 text-primary font-label-md text-label-md hover:underline transition-all group" href="{{ route('pelapor.lapor') }}">
                         <span class="material-symbols-outlined text-[18px] mr-2 group-hover:text-secondary-container transition-colors">report</span>
                         Buat Laporan Anonim
