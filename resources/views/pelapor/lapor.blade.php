@@ -42,7 +42,7 @@
             </div>
         @endif
 
-        <form id="lapor-form" action="{{ route('pelapor.store') }}" method="POST" enctype="multipart/form-data" class="{{ session('report_code') ? 'hidden ' : '' }}bg-white border border-slate-200 rounded-xl p-6 md:p-8 shadow-sm">
+        <form id="lapor-form" action="{{ route('pelapor.store') }}" method="POST" enctype="multipart/form-data" novalidate class="{{ session('report_code') ? 'hidden ' : '' }}bg-white border border-slate-200 rounded-xl p-6 md:p-8 shadow-sm">
             @csrf
             {{-- STEP 1: Jenis --}}
             <div class="step-content" data-step="1">
@@ -245,7 +245,10 @@
             const star = document.getElementById('nik-required-star');
             const nik = document.getElementById('nik');
             if (star) star.classList.toggle('hidden', !wajib);
-            if (nik) nik.placeholder = wajib ? '16 digit NIK Anda' : '16 digit NIK jika ada';
+            if (nik) {
+                nik.required = wajib;
+                nik.placeholder = wajib ? '16 digit NIK Anda' : '16 digit NIK jika ada';
+            }
         }
 
         document.querySelectorAll('input[name="jenis_radio"]').forEach(radio => {
@@ -272,31 +275,44 @@
 
         // Validasi step 2 (field wajib): telepon, deskripsi, lokasi (+ NIK jika darurat)
         function nextFromDetail() {
-            const required = ['telepon', 'deskripsi', 'lokasi'];
-            if (document.getElementById('jenis').value === 'emergency') required.push('nik');
-            const labels = {
-                telepon: 'Nomor WhatsApp / Telepon',
-                nik: 'NIK (wajib untuk laporan darurat)',
-                deskripsi: 'Deskripsi Singkat',
-                lokasi: 'Lokasi Kejadian',
-            };
+            const detailStep = document.querySelector('.step-content[data-step="2"]');
+            const invalidField = Array.from(detailStep.querySelectorAll('input, textarea, select'))
+                .find(field => !field.checkValidity());
 
-            const empty = required.find(name => {
-                const el = document.querySelector(`[name="${name}"]`);
-                return !el || !el.value.trim();
-            });
-
-            if (empty) {
-                const el = document.querySelector(`[name="${empty}"]`);
-                el.focus();
-                el.classList.add('border-red-500');
-                alert('Mohon lengkapi: ' + labels[empty]);
-                setTimeout(() => el.classList.remove('border-red-500'), 2000);
+            if (invalidField) {
+                invalidField.reportValidity();
+                invalidField.focus();
                 return;
             }
 
             goStep(3);
         }
+
+        document.getElementById('lapor-form').addEventListener('submit', function (event) {
+            const selectedType = document.querySelector('input[name="jenis_radio"]:checked');
+            if (selectedType) {
+                document.getElementById('jenis').value = selectedType.value;
+            }
+
+            const invalidField = Array.from(this.elements)
+                .find(field => field.willValidate && !field.checkValidity());
+
+            if (!invalidField) {
+                return;
+            }
+
+            event.preventDefault();
+            const invalidStep = invalidField.closest('.step-content')?.dataset.step;
+
+            if (invalidStep) {
+                goStep(Number(invalidStep));
+            }
+
+            requestAnimationFrame(() => {
+                invalidField.focus();
+                invalidField.reportValidity();
+            });
+        });
 
         // Recalc saat layout berubah
         window.addEventListener('resize', updateLines);

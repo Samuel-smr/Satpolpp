@@ -220,7 +220,7 @@
                     <label class="flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 p-6 text-center transition-colors hover:bg-slate-100">
                         <span class="material-symbols-outlined mb-2 text-4xl text-slate-400">cloud_upload</span>
                         <p id="archive-file-name" class="text-sm font-medium text-slate-700">Pilih file arsip</p>
-                        <p class="mt-1 text-xs text-slate-500">PDF, JPG, PNG, DOC, DOCX, atau ZIP. Maksimal 50 MB.</p>
+                        <p class="mt-1 text-xs text-slate-500">PDF, JPG, PNG, DOC, DOCX, atau ZIP. Maksimal 20 MB.</p>
                         <input id="archive-file" type="file" name="file" required
                             accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.zip" class="sr-only"
                             onchange="tampilkanNamaFile(this)">

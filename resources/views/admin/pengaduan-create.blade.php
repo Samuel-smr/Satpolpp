@@ -68,6 +68,9 @@
                 <label class="block text-sm font-semibold text-slate-700">Alamat lokasi
                     <textarea id="location_address" name="location_address" required rows="3" class="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 focus:border-sidebar-active focus:bg-white focus:outline-none focus:ring-1 focus:ring-sidebar-active">{{ old('location_address') }}</textarea>
                 </label>
+                <div class="mt-4">
+                    <x-location-map-controls prefix="report" />
+                </div>
                 <div id="report-map" class="mt-4 h-64 rounded-xl border border-slate-200"></div>
                 <div class="mt-3 grid grid-cols-2 gap-3">
                     <label class="block text-sm font-semibold text-slate-700">Latitude<input id="latitude" name="latitude" value="{{ old('latitude', '-7.75') }}" required readonly class="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900"></label>
@@ -108,10 +111,7 @@
         if (window.L && document.getElementById('report-map')) {
             const latitudeInput = document.getElementById('latitude');
             const longitudeInput = document.getElementById('longitude');
-            const initialLatitude = Number.parseFloat(latitudeInput.value);
-            const initialLongitude = Number.parseFloat(longitudeInput.value);
             const map = L.map('report-map');
-            let marker = null;
 
             if (window.KulonProgoMap) {
                 window.KulonProgoMap.setup(map);
@@ -124,26 +124,15 @@
                 attribution: '&copy; OpenStreetMap',
             }).addTo(map);
 
-            const setMarker = (latitude, longitude, moveMap = false) => {
-                if (marker) {
-                    marker.setLatLng([latitude, longitude]);
-                } else {
-                    marker = L.marker([latitude, longitude]).addTo(map);
-                }
-
-                if (moveMap) {
-                    map.setView([latitude, longitude], 15);
-                }
-            };
-
-            if (Number.isFinite(initialLatitude) && Number.isFinite(initialLongitude)) {
-                setMarker(initialLatitude, initialLongitude, true);
-            }
-
-            map.on('click', (event) => {
-                latitudeInput.value = event.latlng.lat.toFixed(7);
-                longitudeInput.value = event.latlng.lng.toFixed(7);
-                setMarker(event.latlng.lat, event.latlng.lng);
+            window.KulonProgoMap?.createLocationPicker({
+                map,
+                latitudeInput,
+                longitudeInput,
+                addressInput: document.getElementById('location_address'),
+                searchInput: document.getElementById('report-location-search'),
+                searchButton: document.getElementById('report-location-search-button'),
+                currentLocationButton: document.getElementById('report-current-location-button'),
+                statusElement: document.getElementById('report-location-status')
             });
         }
     </script>

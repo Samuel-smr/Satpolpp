@@ -41,7 +41,7 @@ class UpsertArchiveRequest extends FormRequest
                 'file',
                 'mimes:pdf,jpg,jpeg,png,doc,docx,zip',
                 'extensions:pdf,jpg,jpeg,png,doc,docx,zip',
-                'max:51200',
+                'max:20480',
             ],
         ];
     }
@@ -59,7 +59,7 @@ class UpsertArchiveRequest extends FormRequest
             'file.required' => 'File arsip wajib diunggah.',
             'file.mimes' => 'File harus berformat PDF, JPG, JPEG, PNG, DOC, DOCX, atau ZIP.',
             'file.extensions' => 'Ekstensi file harus PDF, JPG, JPEG, PNG, DOC, DOCX, atau ZIP.',
-            'file.max' => 'Ukuran file arsip maksimal 50 MB.',
+            'file.max' => 'Ukuran file arsip maksimal 20 MB.',
         ];
     }
 }

@@ -20,6 +20,11 @@ class GuestReportTest extends TestCase
     {
         $this->get(route('pelapor.lapor'))
             ->assertOk()
+            ->assertSee('id="lapor-form"', false)
+            ->assertSee('method="POST"', false)
+            ->assertSee('novalidate', false)
+            ->assertSee('invalidField.reportValidity()', false)
+            ->assertSee('nik.required = wajib', false)
             ->assertSee('name="nik"', false)
             ->assertSee('inputmode="numeric"', false)
             ->assertSee('pattern="[0-9]{16}"', false)

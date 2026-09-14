@@ -1,0 +1,713 @@
+USE CASE SIPRAJA — PELAPOR, ADMIN, DAN SUPER ADMIN
+Disusun dari kode lokal yang diperiksa pada 14 September 2026.
+
+CARA MEMBUKA
+1. Buka aplikasi draw.io / diagrams.net.
+2. Pilih File > Open From > Device (atau menu Buka dari Perangkat).
+3. Pilih SIPRAJA-use-case.drawio.
+4. Halaman 01 berisi ringkasan tiga aktor. Gunakan tab halaman untuk membuka detail.
+5. Setiap oval, aktor, dan garis adalah objek yang dapat diedit, bukan gambar datar.
+6. Alternatif teks: buka SIPRAJA-use-case.puml, salin satu blok @startuml sampai
+   @enduml ke editor yang mendukung PlantUML. Jangan tempel PlantUML ke editor Mermaid.
+7. File TXT ini berisi uraian langkah; tidak dimaksudkan sebagai sintaks diagram.
+
+RUANG LINGKUP DAN NOTASI
+- Use case diagram menjelaskan siapa dapat menggunakan fungsi apa.
+  Urutan tindakan dirinci pada bagian LANGKAH, bukan ditunjukkan oleh garis asosiasi.
+- Batas kotak adalah sistem SIPRAJA. Sistem bukan aktor keempat.
+- Pelapor adalah pengguna publik/tamu; Admin dan Super Admin adalah peran autentikasi terpisah.
+- Tidak ada generalisasi Super Admin mewarisi Admin, karena hak aksesnya tidak identik.
+- «include»: fungsi wajib yang dijalankan oleh fungsi asal; arah A04 menuju A05.
+- «extend»: fungsi tambahan bersyarat; arah P03 menuju P02.
+  Titik tambahan adalah ketika melihat laporan selesai dan belum memberikan feedback.
+- Login aktif merupakan prasyarat fitur privat, bukan include login ulang untuk setiap aksi.
+- Beberapa oval mengelompokkan tindakan satu fitur (misalnya tambah/edit).
+  Langkah dan alternatifnya menjelaskan tindakan yang dipilih; semua tindakan itu tidak wajib
+  dilakukan berurutan pada setiap kunjungan.
+- Pengisian peta, validasi, unggahan, dan penyimpanan merupakan langkah internal proses.
+  Tidak semuanya dijadikan use case mandiri karena bukan tujuan pengguna yang terpisah.
+- File ini mendeskripsikan implementasi yang tersedia, bukan rancangan fitur tambahan.
+- Halaman umum seperti beranda/panduan merupakan pintu masuk, bukan use case bisnis tersendiri.
+
+DAFTAR HALAMAN DRAW.IO
+01. Ringkasan tiga aktor
+02. Pelapor
+03. Akses bersama
+04. Laporan admin
+05. Kegiatan bersama
+06. Operasional admin
+07. Administrasi super admin
+08. Pengawasan super admin
+
+BATAS HAK AKSES PENTING
+Pelapor:
+  Mengirim laporan tanpa kategori; memantau laporan milik akses tamu; memberi feedback.
+Admin:
+  Mengelola laporan/status/penyelesaian, kegiatan internal, evaluasi, arsip, aset,
+  melihat feedback, dan memperbarui profil sendiri.
+Super Admin:
+  Mengelola akun, petugas, organisasi, kegiatan internal; melihat laporan terkait
+  kegiatan eksternal; monitoring audit dan peta.
+Bersama (Admin dan Super Admin):
+  Login/logout, dashboard sesuai peran, pencarian global, notifikasi milik sendiri,
+  daftar/detail kegiatan, CRUD internal, dokumentasi internal, ekspor PDF/Excel.
+Tidak diasumsikan tersedia:
+  Registrasi pelapor, pemulihan akses laporan hanya dengan kode, CRUD template kegiatan,
+  penolakan laporan, edit kegiatan eksternal melalui form internal, atau perubahan
+  status laporan oleh super admin. Route profil mandiri hanya tersedia untuk admin.
+
+PEMILIH LOKASI PADA FORM
+Digunakan pada tambah/edit kegiatan, tambah laporan admin, dan penyelesaian laporan.
+1. Pengguna dapat mencari nama tempat/alamat, memakai Lokasi Saat Ini, atau klik peta.
+2. Pencarian membatasi hasil ke kotak wilayah sekitar Kulon Progo dan memilih hasil pertama.
+3. Pencarian mengubah marker, latitude, longitude, dan alamat dari hasil layanan.
+4. Lokasi Saat Ini meminta izin browser, mengisi koordinat, lalu mencoba mengambil alamat.
+   Bila layanan alamat gagal, koordinat tetap dapat digunakan; alamat perlu diperiksa.
+5. Izin ditolak atau lokasi gagal diperoleh: pengguna mendapat pesan dan bisa mencoba
+   kembali atau memilih titik secara manual.
+6. Klik peta memperbarui marker/koordinat; tidak otomatis mengubah alamat.
+7. Form kegiatan dan penyelesaian juga menerima koordinat manual.
+8. Form pelapor publik saat ini menyimpan alamat teks; latitude/longitude awal kosong.
+
+RINCIAN PROSES
+============================================================================
+
+P01 — Mengirim laporan masyarakat
+Kelompok    : Pelapor
+Aktor       : Pelapor
+Prasyarat   : Halaman publik dapat diakses.
+Langkah:
+  1. Buka menu Lapor dan pilih jenis laporan.
+  2. Isi telepon/WhatsApp, deskripsi, dan alamat kejadian; NIK 16 digit wajib untuk laporan darurat.
+  3. Opsional unggah maksimal 3 foto JPG/JPEG/PNG/WEBP, masing-masing maksimal 5 MB; setujui pernyataan kebenaran data.
+  4. Klik kirim; sistem memvalidasi, menyimpan laporan dan bukti, membuat kode unik serta akses tamu melalui cookie browser.
+  5. Sistem mencatat status Laporan dibuat, memberi notifikasi kepada admin aktif, dan menampilkan kode laporan.
+Alternatif / gagal:
+  Data salah atau persetujuan belum diberikan: perbaiki form dan kirim ulang. Penyimpanan gagal: bukti yang sempat tersimpan dibersihkan.
+Hasil akhir:
+  Laporan tersimpan tanpa kategori dan tanpa koordinat awal; pelapor tidak login.
+Sumber kode : PelaporController; StoreGuestReportRequest
+----------------------------------------------------------------------------
+
+P02 — Melihat status laporan sendiri
+Kelompok    : Pelapor
+Aktor       : Pelapor
+Prasyarat   : Cookie akses tamu masih valid pada browser yang dipakai mengirim.
+Langkah:
+  1. Buka menu Status.
+  2. Sistem memeriksa token akses tamu dan mengambil laporan milik akses tersebut.
+  3. Lihat kode, jenis, deskripsi, lokasi dan tahap status; pilih laporan untuk melihat informasi yang ditampilkan.
+Alternatif / gagal:
+  Cookie tidak ada/kedaluwarsa atau browser berbeda: daftar laporan milik akses tersebut tidak tersedia. Kode bukan mekanisme login/pencarian server pengganti cookie.
+Hasil akhir:
+  Pelapor mengetahui status laporannya.
+Sumber kode : PelaporController::status; resources/views/pelapor/status.blade.php
+----------------------------------------------------------------------------
+
+P03 — Memberi feedback penanganan
+Kelompok    : Pelapor
+Aktor       : Pelapor
+Prasyarat   : Laporan milik akses tamu, sudah selesai, dan belum pernah diberi feedback.
+Langkah:
+  1. Buka laporan selesai pada menu Status.
+  2. Pilih rating 1–5 dan isi komentar opsional maksimal 2000 karakter.
+  3. Kirim feedback; sistem memeriksa kepemilikan, status selesai, dan feedback sebelumnya.
+  4. Sistem menyimpan rating, komentar, dan waktu pengiriman.
+Alternatif / gagal:
+  Rating tidak valid: perbaiki. Bukan pemilik atau belum selesai: ditolak. Feedback kedua pada laporan sama: ditolak.
+Hasil akhir:
+  Satu feedback tersimpan untuk laporan tersebut.
+Sumber kode : PelaporController::storeFeedback; StoreReportFeedbackRequest
+----------------------------------------------------------------------------
+
+C01 — Login
+Kelompok    : Akses bersama
+Aktor       : Admin; Super Admin
+Prasyarat   : Akun sudah dibuat dan berstatus aktif.
+Langkah:
+  1. Buka halaman login.
+  2. Isi username atau email dan kata sandi; opsi ingat saya bila diperlukan.
+  3. Sistem memvalidasi kredensial serta status aktif.
+  4. Sesi diperbarui dan pengguna diarahkan ke dashboard sesuai peran.
+Alternatif / gagal:
+  Kredensial salah/akun diblokir: login gagal. Setelah 5 percobaan gagal pada pembatas yang sama, tunggu waktu yang ditentukan.
+Hasil akhir:
+  Sesi autentikasi aktif sesuai peran.
+Sumber kode : AuthController
+----------------------------------------------------------------------------
+
+C02 — Melihat dashboard
+Kelompok    : Akses bersama
+Aktor       : Admin; Super Admin
+Prasyarat   : Sudah login sesuai peran.
+Langkah:
+  1. Buka Dashboard.
+  2. Sistem mengambil ringkasan sesuai peran.
+  3. Lihat statistik dan informasi ringkas untuk menentukan menu tindak lanjut.
+Alternatif / gagal:
+  Sesi tidak tersedia: login. Peran tidak sesuai: akses ditolak.
+Hasil akhir:
+  Ringkasan operasional atau pengawasan ditampilkan.
+Sumber kode : AdminController::dashboard; SuperAdminController::dashboard
+----------------------------------------------------------------------------
+
+C03 — Mencari data global
+Kelompok    : Akses bersama
+Aktor       : Admin; Super Admin
+Prasyarat   : Sudah login.
+Langkah:
+  1. Masukkan kata kunci pada pencarian global.
+  2. Sistem mencari data dan membentuk tautan sesuai peran.
+  3. Pilih hasil untuk membuka halaman yang diizinkan.
+Alternatif / gagal:
+  Hasil kosong: ubah kata kunci. Permintaan terlalu sering: dibatasi.
+Hasil akhir:
+  Pengguna menuju data terkait sesuai hak akses.
+Sumber kode : GlobalSearchController; routes/web.php
+----------------------------------------------------------------------------
+
+C04 — Melihat dan menandai notifikasi
+Kelompok    : Akses bersama
+Aktor       : Admin; Super Admin
+Prasyarat   : Sudah login; notifikasi yang diakses milik akun sendiri.
+Langkah:
+  1. Buka notifikasi.
+  2. Sistem menampilkan sampai 10 notifikasi terbaru dan jumlah belum dibaca.
+  3. Klik notifikasi untuk menandai dibaca dan mengikuti tautan internal yang tersedia, atau tandai semua dibaca.
+Alternatif / gagal:
+  Notifikasi akun lain/tidak ditemukan: ditolak. Tidak ada notifikasi: daftar kosong.
+Hasil akhir:
+  Status baca notifikasi diperbarui. Notifikasi laporan baru dikirim ke admin aktif, bukan otomatis ke super admin.
+Sumber kode : NotificationController; PelaporController::store
+----------------------------------------------------------------------------
+
+C05 — Logout
+Kelompok    : Akses bersama
+Aktor       : Admin; Super Admin
+Prasyarat   : Sudah login.
+Langkah:
+  1. Klik Keluar.
+  2. Sistem mengakhiri autentikasi, membatalkan sesi dan memperbarui token sesi.
+  3. Sistem mengarahkan pengguna ke halaman publik.
+Alternatif / gagal:
+  Untuk masuk kembali, lakukan login.
+Hasil akhir:
+  Sesi pengguna berakhir.
+Sumber kode : AuthController::logout
+----------------------------------------------------------------------------
+
+A01 — Melihat dan memfilter pengaduan
+Kelompok    : Laporan admin
+Aktor       : Admin
+Prasyarat   : Sudah login sebagai admin.
+Langkah:
+  1. Buka Pengaduan.
+  2. Gunakan pencarian/filter yang tersedia.
+  3. Pilih laporan untuk membuka detail, bukti, dan informasi status.
+Alternatif / gagal:
+  Data tidak ditemukan: ubah filter atau kembali ke daftar.
+Hasil akhir:
+  Daftar atau detail laporan tampil.
+Sumber kode : AdminController::pengaduan; pengaduanDetail
+----------------------------------------------------------------------------
+
+A02 — Mencatat laporan online atau offline
+Kelompok    : Laporan admin
+Aktor       : Admin
+Prasyarat   : Sudah login sebagai admin.
+Langkah:
+  1. Buka Tambah Laporan; pilih jenis dan sumber.
+  2. Untuk online pilih platform; untuk offline isi NIK 16 digit. Isi telepon, nama opsional, deskripsi dan alamat.
+  3. Tentukan titik peta dengan pencarian, lokasi saat ini atau klik peta; koordinat terisi.
+  4. Opsional unggah maksimal 3 foto, masing-masing 5 MB; klik Simpan Laporan.
+  5. Sistem memvalidasi dan menyimpan laporan berstatus Laporan dibuat beserta riwayat dan bukti.
+Alternatif / gagal:
+  Sumber/identitas/koordinat/file tidak valid: perbaiki dan simpan kembali.
+Hasil akhir:
+  Laporan masuk ke alur penanganan; kategori tidak diminta.
+Sumber kode : AdminReportController; StoreAdminReportRequest
+----------------------------------------------------------------------------
+
+A03 — Memajukan status penanganan
+Kelompok    : Laporan admin
+Aktor       : Admin
+Prasyarat   : Laporan tersedia dan status belum mencapai Ditindaklanjuti/Selesai.
+Langkah:
+  1. Buka detail laporan dan periksa isi/bukti.
+  2. Pilih aksi untuk tahap berikutnya; isi catatan opsional.
+  3. Sistem memastikan status awal belum berubah.
+  4. Status maju satu tahap: Laporan dibuat → Laporan diterima → Sedang diverifikasi → Ditindaklanjuti.
+  5. Sistem menyimpan riwayat status dan audit.
+Alternatif / gagal:
+  Status berubah oleh proses lain: muat ulang. Tahap Ditindaklanjuti wajib memakai form penyelesaian. Tidak ada transisi penolakan atau mundur pada implementasi ini.
+Hasil akhir:
+  Laporan maju tepat satu tahap.
+Sumber kode : ReportStatusController; ReportStatus
+----------------------------------------------------------------------------
+
+A04 — Menyelesaikan laporan
+Kelompok    : Laporan admin
+Aktor       : Admin
+Prasyarat   : Laporan berstatus Ditindaklanjuti dan belum mempunyai kegiatan penanganan.
+Langkah:
+  1. Buka form Selesaikan Laporan.
+  2. Opsional pilih template; isi nama kegiatan, tanggal tidak melebihi hari ini, waktu/deskripsi opsional, dan hasil penanganan.
+  3. Isi alamat dan titik peta; pilih minimal satu petugas aktif.
+  4. Unggah 1–3 foto bukti penanganan, masing-masing maksimal 5 MB.
+  5. Klik Simpan dan Buat Kegiatan Eksternal; sistem memvalidasi status, petugas dan bukti.
+  6. Sistem membuat kegiatan eksternal terkait, menyalin koordinat ke laporan, mengubah status menjadi selesai, serta menyimpan riwayat/audit.
+Alternatif / gagal:
+  Data tidak valid, status berubah, petugas tidak aktif, atau kegiatan sudah ada: permintaan ditolak; perbaiki/muat ulang.
+Hasil akhir:
+  Laporan selesai; detail menampilkan lokasi, koordinat, peta dan preview bukti penanganan.
+Sumber kode : CompleteReportController
+----------------------------------------------------------------------------
+
+A05 — Membuat kegiatan eksternal dari penyelesaian
+Kelompok    : Laporan admin
+Aktor       : Admin (pemicu melalui A04; pelaksanaan otomatis oleh sistem)
+Prasyarat   : Dipanggil sebagai bagian wajib A04, bukan form tambah kegiatan eksternal yang berdiri sendiri.
+Langkah:
+  1. Sistem membuat kegiatan bertipe eksternal dengan relasi laporan.
+  2. Simpan nama, tanggal, lokasi, koordinat, hasil, petugas dan dokumentasi.
+  3. Simpan category kosong dan pertahankan keterkaitan ke laporan.
+Alternatif / gagal:
+  Kegiatan penanganan sudah tercatat: cegah duplikasi. Transaksi gagal: perubahan dibatalkan.
+Hasil akhir:
+  Satu kegiatan eksternal tercatat untuk laporan yang diselesaikan.
+Sumber kode : CompleteReportController::store
+----------------------------------------------------------------------------
+
+A06 — Menghapus laporan
+Kelompok    : Laporan admin
+Aktor       : Admin
+Prasyarat   : Laporan tersedia.
+Langkah:
+  1. Pilih hapus pada laporan dan konfirmasi sesuai antarmuka.
+  2. Sistem melakukan soft delete dan mencatat penghapusan.
+  3. Daftar aktif tidak lagi menampilkan laporan tersebut.
+Alternatif / gagal:
+  Batal: data tetap. Laporan tidak ditemukan: tidak dapat dihapus ulang melalui daftar aktif.
+Hasil akhir:
+  Laporan ditandai terhapus; riwayat, file, dan keterkaitan kegiatan dipertahankan.
+Sumber kode : AdminReportController::destroy
+----------------------------------------------------------------------------
+
+A07 — Melihat feedback masyarakat
+Kelompok    : Laporan admin
+Aktor       : Admin
+Prasyarat   : Sudah login sebagai admin.
+Langkah:
+  1. Buka menu Feedback.
+  2. Lihat data rating dan komentar yang tersedia.
+  3. Gunakan informasi feedback untuk meninjau hasil layanan.
+Alternatif / gagal:
+  Belum ada feedback: tampilkan keadaan kosong.
+Hasil akhir:
+  Feedback masyarakat terbaca; bukan CRUD feedback oleh admin.
+Sumber kode : AdminController::feedback
+----------------------------------------------------------------------------
+
+K01 — Melihat dan memfilter kegiatan
+Kelompok    : Kegiatan bersama
+Aktor       : Admin; Super Admin
+Prasyarat   : Sudah login sesuai peran.
+Langkah:
+  1. Buka Acara dan Kegiatan/Kegiatan.
+  2. Cari nama, laporan atau lokasi; pilih bulan/rentang tanggal, jenis dan kategori bila diperlukan.
+  3. Sistem menampilkan daftar sesuai filter.
+  4. Buka kegiatan internal untuk detail atau kegiatan eksternal melalui detail laporan terkait.
+Alternatif / gagal:
+  Tidak ada hasil: ubah/reset filter.
+Hasil akhir:
+  Data kegiatan tampil sesuai filter dan akses.
+Sumber kode : AdminController::kegiatan; ActivityController::show
+----------------------------------------------------------------------------
+
+K02 — Menambah kegiatan internal
+Kelompok    : Kegiatan bersama
+Aktor       : Admin; Super Admin
+Prasyarat   : Template kategori dan minimal satu petugas aktif tersedia.
+Langkah:
+  1. Buka Tambah Kegiatan.
+  2. Opsional pilih template: nama, kategori dan deskripsi otomatis diisi; kategori dapat dipilih manual dari nama template aktif.
+  3. Isi nama, tanggal, waktu opsional, deskripsi/hasil opsional, alamat dan koordinat.
+  4. Pilih minimal satu petugas aktif; opsional unggah maksimal 3 foto dokumentasi, masing-masing 5 MB.
+  5. Klik simpan; sistem memvalidasi dan menyimpan kegiatan internal, relasi petugas, dokumentasi, dan audit.
+Alternatif / gagal:
+  Kategori tidak aktif, koordinat salah, petugas tidak aktif, atau file tidak sesuai: perbaiki form.
+Hasil akhir:
+  Kegiatan internal tersimpan tanpa report_id.
+Sumber kode : ActivityController::store; StoreInternalActivityRequest
+----------------------------------------------------------------------------
+
+K03 — Mengedit kegiatan internal
+Kelompok    : Kegiatan bersama
+Aktor       : Admin; Super Admin
+Prasyarat   : Kegiatan internal tersedia.
+Langkah:
+  1. Buka detail/daftar lalu Edit.
+  2. Sistem mengisi form dengan data saat ini.
+  3. Ubah informasi, kategori, lokasi/peta atau petugas; tambahkan dokumentasi bila perlu.
+  4. Simpan; sistem memeriksa validasi, perubahan bersamaan, dan total maksimal 3 dokumentasi.
+  5. Sistem memperbarui kegiatan dan relasi petugas serta mencatat audit.
+Alternatif / gagal:
+  Data sudah berubah: muat ulang. Kegiatan eksternal tidak memakai endpoint edit internal.
+Hasil akhir:
+  Data kegiatan internal diperbarui.
+Sumber kode : ActivityController::edit; update; UpdateInternalActivityRequest
+----------------------------------------------------------------------------
+
+K04 — Menghapus kegiatan internal
+Kelompok    : Kegiatan bersama
+Aktor       : Admin; Super Admin
+Prasyarat   : Kegiatan internal tersedia.
+Langkah:
+  1. Pilih hapus dan konfirmasi.
+  2. Sistem memastikan kegiatan bertipe internal.
+  3. Sistem melakukan soft delete dan mencatat audit.
+Alternatif / gagal:
+  Batal: tetap tersimpan. Kegiatan eksternal tidak dapat dihapus melalui aksi ini.
+Hasil akhir:
+  Kegiatan internal tidak lagi tampil pada daftar aktif.
+Sumber kode : ActivityController::destroy
+----------------------------------------------------------------------------
+
+K05 — Melihat atau menghapus dokumentasi internal
+Kelompok    : Kegiatan bersama
+Aktor       : Admin; Super Admin
+Prasyarat   : Lampiran memang milik kegiatan internal yang dapat diakses.
+Langkah:
+  1. Buka detail kegiatan dan lihat preview dokumentasi.
+  2. Buka lampiran untuk melihat gambar.
+  3. Jika perlu, pilih hapus lampiran melalui aksi yang tersedia dan konfirmasi.
+Alternatif / gagal:
+  Lampiran tidak sesuai kegiatan/tidak ditemukan: ditolak. Batal hapus: file tetap.
+Hasil akhir:
+  Dokumentasi terlihat atau lampiran terpilih dihapus.
+Sumber kode : InternalActivityAttachmentController
+----------------------------------------------------------------------------
+
+K06 — Mengekspor kegiatan ke PDF atau Excel
+Kelompok    : Kegiatan bersama
+Aktor       : Admin; Super Admin
+Prasyarat   : Daftar kegiatan dapat diakses.
+Langkah:
+  1. Tentukan filter kegiatan.
+  2. Klik Ekspor PDF atau Excel.
+  3. Sistem menyiapkan data sesuai filter; PDF memuat dokumentasi yang tersedia.
+  4. Browser mengunduh hasil ekspor.
+Alternatif / gagal:
+  Tidak ada kegiatan: tampilkan peringatan. Gagal menyiapkan file/gambar: tampilkan kegagalan sesuai antarmuka.
+Hasil akhir:
+  File laporan kegiatan tersedia untuk pengguna.
+Sumber kode : resources/views/admin/kegiatan.blade.php
+----------------------------------------------------------------------------
+
+K07 — Melihat laporan terkait kegiatan eksternal
+Kelompok    : Kegiatan bersama
+Aktor       : Admin; Super Admin
+Prasyarat   : Kegiatan eksternal memiliki laporan terkait.
+Langkah:
+  1. Pilih detail kegiatan eksternal pada daftar.
+  2. Sistem membuka detail laporan terkait dan bukti yang diizinkan.
+  3. Lihat status, lokasi, petugas, hasil penanganan dan dokumentasi yang tersedia.
+Alternatif / gagal:
+  Laporan/relasi tidak tersedia: detail tidak dapat diakses.
+Hasil akhir:
+  Super admin memperoleh tampilan baca saja; admin memiliki aksi penanganan sesuai status.
+Sumber kode : AdminController::pengaduanDetail; ReportAttachmentController
+----------------------------------------------------------------------------
+
+E01 — Menambah evaluasi kegiatan
+Kelompok    : Operasional admin
+Aktor       : Admin
+Prasyarat   : Kegiatan belum memiliki evaluasi.
+Langkah:
+  1. Buka Evaluasi dan Tambah Evaluasi.
+  2. Pilih sumber internal atau eksternal.
+  3. Internal: pilih kategori dari seluruh nama template lalu pilih kegiatan yang sesuai. Eksternal: kategori dinonaktifkan dan nama kegiatan eksternal tetap dapat dipilih.
+  4. Isi catatan evaluasi dan kendala opsional, lalu simpan.
+  5. Sistem memastikan kegiatan belum dievaluasi, menyimpan catatan, evaluator, waktu dan audit.
+Alternatif / gagal:
+  Tidak ada kegiatan pada kategori: tampilkan Belum ada kegiatan pada kategori ini; pemilihan kegiatan kosong dinonaktifkan. Sudah dievaluasi: ditolak.
+Hasil akhir:
+  Evaluasi melekat pada kegiatan terpilih.
+Sumber kode : ActivityEvaluationController; resources/views/admin/evaluasi.blade.php
+----------------------------------------------------------------------------
+
+E02 — Melihat, mengedit atau menghapus evaluasi
+Kelompok    : Operasional admin
+Aktor       : Admin
+Prasyarat   : Sudah login; evaluasi tersedia untuk edit/hapus.
+Langkah:
+  1. Buka Evaluasi dan cari/filter menurut sumber atau tanggal.
+  2. Lihat catatan; pilih edit untuk mengubah catatan/kendala kemudian simpan.
+  3. Alternatif: pilih hapus dan konfirmasi; sistem mengosongkan data evaluasi serta mencatat audit.
+Alternatif / gagal:
+  Batal: tidak berubah. Evaluasi sudah tidak ada: ditolak.
+Hasil akhir:
+  Evaluasi tampil/diperbarui/dihapus; kegiatan tetap ada.
+Sumber kode : ActivityEvaluationController
+----------------------------------------------------------------------------
+
+R01 — Menambah atau mengedit arsip
+Kelompok    : Operasional admin
+Aktor       : Admin
+Prasyarat   : Sudah login sebagai admin.
+Langkah:
+  1. Buka Arsip lalu Tambah atau Edit.
+  2. Isi judul, kategori operasional arsip, sifat dokumen dan deskripsi opsional.
+  3. Tambah: unggah file wajib. Edit: file pengganti opsional.
+  4. Simpan; sistem memvalidasi ekstensi/isi dan ukuran maksimal 20 MB serta menyimpan metadata/file.
+Alternatif / gagal:
+  Format yang diterima PDF/JPG/JPEG/PNG/DOC/DOCX/ZIP. Melebihi batas aplikasi atau konfigurasi server: unggahan gagal; perbaiki dan ulangi.
+Hasil akhir:
+  Arsip tersimpan atau diperbarui.
+Sumber kode : ArchiveController; UpsertArchiveRequest
+----------------------------------------------------------------------------
+
+R02 — Mencari, melihat atau mengunduh arsip
+Kelompok    : Operasional admin
+Aktor       : Admin
+Prasyarat   : Arsip dapat diakses oleh admin.
+Langkah:
+  1. Buka Arsip.
+  2. Cari/filter judul, kategori atau tipe dokumen/media.
+  3. Pilih lihat file atau unduh.
+  4. Sistem mengirim file arsip.
+Alternatif / gagal:
+  Arsip atau file tidak ditemukan: tidak dapat ditampilkan/diunduh.
+Hasil akhir:
+  Arsip ditemukan dan file dapat dibaca/disimpan.
+Sumber kode : ArchiveController::index; show; download
+----------------------------------------------------------------------------
+
+R03 — Menghapus arsip
+Kelompok    : Operasional admin
+Aktor       : Admin
+Prasyarat   : Arsip tersedia.
+Langkah:
+  1. Pilih hapus arsip dan konfirmasi.
+  2. Sistem menjalankan penghapusan arsip sesuai implementasi penyimpanan.
+  3. Daftar arsip diperbarui.
+Alternatif / gagal:
+  Batal: arsip tetap. Data tidak ditemukan: permintaan gagal.
+Hasil akhir:
+  Arsip tidak lagi tersedia di daftar aktif.
+Sumber kode : ArchiveController::destroy
+----------------------------------------------------------------------------
+
+T01 — Menambah atau mengedit aset
+Kelompok    : Operasional admin
+Aktor       : Admin
+Prasyarat   : Sudah login sebagai admin.
+Langkah:
+  1. Buka Aset dan pilih Tambah atau Edit.
+  2. Isi nama, kategori dan kondisi; isi kode, lokasi, tahun perolehan bila diperlukan.
+  3. Jika kategori kendaraan, tampilkan dan isi tanggal jatuh tempo pajak serta kilometer servis oli berikutnya bila diperlukan.
+  4. Simpan; sistem memvalidasi dan menyimpan data.
+Alternatif / gagal:
+  Kode ganda, tahun/tanggal/kilometer salah: perbaiki. Field pajak/oli dikecualikan untuk kategori selain kendaraan.
+Hasil akhir:
+  Aset tersimpan atau diperbarui.
+Sumber kode : AssetController; StoreAssetRequest
+----------------------------------------------------------------------------
+
+T02 — Melihat atau menghapus aset
+Kelompok    : Operasional admin
+Aktor       : Admin
+Prasyarat   : Sudah login sebagai admin.
+Langkah:
+  1. Buka daftar Aset dan gunakan pencarian/filter yang tersedia.
+  2. Tinjau informasi aset.
+  3. Bila diperlukan pilih hapus dan konfirmasi; sistem memperbarui daftar.
+Alternatif / gagal:
+  Batal: data tetap. Aset tidak ditemukan: penghapusan gagal.
+Hasil akhir:
+  Aset terbaca atau dihapus dari daftar aktif.
+Sumber kode : AssetController
+----------------------------------------------------------------------------
+
+A08 — Mengubah profil dan kata sandi sendiri
+Kelompok    : Operasional admin
+Aktor       : Admin
+Prasyarat   : Sudah login sebagai admin.
+Langkah:
+  1. Buka Profil.
+  2. Ubah nama, username atau email.
+  3. Jika mengganti kata sandi, isi kata sandi saat ini, kata sandi baru minimal 8 karakter dan konfirmasi.
+  4. Simpan; sistem memvalidasi, memperbarui profil dan mencatat audit.
+Alternatif / gagal:
+  Username/email sudah digunakan, kata sandi lama salah atau konfirmasi berbeda: perbaiki.
+Hasil akhir:
+  Profil atau kata sandi admin diperbarui.
+Sumber kode : ProfileController; UpdateProfileRequest
+----------------------------------------------------------------------------
+
+S01 — Melihat dan menambah akun admin
+Kelompok    : Administrasi super admin
+Aktor       : Super Admin
+Prasyarat   : Sudah login sebagai super admin.
+Langkah:
+  1. Buka Manajemen User dan lihat daftar akun.
+  2. Pilih Tambah; isi nama, username, email opsional dan kata sandi minimal 8 karakter.
+  3. Simpan; sistem memeriksa keunikan username/email.
+  4. Sistem membuat akun dengan role Admin dan status Aktif.
+Alternatif / gagal:
+  Data tidak valid atau username/email ganda: perbaiki. Form tambah tidak menawarkan pembuatan role baru.
+Hasil akhir:
+  Akun admin baru tersedia.
+Sumber kode : SuperAdminController::user; storeUser; StoreAdminUserRequest
+----------------------------------------------------------------------------
+
+S02 — Mengedit akun pengguna
+Kelompok    : Administrasi super admin
+Aktor       : Super Admin
+Prasyarat   : Akun target tersedia.
+Langkah:
+  1. Buka Manajemen User dan pilih Edit.
+  2. Ubah nama, username, email atau kata sandi opsional.
+  3. Simpan; sistem memvalidasi dan memperbarui akun.
+Alternatif / gagal:
+  Kata sandi kosong: kata sandi lama tetap. Identitas ganda/tidak valid: ditolak.
+Hasil akhir:
+  Identitas atau kata sandi akun diperbarui; form ini tidak mengubah role.
+Sumber kode : SuperAdminController::updateUser; UpdateAdminUserRequest
+----------------------------------------------------------------------------
+
+S03 — Memblokir atau mengaktifkan akun
+Kelompok    : Administrasi super admin
+Aktor       : Super Admin
+Prasyarat   : Akun target bukan akun yang sedang digunakan.
+Langkah:
+  1. Pilih aksi status akun pada Manajemen User.
+  2. Sistem memeriksa bukan akun sendiri.
+  3. Sistem mengganti Aktif menjadi Diblokir, atau sebaliknya.
+Alternatif / gagal:
+  Akun sendiri: permintaan ditolak.
+Hasil akhir:
+  Status akses akun berubah.
+Sumber kode : SuperAdminController::toggleUserStatus
+----------------------------------------------------------------------------
+
+S04 — Menghapus akun pengguna
+Kelompok    : Administrasi super admin
+Aktor       : Super Admin
+Prasyarat   : Akun target bukan akun yang sedang digunakan.
+Langkah:
+  1. Pilih hapus akun dan konfirmasi.
+  2. Sistem memeriksa target.
+  3. Sistem menghapus akun dan memperbarui daftar.
+Alternatif / gagal:
+  Akun sendiri: ditolak. Batal: tidak berubah.
+Hasil akhir:
+  Akun target dihapus sesuai model penyimpanan.
+Sumber kode : SuperAdminController::destroyUser
+----------------------------------------------------------------------------
+
+S05 — Melihat, menambah atau mengedit petugas
+Kelompok    : Administrasi super admin
+Aktor       : Super Admin
+Prasyarat   : Sudah login sebagai super admin.
+Langkah:
+  1. Buka Petugas dan lihat daftar/statistik.
+  2. Pilih Tambah atau Edit.
+  3. Isi NIP, nama, pilih jabatan, nama satuan kerja, serta unit kerja dari opsi yang disediakan.
+  4. Simpan; sistem memvalidasi NIP unik dan pilihan resmi; petugas baru diberi status Aktif.
+Alternatif / gagal:
+  NIP ganda/field kosong/pilihan tidak sah: perbaiki. Batal atau silang menutup form tanpa menyimpan.
+Hasil akhir:
+  Data petugas tersimpan atau diperbarui.
+Sumber kode : OfficerController; UpsertOfficerRequest; OfficerOptions
+----------------------------------------------------------------------------
+
+S06 — Mengubah status atau menghapus petugas
+Kelompok    : Administrasi super admin
+Aktor       : Super Admin
+Prasyarat   : Petugas tersedia.
+Langkah:
+  1. Pilih aksi status untuk mengganti status petugas.
+  2. Sistem menjalankan siklus Aktif → Cuti → Nonaktif → Aktif.
+  3. Alternatif: pilih hapus dan konfirmasi, lalu sistem menghapus petugas dari daftar aktif.
+Alternatif / gagal:
+  Batal: data tetap. Petugas tidak aktif tidak tersedia sebagai pilihan petugas aktif pada kegiatan baru.
+Hasil akhir:
+  Status petugas diperbarui atau petugas dihapus.
+Sumber kode : OfficerController::toggleStatus; destroy
+----------------------------------------------------------------------------
+
+S07 — Melihat, menambah atau mengedit unit organisasi
+Kelompok    : Administrasi super admin
+Aktor       : Super Admin
+Prasyarat   : Sudah login sebagai super admin.
+Langkah:
+  1. Buka Manajemen Organisasi.
+  2. Pilih Tambah Unit atau Edit.
+  3. Isi nama, tipe dan status aktif; kode, induk, zona operasional, pimpinan dan deskripsi sesuai kebutuhan.
+  4. Simpan; sistem memeriksa keunikan kode dan struktur induk tanpa siklus.
+Alternatif / gagal:
+  Induk diri sendiri/keturunan sendiri atau kode ganda: ditolak. Batal atau silang menutup form tanpa perubahan.
+Hasil akhir:
+  Struktur organisasi tersimpan atau diperbarui.
+Sumber kode : OrganizationalUnitController; UpsertOrganizationalUnitRequest
+----------------------------------------------------------------------------
+
+S08 — Menghapus unit organisasi
+Kelompok    : Administrasi super admin
+Aktor       : Super Admin
+Prasyarat   : Unit tersedia dan tidak mempunyai unit bawahan.
+Langkah:
+  1. Pilih hapus unit dan konfirmasi.
+  2. Sistem memeriksa apakah ada unit bawahan.
+  3. Jika tidak ada, sistem menghapus unit dan memperbarui daftar.
+Alternatif / gagal:
+  Masih punya unit bawahan: ditolak. Batal: tidak berubah.
+Hasil akhir:
+  Unit terpilih dihapus.
+Sumber kode : OrganizationalUnitController::destroy
+----------------------------------------------------------------------------
+
+S09 — Memantau aktivitas sistem
+Kelompok    : Pengawasan super admin
+Aktor       : Super Admin
+Prasyarat   : Sudah login sebagai super admin.
+Langkah:
+  1. Buka Monitoring.
+  2. Sistem mengambil maksimal 100 audit terbaru, statistik hari ini dan tren 7 hari.
+  3. Tinjau waktu, pengguna, modul dan deskripsi aktivitas; gunakan kontrol tampilan yang tersedia.
+Alternatif / gagal:
+  Belum ada audit: statistik/daftar kosong. Audit hanya mencakup tindakan yang memang dicatat aplikasi.
+Hasil akhir:
+  Super admin mengetahui aktivitas yang tercatat.
+Sumber kode : SuperAdminController::monitoring
+----------------------------------------------------------------------------
+
+S10 — Melihat peta persebaran
+Kelompok    : Pengawasan super admin
+Aktor       : Super Admin
+Prasyarat   : Sudah login sebagai super admin.
+Langkah:
+  1. Buka Peta.
+  2. Sistem menyiapkan titik laporan dan kegiatan yang mempunyai koordinat serta ringkasan/grafik.
+  3. Jelajahi peta dan pilih marker untuk melihat informasi lokasi yang tersedia.
+Alternatif / gagal:
+  Data tanpa koordinat tidak menjadi titik peta. Layanan peta gagal: peta tidak termuat sepenuhnya.
+Hasil akhir:
+  Persebaran laporan dan kegiatan dapat dipantau.
+Sumber kode : SuperAdminController::peta; resources/views/super_admin/peta.blade.php
+----------------------------------------------------------------------------
+
+SUMBER PEMETAAN
+- routes/web.php: endpoint aktif dan pembagian peran.
+- app/Http/Controllers/: tindakan dan batas akses pada masing-masing proses.
+- app/Http/Requests/: field, prasyarat dan validasi.
+- app/ReportStatus.php: tahapan status laporan yang benar-benar tersedia.
+- resources/views/admin/kegiatan.blade.php: filter dan ekspor kegiatan.
+- resources/views/admin/evaluasi.blade.php: kategori/sumber/pemilihan kegiatan.
+- public/js/kulon-progo-map.js: pencarian dan pengambilan lokasi saat ini.
+
+CATATAN PEMAKAIAN UNTUK LAPORAN AKADEMIK
+Gunakan halaman ringkasan untuk gambaran umum dan halaman detail sesuai bab/modul.
+Kode proses sengaja konsisten antara diagram dan uraian ini agar mudah dirujuk.
+Nama menu dapat disesuaikan untuk kebutuhan penulisan tanpa mengubah hak aksesnya.

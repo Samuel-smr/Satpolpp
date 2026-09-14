@@ -1,0 +1,849 @@
+SEQUENCE DIAGRAM SIPRAJA — PELAPOR, ADMIN, DAN SUPER ADMIN
+Dibuat berdasarkan implementasi lokal yang diperiksa pada 14 September 2026.
+
+MEMBUKA DI DRAW.IO
+1. Buka draw.io / diagrams.net.
+2. Pilih File > Open From > Device, lalu SIPRAJA-sequence.drawio.
+3. Pilih tab halaman proses yang diperlukan. Gunakan zoom untuk membaca detail.
+4. Objek peserta, garis lifeline, pesan dan frame dapat diedit.
+5. Untuk presentasi, ekspor halaman terpilih ke PDF, SVG atau PNG dari draw.io.
+6. Alternatif: salin satu blok @startuml ... @enduml pada SIPRAJA-sequence.puml
+   ke editor PlantUML. Berkas TXT ini adalah penjelasan, bukan kode diagram.
+
+CARA MEMBACA
+- Urutan waktu dari atas ke bawah. Angka pada pesan memudahkan pencocokan dengan uraian.
+- A = pengguna; B = halaman/browser; C = aplikasi Laravel/controller;
+  D = database melalui Eloquent. Peserta tambahan hanya muncul jika diperlukan.
+- Aktor 'Admin / Super Admin' berarti salah satu peran melakukan proses yang sama,
+  bukan kedua pengguna harus mengirim permintaan bersama.
+- Kotak peserta dan garis vertikal putus-putus adalah lifeline.
+- Panah penuh menunjukkan permintaan/pemanggilan; putus-putus menunjukkan respons.
+- Panah kembali ke lifeline sendiri menunjukkan pengolahan lokal.
+- Frame alt berisi alternatif yang saling eksklusif; pilih cabang sesuai kondisi.
+- Frame opt dijalankan hanya jika kondisi terpenuhi; loop mengulang pesan di dalamnya.
+- Tidak semua query atau respons framework digambar satu per satu. Pesan agregat
+  seperti 'UPDATE ... dan audit' menyatakan rangkaian tindakan, bukan satu query SQL.
+- Database adalah abstraksi Eloquent/DB, bukan controller kedua.
+- C menggabungkan pipeline HTTP: middleware, route binding, Form Request, controller.
+  Form Request berjalan sebelum metode controller; digabung agar diagram terbaca.
+- Request privat membutuhkan sesi sah dan role sesuai routes/web.php.
+  Pemeriksaan auth tidak diulang di setiap gambar. Kegagalan umum dapat menghasilkan
+  redirect login, 403, 404 atau kesalahan validasi sesuai tahap kegagalan.
+- Form biasa umumnya kembali dengan error validasi; permintaan JSON dapat menerima 422.
+- Pengiriman form dengan CSRF tidak sah ditolak oleh framework; bukan jalur sukses.
+- Perintah simpan memicu proses server; batal/silang tidak menyimpan data.
+- BEGIN/COMMIT/ROLLBACK ditampilkan sebagai konsep transaksi Laravel.
+  File fisik tidak ikut rollback database: controller melakukan pembersihan terpisah.
+- Beberapa controller CRUD sederhana tidak membungkus write dan audit dalam transaksi;
+  diagram tidak menambahkan transaksi yang tidak ada.
+- Tidak ada sesi login untuk pelapor. Akses laporan sendiri memakai cookie guest.
+- Sequence diagram menjelaskan urutan komunikasi. Dokumen use case sebelumnya
+  menjelaskan tujuan pengguna; kode referensinya dipertahankan di sini.
+
+BATAS IMPLEMENTASI YANG PENTING
+1. Admin dan super admin adalah role terpisah; bukan pewarisan semua izin.
+2. Tahap laporan: Submitted → Received → Verifying → InProgress → Completed.
+   Tidak ada tahap ditolak. Completed menggunakan form penyelesaian.
+3. Penyelesaian membuat satu kegiatan eksternal; category NULL; koordinat disalin
+   ke laporan. Alamat laporan asli tidak diganti oleh proses ini; kegiatan menyimpan
+   alamat penanganannya sendiri.
+4. Kegiatan internal dapat ditambah/edit/hapus oleh admin dan super admin.
+   Kegiatan eksternal dilihat melalui laporan terkait; super admin baca saja.
+5. Feedback hanya untuk pemilik akses tamu, setelah selesai, dan satu kali.
+6. Peta form melakukan pencarian/geolokasi di browser. Koordinat masuk database
+   ketika form laporan/kegiatan disimpan, bukan saat marker digeser.
+7. Notifikasi laporan baru menggunakan kanal database Laravel secara langsung;
+   tidak diasumsikan antrean worker, push realtime, email atau WhatsApp.
+8. Ekspor PDF/Excel kegiatan berjalan di browser memakai data dari server.
+9. Arsip maksimal 20 MB menurut validasi aplikasi; konfigurasi PHP/web server
+   juga harus mendukung ukuran request. Diagram tidak mengubah konfigurasi itu.
+10. Monitoring hanya menunjukkan audit yang benar-benar dicatat kode.
+11. Alur kegagalan penting digambar; ini bukan enumerasi semua kegagalan OS/jaringan.
+    Bila database gagal di dalam transaksi, perubahan rollback dan controller
+    membersihkan file baru sesuai implementasinya.
+12. Notifikasi dibuat setelah transaksi laporan selesai. Kegagalan notifikasi
+    tidak otomatis membatalkan laporan yang sudah di-commit.
+
+DAFTAR HALAMAN
+01. Login dan logout — Admin / Super Admin
+02. Pelapor mengirim laporan — Pelapor
+03. Pelapor memantau status — Pelapor
+04. Pelapor memberi feedback — Pelapor
+05. Admin mencatat laporan — Admin
+06. Admin memajukan status — Admin
+07. Admin menyelesaikan laporan — Admin
+08. Daftar detail dan hapus laporan — Admin / Super Admin
+09. Tambah kegiatan internal — Admin / Super Admin
+10. Edit dan hapus kegiatan internal — Admin / Super Admin
+11. Filter dan ekspor kegiatan — Admin / Super Admin
+12. Pencarian dan lokasi saat ini — Admin / Super Admin
+13. Tambah edit hapus evaluasi — Admin
+14. Arsip tambah dan edit — Admin
+15. Arsip lihat unduh dan hapus — Admin
+16. Manajemen aset — Admin
+17. Kelola akun pengguna — Super Admin
+18. Kelola petugas — Super Admin
+19. Kelola unit organisasi — Super Admin
+20. Dashboard monitoring dan peta — Admin / Super Admin
+21. Pencarian notifikasi dan profil — Admin / Super Admin
+
+PENJELASAN PER HALAMAN
+
+=====================================================================================
+SQ01 — Login dan logout
+Aktor: Admin / Super Admin
+Penangan: AuthController
+Referensi use case: C01, C05
+Penjelasan dan aturan:
+Login memeriksa akun aktif. Logout membatalkan sesi. RateLimiter ditampilkan sebagai komponen logis aplikasi, bukan diasumsikan tabel tertentu.
+Urutan pesan dan kondisi:
+1. Admin / Super Admin --> Halaman / Browser: Isi username/email dan kata sandi
+2. Halaman / Browser --> AuthController: POST /login
+3. AuthController --> AuthController: Validasi input; periksa pembatas percobaan
+ALT [batas percobaan terlampaui]
+  4. AuthController --respons--> Halaman / Browser: Pesan tunggu; login ditolak
+ELSE [boleh mencoba]
+  5. AuthController --> Database / Eloquent: Cari akun aktif; autentikasi kredensial
+  6. Database / Eloquent --respons--> AuthController: Hasil autentikasi
+  ALT [kredensial tidak cocok]
+    7. AuthController --> AuthController: Tambah hit percobaan gagal
+    8. AuthController --respons--> Halaman / Browser: Kembali ke login dengan pesan kesalahan
+  ELSE [kredensial cocok]
+    9. AuthController --> AuthController: Bersihkan hit; regenerasi sesi
+    10. AuthController --respons--> Halaman / Browser: Redirect dashboard sesuai role
+    11. Halaman / Browser --respons--> Admin / Super Admin: Tampilkan dashboard
+    OPT [pengguna memilih keluar]
+      12. Admin / Super Admin --> Halaman / Browser: Klik Logout
+      13. Halaman / Browser --> AuthController: POST /logout
+      14. AuthController --> AuthController: Logout; invalidate sesi; regenerasi token
+      15. AuthController --respons--> Halaman / Browser: Redirect beranda publik
+    END
+  END
+END
+
+=====================================================================================
+SQ02 — Pelapor mengirim laporan
+Aktor: Pelapor
+Penangan: PelaporController
+Referensi use case: P01
+Penjelasan dan aturan:
+Tanpa login; NIK wajib untuk darurat; foto opsional maksimal 3 × 5 MB. Token mentah disimpan dalam cookie, hash di database. Notifikasi memakai kanal database, bukan email/WhatsApp.
+Urutan pesan dan kondisi:
+1. Pelapor --> Halaman / Browser: Isi jenis, telepon, NIK sesuai kondisi, deskripsi dan alamat
+2. Pelapor --> Halaman / Browser: Opsional pilih foto; setujui pernyataan; Kirim
+3. Halaman / Browser --> PelaporController: POST /lapor (multipart + cookie tamu)
+4. PelaporController --> PelaporController: StoreGuestReportRequest: validasi
+ALT [input tidak valid]
+  5. PelaporController --respons--> Halaman / Browser: Kembali ke form dengan kesalahan
+ELSE [valid]
+  OPT [foto dilampirkan]
+    6. PelaporController --> Storage lokal: Simpan foto ke reports/evidence
+    7. Storage lokal --respons--> PelaporController: Path dan metadata foto
+  END
+  8. PelaporController --> Database / Eloquent: Temukan akses tamu valid atau buat token hash baru
+  9. Database / Eloquent --respons--> PelaporController: GuestAccess
+  10. PelaporController --> Database / Eloquent: BEGIN; buat kode unik dan laporan Submitted
+  11. PelaporController --> Database / Eloquent: Simpan riwayat dan metadata lampiran
+  ALT [transaksi berhasil]
+    12. PelaporController --> Database / Eloquent: COMMIT
+    13. PelaporController --> Database / Eloquent: Ambil pengguna Admin aktif
+    14. Database / Eloquent --respons--> PelaporController: Daftar penerima
+    15. PelaporController --> Notifikasi Laravel: Kirim NewReportNotification
+    16. Notifikasi Laravel --> Database / Eloquent: Simpan notifikasi database
+    17. PelaporController --respons--> Halaman / Browser: Redirect /lapor + kode + cookie akses tamu
+    18. Halaman / Browser --respons--> Pelapor: Tampilkan kode laporan
+  ELSE [penyimpanan/transaksi gagal]
+    19. PelaporController --> Database / Eloquent: ROLLBACK bila transaksi dimulai
+    20. PelaporController --> Storage lokal: Bersihkan foto yang sempat tersimpan
+    21. PelaporController --respons--> Halaman / Browser: Permintaan gagal; laporan belum berhasil dibuat
+  END
+END
+
+=====================================================================================
+SQ03 — Pelapor memantau status
+Aktor: Pelapor
+Penangan: PelaporController
+Referensi use case: P02
+Penjelasan dan aturan:
+Daftar berasal dari cookie akses tamu valid pada browser tersebut. Kode laporan bukan pengganti cookie untuk mengambil laporan milik sendiri.
+Urutan pesan dan kondisi:
+1. Pelapor --> Halaman / Browser: Buka menu Status
+2. Halaman / Browser --> PelaporController: GET /status dengan cookie sipraja_guest_token
+3. PelaporController --> Database / Eloquent: Cocokkan hash token dan masa berlaku
+4. Database / Eloquent --respons--> PelaporController: Akses tamu atau tidak ditemukan
+ALT [akses tidak valid / cookie tidak ada]
+  5. PelaporController --respons--> Halaman / Browser: Halaman status dengan daftar kosong
+ELSE [akses valid]
+  6. PelaporController --> Database / Eloquent: Perbarui last_used_at; ambil laporan dan riwayat milik akses
+  7. Database / Eloquent --respons--> PelaporController: Laporan terurut terbaru
+  8. PelaporController --> PelaporController: Susun data status dan informasi feedback
+  9. PelaporController --respons--> Halaman / Browser: Render halaman Status
+  10. Halaman / Browser --respons--> Pelapor: Tampilkan daftar dan tahap laporan
+END
+
+=====================================================================================
+SQ04 — Pelapor memberi feedback
+Aktor: Pelapor
+Penangan: PelaporController
+Referensi use case: P03
+Penjelasan dan aturan:
+Rating 1–5, komentar opsional. Kepemilikan dan status selesai diperiksa server. Feedback kedua ditolak dengan 409.
+Urutan pesan dan kondisi:
+1. Pelapor --> Halaman / Browser: Pilih laporan selesai; isi rating dan komentar
+2. Halaman / Browser --> PelaporController: POST /status/{code}/feedback
+3. PelaporController --> PelaporController: Validasi rating/komentar
+ALT [input salah]
+  4. PelaporController --respons--> Halaman / Browser: Kesalahan validasi
+ELSE [input valid]
+  5. PelaporController --> Database / Eloquent: Periksa akses tamu dan kepemilikan laporan
+  6. Database / Eloquent --respons--> PelaporController: Hasil pemeriksaan
+  ALT [bukan pemilik / akses tidak valid]
+    7. PelaporController --respons--> Halaman / Browser: 404
+  ELSE [pemilik sah]
+    8. PelaporController --> Database / Eloquent: BEGIN; lockForUpdate laporan
+    9. Database / Eloquent --respons--> PelaporController: Status dan feedback terbaru
+    ALT [belum selesai]
+      10. PelaporController --> Database / Eloquent: ROLLBACK
+      11. PelaporController --respons--> Halaman / Browser: 404
+    ELSE [feedback sudah dikirim]
+      12. PelaporController --> Database / Eloquent: ROLLBACK
+      13. PelaporController --respons--> Halaman / Browser: 409: feedback sudah pernah dikirim
+    ELSE [selesai dan belum feedback]
+      14. PelaporController --> Database / Eloquent: UPDATE rating, komentar, waktu; COMMIT
+      15. PelaporController --respons--> Halaman / Browser: JSON feedback berhasil disimpan
+      16. Halaman / Browser --respons--> Pelapor: Tampilkan keberhasilan
+    END
+  END
+END
+
+=====================================================================================
+SQ05 — Admin mencatat laporan
+Aktor: Admin
+Penangan: AdminReportController
+Referensi use case: A02
+Penjelasan dan aturan:
+Online wajib platform; offline wajib NIK 16 digit. Koordinat wajib, kategori tidak diminta. Foto opsional maksimal 3 × 5 MB.
+Urutan pesan dan kondisi:
+1. Admin --> Halaman / Browser: Buka Tambah Laporan
+2. Halaman / Browser --> AdminReportController: GET /admin/pengaduan/create
+3. AdminReportController --respons--> Halaman / Browser: Form sumber, identitas, lokasi dan bukti
+4. Admin --> Halaman / Browser: Pilih sumber; isi identitas dan deskripsi
+ALT [online]
+  5. Halaman / Browser --> Halaman / Browser: Tampilkan pilihan platform; NIK tidak wajib
+ELSE [offline]
+  6. Halaman / Browser --> Halaman / Browser: Wajibkan NIK; sembunyikan platform
+END
+7. Admin --> Halaman / Browser: Pilih titik lokasi dan foto opsional; Simpan
+8. Halaman / Browser --> AdminReportController: POST /admin/pengaduan
+9. AdminReportController --> AdminReportController: Validasi melalui StoreAdminReportRequest
+ALT [tidak valid]
+  10. AdminReportController --respons--> Halaman / Browser: Kembali ke form dengan kesalahan
+ELSE [valid]
+  OPT [ada foto]
+    11. AdminReportController --> Storage lokal: Simpan bukti
+    12. Storage lokal --respons--> AdminReportController: Path foto
+  END
+  13. AdminReportController --> Database / Eloquent: Transaksi: buat laporan Submitted, riwayat dan lampiran
+  ALT [berhasil]
+    14. Database / Eloquent --respons--> AdminReportController: Data tersimpan
+    15. AdminReportController --> Database / Eloquent: Ambil Admin aktif; simpan NewReportNotification via kanal database
+    16. AdminReportController --respons--> Halaman / Browser: Redirect detail laporan
+  ELSE [gagal]
+    17. AdminReportController --> Storage lokal: Bersihkan bukti yang sempat disimpan
+    18. AdminReportController --respons--> Halaman / Browser: Permintaan gagal
+  END
+END
+
+=====================================================================================
+SQ06 — Admin memajukan status
+Aktor: Admin
+Penangan: ReportStatusController
+Referensi use case: A03
+Penjelasan dan aturan:
+Tidak ada alur status ditolak atau kembali ke tahap sebelumnya. Ditindaklanjuti hanya dapat diselesaikan melalui form penyelesaian.
+Urutan pesan dan kondisi:
+1. Admin --> Halaman / Browser: Buka detail; klik tahap berikutnya dan isi catatan opsional
+2. Halaman / Browser --> ReportStatusController: PATCH /admin/pengaduan/{code}/status
+3. ReportStatusController --> ReportStatusController: Validasi current_status dan catatan
+4. ReportStatusController --> Database / Eloquent: BEGIN; lockForUpdate laporan
+5. Database / Eloquent --respons--> ReportStatusController: Status terbaru
+ALT [status awal sudah berubah]
+  6. ReportStatusController --> Database / Eloquent: ROLLBACK
+  7. ReportStatusController --respons--> Halaman / Browser: Minta muat ulang halaman
+ELSE [status cocok]
+  8. ReportStatusController --> ReportStatusController: Hitung nextProcessingStatus
+  ALT [tidak ada tahap berikutnya]
+    9. ReportStatusController --> Database / Eloquent: ROLLBACK
+    10. ReportStatusController --respons--> Halaman / Browser: Gunakan penyelesaian / laporan sudah selesai
+  ELSE [tahap berikutnya tersedia]
+    11. ReportStatusController --> Database / Eloquent: UPDATE status; INSERT riwayat dan audit; COMMIT
+    12. ReportStatusController --respons--> Halaman / Browser: Redirect detail dengan status baru
+    13. Halaman / Browser --respons--> Admin: Dibuat → Diterima → Diverifikasi → Ditindaklanjuti
+  END
+END
+
+=====================================================================================
+SQ07 — Admin menyelesaikan laporan
+Aktor: Admin
+Penangan: CompleteReportController
+Referensi use case: A04, A05
+Penjelasan dan aturan:
+Bukti 1–3 foto, minimal satu petugas aktif, tanggal tidak melewati hari ini. Semua perubahan DB berada dalam satu transaksi. Penyimpanan file mendahului transaksi dan dibersihkan bila gagal.
+Urutan pesan dan kondisi:
+1. Admin --> Halaman / Browser: Isi nama, tanggal, hasil, lokasi/koordinat dan petugas
+2. Admin --> Halaman / Browser: Unggah bukti; Simpan dan Buat Kegiatan Eksternal
+3. Halaman / Browser --> CompleteReportController: POST /admin/pengaduan/{code}/complete
+4. CompleteReportController --> CompleteReportController: Validasi form penyelesaian
+ALT [input tidak valid]
+  5. CompleteReportController --respons--> Halaman / Browser: Kembali dengan kesalahan
+ELSE [input valid]
+  6. CompleteReportController --> Storage lokal: Simpan foto penanganan
+  7. Storage lokal --respons--> CompleteReportController: Path dan metadata
+  8. CompleteReportController --> Database / Eloquent: BEGIN; kunci laporan; cek kegiatan termasuk terhapus
+  9. CompleteReportController --> Database / Eloquent: Kunci dan periksa petugas aktif
+  10. Database / Eloquent --respons--> CompleteReportController: Status, kegiatan dan petugas terbaru
+  ALT [status berubah / bukan InProgress / kegiatan sudah ada / petugas tidak aktif]
+    11. CompleteReportController --> Database / Eloquent: ROLLBACK
+    12. CompleteReportController --> Storage lokal: Hapus foto baru
+    13. CompleteReportController --respons--> Halaman / Browser: Tolak; muat ulang/perbaiki form
+  ELSE [pemeriksaan lolos]
+    14. CompleteReportController --> Database / Eloquent: INSERT kegiatan External, report_id, category NULL
+    15. CompleteReportController --> Database / Eloquent: INSERT relasi petugas dan lampiran public
+    16. CompleteReportController --> Database / Eloquent: UPDATE laporan Completed, waktu, latitude dan longitude
+    17. CompleteReportController --> Database / Eloquent: INSERT riwayat dan audit; COMMIT
+    18. CompleteReportController --respons--> Halaman / Browser: Redirect detail laporan selesai
+    19. Halaman / Browser --respons--> Admin: Tampilkan hasil, peta dan preview penanganan
+  END
+END
+
+=====================================================================================
+SQ08 — Daftar detail dan hapus laporan
+Aktor: Admin / Super Admin
+Penangan: AdminController + AdminReportController
+Referensi use case: A01, A06, A07, K07
+Penjelasan dan aturan:
+Daftar pengaduan, feedback dan penghapusan hanya admin. Super admin membuka detail terkait kegiatan dengan mode baca saja. Lampiran diambil melalui endpoint terotorisasi.
+Urutan pesan dan kondisi:
+1. Admin / Super Admin --> Halaman / Browser: Pilih daftar/detail laporan yang diizinkan
+2. Halaman / Browser --> AdminController + AdminReportController: GET halaman sesuai role
+3. AdminController + AdminReportController --> Database / Eloquent: Ambil laporan, relasi, riwayat dan data detail
+4. Database / Eloquent --respons--> AdminController + AdminReportController: Data laporan
+5. AdminController + AdminReportController --respons--> Halaman / Browser: Render detail; super admin baca saja
+OPT [browser memuat bukti]
+  6. Halaman / Browser --> AdminController + AdminReportController: GET endpoint lampiran yang sesuai
+  7. AdminController + AdminReportController --> AdminController + AdminReportController: Periksa relasi, audience dan jenis file
+  8. AdminController + AdminReportController --> Storage lokal: Periksa keberadaan; baca file
+  9. Storage lokal --respons--> AdminController + AdminReportController: Isi gambar
+  10. AdminController + AdminReportController --respons--> Halaman / Browser: Stream gambar dengan header aman
+END
+OPT [Admin memilih hapus dan konfirmasi]
+  11. Halaman / Browser --> AdminController + AdminReportController: DELETE /admin/pengaduan/{code}
+  12. AdminController + AdminReportController --> Database / Eloquent: Soft delete laporan dan simpan audit
+  13. AdminController + AdminReportController --respons--> Halaman / Browser: Kembali ke daftar aktif
+END
+OPT [Admin membuka Feedback]
+  14. Halaman / Browser --> AdminController + AdminReportController: GET /admin/feedback
+  15. AdminController + AdminReportController --> Database / Eloquent: Ambil feedback laporan
+  16. Database / Eloquent --respons--> AdminController + AdminReportController: Rating dan komentar
+  17. AdminController + AdminReportController --respons--> Halaman / Browser: Render halaman feedback
+END
+
+=====================================================================================
+SQ09 — Tambah kegiatan internal
+Aktor: Admin / Super Admin
+Penangan: ActivityController
+Referensi use case: K02
+Penjelasan dan aturan:
+Kategori berasal dari nama template aktif. Template pilihan opsional; kategori dan minimal satu petugas aktif wajib. Dokumentasi opsional maksimal 3 × 5 MB.
+Urutan pesan dan kondisi:
+1. Admin / Super Admin --> Halaman / Browser: Buka Tambah Kegiatan
+2. Halaman / Browser --> ActivityController: GET kegiatan/create sesuai role
+3. ActivityController --> Database / Eloquent: Ambil template aktif dan petugas aktif
+4. Database / Eloquent --respons--> ActivityController: Pilihan form
+5. ActivityController --respons--> Halaman / Browser: Render form kegiatan
+OPT [pilih template]
+  6. Admin / Super Admin --> Halaman / Browser: Pilih template kegiatan
+  7. Halaman / Browser --> Halaman / Browser: Isi nama, kategori dan deskripsi otomatis
+END
+8. Admin / Super Admin --> Halaman / Browser: Lengkapi tanggal, lokasi, kategori, petugas dan foto
+9. Halaman / Browser --> ActivityController: POST kegiatan sesuai role
+10. ActivityController --> ActivityController: Validasi StoreInternalActivityRequest
+ALT [validasi gagal]
+  11. ActivityController --respons--> Halaman / Browser: Kesalahan form
+ELSE [valid]
+  OPT [ada foto]
+    12. ActivityController --> Storage lokal: Simpan dokumentasi internal
+    13. Storage lokal --respons--> ActivityController: Path foto
+  END
+  14. ActivityController --> Database / Eloquent: BEGIN; kunci dan periksa petugas/template aktif
+  ALT [referensi sudah tidak aktif]
+    15. ActivityController --> Database / Eloquent: ROLLBACK
+    16. ActivityController --> Storage lokal: Bersihkan foto baru
+    17. ActivityController --respons--> Halaman / Browser: Minta pilih ulang referensi
+  ELSE [referensi valid]
+    18. ActivityController --> Database / Eloquent: INSERT kegiatan Internal; report_id NULL
+    19. ActivityController --> Database / Eloquent: INSERT petugas, lampiran internal, audit; COMMIT
+    20. ActivityController --respons--> Halaman / Browser: Redirect detail kegiatan
+  END
+END
+
+=====================================================================================
+SQ10 — Edit dan hapus kegiatan internal
+Aktor: Admin / Super Admin
+Penangan: ActivityController
+Referensi use case: K03, K04, K05
+Penjelasan dan aturan:
+Tidak berlaku untuk kegiatan eksternal. Edit memeriksa current_updated_at dan total dokumentasi lama + baru maksimal 3. Penghapusan dokumentasi memakai controller lampiran. Saat transaksi penghapusan lampiran gagal, file karantina dipindahkan kembali ke path asal.
+Urutan pesan dan kondisi:
+1. Admin / Super Admin --> Halaman / Browser: Buka kegiatan internal dan pilih aksi
+ALT [Edit]
+  2. Halaman / Browser --> ActivityController: GET kegiatan/{id}/edit
+  3. ActivityController --> Database / Eloquent: Ambil kegiatan dan pilihan form
+  4. Database / Eloquent --respons--> ActivityController: Data tersimpan
+  5. ActivityController --respons--> Halaman / Browser: Form terisi + current_updated_at
+  6. Admin / Super Admin --> Halaman / Browser: Ubah data dan simpan
+  7. Halaman / Browser --> ActivityController: PUT kegiatan/{id} + dokumentasi baru
+  8. ActivityController --> ActivityController: Validasi; pastikan Internal
+  OPT [foto baru]
+    9. ActivityController --> Storage lokal: Simpan foto baru
+  END
+  10. ActivityController --> Database / Eloquent: BEGIN; kunci kegiatan; periksa versi, jumlah foto, referensi
+  ALT [konflik / referensi tidak valid / foto berlebih]
+    11. ActivityController --> Database / Eloquent: ROLLBACK
+    12. ActivityController --> Storage lokal: Bersihkan foto baru
+    13. ActivityController --respons--> Halaman / Browser: Muat ulang atau perbaiki
+  ELSE [valid]
+    14. ActivityController --> Database / Eloquent: UPDATE kegiatan; sync petugas; tambah lampiran dan audit; COMMIT
+    15. ActivityController --respons--> Halaman / Browser: Redirect detail yang diperbarui
+  END
+ELSE [Hapus kegiatan; konfirmasi]
+  16. Halaman / Browser --> ActivityController: DELETE kegiatan/{id}
+  17. ActivityController --> Database / Eloquent: Kunci dan pastikan Internal; soft delete; audit
+  18. ActivityController --respons--> Halaman / Browser: Redirect daftar kegiatan
+ELSE [Hapus dokumentasi; konfirmasi]
+  19. Halaman / Browser --> ActivityController: DELETE endpoint lampiran internal
+  20. ActivityController --> ActivityController: Periksa kepemilikan lampiran dan jenis kegiatan
+  21. ActivityController --> Database / Eloquent: BEGIN; kunci kegiatan dan lampiran
+  22. ActivityController --> Storage lokal: Pindahkan file ke karantina jika ada
+  23. ActivityController --> Database / Eloquent: Hapus metadata lampiran; audit; COMMIT
+  24. ActivityController --> Storage lokal: Hapus file karantina setelah commit
+  25. ActivityController --respons--> Halaman / Browser: Detail dokumentasi diperbarui
+END
+
+=====================================================================================
+SQ11 — Filter dan ekspor kegiatan
+Aktor: Admin / Super Admin
+Penangan: AdminController + endpoint lampiran
+Referensi use case: K01, K06
+Penjelasan dan aturan:
+PDF dan Excel dibuat di browser, bukan endpoint server ekspor dokumen. Data ekspor mengikuti filter dan lampiran diperiksa melalui endpoint yang sesuai.
+Urutan pesan dan kondisi:
+1. Admin / Super Admin --> Halaman / Browser: Pilih kata kunci, bulan/rentang, jenis dan kategori
+2. Halaman / Browser --> AdminController + endpoint lampiran: GET kegiatan dengan filter
+3. AdminController + endpoint lampiran --> Database / Eloquent: Query daftar dan data ekspor beserta relasi
+4. Database / Eloquent --respons--> AdminController + endpoint lampiran: Data sesuai filter
+5. AdminController + endpoint lampiran --respons--> Halaman / Browser: Halaman + exportActivities
+6. Admin / Super Admin --> Halaman / Browser: Klik PDF atau Excel
+ALT [data ekspor kosong]
+  7. Halaman / Browser --respons--> Admin / Super Admin: Tampilkan peringatan tidak ada kegiatan
+ELSE [Excel]
+  8. Halaman / Browser --> Halaman / Browser: Susun worksheet dan workbook dengan XLSX
+  9. Halaman / Browser --respons--> Admin / Super Admin: Unduh file .xlsx
+ELSE [PDF]
+  LOOP [setiap dokumentasi yang dimuat]
+    10. Halaman / Browser --> AdminController + endpoint lampiran: GET gambar melalui endpoint lampiran
+    11. AdminController + endpoint lampiran --> Storage lokal: Baca file yang diizinkan
+    12. Storage lokal --respons--> AdminController + endpoint lampiran: Isi file
+    13. AdminController + endpoint lampiran --respons--> Halaman / Browser: Gambar
+  END
+  14. Halaman / Browser --> Halaman / Browser: Susun tabel dan dokumentasi dengan jsPDF
+  15. Halaman / Browser --respons--> Admin / Super Admin: Unduh file .pdf
+END
+
+=====================================================================================
+SQ12 — Pencarian dan lokasi saat ini
+Aktor: Admin / Super Admin
+Penangan: Tidak ada request simpan pada tahap ini
+Referensi use case: Langkah lokasi pada A02, A04, K02, K03
+Penjelasan dan aturan:
+Komponen peta berjalan di browser. Klik peta memperbarui koordinat saja; pencarian mengisi alamat. Geolokasi mencoba reverse geocode dan tidak otomatis menyimpan ke database.
+Urutan pesan dan kondisi:
+1. Admin / Super Admin --> Halaman / Browser: Pilih cara menentukan lokasi
+ALT [Cari Lokasi]
+  2. Admin / Super Admin --> Halaman / Browser: Isi nama tempat/alamat; klik Cari
+  3. Halaman / Browser --> Nominatim: GET Nominatim search; batas sekitar Kulon Progo
+  4. Nominatim --respons--> Halaman / Browser: Hasil JSON atau kegagalan
+  ALT [hasil ditemukan]
+    5. Halaman / Browser --> Halaman / Browser: Pilih hasil pertama; ubah marker, koordinat dan alamat
+  ELSE [kosong / jaringan gagal]
+    6. Halaman / Browser --respons--> Admin / Super Admin: Pesan lokasi tidak ditemukan / gagal mencari
+  END
+ELSE [Lokasi Saat Ini]
+  7. Halaman / Browser --> Geolocation browser: getCurrentPosition; minta izin lokasi
+  ALT [ditolak / timeout / tidak tersedia]
+    8. Geolocation browser --respons--> Halaman / Browser: Kesalahan geolokasi
+    9. Halaman / Browser --respons--> Admin / Super Admin: Pesan izin atau lokasi gagal
+  ELSE [berhasil]
+    10. Geolocation browser --respons--> Halaman / Browser: Latitude dan longitude
+    11. Halaman / Browser --> Halaman / Browser: Ubah marker dan koordinat
+    12. Halaman / Browser --> Nominatim: GET Nominatim reverse
+    13. Nominatim --respons--> Halaman / Browser: Alamat atau kegagalan
+    14. Halaman / Browser --> Halaman / Browser: Isi alamat jika tersedia; koordinat tetap dipertahankan
+  END
+ELSE [Klik peta / koordinat manual pada form yang mendukung]
+  15. Admin / Super Admin --> Halaman / Browser: Pilih titik / ubah nilai koordinat
+  16. Halaman / Browser --> Halaman / Browser: Sinkronkan marker dan latitude/longitude
+END
+17. Admin / Super Admin --> Halaman / Browser: Simpan form melalui proses kegiatan/laporan terkait
+
+=====================================================================================
+SQ13 — Tambah edit hapus evaluasi
+Aktor: Admin
+Penangan: ActivityEvaluationController
+Referensi use case: E01, E02
+Penjelasan dan aturan:
+Kategori dari seluruh nama template. Eksternal: kategori disabled, kegiatan dapat dipilih bila tersedia. Evaluasi tersimpan pada record Activity, bukan tabel evaluasi terpisah.
+Urutan pesan dan kondisi:
+1. Admin --> Halaman / Browser: Buka Evaluasi
+2. Halaman / Browser --> ActivityEvaluationController: GET /admin/evaluasi
+3. ActivityEvaluationController --> Database / Eloquent: Ambil evaluasi, kegiatan belum dievaluasi dan semua kategori
+4. Database / Eloquent --respons--> ActivityEvaluationController: Data dan pilihan
+5. ActivityEvaluationController --respons--> Halaman / Browser: Render daftar/form
+ALT [Tambah evaluasi]
+  6. Admin --> Halaman / Browser: Pilih sumber
+  ALT [Internal]
+    7. Halaman / Browser --> Halaman / Browser: Aktifkan kategori; filter kegiatan menurut kategori
+  ELSE [Eksternal]
+    8. Halaman / Browser --> Halaman / Browser: Nonaktifkan kategori; tampilkan kegiatan eksternal terkait laporan
+  END
+  ALT [tidak ada kegiatan sesuai pilihan]
+    9. Halaman / Browser --respons--> Admin: Pesan kosong; pilihan kegiatan dinonaktifkan
+  ELSE [kegiatan tersedia]
+    10. Admin --> Halaman / Browser: Pilih kegiatan; isi catatan/kendala; Simpan
+    11. Halaman / Browser --> ActivityEvaluationController: POST /admin/evaluasi
+    12. ActivityEvaluationController --> ActivityEvaluationController: Validasi Form Request
+    13. ActivityEvaluationController --> Database / Eloquent: BEGIN; kunci kegiatan; periksa evaluated_at
+    ALT [sudah dievaluasi]
+      14. ActivityEvaluationController --> Database / Eloquent: ROLLBACK
+      15. ActivityEvaluationController --respons--> Halaman / Browser: 422: kegiatan sudah memiliki evaluasi
+    ELSE [belum]
+      16. ActivityEvaluationController --> Database / Eloquent: UPDATE evaluasi, evaluator, waktu; audit; COMMIT
+      17. ActivityEvaluationController --respons--> Halaman / Browser: Redirect evaluasi berhasil
+    END
+  END
+ELSE [Edit]
+  18. Halaman / Browser --> ActivityEvaluationController: PUT evaluasi/{activity} dengan catatan baru
+  19. ActivityEvaluationController --> Database / Eloquent: Transaksi: periksa evaluasi ada; UPDATE dan audit
+  20. ActivityEvaluationController --respons--> Halaman / Browser: Daftar diperbarui
+ELSE [Hapus; konfirmasi]
+  21. Halaman / Browser --> ActivityEvaluationController: DELETE evaluasi/{activity}
+  22. ActivityEvaluationController --> Database / Eloquent: Transaksi: kosongkan field evaluasi; audit
+  23. ActivityEvaluationController --respons--> Halaman / Browser: Evaluasi dihapus; kegiatan tetap ada
+END
+
+=====================================================================================
+SQ14 — Arsip tambah dan edit
+Aktor: Admin
+Penangan: ArchiveController
+Referensi use case: R01
+Penjelasan dan aturan:
+File maksimal 20 MB; PDF/JPG/JPEG/PNG/DOC/DOCX/ZIP. File baru disimpan sebelum transaksi. File lama diganti hanya setelah transaksi berhasil.
+Urutan pesan dan kondisi:
+1. Admin --> Halaman / Browser: Isi judul, kategori, sifat, deskripsi; pilih file
+2. Halaman / Browser --> ArchiveController: POST arsip / PUT arsip/{id}
+3. ArchiveController --> ArchiveController: UpsertArchiveRequest: validasi metadata dan file
+ALT [tidak valid]
+  4. ArchiveController --respons--> Halaman / Browser: Kesalahan form
+ELSE [valid]
+  OPT [Tambah atau Edit dengan file pengganti]
+    5. ArchiveController --> Storage lokal: Simpan file baru ke archives/files
+    6. Storage lokal --respons--> ArchiveController: Path dan metadata file
+  END
+  7. ArchiveController --> Database / Eloquent: BEGIN; INSERT/UPDATE arsip dan audit
+  ALT [transaksi gagal]
+    8. ArchiveController --> Database / Eloquent: ROLLBACK
+    OPT [file baru tersimpan]
+      9. ArchiveController --> Storage lokal: Hapus file baru
+    END
+    10. ArchiveController --respons--> Halaman / Browser: Permintaan gagal
+  ELSE [transaksi berhasil]
+    11. ArchiveController --> Database / Eloquent: COMMIT
+    OPT [Edit dengan file pengganti]
+      12. ArchiveController --> Storage lokal: Hapus file lama
+    END
+    13. ArchiveController --respons--> Halaman / Browser: Redirect daftar; pesan berhasil
+  END
+END
+
+=====================================================================================
+SQ15 — Arsip lihat unduh dan hapus
+Aktor: Admin
+Penangan: ArchiveController
+Referensi use case: R02, R03
+Penjelasan dan aturan:
+Soft delete arsip tidak sama dengan menghapus fisik file. PDF/gambar yang didukung dapat ditampilkan inline; format lain dikirim sebagai attachment.
+Urutan pesan dan kondisi:
+1. Admin --> Halaman / Browser: Cari/filter arsip
+2. Halaman / Browser --> ArchiveController: GET /admin/arsip dengan filter
+3. ArchiveController --> Database / Eloquent: Query arsip aktif dan statistik
+4. Database / Eloquent --respons--> ArchiveController: Data arsip
+5. ArchiveController --respons--> Halaman / Browser: Render daftar
+ALT [Lihat / Unduh]
+  6. Halaman / Browser --> ArchiveController: GET arsip/{id}/file atau /download
+  7. ArchiveController --> Storage lokal: Periksa file ada
+  ALT [file tidak ada]
+    8. ArchiveController --respons--> Halaman / Browser: 404
+  ELSE [file ada]
+    9. ArchiveController --> Storage lokal: Baca file
+    10. Storage lokal --respons--> ArchiveController: Isi dokumen
+    11. ArchiveController --respons--> Halaman / Browser: Stream inline/attachment atau download
+    12. Halaman / Browser --respons--> Admin: Tampilkan atau simpan file
+  END
+ELSE [Hapus; konfirmasi]
+  13. Halaman / Browser --> ArchiveController: DELETE arsip/{id}
+  14. ArchiveController --> Database / Eloquent: Soft delete arsip; simpan audit
+  15. ArchiveController --respons--> Halaman / Browser: Redirect daftar arsip
+ELSE [Batal]
+  16. Halaman / Browser --> Halaman / Browser: Tutup dialog; tidak mengirim perubahan
+END
+
+=====================================================================================
+SQ16 — Manajemen aset
+Aktor: Admin
+Penangan: AssetController
+Referensi use case: T01, T02
+Penjelasan dan aturan:
+Pajak berupa tanggal, servis oli berupa kilometer servis berikutnya. Jika kategori berubah dari kendaraan, kedua field dihapus nilainya pada penyimpanan.
+Urutan pesan dan kondisi:
+1. Admin --> Halaman / Browser: Buka Aset
+2. Halaman / Browser --> AssetController: GET /admin/aset
+3. AssetController --> Database / Eloquent: Ambil daftar dan ringkasan aset
+4. Database / Eloquent --respons--> AssetController: Data aset
+5. AssetController --respons--> Halaman / Browser: Render halaman
+ALT [Tambah / Edit]
+  6. Admin --> Halaman / Browser: Isi nama, kategori, kondisi dan informasi tambahan
+  ALT [Kendaraan]
+    7. Halaman / Browser --> Halaman / Browser: Tampilkan tanggal pajak dan kilometer servis oli
+  ELSE [Selain kendaraan]
+    8. Halaman / Browser --> Halaman / Browser: Sembunyikan field kendaraan
+  END
+  9. Halaman / Browser --> AssetController: POST / PUT aset
+  10. AssetController --> AssetController: Validasi StoreAssetRequest
+  ALT [invalid]
+    11. AssetController --respons--> Halaman / Browser: Kesalahan field/kode unik
+  ELSE [valid]
+    12. AssetController --> AssetController: Kosongkan data pajak/oli bila bukan kendaraan
+    13. AssetController --> Database / Eloquent: INSERT/UPDATE aset; INSERT audit
+    14. AssetController --respons--> Halaman / Browser: Redirect daftar
+  END
+ELSE [Hapus; konfirmasi]
+  15. Halaman / Browser --> AssetController: DELETE aset/{id}
+  16. AssetController --> Database / Eloquent: Soft delete aset; simpan audit
+  17. AssetController --respons--> Halaman / Browser: Daftar diperbarui
+END
+
+=====================================================================================
+SQ17 — Kelola akun pengguna
+Aktor: Super Admin
+Penangan: SuperAdminController
+Referensi use case: S01–S04
+Penjelasan dan aturan:
+Tambah menghasilkan Admin aktif. Edit tidak mengubah role. Akun yang sedang digunakan tidak dapat diblokir atau dihapus.
+Urutan pesan dan kondisi:
+1. Super Admin --> Halaman / Browser: Buka Manajemen User
+2. Halaman / Browser --> SuperAdminController: GET /super-admin/user
+3. SuperAdminController --> Database / Eloquent: Ambil akun pengguna
+4. Database / Eloquent --respons--> SuperAdminController: Daftar akun
+5. SuperAdminController --respons--> Halaman / Browser: Render daftar
+ALT [Tambah / Edit]
+  6. Super Admin --> Halaman / Browser: Isi nama, username, email opsional dan password
+  7. Halaman / Browser --> SuperAdminController: POST / PUT user
+  8. SuperAdminController --> SuperAdminController: Validasi identitas unik dan password minimal 8
+  ALT [invalid]
+    9. SuperAdminController --respons--> Halaman / Browser: Kesalahan form
+  ELSE [valid]
+    10. SuperAdminController --> Database / Eloquent: INSERT Admin Aktif / UPDATE akun target
+    11. SuperAdminController --respons--> Halaman / Browser: Redirect daftar; sukses
+  END
+ELSE [Blokir/Aktifkan atau Hapus]
+  12. Halaman / Browser --> SuperAdminController: PATCH status / DELETE akun target
+  ALT [target akun sendiri]
+    13. SuperAdminController --respons--> Halaman / Browser: 422: tindakan ditolak
+  ELSE [akun lain]
+    14. SuperAdminController --> Database / Eloquent: Toggle Aktif/Diblokir atau delete akun
+    15. SuperAdminController --respons--> Halaman / Browser: JSON status/keberhasilan
+  END
+ELSE [Batal]
+  16. Halaman / Browser --> Halaman / Browser: Tutup form/dialog tanpa perubahan
+END
+
+=====================================================================================
+SQ18 — Kelola petugas
+Aktor: Super Admin
+Penangan: OfficerController
+Referensi use case: S05, S06
+Penjelasan dan aturan:
+Field petugas: NIP, nama, jabatan, nama satuan kerja, unit kerja. Jabatan/satuan/unit divalidasi terhadap OfficerOptions.
+Urutan pesan dan kondisi:
+1. Super Admin --> Halaman / Browser: Buka Petugas
+2. Halaman / Browser --> OfficerController: GET /super-admin/petugas
+3. OfficerController --> Database / Eloquent: Ambil petugas; susun statistik
+4. Database / Eloquent --respons--> OfficerController: Data petugas
+5. OfficerController --respons--> Halaman / Browser: Render daftar dan pilihan resmi
+ALT [Tambah / Edit]
+  6. Super Admin --> Halaman / Browser: Isi NIP, nama, jabatan, satuan kerja, unit kerja
+  7. Halaman / Browser --> OfficerController: POST / PUT petugas
+  8. OfficerController --> OfficerController: Validasi NIP unik dan opsi resmi
+  ALT [invalid]
+    9. OfficerController --respons--> Halaman / Browser: Pesan validasi
+  ELSE [valid]
+    10. OfficerController --> Database / Eloquent: INSERT status Aktif / UPDATE data petugas
+    11. OfficerController --respons--> Halaman / Browser: Redirect daftar
+  END
+ELSE [Ubah status]
+  12. Halaman / Browser --> OfficerController: PATCH petugas/{id}/status
+  13. OfficerController --> Database / Eloquent: UPDATE Aktif → Cuti → Nonaktif → Aktif
+  14. OfficerController --respons--> Halaman / Browser: JSON status dan label
+ELSE [Hapus; konfirmasi]
+  15. Halaman / Browser --> OfficerController: DELETE petugas/{id}
+  16. OfficerController --> Database / Eloquent: Delete petugas sesuai model
+  17. OfficerController --respons--> Halaman / Browser: JSON keberhasilan
+ELSE [Batal / silang]
+  18. Halaman / Browser --> Halaman / Browser: Tutup form tanpa menyimpan
+END
+
+=====================================================================================
+SQ19 — Kelola unit organisasi
+Aktor: Super Admin
+Penangan: OrganizationalUnitController
+Referensi use case: S07, S08
+Penjelasan dan aturan:
+Kode unik, induk tidak boleh diri sendiri atau keturunannya. Penghapusan unit yang masih memiliki bawahan ditolak.
+Urutan pesan dan kondisi:
+1. Super Admin --> Halaman / Browser: Buka Manajemen Organisasi
+2. Halaman / Browser --> OrganizationalUnitController: GET /super-admin/organisasi
+3. OrganizationalUnitController --> Database / Eloquent: Ambil unit, pimpinan aktif, zona dan statistik
+4. Database / Eloquent --respons--> OrganizationalUnitController: Data pilihan
+5. OrganizationalUnitController --respons--> Halaman / Browser: Render daftar/form
+ALT [Tambah / Edit]
+  6. Super Admin --> Halaman / Browser: Isi nama, tipe, status; kode, induk, zona/pimpinan opsional
+  7. Halaman / Browser --> OrganizationalUnitController: POST / PUT organisasi
+  8. OrganizationalUnitController --> OrganizationalUnitController: Validasi UpsertOrganizationalUnitRequest
+  9. OrganizationalUnitController --> Database / Eloquent: Periksa kode, referensi dan rantai induk saat edit
+  ALT [invalid / struktur siklik]
+    10. OrganizationalUnitController --respons--> Halaman / Browser: Kesalahan form
+  ELSE [valid]
+    11. OrganizationalUnitController --> Database / Eloquent: INSERT / UPDATE unit
+    12. OrganizationalUnitController --respons--> Halaman / Browser: Redirect daftar organisasi
+  END
+ELSE [Hapus; konfirmasi]
+  13. Halaman / Browser --> OrganizationalUnitController: DELETE organisasi/{id}
+  14. OrganizationalUnitController --> Database / Eloquent: Periksa children()->exists()
+  15. Database / Eloquent --respons--> OrganizationalUnitController: Ada / tidak ada bawahan
+  ALT [ada bawahan]
+    16. OrganizationalUnitController --respons--> Halaman / Browser: 422: unit belum dapat dihapus
+  ELSE [tanpa bawahan]
+    17. OrganizationalUnitController --> Database / Eloquent: Delete unit
+    18. OrganizationalUnitController --respons--> Halaman / Browser: JSON berhasil
+  END
+ELSE [Batal / silang]
+  19. Halaman / Browser --> Halaman / Browser: Tutup modal; tidak menyimpan
+END
+
+=====================================================================================
+SQ20 — Dashboard monitoring dan peta
+Aktor: Admin / Super Admin
+Penangan: AdminController / SuperAdminController
+Referensi use case: C02, S09, S10
+Penjelasan dan aturan:
+Dashboard tersedia sesuai role. Monitoring dan peta hanya super admin. Monitoring mengambil maksimal 100 audit terbaru dan tren 7 hari, bukan seluruh aktivitas yang tidak tercatat.
+Urutan pesan dan kondisi:
+1. Admin / Super Admin --> Halaman / Browser: Pilih menu sesuai hak akses
+2. Halaman / Browser --> AdminController / SuperAdminController: GET dashboard / monitoring / peta
+3. AdminController / SuperAdminController --> AdminController / SuperAdminController: Middleware auth dan Gate role
+ALT [akses ditolak]
+  4. AdminController / SuperAdminController --respons--> Halaman / Browser: Redirect login / 403 sesuai kondisi
+ELSE [diizinkan]
+  ALT [Dashboard]
+    5. AdminController / SuperAdminController --> Database / Eloquent: Agregasi statistik sesuai role
+    6. Database / Eloquent --respons--> AdminController / SuperAdminController: Ringkasan
+    7. AdminController / SuperAdminController --respons--> Halaman / Browser: Render dashboard
+  ELSE [Monitoring — Super Admin]
+    8. AdminController / SuperAdminController --> Database / Eloquent: Ambil 100 audit terbaru + statistik hari ini/tren 7 hari
+    9. Database / Eloquent --respons--> AdminController / SuperAdminController: Log dan data grafik
+    10. AdminController / SuperAdminController --respons--> Halaman / Browser: Render monitoring
+  ELSE [Peta — Super Admin]
+    11. AdminController / SuperAdminController --> Database / Eloquent: Ambil laporan/kegiatan berkoordinat dan data grafik
+    12. Database / Eloquent --respons--> AdminController / SuperAdminController: Titik dan ringkasan
+    13. AdminController / SuperAdminController --respons--> Halaman / Browser: Render halaman dengan data marker
+    14. Halaman / Browser --> Sumber tile/batas peta: Muat tile peta dan batas wilayah
+    15. Sumber tile/batas peta --respons--> Halaman / Browser: Data visual peta
+    16. Admin / Super Admin --> Halaman / Browser: Jelajahi peta; klik marker
+    17. Halaman / Browser --respons--> Admin / Super Admin: Tampilkan informasi titik
+  END
+END
+
+=====================================================================================
+SQ21 — Pencarian notifikasi dan profil
+Aktor: Admin / Super Admin
+Penangan: GlobalSearch / Notification / ProfileController
+Referensi use case: C03, C04, A08
+Penjelasan dan aturan:
+Semua route memerlukan login. Profil mandiri hanya admin. Hasil pencarian diarahkan sesuai role. Notifikasi hanya milik akun sendiri.
+Urutan pesan dan kondisi:
+1. Admin / Super Admin --> Halaman / Browser: Pilih fungsi
+ALT [Pencarian global]
+  2. Halaman / Browser --> GlobalSearch / Notification / ProfileController: GET /global-search?q=...
+  3. GlobalSearch / Notification / ProfileController --> GlobalSearch / Notification / ProfileController: Validasi kata kunci 2–100; throttle 60/menit
+  4. GlobalSearch / Notification / ProfileController --> Database / Eloquent: Cari maksimal 5 laporan, 5 kegiatan, 5 petugas
+  5. Database / Eloquent --respons--> GlobalSearch / Notification / ProfileController: Hasil pencarian
+  6. GlobalSearch / Notification / ProfileController --> GlobalSearch / Notification / ProfileController: Bentuk tautan sesuai role
+  7. GlobalSearch / Notification / ProfileController --respons--> Halaman / Browser: JSON hasil
+  8. Admin / Super Admin --> Halaman / Browser: Pilih hasil; buka halaman terkait
+ELSE [Notifikasi]
+  9. Halaman / Browser --> GlobalSearch / Notification / ProfileController: GET /notifications
+  10. GlobalSearch / Notification / ProfileController --> Database / Eloquent: Ambil 10 terbaru milik akun + jumlah belum dibaca
+  11. Database / Eloquent --respons--> GlobalSearch / Notification / ProfileController: Data notifikasi
+  12. GlobalSearch / Notification / ProfileController --respons--> Halaman / Browser: JSON daftar
+  OPT [Tandai satu / semua dibaca]
+    13. Halaman / Browser --> GlobalSearch / Notification / ProfileController: POST endpoint read / read-all
+    14. GlobalSearch / Notification / ProfileController --> Database / Eloquent: UPDATE read_at milik akun sendiri
+    15. GlobalSearch / Notification / ProfileController --respons--> Halaman / Browser: Redirect tautan internal atau halaman sebelumnya
+  END
+ELSE [Profil — Admin]
+  16. Admin / Super Admin --> Halaman / Browser: Ubah nama/username/email; password opsional
+  17. Halaman / Browser --> GlobalSearch / Notification / ProfileController: PUT /admin/profile
+  18. GlobalSearch / Notification / ProfileController --> GlobalSearch / Notification / ProfileController: Validasi unik; password lama/konfirmasi jika diganti
+  ALT [invalid]
+    19. GlobalSearch / Notification / ProfileController --respons--> Halaman / Browser: Kesalahan form
+  ELSE [valid]
+    20. GlobalSearch / Notification / ProfileController --> Database / Eloquent: UPDATE profil; INSERT audit tanpa password mentah
+    21. GlobalSearch / Notification / ProfileController --respons--> Halaman / Browser: Redirect profil berhasil
+  END
+END
+
+SUMBER KODE
+- routes/web.php: route dan pembagian hak akses.
+- app/Http/Controllers/AuthController.php: autentikasi, pembatas percobaan, logout.
+- PelaporController.php, AdminReportController.php, ReportStatusController.php:
+  pencatatan, akses tamu, feedback dan status laporan.
+- CompleteReportController.php: penyelesaian, transaksi dan kegiatan eksternal.
+- ActivityController.php, InternalActivityAttachmentController.php:
+  kegiatan internal, konflik edit dan penghapusan file melalui karantina.
+- AdminController.php dan resources/views/admin/kegiatan.blade.php:
+  data daftar, detail dan ekspor kegiatan di browser.
+- ActivityEvaluationController.php, ArchiveController.php, AssetController.php:
+  pengelolaan operasional.
+- SuperAdminController.php, OfficerController.php, OrganizationalUnitController.php:
+  administrasi, monitoring dan peta.
+- GlobalSearchController.php, NotificationController.php, ProfileController.php:
+  fitur akun dan navigasi.
+- app/Http/Requests/: validasi sebelum controller.
+- app/Notifications/NewReportNotification.php: notifikasi database.
+- public/js/kulon-progo-map.js: geocoding dan geolokasi.
+
+PENGGUNAAN UNTUK DOKUMENTASI
+Diagram memakai peserta logis agar dapat dibaca sebagai dokumentasi sistem,
+bukan tracing setiap pemanggilan framework. Cabang CRUD pada satu halaman adalah
+pilihan operasi berbeda, bukan perintah untuk melakukan semuanya berurutan.
+Kode referensi mengarah ke dokumen use case yang telah dibuat sebelumnya.

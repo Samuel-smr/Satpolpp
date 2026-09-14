@@ -1,0 +1,829 @@
+' Pilih satu blok @startuml ... @enduml untuk editor PlantUML.
+
+@startuml SQ01
+title SQ01 - Login dan logout
+hide footbox
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 55
+autonumber
+actor "Admin / Super Admin" as A
+participant "Halaman / Browser" as B
+participant "AuthController" as C
+database "Database / Eloquent" as D
+A -> B : Isi username/email dan kata sandi
+B -> C : POST /login
+C -> C : Validasi input; periksa pembatas percobaan
+alt batas percobaan terlampaui
+C --> B : Pesan tunggu; login ditolak
+else boleh mencoba
+C -> D : Cari akun aktif; autentikasi kredensial
+D --> C : Hasil autentikasi
+alt kredensial tidak cocok
+C -> C : Tambah hit percobaan gagal
+C --> B : Kembali ke login dengan pesan kesalahan
+else kredensial cocok
+C -> C : Bersihkan hit; regenerasi sesi
+C --> B : Redirect dashboard sesuai role
+B --> A : Tampilkan dashboard
+opt pengguna memilih keluar
+A -> B : Klik Logout
+B -> C : POST /logout
+C -> C : Logout; invalidate sesi; regenerasi token
+C --> B : Redirect beranda publik
+end
+end
+end
+@enduml
+
+@startuml SQ02
+title SQ02 - Pelapor mengirim laporan
+hide footbox
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 55
+autonumber
+actor "Pelapor" as A
+participant "Halaman / Browser" as B
+participant "PelaporController" as C
+database "Database / Eloquent" as D
+participant "Storage lokal" as F
+participant "Notifikasi Laravel" as N
+A -> B : Isi jenis, telepon, NIK sesuai kondisi, deskripsi dan alamat
+A -> B : Opsional pilih foto; setujui pernyataan; Kirim
+B -> C : POST /lapor (multipart + cookie tamu)
+C -> C : StoreGuestReportRequest: validasi
+alt input tidak valid
+C --> B : Kembali ke form dengan kesalahan
+else valid
+opt foto dilampirkan
+C -> F : Simpan foto ke reports/evidence
+F --> C : Path dan metadata foto
+end
+C -> D : Temukan akses tamu valid atau buat token hash baru
+D --> C : GuestAccess
+C -> D : BEGIN; buat kode unik dan laporan Submitted
+C -> D : Simpan riwayat dan metadata lampiran
+alt transaksi berhasil
+C -> D : COMMIT
+C -> D : Ambil pengguna Admin aktif
+D --> C : Daftar penerima
+C -> N : Kirim NewReportNotification
+N -> D : Simpan notifikasi database
+C --> B : Redirect /lapor + kode + cookie akses tamu
+B --> A : Tampilkan kode laporan
+else penyimpanan/transaksi gagal
+C -> D : ROLLBACK bila transaksi dimulai
+C -> F : Bersihkan foto yang sempat tersimpan
+C --> B : Permintaan gagal; laporan belum berhasil dibuat
+end
+end
+@enduml
+
+@startuml SQ03
+title SQ03 - Pelapor memantau status
+hide footbox
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 55
+autonumber
+actor "Pelapor" as A
+participant "Halaman / Browser" as B
+participant "PelaporController" as C
+database "Database / Eloquent" as D
+A -> B : Buka menu Status
+B -> C : GET /status dengan cookie sipraja_guest_token
+C -> D : Cocokkan hash token dan masa berlaku
+D --> C : Akses tamu atau tidak ditemukan
+alt akses tidak valid / cookie tidak ada
+C --> B : Halaman status dengan daftar kosong
+else akses valid
+C -> D : Perbarui last_used_at; ambil laporan dan riwayat milik akses
+D --> C : Laporan terurut terbaru
+C -> C : Susun data status dan informasi feedback
+C --> B : Render halaman Status
+B --> A : Tampilkan daftar dan tahap laporan
+end
+@enduml
+
+@startuml SQ04
+title SQ04 - Pelapor memberi feedback
+hide footbox
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 55
+autonumber
+actor "Pelapor" as A
+participant "Halaman / Browser" as B
+participant "PelaporController" as C
+database "Database / Eloquent" as D
+A -> B : Pilih laporan selesai; isi rating dan komentar
+B -> C : POST /status/{code}/feedback
+C -> C : Validasi rating/komentar
+alt input salah
+C --> B : Kesalahan validasi
+else input valid
+C -> D : Periksa akses tamu dan kepemilikan laporan
+D --> C : Hasil pemeriksaan
+alt bukan pemilik / akses tidak valid
+C --> B : 404
+else pemilik sah
+C -> D : BEGIN; lockForUpdate laporan
+D --> C : Status dan feedback terbaru
+alt belum selesai
+C -> D : ROLLBACK
+C --> B : 404
+else feedback sudah dikirim
+C -> D : ROLLBACK
+C --> B : 409: feedback sudah pernah dikirim
+else selesai dan belum feedback
+C -> D : UPDATE rating, komentar, waktu; COMMIT
+C --> B : JSON feedback berhasil disimpan
+B --> A : Tampilkan keberhasilan
+end
+end
+end
+@enduml
+
+@startuml SQ05
+title SQ05 - Admin mencatat laporan
+hide footbox
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 55
+autonumber
+actor "Admin" as A
+participant "Halaman / Browser" as B
+participant "AdminReportController" as C
+database "Database / Eloquent" as D
+participant "Storage lokal" as F
+A -> B : Buka Tambah Laporan
+B -> C : GET /admin/pengaduan/create
+C --> B : Form sumber, identitas, lokasi dan bukti
+A -> B : Pilih sumber; isi identitas dan deskripsi
+alt online
+B -> B : Tampilkan pilihan platform; NIK tidak wajib
+else offline
+B -> B : Wajibkan NIK; sembunyikan platform
+end
+A -> B : Pilih titik lokasi dan foto opsional; Simpan
+B -> C : POST /admin/pengaduan
+C -> C : Validasi melalui StoreAdminReportRequest
+alt tidak valid
+C --> B : Kembali ke form dengan kesalahan
+else valid
+opt ada foto
+C -> F : Simpan bukti
+F --> C : Path foto
+end
+C -> D : Transaksi: buat laporan Submitted, riwayat dan lampiran
+alt berhasil
+D --> C : Data tersimpan
+C -> D : Ambil Admin aktif; simpan NewReportNotification via kanal database
+C --> B : Redirect detail laporan
+else gagal
+C -> F : Bersihkan bukti yang sempat disimpan
+C --> B : Permintaan gagal
+end
+end
+@enduml
+
+@startuml SQ06
+title SQ06 - Admin memajukan status
+hide footbox
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 55
+autonumber
+actor "Admin" as A
+participant "Halaman / Browser" as B
+participant "ReportStatusController" as C
+database "Database / Eloquent" as D
+A -> B : Buka detail; klik tahap berikutnya dan isi catatan opsional
+B -> C : PATCH /admin/pengaduan/{code}/status
+C -> C : Validasi current_status dan catatan
+C -> D : BEGIN; lockForUpdate laporan
+D --> C : Status terbaru
+alt status awal sudah berubah
+C -> D : ROLLBACK
+C --> B : Minta muat ulang halaman
+else status cocok
+C -> C : Hitung nextProcessingStatus
+alt tidak ada tahap berikutnya
+C -> D : ROLLBACK
+C --> B : Gunakan penyelesaian / laporan sudah selesai
+else tahap berikutnya tersedia
+C -> D : UPDATE status; INSERT riwayat dan audit; COMMIT
+C --> B : Redirect detail dengan status baru
+B --> A : Dibuat → Diterima → Diverifikasi → Ditindaklanjuti
+end
+end
+@enduml
+
+@startuml SQ07
+title SQ07 - Admin menyelesaikan laporan
+hide footbox
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 55
+autonumber
+actor "Admin" as A
+participant "Halaman / Browser" as B
+participant "CompleteReportController" as C
+database "Database / Eloquent" as D
+participant "Storage lokal" as F
+A -> B : Isi nama, tanggal, hasil, lokasi/koordinat dan petugas
+A -> B : Unggah bukti; Simpan dan Buat Kegiatan Eksternal
+B -> C : POST /admin/pengaduan/{code}/complete
+C -> C : Validasi form penyelesaian
+alt input tidak valid
+C --> B : Kembali dengan kesalahan
+else input valid
+C -> F : Simpan foto penanganan
+F --> C : Path dan metadata
+C -> D : BEGIN; kunci laporan; cek kegiatan termasuk terhapus
+C -> D : Kunci dan periksa petugas aktif
+D --> C : Status, kegiatan dan petugas terbaru
+alt status berubah / bukan InProgress / kegiatan sudah ada / petugas tidak aktif
+C -> D : ROLLBACK
+C -> F : Hapus foto baru
+C --> B : Tolak; muat ulang/perbaiki form
+else pemeriksaan lolos
+C -> D : INSERT kegiatan External, report_id, category NULL
+C -> D : INSERT relasi petugas dan lampiran public
+C -> D : UPDATE laporan Completed, waktu, latitude dan longitude
+C -> D : INSERT riwayat dan audit; COMMIT
+C --> B : Redirect detail laporan selesai
+B --> A : Tampilkan hasil, peta dan preview penanganan
+end
+end
+@enduml
+
+@startuml SQ08
+title SQ08 - Daftar detail dan hapus laporan
+hide footbox
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 55
+autonumber
+actor "Admin / Super Admin" as A
+participant "Halaman / Browser" as B
+participant "AdminController + AdminReportController" as C
+database "Database / Eloquent" as D
+participant "Storage lokal" as F
+A -> B : Pilih daftar/detail laporan yang diizinkan
+B -> C : GET halaman sesuai role
+C -> D : Ambil laporan, relasi, riwayat dan data detail
+D --> C : Data laporan
+C --> B : Render detail; super admin baca saja
+opt browser memuat bukti
+B -> C : GET endpoint lampiran yang sesuai
+C -> C : Periksa relasi, audience dan jenis file
+C -> F : Periksa keberadaan; baca file
+F --> C : Isi gambar
+C --> B : Stream gambar dengan header aman
+end
+opt Admin memilih hapus dan konfirmasi
+B -> C : DELETE /admin/pengaduan/{code}
+C -> D : Soft delete laporan dan simpan audit
+C --> B : Kembali ke daftar aktif
+end
+opt Admin membuka Feedback
+B -> C : GET /admin/feedback
+C -> D : Ambil feedback laporan
+D --> C : Rating dan komentar
+C --> B : Render halaman feedback
+end
+@enduml
+
+@startuml SQ09
+title SQ09 - Tambah kegiatan internal
+hide footbox
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 55
+autonumber
+actor "Admin / Super Admin" as A
+participant "Halaman / Browser" as B
+participant "ActivityController" as C
+database "Database / Eloquent" as D
+participant "Storage lokal" as F
+A -> B : Buka Tambah Kegiatan
+B -> C : GET kegiatan/create sesuai role
+C -> D : Ambil template aktif dan petugas aktif
+D --> C : Pilihan form
+C --> B : Render form kegiatan
+opt pilih template
+A -> B : Pilih template kegiatan
+B -> B : Isi nama, kategori dan deskripsi otomatis
+end
+A -> B : Lengkapi tanggal, lokasi, kategori, petugas dan foto
+B -> C : POST kegiatan sesuai role
+C -> C : Validasi StoreInternalActivityRequest
+alt validasi gagal
+C --> B : Kesalahan form
+else valid
+opt ada foto
+C -> F : Simpan dokumentasi internal
+F --> C : Path foto
+end
+C -> D : BEGIN; kunci dan periksa petugas/template aktif
+alt referensi sudah tidak aktif
+C -> D : ROLLBACK
+C -> F : Bersihkan foto baru
+C --> B : Minta pilih ulang referensi
+else referensi valid
+C -> D : INSERT kegiatan Internal; report_id NULL
+C -> D : INSERT petugas, lampiran internal, audit; COMMIT
+C --> B : Redirect detail kegiatan
+end
+end
+@enduml
+
+@startuml SQ10
+title SQ10 - Edit dan hapus kegiatan internal
+hide footbox
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 55
+autonumber
+actor "Admin / Super Admin" as A
+participant "Halaman / Browser" as B
+participant "ActivityController" as C
+database "Database / Eloquent" as D
+participant "Storage lokal" as F
+A -> B : Buka kegiatan internal dan pilih aksi
+alt Edit
+B -> C : GET kegiatan/{id}/edit
+C -> D : Ambil kegiatan dan pilihan form
+D --> C : Data tersimpan
+C --> B : Form terisi + current_updated_at
+A -> B : Ubah data dan simpan
+B -> C : PUT kegiatan/{id} + dokumentasi baru
+C -> C : Validasi; pastikan Internal
+opt foto baru
+C -> F : Simpan foto baru
+end
+C -> D : BEGIN; kunci kegiatan; periksa versi, jumlah foto, referensi
+alt konflik / referensi tidak valid / foto berlebih
+C -> D : ROLLBACK
+C -> F : Bersihkan foto baru
+C --> B : Muat ulang atau perbaiki
+else valid
+C -> D : UPDATE kegiatan; sync petugas; tambah lampiran dan audit; COMMIT
+C --> B : Redirect detail yang diperbarui
+end
+else Hapus kegiatan; konfirmasi
+B -> C : DELETE kegiatan/{id}
+C -> D : Kunci dan pastikan Internal; soft delete; audit
+C --> B : Redirect daftar kegiatan
+else Hapus dokumentasi; konfirmasi
+B -> C : DELETE endpoint lampiran internal
+C -> C : Periksa kepemilikan lampiran dan jenis kegiatan
+C -> D : BEGIN; kunci kegiatan dan lampiran
+C -> F : Pindahkan file ke karantina jika ada
+C -> D : Hapus metadata lampiran; audit; COMMIT
+C -> F : Hapus file karantina setelah commit
+C --> B : Detail dokumentasi diperbarui
+end
+@enduml
+
+@startuml SQ11
+title SQ11 - Filter dan ekspor kegiatan
+hide footbox
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 55
+autonumber
+actor "Admin / Super Admin" as A
+participant "Halaman / Browser" as B
+participant "AdminController + endpoint lampiran" as C
+database "Database / Eloquent" as D
+participant "Storage lokal" as F
+A -> B : Pilih kata kunci, bulan/rentang, jenis dan kategori
+B -> C : GET kegiatan dengan filter
+C -> D : Query daftar dan data ekspor beserta relasi
+D --> C : Data sesuai filter
+C --> B : Halaman + exportActivities
+A -> B : Klik PDF atau Excel
+alt data ekspor kosong
+B --> A : Tampilkan peringatan tidak ada kegiatan
+else Excel
+B -> B : Susun worksheet dan workbook dengan XLSX
+B --> A : Unduh file .xlsx
+else PDF
+loop setiap dokumentasi yang dimuat
+B -> C : GET gambar melalui endpoint lampiran
+C -> F : Baca file yang diizinkan
+F --> C : Isi file
+C --> B : Gambar
+end
+B -> B : Susun tabel dan dokumentasi dengan jsPDF
+B --> A : Unduh file .pdf
+end
+@enduml
+
+@startuml SQ12
+title SQ12 - Pencarian dan lokasi saat ini
+hide footbox
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 55
+autonumber
+actor "Admin / Super Admin" as A
+participant "Halaman / Browser" as B
+participant "Nominatim" as G
+participant "Geolocation browser" as L
+A -> B : Pilih cara menentukan lokasi
+alt Cari Lokasi
+A -> B : Isi nama tempat/alamat; klik Cari
+B -> G : GET Nominatim search; batas sekitar Kulon Progo
+G --> B : Hasil JSON atau kegagalan
+alt hasil ditemukan
+B -> B : Pilih hasil pertama; ubah marker, koordinat dan alamat
+else kosong / jaringan gagal
+B --> A : Pesan lokasi tidak ditemukan / gagal mencari
+end
+else Lokasi Saat Ini
+B -> L : getCurrentPosition; minta izin lokasi
+alt ditolak / timeout / tidak tersedia
+L --> B : Kesalahan geolokasi
+B --> A : Pesan izin atau lokasi gagal
+else berhasil
+L --> B : Latitude dan longitude
+B -> B : Ubah marker dan koordinat
+B -> G : GET Nominatim reverse
+G --> B : Alamat atau kegagalan
+B -> B : Isi alamat jika tersedia; koordinat tetap dipertahankan
+end
+else Klik peta / koordinat manual pada form yang mendukung
+A -> B : Pilih titik / ubah nilai koordinat
+B -> B : Sinkronkan marker dan latitude/longitude
+end
+A -> B : Simpan form melalui proses kegiatan/laporan terkait
+@enduml
+
+@startuml SQ13
+title SQ13 - Tambah edit hapus evaluasi
+hide footbox
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 55
+autonumber
+actor "Admin" as A
+participant "Halaman / Browser" as B
+participant "ActivityEvaluationController" as C
+database "Database / Eloquent" as D
+A -> B : Buka Evaluasi
+B -> C : GET /admin/evaluasi
+C -> D : Ambil evaluasi, kegiatan belum dievaluasi dan semua kategori
+D --> C : Data dan pilihan
+C --> B : Render daftar/form
+alt Tambah evaluasi
+A -> B : Pilih sumber
+alt Internal
+B -> B : Aktifkan kategori; filter kegiatan menurut kategori
+else Eksternal
+B -> B : Nonaktifkan kategori; tampilkan kegiatan eksternal terkait laporan
+end
+alt tidak ada kegiatan sesuai pilihan
+B --> A : Pesan kosong; pilihan kegiatan dinonaktifkan
+else kegiatan tersedia
+A -> B : Pilih kegiatan; isi catatan/kendala; Simpan
+B -> C : POST /admin/evaluasi
+C -> C : Validasi Form Request
+C -> D : BEGIN; kunci kegiatan; periksa evaluated_at
+alt sudah dievaluasi
+C -> D : ROLLBACK
+C --> B : 422: kegiatan sudah memiliki evaluasi
+else belum
+C -> D : UPDATE evaluasi, evaluator, waktu; audit; COMMIT
+C --> B : Redirect evaluasi berhasil
+end
+end
+else Edit
+B -> C : PUT evaluasi/{activity} dengan catatan baru
+C -> D : Transaksi: periksa evaluasi ada; UPDATE dan audit
+C --> B : Daftar diperbarui
+else Hapus; konfirmasi
+B -> C : DELETE evaluasi/{activity}
+C -> D : Transaksi: kosongkan field evaluasi; audit
+C --> B : Evaluasi dihapus; kegiatan tetap ada
+end
+@enduml
+
+@startuml SQ14
+title SQ14 - Arsip tambah dan edit
+hide footbox
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 55
+autonumber
+actor "Admin" as A
+participant "Halaman / Browser" as B
+participant "ArchiveController" as C
+database "Database / Eloquent" as D
+participant "Storage lokal" as F
+A -> B : Isi judul, kategori, sifat, deskripsi; pilih file
+B -> C : POST arsip / PUT arsip/{id}
+C -> C : UpsertArchiveRequest: validasi metadata dan file
+alt tidak valid
+C --> B : Kesalahan form
+else valid
+opt Tambah atau Edit dengan file pengganti
+C -> F : Simpan file baru ke archives/files
+F --> C : Path dan metadata file
+end
+C -> D : BEGIN; INSERT/UPDATE arsip dan audit
+alt transaksi gagal
+C -> D : ROLLBACK
+opt file baru tersimpan
+C -> F : Hapus file baru
+end
+C --> B : Permintaan gagal
+else transaksi berhasil
+C -> D : COMMIT
+opt Edit dengan file pengganti
+C -> F : Hapus file lama
+end
+C --> B : Redirect daftar; pesan berhasil
+end
+end
+@enduml
+
+@startuml SQ15
+title SQ15 - Arsip lihat unduh dan hapus
+hide footbox
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 55
+autonumber
+actor "Admin" as A
+participant "Halaman / Browser" as B
+participant "ArchiveController" as C
+database "Database / Eloquent" as D
+participant "Storage lokal" as F
+A -> B : Cari/filter arsip
+B -> C : GET /admin/arsip dengan filter
+C -> D : Query arsip aktif dan statistik
+D --> C : Data arsip
+C --> B : Render daftar
+alt Lihat / Unduh
+B -> C : GET arsip/{id}/file atau /download
+C -> F : Periksa file ada
+alt file tidak ada
+C --> B : 404
+else file ada
+C -> F : Baca file
+F --> C : Isi dokumen
+C --> B : Stream inline/attachment atau download
+B --> A : Tampilkan atau simpan file
+end
+else Hapus; konfirmasi
+B -> C : DELETE arsip/{id}
+C -> D : Soft delete arsip; simpan audit
+C --> B : Redirect daftar arsip
+else Batal
+B -> B : Tutup dialog; tidak mengirim perubahan
+end
+@enduml
+
+@startuml SQ16
+title SQ16 - Manajemen aset
+hide footbox
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 55
+autonumber
+actor "Admin" as A
+participant "Halaman / Browser" as B
+participant "AssetController" as C
+database "Database / Eloquent" as D
+A -> B : Buka Aset
+B -> C : GET /admin/aset
+C -> D : Ambil daftar dan ringkasan aset
+D --> C : Data aset
+C --> B : Render halaman
+alt Tambah / Edit
+A -> B : Isi nama, kategori, kondisi dan informasi tambahan
+alt Kendaraan
+B -> B : Tampilkan tanggal pajak dan kilometer servis oli
+else Selain kendaraan
+B -> B : Sembunyikan field kendaraan
+end
+B -> C : POST / PUT aset
+C -> C : Validasi StoreAssetRequest
+alt invalid
+C --> B : Kesalahan field/kode unik
+else valid
+C -> C : Kosongkan data pajak/oli bila bukan kendaraan
+C -> D : INSERT/UPDATE aset; INSERT audit
+C --> B : Redirect daftar
+end
+else Hapus; konfirmasi
+B -> C : DELETE aset/{id}
+C -> D : Soft delete aset; simpan audit
+C --> B : Daftar diperbarui
+end
+@enduml
+
+@startuml SQ17
+title SQ17 - Kelola akun pengguna
+hide footbox
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 55
+autonumber
+actor "Super Admin" as A
+participant "Halaman / Browser" as B
+participant "SuperAdminController" as C
+database "Database / Eloquent" as D
+A -> B : Buka Manajemen User
+B -> C : GET /super-admin/user
+C -> D : Ambil akun pengguna
+D --> C : Daftar akun
+C --> B : Render daftar
+alt Tambah / Edit
+A -> B : Isi nama, username, email opsional dan password
+B -> C : POST / PUT user
+C -> C : Validasi identitas unik dan password minimal 8
+alt invalid
+C --> B : Kesalahan form
+else valid
+C -> D : INSERT Admin Aktif / UPDATE akun target
+C --> B : Redirect daftar; sukses
+end
+else Blokir/Aktifkan atau Hapus
+B -> C : PATCH status / DELETE akun target
+alt target akun sendiri
+C --> B : 422: tindakan ditolak
+else akun lain
+C -> D : Toggle Aktif/Diblokir atau delete akun
+C --> B : JSON status/keberhasilan
+end
+else Batal
+B -> B : Tutup form/dialog tanpa perubahan
+end
+@enduml
+
+@startuml SQ18
+title SQ18 - Kelola petugas
+hide footbox
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 55
+autonumber
+actor "Super Admin" as A
+participant "Halaman / Browser" as B
+participant "OfficerController" as C
+database "Database / Eloquent" as D
+A -> B : Buka Petugas
+B -> C : GET /super-admin/petugas
+C -> D : Ambil petugas; susun statistik
+D --> C : Data petugas
+C --> B : Render daftar dan pilihan resmi
+alt Tambah / Edit
+A -> B : Isi NIP, nama, jabatan, satuan kerja, unit kerja
+B -> C : POST / PUT petugas
+C -> C : Validasi NIP unik dan opsi resmi
+alt invalid
+C --> B : Pesan validasi
+else valid
+C -> D : INSERT status Aktif / UPDATE data petugas
+C --> B : Redirect daftar
+end
+else Ubah status
+B -> C : PATCH petugas/{id}/status
+C -> D : UPDATE Aktif → Cuti → Nonaktif → Aktif
+C --> B : JSON status dan label
+else Hapus; konfirmasi
+B -> C : DELETE petugas/{id}
+C -> D : Delete petugas sesuai model
+C --> B : JSON keberhasilan
+else Batal / silang
+B -> B : Tutup form tanpa menyimpan
+end
+@enduml
+
+@startuml SQ19
+title SQ19 - Kelola unit organisasi
+hide footbox
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 55
+autonumber
+actor "Super Admin" as A
+participant "Halaman / Browser" as B
+participant "OrganizationalUnitController" as C
+database "Database / Eloquent" as D
+A -> B : Buka Manajemen Organisasi
+B -> C : GET /super-admin/organisasi
+C -> D : Ambil unit, pimpinan aktif, zona dan statistik
+D --> C : Data pilihan
+C --> B : Render daftar/form
+alt Tambah / Edit
+A -> B : Isi nama, tipe, status; kode, induk, zona/pimpinan opsional
+B -> C : POST / PUT organisasi
+C -> C : Validasi UpsertOrganizationalUnitRequest
+C -> D : Periksa kode, referensi dan rantai induk saat edit
+alt invalid / struktur siklik
+C --> B : Kesalahan form
+else valid
+C -> D : INSERT / UPDATE unit
+C --> B : Redirect daftar organisasi
+end
+else Hapus; konfirmasi
+B -> C : DELETE organisasi/{id}
+C -> D : Periksa children()->exists()
+D --> C : Ada / tidak ada bawahan
+alt ada bawahan
+C --> B : 422: unit belum dapat dihapus
+else tanpa bawahan
+C -> D : Delete unit
+C --> B : JSON berhasil
+end
+else Batal / silang
+B -> B : Tutup modal; tidak menyimpan
+end
+@enduml
+
+@startuml SQ20
+title SQ20 - Dashboard monitoring dan peta
+hide footbox
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 55
+autonumber
+actor "Admin / Super Admin" as A
+participant "Halaman / Browser" as B
+participant "AdminController / SuperAdminController" as C
+database "Database / Eloquent" as D
+participant "Sumber tile/batas peta" as G
+A -> B : Pilih menu sesuai hak akses
+B -> C : GET dashboard / monitoring / peta
+C -> C : Middleware auth dan Gate role
+alt akses ditolak
+C --> B : Redirect login / 403 sesuai kondisi
+else diizinkan
+alt Dashboard
+C -> D : Agregasi statistik sesuai role
+D --> C : Ringkasan
+C --> B : Render dashboard
+else Monitoring — Super Admin
+C -> D : Ambil 100 audit terbaru + statistik hari ini/tren 7 hari
+D --> C : Log dan data grafik
+C --> B : Render monitoring
+else Peta — Super Admin
+C -> D : Ambil laporan/kegiatan berkoordinat dan data grafik
+D --> C : Titik dan ringkasan
+C --> B : Render halaman dengan data marker
+B -> G : Muat tile peta dan batas wilayah
+G --> B : Data visual peta
+A -> B : Jelajahi peta; klik marker
+B --> A : Tampilkan informasi titik
+end
+end
+@enduml
+
+@startuml SQ21
+title SQ21 - Pencarian notifikasi dan profil
+hide footbox
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 55
+autonumber
+actor "Admin / Super Admin" as A
+participant "Halaman / Browser" as B
+participant "GlobalSearch / Notification / ProfileController" as C
+database "Database / Eloquent" as D
+A -> B : Pilih fungsi
+alt Pencarian global
+B -> C : GET /global-search?q=...
+C -> C : Validasi kata kunci 2–100; throttle 60/menit
+C -> D : Cari maksimal 5 laporan, 5 kegiatan, 5 petugas
+D --> C : Hasil pencarian
+C -> C : Bentuk tautan sesuai role
+C --> B : JSON hasil
+A -> B : Pilih hasil; buka halaman terkait
+else Notifikasi
+B -> C : GET /notifications
+C -> D : Ambil 10 terbaru milik akun + jumlah belum dibaca
+D --> C : Data notifikasi
+C --> B : JSON daftar
+opt Tandai satu / semua dibaca
+B -> C : POST endpoint read / read-all
+C -> D : UPDATE read_at milik akun sendiri
+C --> B : Redirect tautan internal atau halaman sebelumnya
+end
+else Profil — Admin
+A -> B : Ubah nama/username/email; password opsional
+B -> C : PUT /admin/profile
+C -> C : Validasi unik; password lama/konfirmasi jika diganti
+alt invalid
+C --> B : Kesalahan form
+else valid
+C -> D : UPDATE profil; INSERT audit tanpa password mentah
+C --> B : Redirect profil berhasil
+end
+end
+@enduml

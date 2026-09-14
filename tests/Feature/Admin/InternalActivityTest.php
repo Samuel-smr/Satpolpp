@@ -40,6 +40,8 @@ class InternalActivityTest extends TestCase
         $response->assertDontSeeText('Petugas Nonaktif');
         $response->assertSee('name="category"', false);
         $response->assertSee('data-category="Template Aktif"', false);
+        $response->assertSee('id="activity-location-search"', false);
+        $response->assertSee('id="activity-current-location-button"', false);
     }
 
     public function test_admin_can_create_internal_activity_with_officers_and_internal_documentation(): void
@@ -205,6 +207,8 @@ class InternalActivityTest extends TestCase
         $response->assertSee('Petugas Terpilih');
         $response->assertSee('lama.jpg');
         $response->assertSee('Tersimpan 1 dari 3 foto.');
+        $response->assertSee('id="activity-location-search"', false);
+        $response->assertSee('id="activity-current-location-button"', false);
     }
 
     public function test_admin_can_update_internal_activity_sync_officers_and_append_documentation(): void

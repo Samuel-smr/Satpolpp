@@ -1,0 +1,430 @@
+' CLASS DIAGRAM SIPRAJA
+' Blok pertama = model lengkap. Blok kedua = enum.
+' Salin satu blok @startuml ... @enduml ke editor PlantUML.
+
+@startuml SIPRAJA_Class_Models
+left to right direction
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam shadowing false
+hide empty methods
+title SIPRAJA - Class model dan relasi
+class User <<model>> {
+  id: bigint {PK}
+  name: string
+  username: string {unique}
+  email: string? {unique}
+  email_verified_at: DateTime?
+  password: string {hashed, hidden}
+  role: UserRole
+  status: UserStatus
+  remember_token: string? {hidden}
+  created_at: DateTime?
+  updated_at: DateTime?
+  --
+  + createdReports(): HasMany<Report>
+  # casts(): array
+}
+class GuestAccess <<model>> {
+  id: bigint {PK}
+  token_hash: string {unique, hidden}
+  last_used_at: DateTime?
+  expires_at: DateTime?
+  created_at: DateTime?
+  updated_at: DateTime?
+  --
+  + reports(): HasMany<Report>
+  # casts(): array
+}
+class Report <<model>> {
+  id: bigint {PK}
+  code: string {unique}
+  guest_access_id: bigint? {FK}
+  created_by_user_id: bigint? {FK}
+  type: ReportType
+  category: ReportCategory?
+  source: ReportSource
+  source_platform: ReportSourcePlatform?
+  reporter_name: string?
+  reporter_phone: string
+  reporter_nik: string? {encrypted, hidden}
+  description: text
+  location_address: text
+  latitude: decimal(10,7)?
+  longitude: decimal(10,7)?
+  status: ReportStatus
+  completed_at: DateTime?
+  feedback_rating: int?
+  feedback_comment: text?
+  feedback_submitted_at: DateTime?
+  created_at: DateTime?
+  updated_at: DateTime?
+  deleted_at: DateTime?
+  --
+  + guestAccess(): BelongsTo<GuestAccess>
+  + createdByUser(): BelongsTo<User>
+  + statusHistories(): HasMany<ReportStatusHistory>
+  + attachments(): MorphMany<Attachment>
+  + activity(): HasOne<Activity>
+  + maskedReporterNik(): ?string
+  # casts(): array
+}
+class ReportStatusHistory <<model>> {
+  id: bigint {PK}
+  report_id: bigint {FK}
+  changed_by_user_id: bigint? {FK}
+  status: ReportStatus
+  note: text?
+  created_at: DateTime
+  --
+  + report(): BelongsTo<Report>
+  + changedByUser(): BelongsTo<User>
+  # casts(): array
+  + UPDATED_AT = null {constant}
+}
+class Activity <<model>> {
+  id: bigint {PK}
+  report_id: bigint? {FK, unique}
+  activity_template_id: bigint? {FK}
+  created_by_user_id: bigint {FK}
+  evaluated_by_user_id: bigint? {FK}
+  name: string
+  type: ActivityType
+  category: string?
+  activity_date: Date
+  start_time: Time?
+  description: text?
+  handling_result: text?
+  location_address: text
+  latitude: decimal(10,7)
+  longitude: decimal(10,7)
+  evaluation_notes: text?
+  evaluation_obstacles: text?
+  evaluated_at: DateTime?
+  created_at: DateTime?
+  updated_at: DateTime?
+  deleted_at: DateTime?
+  --
+  + report(): BelongsTo<Report>
+  + template(): BelongsTo<ActivityTemplate>
+  + createdByUser(): BelongsTo<User>
+  + evaluatedByUser(): BelongsTo<User>
+  + officers(): BelongsToMany<Officer>
+  + attachments(): MorphMany<Attachment>
+  # casts(): array
+}
+class ActivityTemplate <<model>> {
+  id: bigint {PK}
+  name: string
+  operational_category: OperationalCategory?
+  default_description: text?
+  is_active: bool
+  sort_order: int
+  created_at: DateTime?
+  updated_at: DateTime?
+  --
+  + activities(): HasMany<Activity>
+  # casts(): array
+}
+class Officer <<model>> {
+  id: bigint {PK}
+  user_id: bigint? {FK, unique}
+  organizational_unit_id: bigint? {FK}
+  operational_zone_id: bigint? {FK}
+  name: string
+  employee_number: string {unique}
+  position: string?
+  work_unit_name: string?
+  unit_name: string?
+  status: OfficerStatus
+  created_at: DateTime?
+  updated_at: DateTime?
+  deleted_at: DateTime?
+  --
+  + organizationalUnit(): BelongsTo<OrganizationalUnit>
+  + operationalZone(): BelongsTo<OperationalZone>
+  + activities(): BelongsToMany<Activity>
+  # casts(): array
+}
+class OrganizationalUnit <<model>> {
+  id: bigint {PK}
+  parent_id: bigint? {FK self}
+  operational_zone_id: bigint? {FK}
+  leader_officer_id: bigint? {FK}
+  name: string
+  code: string? {unique}
+  type: OrganizationalUnitType
+  description: text?
+  is_active: bool
+  created_at: DateTime?
+  updated_at: DateTime?
+  deleted_at: DateTime?
+  --
+  + parent(): BelongsTo<OrganizationalUnit>
+  + children(): HasMany<OrganizationalUnit>
+  + operationalZone(): BelongsTo<OperationalZone>
+  + leader(): BelongsTo<Officer>
+  + officers(): HasMany<Officer>
+  # casts(): array
+}
+class OperationalZone <<model>> {
+  id: bigint {PK}
+  name: string
+  code: string? {unique}
+  description: text?
+  is_active: bool
+  created_at: DateTime?
+  updated_at: DateTime?
+  deleted_at: DateTime?
+  --
+  + organizationalUnits(): HasMany<OrganizationalUnit>
+  # casts(): array
+}
+class Attachment <<model>> {
+  id: bigint {PK}
+  attachable_type: string
+  attachable_id: bigint
+  uploaded_by_user_id: bigint? {FK}
+  file_path: string
+  original_name: string
+  file_type: string
+  mime_type: string
+  file_size: bigint
+  audience: string
+  created_at: DateTime?
+  updated_at: DateTime?
+  --
+  + attachable(): MorphTo<Model>
+  + uploadedByUser(): BelongsTo<User>
+  # casts(): array
+}
+class Archive <<model>> {
+  id: bigint {PK}
+  created_by_user_id: bigint {FK}
+  title: string
+  operational_category: OperationalCategory
+  description: text?
+  confidentiality: ArchiveConfidentiality
+  file_path: string
+  original_name: string
+  mime_type: string
+  file_extension: string
+  file_size: bigint
+  created_at: DateTime?
+  updated_at: DateTime?
+  deleted_at: DateTime?
+  --
+  + createdByUser(): BelongsTo<User>
+  # casts(): array
+}
+class Asset <<model>> {
+  id: bigint {PK}
+  created_by_user_id: bigint {FK}
+  asset_code: string? {unique}
+  name: string
+  category: AssetCategory
+  condition: AssetCondition
+  location: string?
+  acquisition_year: int?
+  tax_due_date: Date?
+  next_oil_service_km: int?
+  created_at: DateTime?
+  updated_at: DateTime?
+  deleted_at: DateTime?
+  --
+  + createdByUser(): BelongsTo<User>
+  # casts(): array
+}
+class AuditLog <<model>> {
+  id: bigint {PK}
+  actor_user_id: bigint? {FK}
+  subject_type: string?
+  subject_id: bigint?
+  module: string
+  action: string
+  description: text
+  old_values: array?
+  new_values: array?
+  ip_address: string?
+  user_agent: text?
+  created_at: DateTime
+  --
+  + actorUser(): BelongsTo<User>
+  # casts(): array
+  + UPDATED_AT = null {constant}
+}
+class ActivityOfficer <<association_table>> {
+  id: bigint {PK}
+  activity_id: bigint {FK}
+  officer_id: bigint {FK}
+  assignment_role: string?
+  notes: text?
+  created_at: DateTime?
+  updated_at: DateTime?
+  --
+
+}
+class DatabaseNotification <<framework>> {
+  id: UUID {PK}
+  type: string
+  notifiable_type: string
+  notifiable_id: bigint
+  data: array
+  read_at: DateTime?
+  created_at: DateTime?
+  updated_at: DateTime?
+  --
+  + notifiable(): MorphTo<Model>
+  + markAsRead(): void
+  + markAsUnread(): void
+  + read(): bool
+  + unread(): bool
+}
+class "Illuminate\\Database\\Eloquent\\Model" as EloquentModel <<framework>>
+class "Illuminate\\Foundation\\Auth\\User" as Authenticatable <<framework>>
+EloquentModel <|-- Authenticatable
+Authenticatable <|-- User
+EloquentModel <|-- GuestAccess
+EloquentModel <|-- Report
+EloquentModel <|-- ReportStatusHistory
+EloquentModel <|-- Activity
+EloquentModel <|-- ActivityTemplate
+EloquentModel <|-- Officer
+EloquentModel <|-- OrganizationalUnit
+EloquentModel <|-- OperationalZone
+EloquentModel <|-- Attachment
+EloquentModel <|-- Archive
+EloquentModel <|-- Asset
+EloquentModel <|-- AuditLog
+EloquentModel <|-- DatabaseNotification
+GuestAccess "0..1" -- "0..*" Report : akses tamu
+User "0..1" -- "0..*" Report : pencatat
+Report "1" -- "0..*" ReportStatusHistory : riwayat
+User "0..1" -- "0..*" ReportStatusHistory : pengubah status
+Report "0..1" -- "0..1" Activity : penanganan eksternal
+ActivityTemplate "0..1" -- "0..*" Activity : template
+User "1" -- "0..*" Activity : pembuat
+User "0..1" -- "0..*" Activity : evaluator
+Activity "1" -- "0..*" ActivityOfficer : penugasan
+Officer "1" -- "0..*" ActivityOfficer : penugasan
+User "0..1" .. "0..1" Officer : akun petugas {FK saja}
+OrganizationalUnit "0..1" -- "0..*" Officer : keanggotaan
+Officer "0..1" -- "0..*" OrganizationalUnit : pimpinan
+OrganizationalUnit "0..1" -- "0..*" OrganizationalUnit : induk / bawahan
+OperationalZone "0..1" -- "0..*" OrganizationalUnit : zona unit
+OperationalZone "0..1" -- "0..*" Officer : zona petugas
+Report "0..1" .. "0..*" Attachment : pemilik {xor Activity}
+Activity "0..1" .. "0..*" Attachment : pemilik {xor Report}
+User "0..1" -- "0..*" Attachment : pengunggah
+User "1" -- "0..*" Archive : pembuat arsip
+User "1" -- "0..*" Asset : pencatat aset
+User "0..1" -- "0..*" AuditLog : pelaku
+User "1" .. "0..*" DatabaseNotification : notifiable {lingkup SIPRAJA}
+note bottom of ActivityOfficer
+Tabel association; bukan class PHP lokal.
+unique(activity_id, officer_id)
+end note
+note bottom of Attachment
+Pemilik tepat satu: Report ATAU Activity.
+Kedua relasi opsional memakai constraint XOR.
+end note
+@enduml
+
+@startuml SIPRAJA_Class_Enums
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+title SIPRAJA - Enum
+enum ActivityType {
+  Internal = internal
+  External = external
+  + label(): string
+}
+enum ArchiveConfidentiality {
+  Public = public
+  Confidential = confidential
+  + label(): string
+}
+enum AssetCategory {
+  Vehicle = vehicle
+  Supplies = supplies
+  Equipment = equipment
+  Infrastructure = infrastructure
+  Other = other
+  + label(): string
+}
+enum AssetCondition {
+  Good = good
+  NeedsRepair = needs_repair
+  SeverelyDamaged = severely_damaged
+  + label(): string
+}
+enum OfficerStatus {
+  Active = active
+  Leave = leave
+  Inactive = inactive
+  + label(): string
+}
+enum OperationalCategory {
+  PublicOrderPatrol = patroli_ketertiban_umum
+  OfficialSecurityEscort = pengamanan_pengawalan_pejabat
+  EventSecurity = pengamanan_acara_kegiatan
+  PublicComplaintHandling = penanganan_pengaduan_masyarakat
+  RegionalRegulationCompliance = kepatuhan_perda_dan_perkada
+  AttributeSupervision = pembinaan_pengawasan_atribut
+  JudicialEnforcement = penegakan_yustisial
+  NonJudicialEnforcement = penegakan_non_yustisial
+  + label(): string
+}
+enum OrganizationalUnitType {
+  Division = division
+  Team = team
+  Post = post
+  + label(): string
+}
+enum ReportCategory {
+  PublicOrder = public_order
+  EnvironmentalCleanliness = environmental_cleanliness
+  Security = security
+  + label(): string
+}
+enum ReportSource {
+  Online = online
+  Offline = offline
+  + label(): string
+}
+enum ReportSourcePlatform {
+  Website = website
+  WhatsApp = whatsapp
+  Instagram = instagram
+  X = x
+  Facebook = facebook
+  TikTok = tiktok
+  Other = other
+  + label(): string
+}
+enum ReportStatus {
+  Submitted = submitted
+  Received = received
+  Verifying = verifying
+  InProgress = in_progress
+  Completed = completed
+  + label(): string
+  + description(): string
+  + nextProcessingStatus(): ?self
+}
+enum ReportType {
+  Emergency = emergency
+  Information = information
+  + label(): string
+}
+enum UserRole {
+  Admin = admin
+  SuperAdmin = super_admin
+
+}
+enum UserStatus {
+  Active = active
+  Blocked = blocked
+
+}
+@enduml

@@ -38,6 +38,8 @@ class CompleteReportTest extends TestCase
             ->get(route('admin.pengaduan.detail', $report))
             ->assertOk()
             ->assertSee('form-penyelesaian', false)
+            ->assertSee('id="completion-location-search"', false)
+            ->assertSee('id="completion-current-location-button"', false)
             ->assertDontSee('name="operational_category"', false);
 
         $payload = $this->validPayload($report, $officers->pluck('id')->all(), [

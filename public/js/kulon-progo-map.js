@@ -61,6 +61,197 @@
             map.setView(this.center, zoom);
             this.addBoundary(map);
             return map;
+        },
+
+        createLocationPicker({
+            map,
+            latitudeInput,
+            longitudeInput,
+            addressInput = null,
+            searchInput = null,
+            searchButton = null,
+            currentLocationButton = null,
+            statusElement = null,
+            zoom = 16
+        }) {
+            let marker = null;
+
+            const setStatus = (message = '', type = 'info') => {
+                if (!statusElement) {
+                    return;
+                }
+
+                statusElement.textContent = message;
+                statusElement.classList.toggle('text-red-600', type === 'error');
+                statusElement.classList.toggle('text-slate-500', type !== 'error');
+            };
+
+            const setLoading = (button, isLoading) => {
+                if (!button) {
+                    return;
+                }
+
+                button.disabled = isLoading;
+                button.classList.toggle('opacity-60', isLoading);
+                button.classList.toggle('cursor-wait', isLoading);
+            };
+
+            const selectLocation = (latitude, longitude, options = {}) => {
+                const moveMap = options.moveMap ?? true;
+
+                latitudeInput.value = Number(latitude).toFixed(7);
+                longitudeInput.value = Number(longitude).toFixed(7);
+
+                if (marker) {
+                    marker.setLatLng([latitude, longitude]);
+                } else {
+                    marker = L.marker([latitude, longitude]).addTo(map);
+                }
+
+                if (moveMap) {
+                    map.setView([latitude, longitude], zoom);
+                }
+
+                if (addressInput && options.address) {
+                    addressInput.value = options.address;
+                }
+            };
+
+            const reverseGeocode = async (latitude, longitude) => {
+                const params = new URLSearchParams({
+                    format: 'jsonv2',
+                    lat: latitude,
+                    lon: longitude,
+                    zoom: '18',
+                    addressdetails: '1'
+                });
+                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?${params}`, {
+                    headers: { 'Accept-Language': 'id' }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Alamat lokasi tidak dapat dimuat.');
+                }
+
+                return response.json();
+            };
+
+            const searchLocation = async () => {
+                const query = searchInput?.value.trim();
+
+                if (!query) {
+                    setStatus('Masukkan nama tempat atau alamat yang ingin dicari.', 'error');
+                    searchInput?.focus();
+                    return;
+                }
+
+                setLoading(searchButton, true);
+                setStatus('Mencari lokasi...');
+
+                try {
+                    const params = new URLSearchParams({
+                        format: 'jsonv2',
+                        q: query,
+                        limit: '1',
+                        countrycodes: 'id',
+                        viewbox: '110.01,-7.64,110.28,-7.99',
+                        bounded: '1'
+                    });
+                    const response = await fetch(`https://nominatim.openstreetmap.org/search?${params}`, {
+                        headers: { 'Accept-Language': 'id' }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Pencarian lokasi tidak dapat digunakan.');
+                    }
+
+                    const results = await response.json();
+                    const result = results[0];
+
+                    if (!result) {
+                        setStatus('Lokasi tidak ditemukan di wilayah Kulon Progo.', 'error');
+                        return;
+                    }
+
+                    selectLocation(Number.parseFloat(result.lat), Number.parseFloat(result.lon), {
+                        address: result.display_name
+                    });
+                    setStatus('Lokasi ditemukan dan koordinat sudah diperbarui.');
+                } catch (error) {
+                    setStatus('Gagal mencari lokasi. Periksa koneksi internet lalu coba lagi.', 'error');
+                } finally {
+                    setLoading(searchButton, false);
+                }
+            };
+
+            searchButton?.addEventListener('click', searchLocation);
+            searchInput?.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    searchLocation();
+                }
+            });
+
+            currentLocationButton?.addEventListener('click', () => {
+                if (!navigator.geolocation) {
+                    setStatus('Browser ini tidak mendukung akses lokasi saat ini.', 'error');
+                    return;
+                }
+
+                setLoading(currentLocationButton, true);
+                setStatus('Mengambil lokasi saat ini...');
+                navigator.geolocation.getCurrentPosition(async (position) => {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+                    selectLocation(latitude, longitude);
+
+                    try {
+                        const result = await reverseGeocode(latitude, longitude);
+
+                        if (addressInput && result.display_name) {
+                            addressInput.value = result.display_name;
+                        }
+                    } catch (error) {
+                        // Koordinat tetap dapat digunakan saat layanan alamat tidak tersedia.
+                    } finally {
+                        setLoading(currentLocationButton, false);
+                        setStatus('Lokasi saat ini sudah digunakan.');
+                    }
+                }, (error) => {
+                    setLoading(currentLocationButton, false);
+                    const denied = error.code === error.PERMISSION_DENIED;
+                    setStatus(denied
+                        ? 'Izin lokasi ditolak. Aktifkan izin lokasi pada browser.'
+                        : 'Lokasi saat ini tidak dapat diambil. Coba lagi.', 'error');
+                }, {
+                    enableHighAccuracy: true,
+                    timeout: 15000,
+                    maximumAge: 30000
+                });
+            });
+
+            map.on('click', (event) => {
+                selectLocation(event.latlng.lat, event.latlng.lng, { moveMap: false });
+                setStatus('Titik lokasi dan koordinat sudah diperbarui.');
+            });
+
+            [latitudeInput, longitudeInput].forEach((input) => input?.addEventListener('change', () => {
+                const latitude = Number.parseFloat(latitudeInput.value);
+                const longitude = Number.parseFloat(longitudeInput.value);
+
+                if (Number.isFinite(latitude) && Number.isFinite(longitude)) {
+                    selectLocation(latitude, longitude);
+                }
+            }));
+
+            const initialLatitude = Number.parseFloat(latitudeInput.value);
+            const initialLongitude = Number.parseFloat(longitudeInput.value);
+
+            if (Number.isFinite(initialLatitude) && Number.isFinite(initialLongitude)) {
+                selectLocation(initialLatitude, initialLongitude);
+            }
+
+            return { selectLocation, searchLocation };
         }
     };
 })();

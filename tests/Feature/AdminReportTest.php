@@ -30,6 +30,8 @@ class AdminReportTest extends TestCase
             ->assertSee('pattern="[0-9]{16}"', false)
             ->assertSee('name="reporter_phone"', false)
             ->assertSee('type="tel"', false)
+            ->assertSee('id="report-location-search"', false)
+            ->assertSee('id="report-current-location-button"', false)
             ->assertDontSee('name="category"', false);
     }
 

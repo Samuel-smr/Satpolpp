@@ -78,6 +78,40 @@ class ArchiveManagementTest extends TestCase
         ]);
     }
 
+    public function test_admin_can_upload_archive_larger_than_five_megabytes(): void
+    {
+        Storage::fake('local');
+        $admin = User::factory()->create();
+
+        $response = $this->actingAs($admin)->post(route('admin.arsip.store'), [
+            'title' => 'Arsip Besar',
+            'operational_category' => OperationalCategory::RegionalRegulationCompliance->value,
+            'confidentiality' => ArchiveConfidentiality::Public->value,
+            'file' => UploadedFile::fake()->create('arsip-besar.pdf', 6 * 1024, 'application/pdf'),
+        ]);
+
+        $response->assertRedirectToRoute('admin.arsip');
+        $response->assertSessionHas('status', 'Arsip berhasil diunggah.');
+        $this->assertDatabaseHas('archives', ['title' => 'Arsip Besar', 'file_size' => 6 * 1024 * 1024]);
+    }
+
+    public function test_archive_larger_than_twenty_megabytes_is_rejected(): void
+    {
+        Storage::fake('local');
+        $admin = User::factory()->create();
+
+        $response = $this->actingAs($admin)->post(route('admin.arsip.store'), [
+            'title' => 'Arsip Terlalu Besar',
+            'operational_category' => OperationalCategory::RegionalRegulationCompliance->value,
+            'confidentiality' => ArchiveConfidentiality::Public->value,
+            'file' => UploadedFile::fake()->create('arsip-terlalu-besar.pdf', 20 * 1024 + 1, 'application/pdf'),
+        ]);
+
+        $response->assertInvalid(['file']);
+        $this->assertDatabaseCount('archives', 0);
+        $this->assertSame([], Storage::disk('local')->allFiles('archives/files'));
+    }
+
     public function test_admin_can_update_metadata_without_replacing_the_file(): void
     {
         Storage::fake('local');
