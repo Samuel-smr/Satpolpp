@@ -30,7 +30,7 @@
                         <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
                         <span class="font-semibold text-slate-800">Operasional</span>
                     </div>
-                    <p class="text-xs text-slate-400 mt-0.5">Uptime 99.98%</p>
+                    <p class="text-xs text-slate-400 mt-0.5">Aplikasi dapat diakses</p>
                 </div>
             </div>
             <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm flex items-center gap-4">
@@ -43,7 +43,7 @@
                         <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
                         <span class="font-semibold text-slate-800">Normal</span>
                     </div>
-                    <p class="text-xs text-slate-400 mt-0.5">Lantensi 12 ms</p>
+                    <p class="text-xs text-slate-400 mt-0.5">Koneksi berhasil</p>
                 </div>
             </div>
             <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm flex items-center gap-4">
@@ -56,7 +56,7 @@
                         <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
                         <span class="font-semibold text-slate-800">Responsif</span>
                     </div>
-                    <p class="text-xs text-slate-400 mt-0.5">Respon 230 ms</p>
+                    <p class="text-xs text-slate-400 mt-0.5">Laravel aktif</p>
                 </div>
             </div>
             <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm flex items-center gap-4">
@@ -67,10 +67,10 @@
                     <p class="text-xs text-slate-500 font-medium">Storage</p>
                     <div class="flex items-center gap-2">
                         <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-                        <span class="font-semibold text-slate-800">62% Terpakai</span>
+                        <span class="font-semibold text-slate-800">Tersedia</span>
                     </div>
                     <div class="w-24 h-1.5 bg-slate-100 rounded-full mt-1 overflow-hidden">
-                        <div class="h-full bg-amber-500 rounded-full" style="width:62%"></div>
+                        <div class="h-full bg-emerald-500 rounded-full" style="width:100%"></div>
                     </div>
                 </div>
             </div>
@@ -82,8 +82,8 @@
         <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm">
             <div class="flex items-center justify-between mb-4">
                 <div>
-                    <h3 class="font-headline font-bold text-slate-800">Permintaan Sistem</h3>
-                    <p class="text-xs text-slate-400">Total permintaan per minggu</p>
+                    <h3 class="font-headline font-bold text-slate-800">Aktivitas Sistem</h3>
+                    <p class="text-xs text-slate-400">Audit log tujuh hari terakhir</p>
                 </div>
                 <div class="flex items-center gap-1">
                     <span class="text-xs text-slate-400 font-medium">Zona WIB</span>
@@ -96,8 +96,8 @@
         <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm">
             <div class="flex items-center justify-between mb-4">
                 <div>
-                    <h3 class="font-headline font-bold text-slate-800">Pengguna Aktif</h3>
-                    <p class="text-xs text-slate-400">Sesi aktif harian (30 hari)</p>
+                    <h3 class="font-headline font-bold text-slate-800">Pelaku Aktivitas</h3>
+                    <p class="text-xs text-slate-400">Pengguna unik pada audit log harian</p>
                 </div>
             </div>
             <div class="relative h-64">
@@ -109,33 +109,33 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {{-- Metrik Real-Time --}}
         <div class="lg:col-span-1 bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm">
-            <h3 class="font-headline font-bold text-slate-800 mb-4">Metrik Real-time</h3>
+            <h3 class="font-headline font-bold text-slate-800 mb-4">Ringkasan Audit Hari Ini</h3>
             <div class="space-y-4">
                 <div>
                     <div class="flex justify-between text-sm mb-1">
-                        <span class="text-slate-500">CPU Server</span>
-                        <span class="font-semibold text-slate-800">34%</span>
+                        <span class="text-slate-500">Aktivitas tercatat</span>
+                        <span class="font-semibold text-slate-800">{{ $monitoringStats['today'] }}</span>
                     </div>
                     <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                        <div class="h-full bg-brand-500 rounded-full" style="width:34%"></div>
+                        <div class="h-full bg-brand-500 rounded-full" style="width:100%"></div>
                     </div>
                 </div>
                 <div>
                     <div class="flex justify-between text-sm mb-1">
-                        <span class="text-slate-500">Memori (RAM)</span>
-                        <span class="font-semibold text-slate-800">58%</span>
+                        <span class="text-slate-500">Pengguna tercatat</span>
+                        <span class="font-semibold text-slate-800">{{ $monitoringStats['actors'] }}</span>
                     </div>
                     <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                        <div class="h-full bg-super-active rounded-full" style="width:58%"></div>
+                        <div class="h-full bg-super-active rounded-full" style="width:100%"></div>
                     </div>
                 </div>
                 <div>
                     <div class="flex justify-between text-sm mb-1">
-                        <span class="text-slate-500">Bandwidth</span>
-                        <span class="font-semibold text-slate-800">41%</span>
+                        <span class="text-slate-500">Modul terpantau</span>
+                        <span class="font-semibold text-slate-800">{{ $monitoringStats['modules'] }}</span>
                     </div>
                     <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                        <div class="h-full bg-emerald-500 rounded-full" style="width:41%"></div>
+                        <div class="h-full bg-emerald-500 rounded-full" style="width:100%"></div>
                     </div>
                 </div>
                 <div class="pt-3 border-t border-slate-100 mt-5">
@@ -152,7 +152,7 @@
                     <h3 class="font-headline font-bold text-slate-800">Log Aktivitas Sistem</h3>
                     <p class="text-xs text-slate-400">Audit trail terbaru</p>
                 </div>
-                <span class="text-xs bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-1 rounded-full font-medium">Data Dummy</span>
+                <span class="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-full font-medium">Database</span>
             </div>
             <div class="divide-y divide-slate-50 max-h-[340px] overflow-y-auto" id="log-list"></div>
         </div>
@@ -164,44 +164,35 @@
 
 @push('scripts')
 <script>
-    const KODE = 'sipraja_log';
+    const databaseLogs = @json($logs);
+    const monitoringChart = @json($chart);
 
     function getLogs() {
-        let data = JSON.parse(localStorage.getItem(KODE) || '[]');
-        if (data.length === 0) {
-            data = [
-                { waktu: '09:42:15', aksi: 'Super Admin login ke sistem', user: 'Dedi Kurniawan', jenis: 'auth' },
-                { waktu: '09:38:02', aksi: 'Menambahkan petugas baru: Bambang Sutrisno', user: 'Dedi Kurniawan', jenis: 'petugas' },
-                { waktu: '09:30:47', aksi: 'Menandai laporan SPJ-584021 sebagai selesai', user: 'Admin Satpol PP', jenis: 'laporan' },
-                { waktu: '09:21:30', aksi: 'Menambahkan aset: Mobil Patroli Dalmas', user: 'Admin Satpol PP', jenis: 'aset' },
-                { waktu: '09:12:05', aksi: 'Mengubah status petugas Agus Riyanto menjadi cuti', user: 'Dedi Kurniawan', jenis: 'petugas' },
-                { waktu: '09:02:11', aksi: 'Memperbarui data unit kerja', user: 'Dedi Kurniawan', jenis: 'organisasi' },
-                { waktu: '08:55:43', aksi: 'Laporan baru diterima dari masyarakat (SPJ-584100)', user: 'Sistem', jenis: 'laporan' },
-                { waktu: '08:47:19', aksi: 'Login berhasil: Admin Satpol PP', user: 'Admin Satpol PP', jenis: 'auth' },
-            ];
-            localStorage.setItem(KODE, JSON.stringify(data));
-        }
-        return data;
+        return databaseLogs;
     }
 
     function jenisClass(j) {
         if (j === 'auth') return 'bg-purple-100 text-purple-700';
-        if (j === 'laporan') return 'bg-blue-100 text-blue-700';
-        if (j === 'aset') return 'bg-amber-100 text-amber-700';
-        if (j === 'organisasi') return 'bg-slate-200 text-slate-700';
+        if (j === 'reports') return 'bg-blue-100 text-blue-700';
+        if (j === 'assets') return 'bg-amber-100 text-amber-700';
+        if (j === 'organization') return 'bg-slate-200 text-slate-700';
         return 'bg-emerald-100 text-emerald-700';
     }
 
     function iconJenis(j) {
         if (j === 'auth') return 'lock';
-        if (j === 'laporan') return 'description';
-        if (j === 'aset') return 'inventory_2';
-        if (j === 'organisasi') return 'account_balance';
+        if (j === 'reports') return 'description';
+        if (j === 'assets') return 'inventory_2';
+        if (j === 'organization') return 'account_balance';
         return 'badge';
     }
 
     function renderLogs() {
         const logs = getLogs();
+        if (logs.length === 0) {
+            document.getElementById('log-list').innerHTML = '<div class="px-6 py-12 text-center text-sm text-slate-400">Belum ada aktivitas sistem yang tercatat.</div>';
+            return;
+        }
         document.getElementById('log-list').innerHTML = logs.map(l => `
             <div class="flex items-center gap-3 px-6 py-3">
                 <div class="w-8 h-8 rounded-full ${jenisClass(l.jenis)} flex items-center justify-center flex-shrink-0">
@@ -218,10 +209,7 @@
 
     function simulasiRefresh() {
         document.getElementById('last-update').textContent = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        const t = document.getElementById('toast');
-        t.textContent = 'Status sistem diperbarui pada ' + document.getElementById('last-update').textContent;
-        t.classList.remove('hidden');
-        setTimeout(() => t.classList.add('hidden'), 2500);
+        window.location.reload();
     }
 
     // Grafik performa
@@ -233,10 +221,10 @@
         new Chart(document.getElementById('chart-request'), {
             type: 'line',
             data: {
-                labels: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'],
+                labels: monitoringChart.map(item => item.label),
                 datasets: [{
                     label: 'Permintaan',
-                    data: [1200, 1450, 1380, 1620, 1550, 980, 720],
+                    data: monitoringChart.map(item => item.activities),
                     borderColor: '#234a70',
                     backgroundColor: 'rgba(35,74,112,0.08)',
                     fill: true,
@@ -250,10 +238,10 @@
         new Chart(document.getElementById('chart-users'), {
             type: 'bar',
             data: {
-                labels: ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7'],
+                labels: monitoringChart.map(item => item.label),
                 datasets: [{
                     label: 'Pengguna Aktif',
-                    data: [210, 260, 240, 300, 285, 180, 150],
+                    data: monitoringChart.map(item => item.actors),
                     backgroundColor: '#2b4f7c',
                     borderRadius: 6,
                 }]

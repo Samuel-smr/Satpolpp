@@ -128,21 +128,13 @@
         ['Laporan selesai', 'Laporan telah selesai ditangani.'],
     ];
 
-    // Ambil atau seed data contoh
+    const reportsFromDatabase = @json($reports);
+
     function getReports() {
-        let reports = JSON.parse(localStorage.getItem('sipraja_reports') || '[]');
-        if (reports.length === 0) {
-            reports = [
-                { kode: 'SPJ-584021', jenis: 'darurat', kategori: 'Ketertiban Umum', deskripsi: 'Kerumunan massa di alun-alun yang berpotensi gangguan.', lokasi: 'Alun-alun Kulon Progo', telepon: '081234567890', nik: '', dibuat: '31/08/2026 09.12', statusIdx: 3 },
-                { kode: 'SPJ-583990', jenis: 'informasi', kategori: 'Kebersihan Lingkungan', deskripsi: 'Tumpukan sampah di pinggir jalan utama.', lokasi: 'Jl. Sugiman, Pengasih', telepon: '082134567890', nik: '', dibuat: '30/08/2026 16.45', statusIdx: 5 },
-                { kode: 'SPJ-583772', jenis: 'informasi', kategori: 'Keamanan', deskripsi: 'Orang mabuk berkeliaran di area pasar.', lokasi: 'Pasar Wates', telepon: '083145678901', nik: '', dibuat: '29/08/2026 20.03', statusIdx: 1 },
-            ];
-            localStorage.setItem('sipraja_reports', JSON.stringify(reports));
-        }
-        return reports;
+        return reportsFromDatabase;
     }
 
-    function labelJenis(j) { return j === 'darurat' ? 'Darurat' : 'Informasi & Pengaduan'; }
+    function labelJenis(j) { return j === 'emergency' ? 'Darurat' : 'Informasi & Pengaduan'; }
     function labelStatus(idx) { return STATUSES[idx] ? STATUSES[idx][0] : 'Dikirim'; }
     function badgeClass(idx) {
         if (idx >= 5) return 'bg-emerald-100 text-emerald-700';
@@ -151,7 +143,7 @@
         return 'bg-slate-100 text-slate-600';
     }
     function jenisClass(j) {
-        return j === 'darurat' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700';
+        return j === 'emergency' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700';
     }
 
     function filterReports() {
@@ -243,12 +235,16 @@
         section.classList.toggle('hidden', !(idx >= 5));
 
         if (idx >= 5) {
-            // Dummy: selalu tampilkan form rating fresh setiap kali dibuka
-            document.getElementById('rating-view').classList.remove('hidden');
-            document.getElementById('rating-sukses').classList.add('hidden');
-            document.getElementById('rating-komentar').value = '';
-            ratingPicked = 0;
-            ratingRender(0);
+            if (r.feedbackSubmitted) {
+                document.getElementById('rating-view').classList.add('hidden');
+                document.getElementById('rating-sukses').classList.remove('hidden');
+            } else {
+                document.getElementById('rating-view').classList.remove('hidden');
+                document.getElementById('rating-sukses').classList.add('hidden');
+                document.getElementById('rating-komentar').value = '';
+                ratingPicked = 0;
+                ratingRender(0);
+            }
         }
 
         // Bukti penanganan (foto + keterangan) — tanpa lokasi penandaan admin
@@ -300,12 +296,37 @@
         });
     }
 
-    function simpanPenilaian() {
+    async function simpanPenilaian() {
         if (!ratingPicked) { alert('Silakan pilih penilaian bintang terlebih dahulu.'); return; }
-        // Dummy: penilaian tidak disimpan ke penyimpanan, hanya menampilkan konfirmasi.
-        // Saat halaman di-refresh, form rating dapat diisi kembali.
-        document.getElementById('rating-view').classList.add('hidden');
-        document.getElementById('rating-sukses').classList.remove('hidden');
+        const report = getReports().find(item => item.kode === currentKode);
+        if (!report?.feedbackUrl) { alert('Laporan tidak dapat ditemukan.'); return; }
+        const button = document.querySelector('[onclick="simpanPenilaian()"]');
+        button.disabled = true;
+        try {
+            const response = await fetch(report.feedbackUrl, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                },
+                body: JSON.stringify({
+                    rating: ratingPicked,
+                    comment: document.getElementById('rating-komentar').value,
+                }),
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.message || 'Feedback gagal disimpan.');
+            report.feedbackSubmitted = true;
+            report.feedbackRating = ratingPicked;
+            report.feedbackComment = document.getElementById('rating-komentar').value;
+            document.getElementById('rating-view').classList.add('hidden');
+            document.getElementById('rating-sukses').classList.remove('hidden');
+        } catch (error) {
+            alert(error.message);
+        } finally {
+            button.disabled = false;
+        }
     }
 
     // Rating stars: hover preview + click pilih

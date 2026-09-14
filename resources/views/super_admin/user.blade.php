@@ -10,7 +10,7 @@
         </div>
 
         <button type="button" onclick="bukaTambah()"
-            class="inline-flex items-center justify-center gap-2 bg-super-active text-white px-5 py-2.5 rounded-xl font-medium hover:bg-brand-600 transition-colors shadow-sm">
+            class="inline-flex items-center justify-center gap-2 rounded-xl bg-super-active px-5 py-2.5 font-medium text-white shadow-sm transition-colors hover:bg-brand-600">
             <span class="material-symbols-outlined text-[20px]">person_add</span>
             Tambah User
         </button>
@@ -71,7 +71,7 @@
                 <button type="button" data-tab="semua" onclick="setTab('semua')"
                     class="tab-btn text-sm font-semibold px-4 py-2 rounded-xl border transition-colors">Semua</button>
             </div>
-            <span class="text-xs bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-1 rounded-full font-medium">Data Dummy + Tambahan Admin</span>
+            <span class="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-full font-medium">Database</span>
         </div>
 
         <div class="overflow-x-auto">
@@ -108,6 +108,7 @@
 
             <form id="user-form" class="p-6 space-y-4 overflow-y-auto" onsubmit="simpanUser(event)">
                 <input type="hidden" name="edit_index" value="">
+                <input type="hidden" name="_method" value="POST">
                 <div>
                     <label class="block text-sm font-medium mb-1">Nama Lengkap <span class="text-red-500">*</span></label>
                     <input type="text" name="nama" required placeholder="Contoh: Andi Saputra"
@@ -129,8 +130,8 @@
 
                 <div>
                     <label class="block text-sm font-medium mb-1">Kata Sandi <span class="text-red-500">*</span></label>
-                    <input type="password" name="password" required placeholder="Minimal 6 karakter"
-                        minlength="6" class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none">
+                    <input type="password" name="password" required placeholder="Minimal 8 karakter"
+                        minlength="8" class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none">
                     <p id="pw-hint" class="text-xs text-slate-400 mt-1 hidden">Biarkan kosong jika tidak ingin mengubah kata sandi.</p>
                 </div>
 
@@ -147,27 +148,17 @@
 
 @push('scripts')
 <script>
-    const KODE = 'sipraja_users';
+    const databaseUsers = @json($users);
     let tab = 'semua';
 
     function getUsers() {
-        let data = JSON.parse(localStorage.getItem(KODE) || '[]');
-        if (data.length === 0) {
-            data = [
-                { nama: 'Budi Hartono', username: 'budi.hartono', email: 'budi@satpolpp.go.id', status: 'aktif', dibuat: '12/01/2026' },
-                { nama: 'Siti Nurhaliza', username: 'siti.nurhaliza', email: 'siti@satpolpp.go.id', status: 'aktif', dibuat: '20/02/2026' },
-                { nama: 'Agus Salim', username: 'agus.salim', email: 'agus@satpolpp.go.id', status: 'aktif', dibuat: '05/03/2026' },
-                { nama: 'Rina Wulandari', username: 'rina.wulandari', email: 'rina@satpolpp.go.id', status: 'terblokir', dibuat: '18/11/2025' },
-            ];
-            localStorage.setItem(KODE, JSON.stringify(data));
-        }
-        return data;
+        return databaseUsers;
     }
 
-    function saveAll(data) { localStorage.setItem(KODE, JSON.stringify(data)); }
+    function saveAll(data) { databaseUsers.splice(0, databaseUsers.length, ...data); }
 
     function statusClass(s) {
-        return s === 'aktif' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-red-50 text-red-700 border-red-200';
+        return s === 'active' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-red-50 text-red-700 border-red-200';
     }
 
     function filtered(data) {
@@ -187,9 +178,9 @@
     function renderList() {
         const all = getUsers();
         document.getElementById('stat-total').textContent = all.length;
-        document.getElementById('stat-admin').textContent = all.length;
-        document.getElementById('stat-terblokir').textContent = all.filter(u => u.status === 'terblokir').length;
-        document.getElementById('stat-aktif').textContent = all.filter(u => u.status === 'aktif').length;
+        document.getElementById('stat-admin').textContent = all.filter(u => u.role === 'admin').length;
+        document.getElementById('stat-terblokir').textContent = all.filter(u => u.status === 'blocked').length;
+        document.getElementById('stat-aktif').textContent = all.filter(u => u.status === 'active').length;
 
         const list = filtered(all);
         const tbody = document.getElementById('user-list');
@@ -219,12 +210,12 @@
                     </td>
                     <td class="px-6 py-3.5 text-slate-500">${u.username}</td>
                     <td class="px-6 py-3.5">
-                        <span class="text-xs font-semibold px-2.5 py-1 rounded-full border ${statusClass(u.status)} capitalize">${u.status}</span>
+                        <span class="text-xs font-semibold px-2.5 py-1 rounded-full border ${statusClass(u.status)}">${u.status === 'active' ? 'Aktif' : 'Terblokir'}</span>
                     </td>
                     <td class="px-6 py-3.5 text-slate-500">${u.dibuat || '-'}</td>
                     <td class="px-6 py-3.5 text-right whitespace-nowrap">
-                        <button type="button" onclick="toggleStatus(${gi})" class="p-1.5 text-slate-400 hover:text-super-active hover:bg-super-active/10 rounded-lg transition-colors" title="${u.status === 'aktif' ? 'Blokir' : 'Aktifkan'}">
-                            <span class="material-symbols-outlined text-[20px]">${u.status === 'aktif' ? 'block' : 'check_circle'}</span>
+                        <button type="button" onclick="toggleStatus(${gi})" class="p-1.5 text-slate-400 hover:text-super-active hover:bg-super-active/10 rounded-lg transition-colors" title="Ubah status">
+                            <span class="material-symbols-outlined text-[20px]">${u.status === 'active' ? 'block' : 'check_circle'}</span>
                         </button>
                         <button type="button" onclick="bukaEdit(${gi})" class="p-1.5 text-slate-400 hover:text-super-active hover:bg-super-active/10 rounded-lg transition-colors" title="Edit">
                             <span class="material-symbols-outlined text-[20px]">edit</span>
@@ -242,6 +233,7 @@
         document.getElementById('modal-judul').textContent = 'Tambah User';
         document.getElementById('user-form').reset();
         document.querySelector('[name=edit_index]').value = '';
+        document.querySelector('[name=_method]').value = 'POST';
         document.getElementById('pw-hint').classList.add('hidden');
         document.querySelector('[name=password]').required = true;
         document.getElementById('modal').classList.remove('hidden');
@@ -253,6 +245,7 @@
         f.reset();
         document.getElementById('modal-judul').textContent = 'Ubah User';
         document.querySelector('[name=edit_index]').value = gi;
+        document.querySelector('[name=_method]').value = 'PUT';
         f.nama.value = u.nama;
         f.username.value = u.username;
         f.email.value = u.email || '';
@@ -267,40 +260,33 @@
         e.preventDefault();
         const f = document.getElementById('user-form');
         const gi = document.querySelector('[name=edit_index]').value;
-        const all = getUsers();
-        const now = new Date();
-        const pad = n => String(n).padStart(2, '0');
-        const dibuat = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
-
-        const data = {
-            nama: f.nama.value.trim(),
-            username: f.username.value.trim(),
-            email: f.email.value.trim(),
-            role: 'Admin',
-            status: 'aktif',
-            dibuat: dibuat,
-        };
-
-        if (gi !== '') {
-            data.status = all[gi].status;
-            data.dibuat = all[gi].dibuat;
-            all[gi] = data;
-            tampilToast('Edit berhasil! Data user telah diperbarui.');
-        } else {
-            all.unshift(data);
-            tampilToast('Berhasil menambah data user baru.');
-        }
-        saveAll(all);
-        renderList();
-        tutupModal();
+        f.action = gi === '' ? @json(route('super_admin.user.store')) : @json(route('super_admin.user.update', ['user' => '__USER__'])).replace('__USER__', getUsers()[gi].id);
+        const submitButton = f.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        submitButton.classList.add('cursor-wait', 'opacity-70');
+        submitButton.textContent = 'Memproses...';
+        f.submit();
     }
 
     function toggleStatus(gi) {
         const all = getUsers();
-        all[gi].status = all[gi].status === 'aktif' ? 'terblokir' : 'aktif';
-        saveAll(all);
-        renderList();
-        tampilToast('Edit berhasil! Status user diubah menjadi ' + all[gi].status + '.');
+        const user = all[gi];
+        window.konfirmasiHapus({
+            title: 'Konfirmasi Perubahan Status',
+            message: `Ubah status akun "${user.nama}"? Perubahan ini memengaruhi akses login akun.`,
+            confirmText: 'Ya, Ubah Status',
+            onConfirm: () => {
+                fetch(@json(route('super_admin.user.status', ['user' => '__USER__'])).replace('__USER__', user.id), {
+                    method: 'PATCH',
+                    headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'Accept': 'application/json' },
+                }).then(async response => {
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.message || 'Status akun gagal diubah.');
+                    const statusLabel = data.status === 'active' ? 'Aktif' : 'Diblokir';
+                    window.tampilkanToastLaluMuatUlang(`Status akun berhasil diubah menjadi ${statusLabel}.`);
+                }).catch(error => window.tampilToast(error.message, 'error'));
+            },
+        });
     }
 
     function hapusUser(gi) {
@@ -310,10 +296,14 @@
             title: 'Hapus User',
             message: `Apakah Anda yakin ingin menghapus ${nama}? Akun ini tidak akan dapat login kembali.`,
             onConfirm: () => {
-                all.splice(gi, 1);
-                saveAll(all);
-                renderList();
-                tampilToast('User berhasil dihapus.');
+                fetch(@json(route('super_admin.user.destroy', ['user' => '__USER__'])).replace('__USER__', all[gi].id), {
+                    method: 'DELETE',
+                    headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'Accept': 'application/json' },
+                }).then(async response => {
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.message || 'User gagal dihapus.');
+                    window.tampilkanToastLaluMuatUlang(data.message || 'User berhasil dihapus.');
+                }).catch(error => window.tampilToast(error.message, 'error'));
             }
         });
     }

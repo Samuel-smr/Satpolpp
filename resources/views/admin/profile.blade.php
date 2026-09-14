@@ -2,273 +2,193 @@
 
 @section('title', 'Profil Pengguna')
 
-@push('scripts')
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-@endpush
-
 @section('content')
-    <div x-data="profileManager()" x-cloak>
-        
-        <div x-show="view === 'detail'" x-transition.opacity.duration.300ms>
-            
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-                <div>
-                    <h1 class="font-headline text-3xl font-bold text-slate-900 tracking-tight">Profil Pengguna</h1>
-                    <p class="text-sm text-slate-500 mt-1">Kelola informasi pribadi, identitas jabatan, dan preferensi akun Anda.</p>
-                </div>
-                <div>
-                    <button @click="openEdit()" type="button" class="px-4 py-2.5 bg-sidebar-active hover:bg-sidebar-hover rounded-xl text-sm font-semibold text-white shadow-md transition-all flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[18px]">edit</span>
-                        <span>Edit Profil</span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="bg-white border border-slate-200/80 rounded-2xl shadow-sm overflow-hidden mb-6">
-                <div class="h-32 bg-gradient-to-r from-slate-800 to-slate-900 w-full relative"></div>
-                <div class="px-6 pb-6 relative flex flex-col md:flex-row items-center md:items-end justify-between gap-4 -mt-12">
-                    <div class="flex flex-col md:flex-row items-center md:items-end gap-5 text-center md:text-left">
-                        <div class="w-24 h-24 rounded-2xl bg-slate-100 border-4 border-white shadow-md flex items-center justify-center text-slate-400 shrink-0">
-                            <span class="material-symbols-outlined text-[48px]">person</span>
-                        </div>
-                        <div class="mb-1">
-                            <h2 class="text-2xl font-bold text-slate-900 font-headline" x-text="user.nama"></h2>
-                            <p class="text-sm font-semibold text-sidebar-active" x-text="user.jabatan"></p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="px-3 py-1 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Status: Aktif
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                
-                <div class="lg:col-span-1 space-y-6">
-                    <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm">
-                        <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2 mb-4 border-b border-slate-100 pb-4">
-                            <span class="material-symbols-outlined text-[20px] text-slate-400">analytics</span>
-                            Statistik Kinerja
-                        </h3>
-                        <div class="space-y-4">
-                            <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between">
-                                <div>
-                                    <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Tahun Aktif Kerja</div>
-                                    <div class="text-xl font-bold text-slate-800 mt-0.5" x-text="user.tahunMulai + ' (' + hitungMasaKerja(user.tahunMulai) + ' Thn)'"></div>
-                                </div>
-                                <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center">
-                                    <span class="material-symbols-outlined text-[20px]">badge</span>
-                                </div>
-                            </div>
-
-                            <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between">
-                                <div>
-                                    <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Dokumen / Arsip</div>
-                                    <div class="text-xl font-bold text-slate-800 mt-0.5" x-text="stats.totalDokumen + ' File'"></div>
-                                </div>
-                                <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-500 flex items-center justify-center">
-                                    <span class="material-symbols-outlined text-[20px]">folder</span>
-                                </div>
-                            </div>
-
-                            <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between">
-                                <div>
-                                    <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Aktivitas Bulan Ini</div>
-                                    <div class="text-xl font-bold text-slate-800 mt-0.5" x-text="stats.aktivitasBulanIni + ' Log'"></div>
-                                </div>
-                                <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center">
-                                    <span class="material-symbols-outlined text-[20px]">history</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="lg:col-span-2 space-y-6">
-                    <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm">
-                        <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2 mb-6 border-b border-slate-100 pb-4">
-                            <span class="material-symbols-outlined text-[20px] text-slate-400">person_outline</span>
-                            Informasi Detail Pegawai
-                        </h3>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Nama Lengkap</div>
-                                <div class="text-sm font-semibold text-slate-800" x-text="user.nama"></div>
-                            </div>
-
-                            <div>
-                                <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">NIP / ID Pegawai</div>
-                                <div class="text-sm font-semibold text-slate-800" x-text="user.nip"></div>
-                            </div>
-
-                            <div>
-                                <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Jabatan</div>
-                                <div class="text-sm font-semibold text-slate-800" x-text="user.jabatan"></div>
-                            </div>
-
-                            <div>
-                                <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Unit Kerja / Divisi</div>
-                                <div class="text-sm font-semibold text-slate-800" x-text="user.unitKerja"></div>
-                            </div>
-
-                            <div>
-                                <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Email Institusi</div>
-                                <div class="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
-                                    <span class="material-symbols-outlined text-[16px] text-slate-400">mail</span>
-                                    <span x-text="user.email"></span>
-                                </div>
-                            </div>
-
-                            <div>
-                                <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Nomor Telepon</div>
-                                <div class="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
-                                    <span class="material-symbols-outlined text-[16px] text-slate-400">call</span>
-                                    <span x-text="user.telepon"></span>
-                                </div>
-                            </div>
-
-                            <div class="md:col-span-2">
-                                <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Alamat Kantor / Domisili</div>
-                                <div class="text-sm font-medium text-slate-700 leading-relaxed" x-text="user.alamat"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
+    <div class="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-center">
+        <div>
+            <h1 class="font-headline text-3xl font-bold tracking-tight text-slate-900">Profil Pengguna</h1>
+            <p class="mt-1 text-sm text-slate-500">Kelola identitas dan keamanan akun Admin Anda.</p>
         </div>
-
-        <div x-show="view === 'edit'" x-transition.opacity.duration.300ms style="display: none;">
-            <div class="max-w-4xl mx-auto">
-                <div class="flex items-center gap-4 mb-6">
-                    <button @click="view = 'detail'" class="p-2 bg-white border border-slate-200 rounded-full text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-colors">
-                        <span class="material-symbols-outlined">arrow_back</span>
-                    </button>
-                    <div>
-                        <h2 class="text-2xl font-bold font-headline text-slate-900">Edit Profil Pengguna</h2>
-                        <p class="text-sm text-slate-500 mt-1">Ubah data informasi pribadi dan rincian kontak Anda.</p>
-                    </div>
-                </div>
-
-                <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-                    <div class="p-6 md:p-8 space-y-6">
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-2">Nama Lengkap <span class="text-red-500">*</span></label>
-                                <input type="text" x-model="formUser.nama" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm">
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-2">NIP / ID Pegawai</label>
-                                <input type="text" x-model="formUser.nip" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm">
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-2">Jabatan <span class="text-red-500">*</span></label>
-                                <input type="text" x-model="formUser.jabatan" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm">
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-2">Unit Kerja / Divisi</label>
-                                <input type="text" x-model="formUser.unitKerja" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm">
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-2">Email <span class="text-red-500">*</span></label>
-                                <input type="email" x-model="formUser.email" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm">
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-2">Nomor Telepon</label>
-                                <input type="text" x-model="formUser.telepon" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm">
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-2">Tahun Mulai Kerja</label>
-                                <input type="number" x-model="formUser.tahunMulai" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm">
-                            </div>
-
-                            <div class="md:col-span-2">
-                                <label class="block text-sm font-semibold text-slate-700 mb-2">Alamat</label>
-                                <textarea x-model="formUser.alamat" rows="3" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-sidebar-active/20 focus:border-sidebar-active outline-none transition-all text-sm resize-y"></textarea>
-                            </div>
-                        </div>
-
-                    </div>
-                    
-                    <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-3 sticky bottom-0 z-50">
-                        <button @click="view = 'detail'" class="px-6 py-2.5 border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 rounded-xl font-semibold text-sm transition-colors">
-                            Batal
-                        </button>
-                        <button @click="saveProfile()" class="px-6 py-2.5 bg-sidebar-active hover:bg-sidebar-hover text-white rounded-xl font-semibold text-sm transition-colors shadow-md flex items-center gap-2">
-                            <span class="material-symbols-outlined text-[18px]">save</span>
-                            <span>Simpan Perubahan</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+        <button type="button" onclick="bukaEditProfil()"
+            class="inline-flex items-center gap-2 rounded-xl bg-sidebar-active px-4 py-2.5 text-sm font-semibold text-white shadow-md transition-colors hover:bg-sidebar-hover">
+            <span class="material-symbols-outlined text-[18px]">edit</span>
+            Edit Profil
+        </button>
     </div>
 
-    <style>
-        [x-cloak] { display: none !important; }
-    </style>
+    <div class="mb-6 overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
+        <div class="h-32 bg-gradient-to-r from-slate-800 to-slate-900"></div>
+        <div class="relative -mt-12 flex flex-col items-center justify-between gap-4 px-6 pb-6 md:flex-row md:items-end">
+            <div class="flex flex-col items-center gap-5 text-center md:flex-row md:items-end md:text-left">
+                <div class="flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl border-4 border-white bg-slate-100 text-slate-400 shadow-md">
+                    <span class="material-symbols-outlined text-[48px]">person</span>
+                </div>
+                <div class="mb-1">
+                    <h2 class="font-headline text-2xl font-bold text-slate-900">{{ $profileUser->name }}</h2>
+                    <p class="text-sm font-semibold text-sidebar-active">Administrator</p>
+                </div>
+            </div>
+            <span @class([
+                'flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-wider',
+                'border-emerald-100 bg-emerald-50 text-emerald-600' => $profileUser->status === \App\UserStatus::Active,
+                'border-red-100 bg-red-50 text-red-600' => $profileUser->status === \App\UserStatus::Blocked,
+            ])>
+                <span @class([
+                    'h-2 w-2 rounded-full',
+                    'bg-emerald-500' => $profileUser->status === \App\UserStatus::Active,
+                    'bg-red-500' => $profileUser->status === \App\UserStatus::Blocked,
+                ])></span>
+                {{ $profileUser->status === \App\UserStatus::Active ? 'Aktif' : 'Diblokir' }}
+            </span>
+        </div>
+    </div>
 
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div class="space-y-4">
+            <div class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Laporan Dibuat</p>
+                        <p class="font-headline mt-1 text-2xl font-bold text-slate-800">{{ $profileStats['reports_created'] }}</p>
+                    </div>
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-500">
+                        <span class="material-symbols-outlined">description</span>
+                    </div>
+                </div>
+            </div>
+            <div class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Aktivitas Tercatat</p>
+                        <p class="font-headline mt-1 text-2xl font-bold text-slate-800">{{ $profileStats['activities_logged'] }}</p>
+                    </div>
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-500">
+                        <span class="material-symbols-outlined">history</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm lg:col-span-2">
+            <h3 class="mb-6 flex items-center gap-2 border-b border-slate-100 pb-4 text-sm font-bold uppercase tracking-wider text-slate-800">
+                <span class="material-symbols-outlined text-[20px] text-slate-400">manage_accounts</span>
+                Informasi Akun
+            </h3>
+            <dl class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div>
+                    <dt class="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Nama Lengkap</dt>
+                    <dd class="text-sm font-semibold text-slate-800">{{ $profileUser->name }}</dd>
+                </div>
+                <div>
+                    <dt class="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Username</dt>
+                    <dd class="text-sm font-semibold text-slate-800">{{ $profileUser->username }}</dd>
+                </div>
+                <div>
+                    <dt class="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Email</dt>
+                    <dd class="flex items-center gap-1.5 text-sm font-semibold text-slate-800">
+                        <span class="material-symbols-outlined text-[16px] text-slate-400">mail</span>
+                        {{ $profileUser->email ?: 'Belum diisi' }}
+                    </dd>
+                </div>
+                <div>
+                    <dt class="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Akun Dibuat</dt>
+                    <dd class="text-sm font-semibold text-slate-800">{{ $profileUser->created_at->format('d/m/Y H:i') }}</dd>
+                </div>
+            </dl>
+        </div>
+    </div>
+
+    <div id="profile-modal" @class([
+        'fixed inset-0 z-50 flex items-center justify-center p-4',
+        'hidden' => !$errors->any(),
+    ])>
+        <div class="absolute inset-0 bg-black/40" onclick="tutupEditProfil()"></div>
+        <div class="relative max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-2xl bg-white shadow-xl">
+            <div class="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+                <div>
+                    <h2 class="font-headline text-lg font-bold text-slate-800">Edit Profil Pengguna</h2>
+                    <p class="mt-0.5 text-sm text-slate-500">Perbarui informasi akun dan password Anda.</p>
+                </div>
+                <button type="button" onclick="tutupEditProfil()" class="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <form method="POST" action="{{ route('admin.profile.update') }}" class="space-y-5 p-6">
+                @csrf
+                @method('PUT')
+
+                <div>
+                    <label for="profile-name" class="mb-1.5 block text-sm font-semibold text-slate-700">Nama Lengkap <span class="text-red-500">*</span></label>
+                    <input id="profile-name" type="text" name="name" value="{{ old('name', $profileUser->name) }}" required maxlength="255"
+                        class="w-full rounded-xl border border-slate-300 px-4 py-2.5 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active">
+                    @error('name')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                </div>
+
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div>
+                        <label for="profile-username" class="mb-1.5 block text-sm font-semibold text-slate-700">Username <span class="text-red-500">*</span></label>
+                        <input id="profile-username" type="text" name="username" value="{{ old('username', $profileUser->username) }}" required maxlength="100"
+                            class="w-full rounded-xl border border-slate-300 px-4 py-2.5 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active">
+                        @error('username')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                    </div>
+                    <div>
+                        <label for="profile-email" class="mb-1.5 block text-sm font-semibold text-slate-700">Email</label>
+                        <input id="profile-email" type="email" name="email" value="{{ old('email', $profileUser->email) }}" maxlength="255"
+                            class="w-full rounded-xl border border-slate-300 px-4 py-2.5 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active">
+                        @error('email')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                    </div>
+                </div>
+
+                <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                    <div class="mb-4 flex items-start gap-2">
+                        <span class="material-symbols-outlined text-[20px] text-slate-400">lock</span>
+                        <p class="text-xs leading-relaxed text-slate-500">Biarkan seluruh bagian password kosong jika tidak ingin mengganti password.</p>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="current-password" class="mb-1.5 block text-sm font-semibold text-slate-700">Password Saat Ini</label>
+                            <input id="current-password" type="password" name="current_password" autocomplete="current-password"
+                                class="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active">
+                            @error('current_password')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                        </div>
+                        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                            <div>
+                                <label for="new-password" class="mb-1.5 block text-sm font-semibold text-slate-700">Password Baru</label>
+                                <input id="new-password" type="password" name="password" autocomplete="new-password"
+                                    class="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active">
+                                @error('password')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                            </div>
+                            <div>
+                                <label for="password-confirmation" class="mb-1.5 block text-sm font-semibold text-slate-700">Konfirmasi Password Baru</label>
+                                <input id="password-confirmation" type="password" name="password_confirmation" autocomplete="new-password"
+                                    class="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 border-t border-slate-100 pt-4">
+                    <button type="button" onclick="tutupEditProfil()" class="rounded-xl border border-slate-300 px-5 py-2.5 font-semibold text-slate-600 hover:bg-slate-50">Batal</button>
+                    <button type="submit" class="inline-flex items-center gap-2 rounded-xl bg-sidebar-active px-6 py-2.5 font-semibold text-white hover:bg-sidebar-hover">
+                        <span class="material-symbols-outlined text-[18px]">save</span>
+                        Simpan Perubahan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+@endsection
+
+@push('scripts')
     <script>
-        function profileManager() {
-            return {
-                view: 'detail', // 'detail', 'edit'
-                
-                // Data Profil Utama
-                user: {
-                    nama: 'Budi Santoso, S.STP',
-                    nip: '19880312 201001 1 002',
-                    jabatan: 'Kepala Sub Bagian Operasional',
-                    unitKerja: 'Satuan Polisi Pamong Praja',
-                    email: 'budi.santoso@satpolpp.go.id',
-                    telepon: '+62 812-3456-7890',
-                    tahunMulai: 2015,
-                    alamat: 'Jl. Merdeka Selatan No. 8-9, Gambir, Jakarta Pusat'
-                },
+        const modalProfil = document.getElementById('profile-modal');
 
-                // Dummy Statistik Kinerja
-                stats: {
-                    totalDokumen: 142,
-                    aktivitasBulanIni: 28
-                },
+        function bukaEditProfil() {
+            modalProfil.classList.remove('hidden');
+        }
 
-                // Temp State Form
-                formUser: {},
-
-                hitungMasaKerja(tahun) {
-                    const tahunSekarang = new Date().getFullYear();
-                    return Math.max(0, tahunSekarang - tahun);
-                },
-
-                openEdit() {
-                    // Copy data user ke form (shallow copy)
-                    this.formUser = { ...this.user };
-                    this.view = 'edit';
-                    window.scrollTo(0, 0);
-                },
-
-                saveProfile() {
-                    if (!this.formUser.nama || !this.formUser.jabatan || !this.formUser.email) {
-                        alert('Silakan lengkapi field wajib (Nama, Jabatan, dan Email).');
-                        return;
-                    }
-
-                    this.user = { ...this.formUser };
-                    this.view = 'detail';
-                    window.scrollTo(0, 0);
-                    window.tampilToast('Edit berhasil! Profil berhasil diperbarui.');
-                }
-            }
+        function tutupEditProfil() {
+            modalProfil.classList.add('hidden');
         }
     </script>
-@endsection
+@endpush

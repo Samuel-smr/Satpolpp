@@ -32,7 +32,18 @@
         </div>
 
         {{-- Form --}}
-        <form id="lapor-form" class="bg-white border border-slate-200 rounded-xl p-6 md:p-8 shadow-sm">
+        @if ($errors->any())
+            <div class="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                <ul class="list-disc space-y-1 pl-5">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <form id="lapor-form" action="{{ route('pelapor.store') }}" method="POST" enctype="multipart/form-data" class="{{ session('report_code') ? 'hidden ' : '' }}bg-white border border-slate-200 rounded-xl p-6 md:p-8 shadow-sm">
+            @csrf
             {{-- STEP 1: Jenis --}}
             <div class="step-content" data-step="1">
                 <h2 class="font-headline font-bold text-lg mb-4">Pilih Jenis Pengaduan</h2>
@@ -41,7 +52,7 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                     <label class="cursor-pointer">
-                        <input type="radio" name="jenis_radio" value="darurat" class="sr-only peer">
+                        <input type="radio" name="jenis_radio" value="emergency" class="sr-only peer">
                         <div
                             class="border-2 border-slate-200 rounded-xl p-5 text-center peer-checked:border-accent-500 peer-checked:bg-orange-50 transition-colors">
                             <div class="text-3xl mb-2">🚨</div>
@@ -52,7 +63,7 @@
                     </label>
 
                     <label class="cursor-pointer">
-                        <input type="radio" name="jenis_radio" value="informasi" class="sr-only peer">
+                        <input type="radio" name="jenis_radio" value="information" class="sr-only peer">
                         <div
                             class="border-2 border-slate-200 rounded-xl p-5 text-center peer-checked:border-brand-500 peer-checked:bg-blue-50 transition-colors">
                             <div class="text-3xl mb-2">📋</div>
@@ -78,14 +89,14 @@
                     <div>
                         <label class="block text-sm font-medium mb-1">Nomor WhatsApp / Telepon <span
                                 class="text-red-500">*</span></label>
-                        <input type="tel" name="telepon" required placeholder="Contoh: 081234567890"
+                        <input type="tel" name="telepon" required inputmode="tel" maxlength="20" pattern="\+?[0-9][0-9\s-]{8,18}" title="Masukkan 9–19 digit; boleh diawali + serta menggunakan spasi atau tanda hubung." placeholder="Contoh: 081234567890"
                             class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none">
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium mb-1">NIK<span id="nik-required-star"
                                 class="text-red-500 hidden"> *</span></label>
-                        <input type="text" name="nik" id="nik" placeholder="16 digit NIK"
+                        <input type="text" name="nik" id="nik" inputmode="numeric" minlength="16" maxlength="16" pattern="[0-9]{16}" title="NIK harus terdiri dari tepat 16 angka." placeholder="16 digit NIK"
                             class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none">
                     </div>
 
@@ -107,7 +118,7 @@
                         <label class="block text-sm font-medium mb-1">Foto / Video Bukti</label>
                         <label
                             class="flex flex-col items-center justify-center w-full border-2 border-dashed border-slate-300 rounded-xl p-6 cursor-pointer hover:border-brand-500 bg-slate-50 transition-colors text-center">
-                            <input type="file" name="bukti" accept="image/*,video/*" multiple data-handle class="sr-only">
+                            <input type="file" name="bukti[]" accept="image/jpeg,image/png,image/webp" multiple data-handle class="sr-only">
                             <div class="text-3xl mb-2">📎</div>
                             <p class="text-sm font-medium text-slate-600">Klik untuk memilih Foto / Video</p>
                             <p class="text-xs text-slate-400 mt-1">Maks 3 foto atau 1 video pendek</p>
@@ -154,12 +165,12 @@
         </form>
 
         {{-- Hasil Kode Laporan --}}
-        <div id="result" class="hidden mt-8 bg-white border border-slate-200 rounded-xl p-8 text-center shadow-sm">
+        <div id="result" class="{{ session('report_code') ? '' : 'hidden ' }}mt-8 bg-white border border-slate-200 rounded-xl p-8 text-center shadow-sm">
             <div class="text-5xl mb-4">✅</div>
             <h2 class="font-headline text-lg font-bold mb-2">Laporan Terkirim!</h2>
             <p class="text-slate-500 mb-4">Simpan kode laporan Anda untuk memantau status:</p>
             <div class="inline-block bg-slate-100 border border-slate-300 rounded-lg px-6 py-3 font-mono text-xl font-bold text-brand-700"
-                id="kode-laporan">--</div>
+                id="kode-laporan">{{ session('report_code', '--') }}</div>
             <p class="mt-4 text-sm text-slate-500">Gunakan kode ini pada menu <a href="{{ route('pelapor.status') }}"
                     class="text-brand-600 underline">Cek Status Laporan</a>.</p>
         </div>
@@ -230,7 +241,7 @@
 
         // Radio Jenis: set hidden & trigger bulatan step 1 langsung aktif (tercentang)
         function updateNikRequirement() {
-            const wajib = document.getElementById('jenis').value === 'darurat';
+            const wajib = document.getElementById('jenis').value === 'emergency';
             const star = document.getElementById('nik-required-star');
             const nik = document.getElementById('nik');
             if (star) star.classList.toggle('hidden', !wajib);
@@ -262,7 +273,7 @@
         // Validasi step 2 (field wajib): telepon, deskripsi, lokasi (+ NIK jika darurat)
         function nextFromDetail() {
             const required = ['telepon', 'deskripsi', 'lokasi'];
-            if (document.getElementById('jenis').value === 'darurat') required.push('nik');
+            if (document.getElementById('jenis').value === 'emergency') required.push('nik');
             const labels = {
                 telepon: 'Nomor WhatsApp / Telepon',
                 nik: 'NIK (wajib untuk laporan darurat)',
@@ -303,38 +314,5 @@
             });
         });
 
-        // Submit: simpan laporan ke localStorage (front-end, tanpa database)
-        document.getElementById('lapor-form').addEventListener('submit', function (e) {
-            e.preventDefault();
-            const kode = 'SPJ-' + Date.now().toString().slice(-6);
-
-            const jenis = document.getElementById('jenis').value || 'informasi';
-            const nik = document.querySelector('input[name="nik"]').value;
-            if (jenis === 'darurat' && !nik.trim()) {
-                alert('NIK wajib diisikan untuk laporan darurat.');
-                goStep(2);
-                return;
-            }
-
-            const report = {
-                kode: kode,
-                jenis: jenis,
-                deskripsi: document.querySelector('textarea[name="deskripsi"]').value,
-                lokasi: document.querySelector('input[name="lokasi"]').value,
-                telepon: document.querySelector('input[name="telepon"]').value,
-                nik: nik,
-                dibuat: new Date().toLocaleString('id-ID'),
-                statusIdx: 0, // baru dibuat -> "Laporan dibuat"
-            };
-
-            const reports = JSON.parse(localStorage.getItem('sipraja_reports') || '[]');
-            reports.unshift(report);
-            localStorage.setItem('sipraja_reports', JSON.stringify(reports));
-
-            document.getElementById('kode-laporan').textContent = kode;
-            document.getElementById('lapor-form').classList.add('hidden');
-            document.getElementById('result').classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
     </script>
 @endpush

@@ -3,423 +3,372 @@
 @section('title', 'Evaluasi Kegiatan')
 
 @section('content')
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+    <div class="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-center">
         <div>
-            <h1 class="font-headline text-3xl font-bold text-slate-900 tracking-tight">Evaluasi Kegiatan</h1>
-            <p class="text-sm text-slate-500 mt-1">Catat hasil dan kendala dari setiap kegiatan, baik internal Satpol PP
-                maupun kegiatan dari laporan (eksternal).</p>
+            <h1 class="font-headline text-3xl font-bold tracking-tight text-slate-900">Evaluasi Kegiatan</h1>
+            <p class="mt-1 text-sm text-slate-500">Catat hasil dan kendala kegiatan internal maupun kegiatan eksternal
+                yang berasal dari laporan warga.</p>
         </div>
 
         <button type="button" onclick="bukaTambah()"
-            class="inline-flex items-center justify-center gap-2 bg-sidebar-active text-white px-5 py-2.5 rounded-xl font-medium hover:bg-sidebar-hover transition-colors shadow-sm">
+            class="inline-flex items-center justify-center gap-2 rounded-xl bg-sidebar-active px-5 py-2.5 font-medium text-white shadow-sm transition-colors hover:bg-sidebar-hover">
             <span class="material-symbols-outlined text-[20px]">add</span>
             Tambah Evaluasi
         </button>
     </div>
 
-    {{-- Ringkasan --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-xl bg-sidebar-active/10 text-sidebar-active flex items-center justify-center">
-                    <span class="material-symbols-outlined text-[24px]">assessment</span>
-                </div>
-                <div>
-                    <p class="text-xs text-slate-500 font-medium">Total Evaluasi</p>
-                    <p class="font-headline text-2xl font-bold text-slate-900" id="stat-total">0</p>
-                </div>
-            </div>
-        </div>
-        <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-[24px]">home_work</span>
-                </div>
-                <div>
-                    <p class="text-xs text-slate-500 font-medium">Internal</p>
-                    <p class="font-headline text-2xl font-bold text-slate-900" id="stat-internal">0</p>
-                </div>
-            </div>
-        </div>
-        <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-[24px]">description</span>
-                </div>
-                <div>
-                    <p class="text-xs text-slate-500 font-medium">Eksternal (Laporan)</p>
-                    <p class="font-headline text-2xl font-bold text-slate-900" id="stat-eksternal">0</p>
+    <form method="GET" action="{{ route('admin.evaluasi') }}" class="mb-6 grid grid-cols-1 items-end gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-5">
+        <div><label class="mb-1 block text-xs font-semibold text-slate-500" for="evaluation-search">PENCARIAN</label><input id="evaluation-search" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Kegiatan, laporan, hasil" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"></div>
+        <div><label class="mb-1 block text-xs font-semibold text-slate-500" for="evaluation-type">SUMBER</label><select id="evaluation-type" name="type" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"><option value="">Semua sumber</option>@foreach ($activityTypes as $type)<option value="{{ $type->value }}" @selected(($filters['type'] ?? '') === $type->value)>{{ $type->label() }}</option>@endforeach</select></div>
+        <div><label class="mb-1 block text-xs font-semibold text-slate-500" for="evaluation-start">MULAI</label><input id="evaluation-start" type="date" name="date_start" value="{{ $filters['date_start'] ?? '' }}" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"></div>
+        <div><label class="mb-1 block text-xs font-semibold text-slate-500" for="evaluation-end">SAMPAI</label><input id="evaluation-end" type="date" name="date_end" value="{{ $filters['date_end'] ?? '' }}" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"></div>
+        <div class="flex gap-2"><button class="flex-1 rounded-xl bg-sidebar-active px-4 py-2 text-sm font-semibold text-white">Terapkan</button><a href="{{ route('admin.evaluasi') }}" class="rounded-xl border border-slate-300 px-4 py-2 text-sm">Reset</a></div>
+    </form>
+
+    <div class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        @foreach ([
+            ['label' => 'Total Evaluasi', 'value' => $evaluationSummary['total'], 'icon' => 'assessment', 'icon_class' => 'bg-sidebar-active/10 text-sidebar-active'],
+            ['label' => 'Internal', 'value' => $evaluationSummary['internal'], 'icon' => 'home_work', 'icon_class' => 'bg-emerald-50 text-emerald-600'],
+            ['label' => 'Eksternal (Laporan)', 'value' => $evaluationSummary['external'], 'icon' => 'description', 'icon_class' => 'bg-blue-50 text-blue-600'],
+            ['label' => 'Ada Kendala', 'value' => $evaluationSummary['with_obstacles'], 'icon' => 'warning', 'icon_class' => 'bg-amber-50 text-amber-600'],
+        ] as $stat)
+            <div class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-11 w-11 items-center justify-center rounded-xl {{ $stat['icon_class'] }}">
+                        <span class="material-symbols-outlined text-[24px]">{{ $stat['icon'] }}</span>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium text-slate-500">{{ $stat['label'] }}</p>
+                        <p class="font-headline text-2xl font-bold text-slate-900">{{ $stat['value'] }}</p>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-[24px]">warning</span>
-                </div>
-                <div>
-                    <p class="text-xs text-slate-500 font-medium">Ada Kendala</p>
-                    <p class="font-headline text-2xl font-bold text-slate-900" id="stat-kendala">0</p>
-                </div>
-            </div>
-        </div>
+        @endforeach
     </div>
 
-    {{-- Tabel --}}
-    <div class="bg-white border border-slate-200/80 rounded-2xl shadow-sm overflow-hidden">
-        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+    <div class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
+        <div class="flex items-center justify-between border-b border-slate-100 px-6 py-4">
             <span class="text-sm font-semibold text-slate-700">Daftar Evaluasi Kegiatan</span>
-            <span class="text-xs bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-1 rounded-full font-medium">Data
-                Dummy + Tambahan Admin</span>
+            <span class="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">
+                Data Database
+            </span>
         </div>
 
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-                <thead>
-                    <tr class="border-b border-slate-100 text-left text-xs text-slate-400 uppercase tracking-wider">
-                        <th class="px-6 py-3 font-semibold">Kegiatan</th>
-                        <th class="px-6 py-3 font-semibold">Sumber</th>
-                        <th class="px-6 py-3 font-semibold">Keterangan / Kendala</th>
-                        <th class="px-6 py-3 font-semibold">Dibuat</th>
-                        <th class="px-6 py-3 font-semibold text-right">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="evaluasi-list"></tbody>
-            </table>
-        </div>
+        @if ($evaluations->isEmpty())
+            <div class="px-6 py-12 text-center text-slate-400">
+                <span class="material-symbols-outlined mb-2 text-4xl">assessment</span>
+                <p>Belum ada data evaluasi kegiatan.</p>
+            </div>
+        @else
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-slate-100 text-left text-xs uppercase tracking-wider text-slate-400">
+                            <th class="px-6 py-3 font-semibold">Kegiatan</th>
+                            <th class="px-6 py-3 font-semibold">Sumber</th>
+                            <th class="px-6 py-3 font-semibold">Hasil Evaluasi</th>
+                            <th class="px-6 py-3 font-semibold">Kendala</th>
+                            <th class="px-6 py-3 font-semibold">Dievaluasi</th>
+                            <th class="px-6 py-3 text-right font-semibold">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($evaluations as $evaluation)
+                            <tr class="border-b border-slate-50 hover:bg-slate-50/50">
+                                <td class="px-6 py-3.5">
+                                    <p class="font-medium text-slate-800">{{ $evaluation->name }}</p>
+                                    <p class="mt-0.5 text-xs text-slate-500">
+                                        {{ $evaluation->report?->code ?? $evaluation->activity_date->format('d/m/Y') }}
+                                    </p>
+                                </td>
+                                <td class="px-6 py-3.5">
+                                    <span @class([
+                                        'rounded-full border px-2.5 py-1 text-xs font-semibold',
+                                        'border-emerald-200 bg-emerald-50 text-emerald-700' => $evaluation->type === \App\ActivityType::Internal,
+                                        'border-blue-200 bg-blue-50 text-blue-700' => $evaluation->type === \App\ActivityType::External,
+                                    ])>
+                                        {{ $evaluation->type->label() }}
+                                    </span>
+                                </td>
+                                <td class="max-w-sm px-6 py-3.5 text-slate-600">{{ $evaluation->evaluation_notes }}</td>
+                                <td class="max-w-sm px-6 py-3.5 text-slate-600">
+                                    @if ($evaluation->evaluation_obstacles)
+                                        <div class="flex items-start gap-2">
+                                            <span class="material-symbols-outlined mt-0.5 text-[18px] text-amber-500">warning</span>
+                                            <span>{{ $evaluation->evaluation_obstacles }}</span>
+                                        </div>
+                                    @else
+                                        <span class="text-slate-400">Tidak ada</span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-3.5 text-slate-500">
+                                    <p>{{ $evaluation->evaluated_at->format('d/m/Y H:i') }}</p>
+                                    <p class="mt-0.5 text-xs">{{ $evaluation->evaluatedByUser?->name ?? '-' }}</p>
+                                </td>
+                                <td class="px-6 py-3.5 text-right">
+                                    <div class="flex items-center justify-end gap-1">
+                                        <button type="button"
+                                            onclick="bukaEditEvaluasi(@js([
+                                                'id' => $evaluation->id,
+                                                'name' => $evaluation->name,
+                                                'notes' => $evaluation->evaluation_notes,
+                                                'obstacles' => $evaluation->evaluation_obstacles,
+                                            ]))"
+                                            class="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-amber-50 hover:text-amber-600"
+                                            title="Edit evaluasi">
+                                            <span class="material-symbols-outlined text-[20px]">edit</span>
+                                        </button>
+                                        <form method="POST" action="{{ route('admin.evaluasi.destroy', $evaluation) }}"
+                                            data-confirm-delete="Hapus evaluasi kegiatan &quot;{{ $evaluation->name }}&quot;? Kegiatan dan laporan asal tidak akan dihapus dan kegiatan dapat dievaluasi kembali.">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                class="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                                                title="Hapus evaluasi">
+                                                <span class="material-symbols-outlined text-[20px]">delete</span>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
 
-        <div id="kosong" class="hidden px-6 py-12 text-center text-slate-400">
-            <div class="text-4xl mb-2">📊</div>
-            <p>Belum ada data evaluasi kegiatan.</p>
-        </div>
+            @if ($evaluations->hasPages())
+                <div class="border-t border-slate-100 px-6 py-4">
+                    {{ $evaluations->links() }}
+                </div>
+            @endif
+        @endif
     </div>
 
-    {{-- Modal tambah/ubah evaluasi --}}
-    <div id="modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div id="modal" @class([
+        'fixed inset-0 z-50 flex items-center justify-center p-4',
+        'hidden' => !$errors->any() || $editingEvaluation !== null,
+    ])>
         <div class="absolute inset-0 bg-black/40" onclick="tutupModal()"></div>
-        <div class="relative w-full max-w-lg bg-white rounded-2xl shadow-xl overflow-hidden max-h-[90vh] flex flex-col">
-            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-                <h2 class="font-headline font-bold text-slate-800" id="modal-judul">Tambah Evaluasi</h2>
+        <div class="relative flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-white shadow-xl">
+            <div class="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+                <h2 class="font-headline font-bold text-slate-800">Tambah Evaluasi</h2>
                 <button type="button" onclick="tutupModal()" class="text-slate-400 hover:text-slate-600">
                     <span class="material-symbols-outlined">close</span>
                 </button>
             </div>
 
-            <form id="evaluasi-form" class="p-6 space-y-4 overflow-y-auto" onsubmit="simpanEvaluasi(event)">
-                <input type="hidden" name="edit_index" value="">
+            <form method="POST" action="{{ route('admin.evaluasi.store') }}" class="space-y-4 overflow-y-auto p-6">
+                @csrf
+
                 <div>
-                    <label class="block text-sm font-medium mb-1">Sumber <span class="text-red-500">*</span></label>
-                    <select name="sumber" id="select-sumber" onchange="loadOptions()"
-                        class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none bg-white">
+                    <label for="evaluation-source" class="mb-1 block text-sm font-medium">Sumber <span
+                            class="text-red-500">*</span></label>
+                    <select id="evaluation-source" onchange="filterKegiatan()"
+                        class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active">
                         <option value="">Pilih Sumber</option>
-                        <option value="Internal">Internal (Kegiatan Satpol PP)</option>
-                        <option value="Eksternal">Eksternal (Dari Laporan)</option>
+                        <option value="internal">Internal (Kegiatan Satpol PP)</option>
+                        <option value="external" @selected(old('activity_id') && $availableActivities->firstWhere('id', (int) old('activity_id'))?->type === \App\ActivityType::External)>
+                            Eksternal (Dari Laporan)</option>
                     </select>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium mb-1">Kategori <span class="text-red-500">*</span></label>
-                    <select name="kategori" id="select-kategori" onchange="loadOptions()"
-                        class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none bg-white">
-                        <option value="" disabled selected>Pilih Kategori...</option>
-                        <option value="Permintaan Data dan Informasi terkait Ketertiban Umum dan Ketentraman Masyarakat">Permintaan Data dan Informasi terkait Ketertiban Umum dan Ketentraman Masyarakat</option>
-                        <option value="Pelayanan Surat Menyurat">Pelayanan Surat Menyurat</option>
-                        <option value="Patroli Ketertiban Umum, Ketentraman dan Perlindungan Masyarakat">Patroli Ketertiban Umum, Ketentraman dan Perlindungan Masyarakat</option>
-                        <option value="Pelaksanaan Bantuan Pengamanan Unjuk Rasa">Pelaksanaan Bantuan Pengamanan Unjuk Rasa</option>
-                        <option value="Pelaksanaan Bantuan Pengamanan Kegiatan">Pelaksanaan Bantuan Pengamanan Kegiatan</option>
-                        <option value="Penanganan Pengaduan Pelanggaran Ketertiban Umum/Masyarakat">Penanganan Pengaduan Pelanggaran Ketertiban Umum/Masyarakat</option>
-                        <option value="Penegakan Peraturan Daerah dan Peraturan Kepala Daerah">Penegakan Peraturan Daerah dan Peraturan Kepala Daerah</option>
-                        <option value="Pembinaan dan Pengawasan Kepatuhan terhadap Perda dan Perkada">Pembinaan dan Pengawasan Kepatuhan terhadap Perda dan Perkada</option>
-                        <option value="Pembinaan Perlindungan Masyarakat">Pembinaan Perlindungan Masyarakat</option>
+                    <label for="evaluation-category" class="mb-1 block text-sm font-medium">Kategori</label>
+                    <select id="evaluation-category" onchange="filterKegiatan()"
+                        class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active">
+                        <option value="">Semua kategori</option>
+                        @foreach ($availableCategories as $category)
+                            <option value="{{ $category }}">{{ $category }}</option>
+                        @endforeach
                     </select>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium mb-1">Nama Kegiatan <span class="text-red-500">*</span></label>
-                    <select name="nama" required id="select-kegiatan"
-                        class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none bg-white">
+                    <label for="activity-id" class="mb-1 block text-sm font-medium">Nama Kegiatan <span
+                            class="text-red-500">*</span></label>
+                    <select name="activity_id" id="activity-id" required disabled
+                        class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active">
                         <option value="">Pilih Sumber Terlebih Dahulu</option>
+                        @foreach ($availableActivities as $activity)
+                            <option value="{{ $activity->id }}" data-source="{{ $activity->type->value }}" data-category="{{ $activity->category ?? '' }}"
+                                @selected((int) old('activity_id') === $activity->id)>
+                                {{ $activity->name }} — {{ $activity->activity_date->format('d/m/Y') }}
+                                @if ($activity->report)
+                                    ({{ $activity->report->code }})
+                                @endif
+                            </option>
+                        @endforeach
                     </select>
+                    <p id="activity-empty" class="mt-1 hidden text-xs text-slate-500">Belum ada kegiatan pada kategori ini.</p>
+                    @error('activity_id')
+                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium mb-1">Keterangan / Kendala</label>
-                    <textarea name="keterangan" rows="4"
-                        placeholder="Catat hasil kegiatan dan kendala yang dihadapi, mis. jumlah personel terbatas, koordinasi lintas sektor..."
-                        class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active outline-none"></textarea>
+                    <label for="evaluation-notes" class="mb-1 block text-sm font-medium">Hasil Evaluasi <span
+                            class="text-red-500">*</span></label>
+                    <textarea name="evaluation_notes" id="evaluation-notes" rows="4" required maxlength="3000"
+                        placeholder="Catat hasil pelaksanaan dan kondisi setelah kegiatan..."
+                        class="w-full rounded-xl border border-slate-300 px-3 py-2 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active">{{ old('evaluation_notes') }}</textarea>
+                    @error('evaluation_notes')
+                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="evaluation-obstacles" class="mb-1 block text-sm font-medium">Kendala</label>
+                    <textarea name="evaluation_obstacles" id="evaluation-obstacles" rows="3" maxlength="3000"
+                        placeholder="Isi jika terdapat kendala selama pelaksanaan..."
+                        class="w-full rounded-xl border border-slate-300 px-3 py-2 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active">{{ old('evaluation_obstacles') }}</textarea>
+                    @error('evaluation_obstacles')
+                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="flex justify-end gap-3 pt-2">
                     <button type="button" onclick="tutupModal()"
-                        class="border border-slate-300 text-slate-600 px-5 py-2 rounded-xl font-medium hover:bg-slate-50 transition-colors">Batal</button>
+                        class="rounded-xl border border-slate-300 px-5 py-2 font-medium text-slate-600 transition-colors hover:bg-slate-50">Batal</button>
                     <button type="submit"
-                        class="bg-sidebar-active text-white px-6 py-2 rounded-xl font-medium hover:bg-sidebar-hover transition-colors">Simpan</button>
+                        class="rounded-xl bg-sidebar-active px-6 py-2 font-medium text-white transition-colors hover:bg-sidebar-hover">Simpan</button>
                 </div>
             </form>
         </div>
     </div>
 
+    <div id="edit-evaluation-modal" @class([
+        'fixed inset-0 z-50 flex items-center justify-center p-4',
+        'hidden' => !$errors->any() || $editingEvaluation === null,
+    ])>
+        <div class="absolute inset-0 bg-black/40" onclick="tutupEditEvaluasi()"></div>
+        <div class="relative flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-white shadow-xl">
+            <div class="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+                <div>
+                    <h2 class="font-headline font-bold text-slate-800">Edit Evaluasi</h2>
+                    <p id="edit-evaluation-name" class="mt-0.5 text-sm text-slate-500"></p>
+                </div>
+                <button type="button" onclick="tutupEditEvaluasi()" class="text-slate-400 hover:text-slate-600">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
 
+            <form id="edit-evaluation-form" method="POST" action="" class="space-y-4 overflow-y-auto p-6">
+                @csrf
+                @method('PUT')
+                <input id="evaluation-context-id" type="hidden" name="evaluation_context_id" value="{{ old('evaluation_context_id') }}">
 
+                <div>
+                    <label for="edit-evaluation-notes" class="mb-1 block text-sm font-medium">Hasil Evaluasi <span class="text-red-500">*</span></label>
+                    <textarea name="evaluation_notes" id="edit-evaluation-notes" rows="4" required maxlength="3000"
+                        class="w-full rounded-xl border border-slate-300 px-3 py-2 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active"></textarea>
+                    @if ($editingEvaluation)
+                        @error('evaluation_notes')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                    @endif
+                </div>
+
+                <div>
+                    <label for="edit-evaluation-obstacles" class="mb-1 block text-sm font-medium">Kendala</label>
+                    <textarea name="evaluation_obstacles" id="edit-evaluation-obstacles" rows="3" maxlength="3000"
+                        class="w-full rounded-xl border border-slate-300 px-3 py-2 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active"></textarea>
+                    @if ($editingEvaluation)
+                        @error('evaluation_obstacles')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                    @endif
+                </div>
+
+                <div class="flex justify-end gap-3 pt-2">
+                    <button type="button" onclick="tutupEditEvaluasi()"
+                        class="rounded-xl border border-slate-300 px-5 py-2 font-medium text-slate-600 hover:bg-slate-50">Batal</button>
+                    <button type="submit"
+                        class="rounded-xl bg-sidebar-active px-6 py-2 font-medium text-white hover:bg-sidebar-hover">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
     <script>
-        const KODE = 'sipraja_evaluasi';
+        const modalEvaluasi = document.getElementById('modal');
+        const sumberEvaluasi = document.getElementById('evaluation-source');
+        const kategoriEvaluasi = document.getElementById('evaluation-category');
+        const kegiatanEvaluasi = document.getElementById('activity-id');
+        const pesanKegiatanKosong = document.getElementById('activity-empty');
+        const semuaPilihanKegiatan = Array.from(kegiatanEvaluasi.options).slice(1);
+        const modalEditEvaluasi = document.getElementById('edit-evaluation-modal');
+        const formEditEvaluasi = document.getElementById('edit-evaluation-form');
+        const polaUrlEditEvaluasi = @json(route('admin.evaluasi.update', ['activity' => '__ACTIVITY__']));
 
-        function getData() {
-            let data = JSON.parse(localStorage.getItem(KODE) || '[]');
-            if (data.length === 0) {
-                data = [
-                    { nama: 'Patroli rutin kawasan Pasar Wates', sumber: 'Internal', kategori: 'Patroli Ketertiban Umum, Ketentraman dan Perlindungan Masyarakat', keterangan: 'Jumlah personel terbatas saat jam ramai.', dibuat: '01/09/2026' },
-                    { nama: 'Penanganan laporan kerumunan di alun-alun', sumber: 'Eksternal', kategori: 'Penanganan Pengaduan Pelanggaran Ketertiban Umum/Masyarakat', keterangan: 'Koordinasi dengan aparat desa membutuhkan waktu lebih.', dibuat: '02/09/2026' },
-                    { nama: 'Pengamanan acara pasar malam', sumber: 'Internal', kategori: 'Pelaksanaan Bantuan Pengamanan Kegiatan', keterangan: 'Berjalan lancar tanpa kendala.', dibuat: '28/08/2026' },
-                    { nama: 'Tindak lanjut laporan PKL liar', sumber: 'Eksternal', kategori: 'Pembinaan dan Pengawasan Kepatuhan terhadap Perda dan Perkada', keterangan: 'Butuh sosialisasi berulang kepada pedagang.', dibuat: '27/08/2026' },
-                ];
-                localStorage.setItem(KODE, JSON.stringify(data));
-            }
-            return data;
-        }
+        function filterKegiatan() {
+            const sumber = sumberEvaluasi.value;
+            const kategori = kategoriEvaluasi.value;
+            const nilaiLama = kegiatanEvaluasi.value;
+            const sumberEksternal = sumber === 'external';
 
+            kategoriEvaluasi.disabled = sumberEksternal;
 
-
-        function sumberClass(s) {
-            return s === 'Internal'
-                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                : 'bg-blue-50 text-blue-700 border-blue-200';
-        }
-
-        function ambilKegiatanInternal() {
-            try {
-                const k = JSON.parse(localStorage.getItem('sipraja_kegiatan') || '[]');
-                return Array.isArray(k) ? k : [];
-            } catch (e) {
-                return [];
-            }
-        }
-
-        function ambilLaporanSelesai() {
-            try {
-                const r = JSON.parse(localStorage.getItem('sipraja_reports') || '[]');
-                return Array.isArray(r) ? r.filter(x => (x.statusIdx || 0) >= 5) : [];
-            } catch (e) {
-                return [];
-            }
-        }
-
-        function loadOptions() {
-            const sel = document.getElementById('select-kegiatan');
-            const kat = document.getElementById('select-kategori');
-            const src = document.getElementById('select-sumber').value;
-
-            sel.innerHTML = '';
-
-            if (src === 'Eksternal') {
-                kat.value = '';
-                kat.disabled = true;
-            } else {
-                kat.disabled = false;
+            if (sumberEksternal) {
+                kategoriEvaluasi.value = '';
             }
 
+            semuaPilihanKegiatan.forEach((pilihan) => {
+                const sesuaiSumber = pilihan.dataset.source === sumber;
+                const sesuaiKategori = !kategori
+                    || (kategori === '__uncategorized__' && !pilihan.dataset.category)
+                    || pilihan.dataset.category === kategori;
 
-            if (!src) {
-                sel.innerHTML = '<option value="">Pilih Sumber Terlebih Dahulu</option>';
-                sel.disabled = true;
-                return;
+                pilihan.hidden = !sesuaiSumber || !sesuaiKategori;
+            });
+
+            const pilihanTersedia = semuaPilihanKegiatan.filter((pilihan) => !pilihan.hidden);
+            kegiatanEvaluasi.disabled = !sumber || pilihanTersedia.length === 0;
+            pesanKegiatanKosong.classList.toggle('hidden', sumber !== 'internal' || pilihanTersedia.length > 0);
+
+            if (!pilihanTersedia.some((pilihan) => pilihan.value === nilaiLama)) {
+                kegiatanEvaluasi.value = '';
             }
 
-            if (src === 'Internal') {
-                const kategoriDipilih = kat.value;
-
-                // Kunci 'Nama Kegiatan' kalau Kategori BELUM dipilih
-                if (!kategoriDipilih) {
-                    sel.innerHTML = '<option value="">Pilih Kategori Terlebih Dahulu</option>';
-                    sel.disabled = true;
-                    return;
-                }
-
-                sel.disabled = false;
-                let internal = ambilKegiatanInternal();
-                internal = internal.filter(k => k.kategori === kategoriDipilih);
-
-                if (internal.length) {
-                    const og = document.createElement('optgroup');
-                    og.label = 'Kegiatan - ' + kategoriDipilih;
-                    internal.forEach(k => {
-                        const o = document.createElement('option');
-                        o.value = k.nama;
-                        o.textContent = k.nama + (k.tanggal ? ' — ' + k.tanggal : '');
-                        og.appendChild(o);
-                    });
-                    sel.appendChild(og);
-                } else {
-                    sel.innerHTML = '<option value="">Belum ada kegiatan untuk kategori ini</option>';
-                }
-
-            } else if (src === 'Eksternal') {
-                sel.disabled = false;
-                const eksternal = ambilLaporanSelesai();
-                if (eksternal.length) {
-                    const og = document.createElement('optgroup');
-                    og.label = 'Eksternal (Dari Laporan)';
-                    eksternal.forEach(r => {
-                        const o = document.createElement('option');
-                        o.value = r.kode + ' - ' + (r.deskripsi || 'Laporan');
-                        o.textContent = (r.deskripsi || 'Laporan') + ' (' + r.kode + ')';
-                        og.appendChild(o);
-                    });
-                    sel.appendChild(og);
-                } else {
-                    sel.innerHTML = '<option value="">Belum ada laporan selesai</option>';
-                }
-            }
-        }
-
-        function sumberTerpilih() {
-            return document.getElementById('select-sumber').value || 'Internal';
-        }
-
-        function saveAll(data) { localStorage.setItem(KODE, JSON.stringify(data)); }
-
-        function renderList() {
-            const data = getData();
-
-            document.getElementById('stat-total').textContent = data.length;
-            document.getElementById('stat-internal').textContent = data.filter(e => e.sumber === 'Internal').length;
-            document.getElementById('stat-eksternal').textContent = data.filter(e => e.sumber !== 'Internal').length;
-            document.getElementById('stat-kendala').textContent = data.filter(e => e.keterangan && /kendala|keterbatasan|terbatas|butuh|memerlukan|koordinasi/i.test(e.keterangan)).length;
-
-            const tbody = document.getElementById('evaluasi-list');
-            const kosong = document.getElementById('kosong');
-
-            if (data.length === 0) {
-                tbody.innerHTML = '';
-                kosong.classList.remove('hidden');
-                return;
-            }
-            kosong.classList.add('hidden');
-
-            tbody.innerHTML = data.map((e, i) => {
-                const gi = getData().findIndex(x => x.nama === e.nama && x.sumber === e.sumber && x.dibuat === e.dibuat);
-                const adaKendala = e.keterangan && /kendala|keterbatasan|terbatas|butuh|memerlukan|koordinasi/i.test(e.keterangan);
-                return `
-                        <tr class="border-b border-slate-50 hover:bg-slate-50/50">
-                            <td class="px-6 py-3.5 font-medium text-slate-800">${e.nama}</td>
-                            <td class="px-6 py-3.5">
-                                <span class="text-xs font-semibold px-2.5 py-1 rounded-full border ${sumberClass(e.sumber)}">${e.sumber}</span>
-                            </td>
-                            <td class="px-6 py-3.5 text-slate-600 max-w-md">
-                                <div class="flex items-start gap-2">
-                                    ${adaKendala ? '<span class="material-symbols-outlined text-[18px] text-amber-500 flex-shrink-0 mt-0.5">warning</span>' : ''}
-                                    <span>${e.keterangan || '<span class="text-slate-400">-</span>'}</span>
-                                </div>
-                            </td>
-                            <td class="px-6 py-3.5 text-slate-500">${e.dibuat || '-'}</td>
-                            <td class="px-6 py-3.5 text-right whitespace-nowrap">
-                                <button type="button" onclick="bukaEdit(${gi})" class="p-1.5 text-slate-400 hover:text-sidebar-active hover:bg-sidebar-active/10 rounded-lg transition-colors" title="Edit">
-                                    <span class="material-symbols-outlined text-[20px]">edit</span>
-                                </button>
-                                <button type="button" onclick="hapus(${gi})" class="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Hapus">
-                                    <span class="material-symbols-outlined text-[20px]">delete</span>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-            }).join('');
+            kegiatanEvaluasi.options[0].textContent = !sumber
+                ? 'Pilih Sumber Terlebih Dahulu'
+                : pilihanTersedia.length
+                    ? 'Pilih Kegiatan'
+                    : 'Belum ada kegiatan';
         }
 
         function bukaTambah() {
-            document.getElementById('modal-judul').textContent = 'Tambah Evaluasi';
-            document.getElementById('evaluasi-form').reset();
-            document.querySelector('[name=edit_index]').value = '';
-            document.getElementById('select-kategori').value = ''; // Reset dropdown kategori
-            loadOptions();
-            document.getElementById('modal').classList.remove('hidden');
+            modalEvaluasi.classList.remove('hidden');
         }
 
-        function bukaEdit(i) {
-            const e = getData()[i];
-            const f = document.getElementById('evaluasi-form');
-            f.reset();
-            document.getElementById('modal-judul').textContent = 'Ubah Evaluasi';
-            document.querySelector('[name=edit_index]').value = i;
-            f.sumber.value = e.sumber || 'Internal';
-            f.kategori.value = e.kategori || ''; // Set kategori terpilih
-            loadOptions();
-            f.nama.value = e.nama;
-            f.keterangan.value = e.keterangan || '';
-            document.getElementById('modal').classList.remove('hidden');
+        function tutupModal() {
+            modalEvaluasi.classList.add('hidden');
         }
 
-        function tutupModal() { document.getElementById('modal').classList.add('hidden'); }
-
-        function simpanEvaluasi(e) {
-            e.preventDefault();
-            const f = document.getElementById('evaluasi-form');
-            const src = document.getElementById('select-sumber');
-
-            if (!src.value) {
-                alert('Pilih sumber kegiatan terlebih dahulu.');
-                src.focus();
-                return;
-            }
-
-            if (src.value === 'Internal' && !f.kategori.value) {
-                alert('Pilih kategori kegiatan.');
-                f.kategori.focus();
-                return;
-            }
-
-            if (!f.nama.value) {
-                alert('Pilih nama kegiatan.');
-                f.nama.focus();
-                return;
-            }
-
-            const now = new Date();
-            const pad = n => String(n).padStart(2, '0');
-            const dibuat = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
-
-            const data = {
-                nama: f.nama.value.trim(),
-                sumber: sumberTerpilih(),
-                kategori: f.kategori.value, // Simpan kategori ke object
-                keterangan: f.keterangan.value.trim(),
-                dibuat: dibuat,
-            };
-
-            const all = getData();
-            const idx = document.querySelector('[name=edit_index]').value;
-            if (idx !== '') {
-                data.dibuat = all[idx].dibuat;
-                all[idx] = data;
-                tampilToast('Edit berhasil! Data evaluasi telah diperbarui.');
-            } else {
-                all.unshift(data);
-                tampilToast('Berhasil menambah data evaluasi kegiatan.');
-            }
-            saveAll(all);
-            renderList();
-            tutupModal();
+        function bukaEditEvaluasi(evaluation) {
+            formEditEvaluasi.action = polaUrlEditEvaluasi.replace('__ACTIVITY__', evaluation.id);
+            document.getElementById('evaluation-context-id').value = evaluation.id;
+            document.getElementById('edit-evaluation-name').textContent = evaluation.name;
+            document.getElementById('edit-evaluation-notes').value = evaluation.notes ?? '';
+            document.getElementById('edit-evaluation-obstacles').value = evaluation.obstacles ?? '';
+            modalEditEvaluasi.classList.remove('hidden');
         }
 
-        function hapus(i) {
-            const all = getData();
-            const nama = all[i] ? `evaluasi "${all[i].nama}"` : 'evaluasi ini';
-            window.konfirmasiHapus({
-                title: 'Hapus Evaluasi',
-                message: `Apakah Anda yakin ingin menghapus ${nama}? Data yang dihapus tidak dapat dipulihkan.`,
-                onConfirm: () => {
-                    all.splice(i, 1);
-                    saveAll(all);
-                    renderList();
-                    tampilToast('Evaluasi berhasil dihapus.');
-                }
-            });
+        function tutupEditEvaluasi() {
+            modalEditEvaluasi.classList.add('hidden');
         }
 
+        if (kegiatanEvaluasi.value) {
+            sumberEvaluasi.value = kegiatanEvaluasi.selectedOptions[0]?.dataset.source ?? '';
+            kategoriEvaluasi.value = kegiatanEvaluasi.selectedOptions[0]?.dataset.category || '__uncategorized__';
+        }
 
+        filterKegiatan();
 
-        renderList();
+        @if ($editingEvaluation)
+            bukaEditEvaluasi(@js([
+                'id' => $editingEvaluation->id,
+                'name' => $editingEvaluation->name,
+                'notes' => old('evaluation_notes', $editingEvaluation->evaluation_notes),
+                'obstacles' => old('evaluation_obstacles', $editingEvaluation->evaluation_obstacles),
+            ]));
+        @endif
     </script>
 @endpush

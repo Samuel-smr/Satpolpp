@@ -4,22 +4,48 @@
 
 @section('content')
     <!-- Page Header -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+    <div class="mb-8">
         <div>
             <h1 class="font-headline text-3xl font-bold text-slate-900 tracking-tight">Dashboard Overview</h1>
             <p class="text-sm text-slate-500 mt-1">Ringkasan operasional dan status pengaduan warga.</p>
         </div>
-        <div class="flex items-center gap-3">
-            <button type="button" class="px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-all shadow-sm flex items-center gap-2">
-                <span class="material-symbols-outlined text-[18px]">download</span>
-                <span>Unduh Laporan</span>
-            </button>
-            <button type="button" class="px-4 py-2.5 bg-accent-600 hover:bg-accent-500 rounded-xl text-sm font-semibold text-white shadow-md transition-all flex items-center gap-2">
-                <span class="material-symbols-outlined text-[18px]">add</span>
-                <span>Buat Tugas</span>
+    </div>
+
+    @if ($errors->any())
+        <div class="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <ul class="list-disc space-y-1 pl-5">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <form action="{{ route('admin.dashboard') }}" method="GET" class="mb-8 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm">
+        <div class="grid grid-cols-1 items-end gap-4 md:grid-cols-4">
+            <div>
+                <label for="period" class="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500">Periode statistik</label>
+                <select id="period" name="period" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-700 outline-none transition focus:border-sidebar-active focus:bg-white focus:ring-2 focus:ring-sidebar-active/20">
+                    <option value="1" @selected($dashboardFilters['period'] === '1')>1 hari terakhir</option>
+                    <option value="3" @selected($dashboardFilters['period'] === '3')>3 hari terakhir</option>
+                    <option value="7" @selected($dashboardFilters['period'] === '7')>7 hari terakhir</option>
+                    <option value="custom" @selected($dashboardFilters['period'] === 'custom')>Rentang tanggal</option>
+                </select>
+            </div>
+            <div>
+                <label for="date_start" class="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500">Dari tanggal</label>
+                <input id="date_start" name="date_start" type="date" value="{{ $dashboardFilters['period'] === 'custom' ? $dashboardFilters['date_start'] : '' }}" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-700 outline-none transition focus:border-sidebar-active focus:bg-white focus:ring-2 focus:ring-sidebar-active/20">
+            </div>
+            <div>
+                <label for="date_end" class="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500">Sampai tanggal</label>
+                <input id="date_end" name="date_end" type="date" value="{{ $dashboardFilters['period'] === 'custom' ? $dashboardFilters['date_end'] : '' }}" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-700 outline-none transition focus:border-sidebar-active focus:bg-white focus:ring-2 focus:ring-sidebar-active/20">
+            </div>
+            <button type="submit" class="flex items-center justify-center gap-2 rounded-xl bg-sidebar-active px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-sidebar-hover">
+                <span class="material-symbols-outlined text-[18px]">filter_alt</span>
+                Terapkan Filter
             </button>
         </div>
-    </div>
+    </form>
 
     <!-- Summary Metric Cards (4 Cards Grid) -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
@@ -27,8 +53,8 @@
         <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
             <div class="flex items-start justify-between">
                 <div>
-                    <p class="text-xs font-semibold text-slate-600 max-w-[140px] leading-snug">Pengaduan Urgent Hari Ini</p>
-                    <h2 class="font-headline text-3xl font-bold text-red-600 mt-3">12</h2>
+                    <p class="text-xs font-semibold text-slate-600 max-w-[140px] leading-snug">{{ $periodLabel }}</p>
+                    <h2 class="font-headline text-3xl font-bold text-red-600 mt-3">{{ $dashboardStats['urgent_today'] }}</h2>
                 </div>
                 <div class="w-10 h-10 rounded-xl bg-red-100/70 text-red-600 flex items-center justify-center flex-shrink-0">
                     <span class="material-symbols-outlined text-[22px]">warning</span>
@@ -46,7 +72,7 @@
             <div class="flex items-start justify-between">
                 <div>
                     <p class="text-xs font-semibold text-slate-600 max-w-[140px] leading-snug">Belum Ditindaklanjuti</p>
-                    <h2 class="font-headline text-3xl font-bold text-amber-600 mt-3">34</h2>
+                    <h2 class="font-headline text-3xl font-bold text-amber-600 mt-3">{{ $dashboardStats['pending'] }}</h2>
                 </div>
                 <div class="w-10 h-10 rounded-xl bg-amber-100/70 text-amber-600 flex items-center justify-center flex-shrink-0">
                     <span class="material-symbols-outlined text-[22px]">assignment_late</span>
@@ -62,7 +88,7 @@
             <div class="flex items-start justify-between">
                 <div>
                     <p class="text-xs font-semibold text-slate-600 max-w-[140px] leading-snug">Petugas Aktif</p>
-                    <h2 class="font-headline text-3xl font-bold text-slate-900 mt-3">128</h2>
+                    <h2 class="font-headline text-3xl font-bold text-slate-900 mt-3">{{ $dashboardStats['active_officers'] }}</h2>
                 </div>
                 <div class="w-10 h-10 rounded-xl bg-blue-100/70 text-brand-600 flex items-center justify-center flex-shrink-0">
                     <span class="material-symbols-outlined text-[22px]">shield</span>
@@ -78,7 +104,7 @@
             <div class="flex items-start justify-between">
                 <div>
                     <p class="text-xs font-semibold text-slate-600 max-w-[140px] leading-snug">Kegiatan Minggu Ini</p>
-                    <h2 class="font-headline text-3xl font-bold text-slate-900 mt-3">45</h2>
+                    <h2 class="font-headline text-3xl font-bold text-slate-900 mt-3">{{ $dashboardStats['activities_this_week'] }}</h2>
                 </div>
                 <div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center flex-shrink-0">
                     <span class="material-symbols-outlined text-[22px]">calendar_month</span>
@@ -96,13 +122,10 @@
         <div class="lg:col-span-8 bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                 <div>
-                    <h3 class="font-headline text-xl font-bold text-slate-900">Statistik Pengaduan Mingguan</h3>
+                    <h3 class="font-headline text-xl font-bold text-slate-900">Statistik Pengaduan</h3>
                 </div>
                 <div class="flex items-center gap-4">
-                    <button type="button" class="text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg px-3 py-1.5 flex items-center gap-1.5 transition-colors">
-                        <span>7 Hari Terakhir</span>
-                        <span class="material-symbols-outlined text-[16px]">expand_more</span>
-                    </button>
+                    <span class="rounded-lg border border-slate-200 bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-600">{{ $dashboardFilters['date_start'] }} – {{ $dashboardFilters['date_end'] }}</span>
                 </div>
             </div>
 
@@ -124,61 +147,35 @@
             </div>
         </div>
 
-        <!-- Right 4 cols: Tugas Cepat -->
+        <!-- Right 4 cols: Laporan Terbaru -->
         <div class="lg:col-span-4 bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
             <div>
                 <div class="flex items-center justify-between mb-5">
-                    <h3 class="font-headline text-xl font-bold text-slate-900">Tugas Cepat</h3>
-                    <a href="#" class="text-xs font-bold text-amber-700 hover:underline">Lihat Semua</a>
+                    <h3 class="font-headline text-xl font-bold text-slate-900">Laporan Terbaru</h3>
+                    <a href="{{ route('admin.pengaduan') }}" class="text-xs font-bold text-sidebar-active hover:underline">Lihat Semua</a>
                 </div>
 
-                <!-- Task List -->
                 <div class="space-y-4">
-                    <!-- Task Item 1 -->
-                    <div class="bg-white border border-slate-200 rounded-xl p-4 border-l-4 border-l-red-500 hover:shadow-md transition-shadow">
-                        <div class="flex items-start justify-between gap-2">
-                            <div class="min-w-0">
-                                <h4 class="font-semibold text-sm text-slate-800 truncate">Validasi Laporan Pungli #4092</h4>
-                                <p class="text-xs text-slate-500 mt-1 truncate">Kec. Kebayoran Baru, dekat...</p>
+                    @forelse ($latestReports as $latestReport)
+                        <a href="{{ route('admin.pengaduan.detail', $latestReport) }}" class="block rounded-xl border border-slate-200 border-l-4 border-l-sidebar-active bg-white p-4 transition-shadow hover:shadow-md">
+                            <div class="flex items-start justify-between gap-2">
+                                <div class="min-w-0">
+                                    <h4 class="truncate text-sm font-semibold text-slate-800">{{ $latestReport->category?->label() ?? $latestReport->code }}</h4>
+                                    <p class="mt-1 truncate text-xs text-slate-500">{{ $latestReport->location_address }}</p>
+                                </div>
+                                <span class="shrink-0 rounded-full bg-blue-50 px-2.5 py-0.5 text-[11px] font-semibold text-blue-700">{{ $latestReport->status->label() }}</span>
                             </div>
-                            <span class="text-[11px] font-semibold text-red-600 bg-red-50 border border-red-100 px-2.5 py-0.5 rounded-full flex-shrink-0">
-                                Urgent
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- Task Item 2 -->
-                    <div class="bg-white border border-slate-200 rounded-xl p-4 border-l-4 border-l-amber-500 hover:shadow-md transition-shadow">
-                        <div class="flex items-start justify-between gap-2">
-                            <div class="min-w-0">
-                                <h4 class="font-semibold text-sm text-slate-800 truncate">Assign Patroli Malam</h4>
-                                <p class="text-xs text-slate-500 mt-1 truncate">Area Sudirman-Thamrin butuh...</p>
-                            </div>
-                            <span class="text-[11px] font-semibold text-amber-700 bg-amber-50 border border-amber-100 px-2.5 py-0.5 rounded-full flex-shrink-0">
-                                Pending
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- Task Item 3 -->
-                    <div class="bg-white border border-slate-200 rounded-xl p-4 border-l-4 border-l-slate-400 hover:shadow-md transition-shadow">
-                        <div class="flex items-start justify-between gap-2">
-                            <div class="min-w-0">
-                                <h4 class="font-semibold text-sm text-slate-800 truncate">Review Draft SOP Penertiban</h4>
-                                <p class="text-xs text-slate-500 mt-1 truncate">Draft dari divisi hukum, due...</p>
-                            </div>
-                            <span class="text-[11px] font-semibold text-slate-600 bg-slate-100 border border-slate-200 px-2.5 py-0.5 rounded-full flex-shrink-0">
-                                Rutin
-                            </span>
-                        </div>
-                    </div>
+                            <p class="mt-2 text-xs text-slate-400">{{ $latestReport->code }} · {{ $latestReport->created_at->format('d/m/Y H:i') }}</p>
+                        </a>
+                    @empty
+                        <div class="rounded-xl border border-dashed border-slate-200 p-6 text-center text-sm text-slate-400">Belum ada laporan pada periode ini.</div>
+                    @endforelse
                 </div>
             </div>
 
-            <!-- Bottom Button -->
             <div class="mt-6">
-                <a href="#" class="w-full flex items-center justify-center py-2.5 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
-                    Buka Dashboard Task
+                <a href="{{ route('admin.pengaduan') }}" class="flex w-full items-center justify-center rounded-xl border border-slate-300 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50">
+                    Buka Daftar Pengaduan
                 </a>
             </div>
         </div>
@@ -190,7 +187,8 @@
     document.addEventListener("DOMContentLoaded", function () {
         const ctx = document.getElementById('weeklyChart').getContext('2d');
 
-        const labels = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+        const weeklyChart = @json($weeklyChart);
+        const labels = weeklyChart.map((day) => day.label);
 
         new Chart(ctx, {
             type: 'bar',
@@ -200,7 +198,7 @@
                     {
                         type: 'line',
                         label: 'Diselesaikan',
-                        data: [45, 48, 40, 56, 50, 18, 16],
+                        data: weeklyChart.map((day) => day.completed),
                         borderColor: '#fd8b00',
                         borderWidth: 2.5,
                         pointBackgroundColor: '#ffffff',
@@ -213,7 +211,7 @@
                     {
                         type: 'bar',
                         label: 'Laporan Masuk',
-                        data: [45, 52, 38, 64, 48, 25, 20],
+                        data: weeklyChart.map((day) => day.incoming),
                         backgroundColor: '#000a1e',
                         borderRadius: 4,
                         barThickness: 34,
