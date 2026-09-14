@@ -25,7 +25,7 @@
                 </div>
                 <div>
                     <p class="text-xs text-slate-500 font-medium">Total Petugas</p>
-                    <p class="font-headline text-2xl font-bold text-slate-900" id="stat-total">0</p>
+                    <p class="font-headline text-2xl font-bold text-slate-900">{{ $statistics['total'] }}</p>
                 </div>
             </div>
         </div>
@@ -36,7 +36,7 @@
                 </div>
                 <div>
                     <p class="text-xs text-slate-500 font-medium">Aktif</p>
-                    <p class="font-headline text-2xl font-bold text-slate-900" id="stat-aktif">0</p>
+                    <p class="font-headline text-2xl font-bold text-slate-900">{{ $statistics['active'] }}</p>
                 </div>
             </div>
         </div>
@@ -47,7 +47,7 @@
                 </div>
                 <div>
                     <p class="text-xs text-slate-500 font-medium">Cuti</p>
-                    <p class="font-headline text-2xl font-bold text-slate-900" id="stat-cuti">0</p>
+                    <p class="font-headline text-2xl font-bold text-slate-900">{{ $statistics['leave'] }}</p>
                 </div>
             </div>
         </div>
@@ -58,7 +58,7 @@
                 </div>
                 <div>
                     <p class="text-xs text-slate-500 font-medium">Nonaktif</p>
-                    <p class="font-headline text-2xl font-bold text-slate-900" id="stat-nonaktif">0</p>
+                    <p class="font-headline text-2xl font-bold text-slate-900">{{ $statistics['inactive'] }}</p>
                 </div>
             </div>
         </div>
@@ -68,30 +68,41 @@
     <div class="bg-white border border-slate-200/80 rounded-2xl shadow-sm overflow-hidden">
         <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
             <span class="text-sm font-semibold text-slate-700">Daftar Personil</span>
-            <span class="text-xs bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-1 rounded-full font-medium">Data Dummy + Tambahan Admin</span>
+            <span class="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-full font-medium">Database</span>
         </div>
 
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
                     <tr class="border-b border-slate-100 text-left text-xs text-slate-400 uppercase tracking-wider">
-                        <th class="px-6 py-3 font-semibold">Petugas</th>
-                        <th class="px-6 py-3 font-semibold">NIP / KTA</th>
-                        <th class="px-6 py-3 font-semibold">Pangkat / Jabatan</th>
-                        <th class="px-6 py-3 font-semibold">Regu</th>
-                        <th class="px-6 py-3 font-semibold">Zona</th>
-                        <th class="px-6 py-3 font-semibold">Status</th>
+                        <th class="px-6 py-3 font-semibold">NIP</th>
+                        <th class="px-6 py-3 font-semibold">Nama</th>
+                        <th class="px-6 py-3 font-semibold">Jabatan</th>
+                        <th class="px-6 py-3 font-semibold">Nama Satuan Kerja</th>
+                        <th class="px-6 py-3 font-semibold">Unit Kerja</th>
                         <th class="px-6 py-3 font-semibold text-right">Aksi</th>
                     </tr>
                 </thead>
-                <tbody id="petugas-list"></tbody>
+                <tbody>
+                    @forelse ($officers as $officer)
+                        <tr class="border-b border-slate-50 hover:bg-slate-50/50">
+                            <td class="px-6 py-3.5 font-mono text-xs text-slate-500">{{ $officer->employee_number }}</td>
+                            <td class="px-6 py-3.5"><div class="flex items-center gap-3"><div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-super-active/10 text-xs font-bold text-slate-700">{{ collect(explode(' ', $officer->name))->take(2)->map(fn ($word) => mb_substr($word, 0, 1))->join('') }}</div><span class="font-medium text-slate-800">{{ $officer->name }}</span></div></td>
+                            <td class="min-w-80 px-6 py-3.5 text-slate-500">{{ $officer->position }}</td>
+                            <td class="min-w-56 px-6 py-3.5 text-slate-500">{{ $officer->work_unit_name }}</td>
+                            <td class="min-w-56 px-6 py-3.5 text-slate-500">{{ $officer->unit_name }}</td>
+                            <td class="px-6 py-3.5 text-right whitespace-nowrap">
+                                <button type="button" onclick="bukaEdit(@js(['id' => $officer->id, 'name' => $officer->name, 'employee_number' => $officer->employee_number, 'position' => $officer->position, 'work_unit_name' => $officer->work_unit_name, 'unit_name' => $officer->unit_name]))" class="p-1.5 text-slate-400 hover:text-super-active hover:bg-super-active/10 rounded-lg" title="Edit"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+                                <button type="button" onclick="hapusPetugas({{ $officer->id }}, @js($officer->name))" class="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg" title="Hapus"><span class="material-symbols-outlined text-[20px]">delete</span></button>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="6" class="px-6 py-12 text-center text-slate-400">Belum ada data petugas.</td></tr>
+                    @endforelse
+                </tbody>
             </table>
         </div>
 
-        <div id="kosong" class="hidden px-6 py-12 text-center text-slate-400">
-            <div class="text-4xl mb-2">🪪</div>
-            <p>Belum ada data petugas.</p>
-        </div>
     </div>
 
     {{-- Modal tambah/ubah petugas --}}
@@ -105,50 +116,43 @@
                 </button>
             </div>
 
-            <form id="petugas-form" class="p-6 space-y-4 overflow-y-auto" onsubmit="simpanPetugas(event)">
+            <form id="petugas-form" method="POST" class="p-6 space-y-4 overflow-y-auto" onsubmit="simpanPetugas(event)">
+                @csrf
                 <input type="hidden" name="edit_index" value="">
+                <input type="hidden" name="_method" value="POST">
                 <div>
                     <label class="block text-sm font-medium mb-1">Nama Lengkap <span class="text-red-500">*</span></label>
-                    <input type="text" name="nama" required placeholder="Contoh: Joko Widodo Samudra"
+                    <input type="text" name="name" required placeholder="Contoh: Joko Widodo Samudra"
                         class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none">
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-1">NIP / KTA <span class="text-red-500">*</span></label>
-                        <input type="text" name="nip" required placeholder="Contoh: 19750101 202001 1 001"
-                            class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Pangkat / Jabatan</label>
-                        <input type="text" name="pangkat" placeholder="Contoh: Penata Muda / Anggota"
-                            class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Regu / Unit</label>
-                        <select name="regu" id="regu-select"
-                            class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none bg-white">
-                            <option value="">Pilih Unit / Regu</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Zona Operasi</label>
-                        <input type="text" name="zona" placeholder="Contoh: Kecamatan Wates"
-                            class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none">
-                    </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">NIP <span class="text-red-500">*</span></label>
+                    <input type="text" name="employee_number" required maxlength="50" placeholder="Masukkan NIP petugas"
+                        class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none">
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium mb-1">Status <span class="text-red-500">*</span></label>
-                    <select name="status" required
-                        class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none bg-white">
-                        <option value="">Pilih Status</option>
-                        <option value="aktif">Aktif</option>
-                        <option value="cuti">Cuti</option>
-                        <option value="nonaktif">Nonaktif</option>
+                    <label class="block text-sm font-medium mb-1">Jabatan <span class="text-red-500">*</span></label>
+                    <select name="position" required class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none bg-white">
+                        <option value="">Pilih Jabatan</option>
+                        @foreach ($positions as $position)<option value="{{ $position }}">{{ $position }}</option>@endforeach
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-1">Nama Satuan Kerja <span class="text-red-500">*</span></label>
+                    <select name="work_unit_name" required class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none bg-white">
+                        <option value="">Pilih Nama Satuan Kerja</option>
+                        @foreach ($workUnits as $workUnit)<option value="{{ $workUnit }}">{{ $workUnit }}</option>@endforeach
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-1">Unit Kerja <span class="text-red-500">*</span></label>
+                    <select name="unit_name" required class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none bg-white">
+                        <option value="">Pilih Unit Kerja</option>
+                        @foreach ($units as $unit)<option value="{{ $unit }}">{{ $unit }}</option>@endforeach
                     </select>
                 </div>
 
@@ -165,25 +169,12 @@
 @endsection
 
 @push('scripts')
-<script>
-    const KODE = 'sipraja_petugas';
-
+{{-- Kode prototipe daftar lokal dinonaktifkan; CRUD menggunakan endpoint Laravel pada skrip setelah blok ini.
     function getPetugas() {
-        let data = JSON.parse(localStorage.getItem(KODE) || '[]');
-        if (data.length === 0) {
-            data = [
-                { nama: 'Joko Widodo S', nip: '19750101 202001 1 001', pangkat: 'Penata Muda / Anggota', regu: 'Regu A - Patroli', zona: 'Kecamatan Wates', status: 'aktif' },
-                { nama: 'Bambang Sutrisno', nip: '19780212 201402 1 002', pangkat: 'Pengatur / Anggota', regu: 'Regu A - Patroli', zona: 'Kecamatan Wates', status: 'aktif' },
-                { nama: 'Sri Wahyuni', nip: '19850315 201903 2 003', pangkat: 'Penata Muda / Anggota', regu: 'Regu B - Patroli', zona: 'Kecamatan Pengasih', status: 'aktif' },
-                { nama: 'Agus Riyanto', nip: '19900123 201601 1 004', pangkat: 'Pengatur Muda / Anggota', regu: 'Regu B - Patroli', zona: 'Kecamatan Pengasih', status: 'cuti' },
-                { nama: 'Darmawan Hadi', nip: '19731205 201101 1 005', pangkat: 'Penata / Kepala Regu', regu: 'Regu A - Patroli', zona: 'Kecamatan Wates', status: 'nonaktif' },
-            ];
-            localStorage.setItem(KODE, JSON.stringify(data));
-        }
-        return data;
+        return [];
     }
 
-    function saveAll(data) { localStorage.setItem(KODE, JSON.stringify(data)); }
+    function saveAll() {}
 
     function statusClass(s) {
         if (s === 'aktif') return 'bg-emerald-50 text-emerald-700 border-emerald-200';
@@ -244,29 +235,7 @@
         document.getElementById('modal-judul').textContent = 'Tambah Petugas';
         document.getElementById('petugas-form').reset();
         document.querySelector('[name=edit_index]').value = '';
-        isiReguOptions('');
         document.getElementById('modal').classList.remove('hidden');
-    }
-
-    function isiReguOptions(selected) {
-        const select = document.getElementById('regu-select');
-        let units = [];
-        try {
-            units = JSON.parse(localStorage.getItem('sipraja_organisasi') || '[]');
-        } catch (e) { units = []; }
-        const aktif = units.filter(u => u.jenis !== 'Divisi');
-        select.innerHTML = '';
-        const kosong = document.createElement('option');
-        kosong.value = '';
-        kosong.textContent = aktif.length ? 'Pilih Unit / Regu' : 'Belum ada unit di Manajemen Organisasi';
-        select.appendChild(kosong);
-        aktif.forEach(u => {
-            const opt = document.createElement('option');
-            opt.value = u.nama;
-            opt.textContent = u.nama + (u.zona ? ' (' + u.zona + ')' : '');
-            select.appendChild(opt);
-        });
-        select.value = selected;
     }
 
     function bukaEdit(i) {
@@ -278,7 +247,7 @@
         f.nama.value = p.nama;
         f.nip.value = p.nip;
         f.pangkat.value = p.pangkat || '';
-        isiReguOptions(p.regu || '');
+        f.regu.value = p.regu || '';
         f.zona.value = p.zona || '';
         f.status.value = p.status;
         document.getElementById('modal').classList.remove('hidden');
@@ -338,6 +307,87 @@
 
 
 
-    renderList();
+    // Daftar petugas dirender oleh Blade dari database.
+--}}
+<script>
+    window.tutupModal = function () {
+        document.getElementById('modal')?.classList.add('hidden');
+    };
+
+    function bukaTambah() {
+        const form = document.getElementById('petugas-form');
+        form.reset();
+        form.elements.edit_index.value = '';
+        form.elements._method.value = 'POST';
+        document.getElementById('modal-judul').textContent = 'Tambah Petugas';
+        document.getElementById('modal').classList.remove('hidden');
+    }
+
+    function bukaEdit(officer) {
+        const form = document.getElementById('petugas-form');
+        form.reset();
+        form.elements.edit_index.value = officer.id;
+        form.elements._method.value = 'PUT';
+        ['name', 'employee_number', 'position', 'work_unit_name', 'unit_name'].forEach((field) => {
+            form.elements[field].value = officer[field] || '';
+        });
+        document.getElementById('modal-judul').textContent = 'Ubah Petugas';
+        document.getElementById('modal').classList.remove('hidden');
+    }
+
+    function simpanPetugas(event) {
+        event.preventDefault();
+        const form = event.currentTarget;
+        const id = form.elements.edit_index.value;
+        form.action = id === ''
+            ? @json(route('super_admin.petugas.store'))
+            : @json(route('super_admin.petugas.update', ['officer' => '__OFFICER__'])).replace('__OFFICER__', id);
+        const submitButton = form.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        submitButton.classList.add('cursor-wait', 'opacity-70');
+        submitButton.textContent = 'Memproses...';
+        form.submit();
+    }
+
+    function toggleStatus(id) {
+        window.konfirmasiHapus({
+            title: 'Konfirmasi Perubahan Status',
+            message: 'Ubah status petugas ini? Perubahan status dapat memengaruhi penugasan kegiatan.',
+            confirmText: 'Ya, Ubah Status',
+            onConfirm: () => {
+                fetch(@json(route('super_admin.petugas.status', ['officer' => '__OFFICER__'])).replace('__OFFICER__', id), {
+                    method: 'PATCH',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                    },
+                }).then(async response => {
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.message || 'Status petugas gagal diubah.');
+                    window.tampilkanToastLaluMuatUlang(`Status petugas berhasil diubah menjadi ${result.label}.`);
+                }).catch(error => window.tampilToast(error.message, 'error'));
+            },
+        });
+    }
+
+    function hapusPetugas(id, nama) {
+        window.konfirmasiHapus({
+            title: 'Hapus Petugas',
+            message: `Apakah Anda yakin ingin menghapus petugas "${nama}"? Data tetap tersimpan sebagai soft delete.`,
+            onConfirm: () => {
+                fetch(@json(route('super_admin.petugas.destroy', ['officer' => '__OFFICER__'])).replace('__OFFICER__', id), {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                    },
+                }).then(async response => {
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.message || 'Petugas gagal dihapus.');
+                    window.tampilkanToastLaluMuatUlang(result.message || 'Petugas berhasil dihapus.');
+                }).catch(error => window.tampilToast(error.message, 'error'));
+            },
+        });
+    }
 </script>
 @endpush

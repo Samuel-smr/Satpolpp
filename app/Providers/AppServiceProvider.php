@@ -2,6 +2,14 @@
 
 namespace App\Providers;
 
+use App\Models\Activity;
+use App\Models\Report;
+use App\Models\User;
+use App\UserRole;
+use App\UserStatus;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +27,24 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Relation::morphMap([
+            'activity' => Activity::class,
+            'report' => Report::class,
+        ]);
+
+        Gate::define('access-admin', fn (User $user): bool => $user->status === UserStatus::Active
+            && $user->role === UserRole::Admin);
+
+        Gate::define('access-super-admin', fn (User $user): bool => $user->status === UserStatus::Active
+            && $user->role === UserRole::SuperAdmin);
+
+        View::composer(['layouts.admin', 'layouts.super_admin'], function ($view): void {
+            $user = request()->user();
+
+            $view->with([
+                'layoutNotifications' => $user?->notifications()->latest()->limit(10)->get() ?? collect(),
+                'layoutUnreadNotificationCount' => $user?->unreadNotifications()->count() ?? 0,
+            ]);
+        });
     }
 }

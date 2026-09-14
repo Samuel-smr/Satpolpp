@@ -133,12 +133,12 @@
             <!-- Stat Cards -->
             <div class="grid grid-cols-2 gap-4">
                 <div class="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm flex flex-col">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Active Units</span>
-                    <span class="text-2xl font-headline font-bold text-slate-800">142</span>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Unit Aktif</span>
+                    <span class="text-2xl font-headline font-bold text-slate-800">{{ $mapStatistics['active_units'] }}</span>
                 </div>
                 <div class="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm flex flex-col">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Open Reports</span>
-                    <span class="text-2xl font-headline font-bold text-red-600">28</span>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Laporan Terbuka</span>
+                    <span class="text-2xl font-headline font-bold text-red-600">{{ $mapStatistics['open_reports'] }}</span>
                 </div>
             </div>
 
@@ -153,7 +153,7 @@
                     
                     <!-- Chart 1 -->
                     <div>
-                        <h4 class="text-xs font-semibold text-slate-600 mb-3">Incident Categories</h4>
+                        <h4 class="text-xs font-semibold text-slate-600 mb-3">Kategori Laporan</h4>
                         <div class="h-40 w-full relative">
                             <canvas id="incidentChart"></canvas>
                         </div>
@@ -161,7 +161,7 @@
 
                     <!-- Chart 2 -->
                     <div>
-                        <h4 class="text-xs font-semibold text-slate-600 mb-3">Status Distribution</h4>
+                        <h4 class="text-xs font-semibold text-slate-600 mb-3">Distribusi Status</h4>
                         <div class="h-40 w-full relative flex items-center justify-center">
                             <canvas id="statusChart"></canvas>
                         </div>
@@ -169,7 +169,7 @@
 
                     <!-- Chart 3 -->
                     <div>
-                        <h4 class="text-xs font-semibold text-slate-600 mb-3">Avg Response Time (Mins)</h4>
+                        <h4 class="text-xs font-semibold text-slate-600 mb-3">Laporan 7 Hari Terakhir</h4>
                         <div class="h-32 w-full relative">
                             <canvas id="responseChart"></canvas>
                         </div>
@@ -195,28 +195,12 @@
                     kegiatan_internal: true
                 },
 
-                // Mock Data for Map
-                mapData: [
-                    // Kegiatan Eksternal
-                    { id: 'K1', type: 'kegiatan_eksternal', title: 'Operasi Yustisi KTP', desc: 'Pemeriksaan identitas pendatang baru pasca libur panjang.', location: 'Terminal Kampung Rambutan', lat: -6.3093, lng: 106.8834, status: 'Berlangsung', date: 'Hari ini, 08:00' },
-                    { id: 'K2', type: 'kegiatan_eksternal', title: 'Sosialisasi Kawasan Tanpa Rokok', desc: 'Edukasi masyarakat di fasilitas umum.', location: 'Taman Suropati', lat: -6.1997, lng: 106.8326, status: 'Dijadwalkan', date: 'Besok, 09:00' },
-                    { id: 'K3', type: 'kegiatan_eksternal', title: 'Penertiban PKL Monas', desc: 'Pembersihan kawasan ring 1 dari pedagang ilegal.', location: 'Kawasan Monas', lat: -6.1754, lng: 106.8272, status: 'Selesai', date: 'Kemarin, 15:00' },
-
-                    // Kegiatan Internal
-                    { id: 'I1', type: 'kegiatan_internal', title: 'Apel Pasukan', desc: 'Apel pagi gabungan regu patroli wilayah pusat.', location: 'Balai Kota', lat: -6.1820, lng: 106.8250, status: 'Selesai', date: 'Hari ini, 07:00' },
-                    { id: 'I2', type: 'kegiatan_internal', title: 'Pelatihan Jasmani', desc: 'Latihan fisik rutin untuk anggota Satpol PP.', location: 'Gelora Bung Karno', lat: -6.2185, lng: 106.8020, status: 'Berlangsung', date: 'Hari ini, 15:00' },
-                ],
+                mapData: @json($mapPoints),
 
                 // Defines Hotspot areas based on report density
-                hotspotData: [
-                    { lat: -6.1880, lng: 106.8150, radius: 400, intensity: 0.8 }, // Tanah abang high density
-                    { lat: -6.2043, lng: 106.8225, radius: 300, intensity: 0.4 }  // Sudirman medium density
-                ],
+                hotspotData: [],
 
                 initPeta() {
-                    // Muat laporan real (yang sudah selesai + punya lokasi penandaan)
-                    this.loadLaporanFromStorage();
-
                     this.map = L.map('mainMap', {
                         zoomControl: false
                     });
@@ -237,26 +221,7 @@
 
                 // Muat laporan yang sudah selesai + menandai titik lokasi kejadian
                 loadLaporanFromStorage() {
-                    let reports = [];
-                    try {
-                        reports = JSON.parse(localStorage.getItem('sipraja_reports') || '[]');
-                    } catch (e) { reports = []; }
-
-                    const laporanItems = reports
-                        .filter(r => (r.statusIdx != null ? r.statusIdx : 0) >= 5 && r.lokasiSelesai && r.lokasiSelesai.lat && r.lokasiSelesai.lng)
-                        .map((r, i) => ({
-                            id: 'L-' + r.kode,
-                            type: 'laporan',
-                            title: r.kategori || r.kode,
-                            desc: r.deskripsi || '-',
-                            location: r.lokasi || 'Lokasi kejadian',
-                            lat: parseFloat(r.lokasiSelesai.lat),
-                            lng: parseFloat(r.lokasiSelesai.lng),
-                            status: 'Selesai',
-                            date: r.dibuat || '-'
-                        }));
-
-                    this.mapData = laporanItems.concat(this.mapData);
+                    // Titik peta sudah disediakan controller dari database.
                 },
 
                 renderMap() {
@@ -309,25 +274,22 @@
                                 <div class="p-4 pt-5 relative">
                                     <div class="flex items-center gap-2 mb-2">
                                         <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${colorClass}">${typeFormatted}</span>
-                                        <span class="text-[10px] font-semibold text-slate-500">${item.date}</span>
+                                        <span class="text-[10px] font-semibold text-slate-500">${this.escapeHtml(item.date)}</span>
                                     </div>
-                                    <h3 class="text-sm font-bold text-slate-800 mb-1 leading-tight">${item.title}</h3>
-                                    <p class="text-xs text-slate-600 mb-3 line-clamp-2">${item.desc}</p>
+                                    <h3 class="text-sm font-bold text-slate-800 mb-1 leading-tight">${this.escapeHtml(item.title)}</h3>
+                                    <p class="text-xs text-slate-600 mb-3 line-clamp-2">${this.escapeHtml(item.desc || '-')}</p>
                                     
                                     <div class="bg-slate-50 rounded-lg p-2 flex flex-col gap-1.5 mb-3 border border-slate-100">
                                         <div class="flex items-center gap-1.5 text-xs text-slate-700">
                                             <span class="material-symbols-outlined text-[14px] text-slate-400">location_on</span>
-                                            <span class="font-medium line-clamp-1">${item.location}</span>
+                                            <span class="font-medium line-clamp-1">${this.escapeHtml(item.location)}</span>
                                         </div>
                                         <div class="flex items-center gap-1.5 text-xs text-slate-700">
                                             <span class="material-symbols-outlined text-[14px] text-slate-400">info</span>
-                                            Status: <span class="font-bold ${statusColor}">${item.status}</span>
+                                            Status: <span class="font-bold ${statusColor}">${this.escapeHtml(item.status)}</span>
                                         </div>
                                     </div>
                                     
-                                    <button class="w-full py-2 bg-super-active hover:bg-super-hover text-white font-semibold rounded-lg text-xs transition-colors shadow-sm">
-                                        Lihat Detail Lengkap
-                                    </button>
                                 </div>
                             </div>
                         `;
@@ -368,6 +330,12 @@
                 },
 
                 // Formatting Helpers
+                escapeHtml(value) {
+                    const element = document.createElement('div');
+                    element.textContent = value == null ? '' : String(value);
+                    return element.innerHTML;
+                },
+
                 formatType(type) {
                     if (type === 'laporan') return 'Laporan Warga';
                     if (type === 'kegiatan_eksternal') return 'Keg. Eksternal';
@@ -395,10 +363,10 @@
                     new Chart(ctxIncident, {
                         type: 'bar',
                         data: {
-                            labels: ['Noise', 'PKL', 'Permit', 'Traffic', 'Other'],
+                            labels: @json($categoryChart->pluck('label')),
                             datasets: [{
-                                label: 'Incidents',
-                                data: [12, 19, 8, 15, 4],
+                                label: 'Laporan',
+                                data: @json($categoryChart->pluck('total')),
                                 backgroundColor: '#1e3a8a',
                                 borderRadius: 4,
                             }]
@@ -418,10 +386,10 @@
                     new Chart(ctxStatus, {
                         type: 'doughnut',
                         data: {
-                            labels: ['Critical', 'In Progress', 'Resolved'],
+                            labels: @json($statusChart->pluck('label')),
                             datasets: [{
-                                data: [15, 35, 50],
-                                backgroundColor: ['#ef4444', '#f59e0b', '#1e293b'],
+                                data: @json($statusChart->pluck('total')),
+                                backgroundColor: ['#64748b', '#3b82f6', '#8b5cf6', '#f59e0b', '#10b981'],
                                 borderWidth: 0,
                                 cutout: '70%'
                             }]
@@ -442,10 +410,10 @@
                     new Chart(ctxResponse, {
                         type: 'line',
                         data: {
-                            labels: ['08:00', '10:00', '12:00', '14:00', '16:00'],
+                            labels: @json($reportTrend->pluck('label')),
                             datasets: [{
-                                label: 'Avg Time (Mins)',
-                                data: [18, 15, 22, 12, 14],
+                                label: 'Laporan',
+                                data: @json($reportTrend->pluck('total')),
                                 borderColor: '#b45309',
                                 backgroundColor: 'rgba(180, 83, 9, 0.1)',
                                 fill: true,
@@ -460,7 +428,7 @@
                             maintainAspectRatio: false,
                             plugins: { legend: { display: false } },
                             scales: {
-                                y: { beginAtZero: true, max: 25, grid: { borderDash: [2,2] } },
+                                y: { beginAtZero: true, ticks: { precision: 0 }, grid: { borderDash: [2,2] } },
                                 x: { grid: { display: false } }
                             }
                         }
