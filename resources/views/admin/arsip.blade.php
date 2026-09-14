@@ -289,7 +289,20 @@
         }
 
         function tampilkanNamaFile(input) {
-            document.getElementById('archive-file-name').textContent = input.files[0]?.name ?? 'Pilih file arsip';
+            const label = document.getElementById('archive-file-name');
+            const file = input.files[0];
+            const MAX_SIZE = 50 * 1024 * 1024;
+
+            if (file && file.size > MAX_SIZE) {
+                alert('Ukuran file melebihi batas maksimal 50 MB.');
+                input.value = '';
+                label.textContent = 'Pilih file arsip';
+                label.classList.remove('text-red-600');
+                return;
+            }
+
+            label.textContent = file?.name ?? 'Pilih file arsip';
+            label.classList.remove('text-red-600');
         }
 
         @if ($errors->any() && $editingArchive)

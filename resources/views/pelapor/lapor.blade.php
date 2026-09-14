@@ -121,7 +121,7 @@
                             <input type="file" name="bukti[]" accept="image/jpeg,image/png,image/webp" multiple data-handle class="sr-only">
                             <div class="text-3xl mb-2">📎</div>
                             <p class="text-sm font-medium text-slate-600">Klik untuk memilih Foto / Video</p>
-                            <p class="text-xs text-slate-400 mt-1">Maks 3 foto atau 1 video pendek</p>
+                            <p class="text-xs text-slate-400 mt-1">Maks 3 foto, masing-masing maks 5 MB (JPG, PNG, atau WEBP)</p>
                         </label>
                         <div id="file-list" class="mt-3 grid grid-cols-2 md:grid-cols-3 gap-3"></div>
                     <p class="text-xs text-slate-500 mt-2 flex items-center gap-1">
@@ -305,6 +305,16 @@
         // File upload preview (simple)
         document.querySelector('input[data-handle]').addEventListener('change', function (e) {
             const list = document.getElementById('file-list');
+            const MAX_SIZE = 5 * 1024 * 1024;
+            const oversized = Array.from(e.target.files).filter((file) => file.size > MAX_SIZE);
+
+            if (oversized.length > 0) {
+                alert('Terdapat file berukuran lebih dari 5 MB. Masing-masing bukti maksimal 5 MB.');
+                e.target.value = '';
+                list.innerHTML = '';
+                return;
+            }
+
             list.innerHTML = '';
             Array.from(e.target.files).forEach((file) => {
                 const div = document.createElement('div');

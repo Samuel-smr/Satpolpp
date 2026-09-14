@@ -12,7 +12,7 @@
         {{-- Pencarian --}}
         <div class="relative mb-6">
             <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-[20px]">search</span>
-            <input type="text" id="search-input" placeholder="Cari kode, kategori, lokasi, atau deskripsi..."
+            <input type="text" id="search-input" placeholder="Cari kode, lokasi, atau deskripsi..."
                 class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 rounded-xl shadow-sm focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all text-sm">
         </div>
 
@@ -51,10 +51,6 @@
                     <div>
                         <span class="text-slate-400">Jenis:</span>
                         <span class="font-medium" id="d-jenis">--</span>
-                    </div>
-                    <div>
-                        <span class="text-slate-400">Kategori:</span>
-                        <span class="font-medium" id="d-kategori">--</span>
                     </div>
                     <div>
                         <span class="text-slate-400">Lokasi:</span>
@@ -151,7 +147,7 @@
         const all = getReports();
         if (!q) return all;
         return all.filter(r => {
-            const haystack = [r.kode, r.kategori, r.lokasi, r.deskripsi, labelJenis(r.jenis), r.telepon, r.nik].join(' ').toLowerCase();
+            const haystack = [r.kode, r.lokasi, r.deskripsi, labelJenis(r.jenis), r.telepon, r.nik].join(' ').toLowerCase();
             return haystack.includes(q);
         });
     }
@@ -186,7 +182,7 @@
                             <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full ${jenisClass(r.jenis)}">${labelJenis(r.jenis)}</span>
                             <span class="text-xs text-slate-400">${r.waktu ? (r.dibuat || r.waktu) : ''}</span>
                         </div>
-                        <h3 class="font-headline font-bold text-slate-800">${r.kategori || r.lokasi || labelJenis(r.jenis)}</h3>
+                        <h3 class="font-headline font-bold text-slate-800">${r.lokasi || labelJenis(r.jenis)}</h3>
                         <p class="mt-1 text-sm text-slate-500 line-clamp-2">${r.deskripsi || '-'}</p>
                         <p class="mt-1 text-xs text-slate-400">${r.kode}</p>
                     </div>
@@ -205,7 +201,6 @@
         document.getElementById('d-badge').textContent = labelStatus(idx);
         document.getElementById('d-badge').className = 'text-sm font-semibold px-3 py-1 rounded-full ' + badgeClass(idx);
         document.getElementById('d-jenis').textContent = labelJenis(r.jenis);
-        document.getElementById('d-kategori').textContent = r.kategori || '-';
         document.getElementById('d-lokasi').textContent = r.lokasi || '-';
         document.getElementById('d-waktu').textContent = r.dibuat || r.waktu || '-';
         document.getElementById('d-deskripsi').textContent = r.deskripsi || '-';
