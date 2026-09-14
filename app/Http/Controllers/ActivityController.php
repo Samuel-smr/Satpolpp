@@ -11,7 +11,6 @@ use App\Models\AuditLog;
 use App\Models\Officer;
 use App\Models\User;
 use App\OfficerStatus;
-use App\OperationalCategory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -30,7 +29,7 @@ class ActivityController extends Controller
         $activityTemplates = ActivityTemplate::query()
             ->where('is_active', true)
             ->orderBy('sort_order')
-            ->get(['id', 'name', 'operational_category', 'default_description']);
+            ->get(['id', 'name', 'default_description']);
         $activeOfficers = Officer::query()
             ->where('status', OfficerStatus::Active)
             ->orderBy('name')
@@ -39,7 +38,7 @@ class ActivityController extends Controller
         return view('admin.kegiatan-create', [
             'activityTemplates' => $activityTemplates,
             'activeOfficers' => $activeOfficers,
-            'operationalCategories' => OperationalCategory::cases(),
+            ...$this->viewContext(),
         ]);
     }
 
@@ -71,14 +70,20 @@ class ActivityController extends Controller
                     ]);
                 }
 
-                if (isset($validated['activity_template_id']) && ! ActivityTemplate::query()
-                    ->whereKey($validated['activity_template_id'])
-                    ->where('is_active', true)
-                    ->lockForUpdate()
-                    ->exists()) {
-                    throw ValidationException::withMessages([
-                        'activity_template_id' => 'Template kegiatan sudah tidak aktif. Muat ulang formulir.',
-                    ]);
+                $activityTemplate = null;
+
+                if (isset($validated['activity_template_id'])) {
+                    $activityTemplate = ActivityTemplate::query()
+                        ->whereKey($validated['activity_template_id'])
+                        ->where('is_active', true)
+                        ->lockForUpdate()
+                        ->first();
+
+                    if ($activityTemplate === null) {
+                        throw ValidationException::withMessages([
+                            'activity_template_id' => 'Template kegiatan sudah tidak aktif. Muat ulang formulir.',
+                        ]);
+                    }
                 }
 
                 $activity = Activity::create([
@@ -88,7 +93,7 @@ class ActivityController extends Controller
                     'evaluated_by_user_id' => null,
                     'name' => $validated['name'],
                     'type' => ActivityType::Internal,
-                    'operational_category' => $validated['operational_category'],
+                    'category' => $validated['category'],
                     'activity_date' => $validated['activity_date'],
                     'start_time' => $validated['start_time'] ?? null,
                     'description' => $validated['description'] ?? null,
@@ -137,7 +142,7 @@ class ActivityController extends Controller
         }
 
         return redirect()
-            ->route('admin.kegiatan.show', $activity)
+            ->route($this->routeName('show'), $activity)
             ->with('status', 'Kegiatan internal berhasil disimpan.');
     }
 
@@ -148,11 +153,11 @@ class ActivityController extends Controller
         $activity->load([
             'template:id,name',
             'createdByUser:id,name',
-            'officers:id,name,employee_number,rank,position',
+            'officers:id,name,employee_number,position,work_unit_name,unit_name',
             'attachments' => fn ($query) => $query->oldest('created_at'),
         ]);
 
-        return view('admin.kegiatan-detail', compact('activity'));
+        return view('admin.kegiatan-detail', ['activity' => $activity, ...$this->viewContext()]);
     }
 
     public function edit(Activity $activity): View
@@ -166,7 +171,7 @@ class ActivityController extends Controller
         $activityTemplates = ActivityTemplate::query()
             ->where('is_active', true)
             ->orderBy('sort_order')
-            ->get(['id', 'name', 'operational_category', 'default_description']);
+            ->get(['id', 'name', 'default_description']);
         $activeOfficers = Officer::query()
             ->where('status', OfficerStatus::Active)
             ->orderBy('name')
@@ -176,7 +181,7 @@ class ActivityController extends Controller
             'activity' => $activity,
             'activityTemplates' => $activityTemplates,
             'activeOfficers' => $activeOfficers,
-            'operationalCategories' => OperationalCategory::cases(),
+            ...$this->viewContext(),
         ]);
     }
 
@@ -230,26 +235,31 @@ class ActivityController extends Controller
                     ]);
                 }
 
-                if (isset($validated['activity_template_id']) && ! ActivityTemplate::query()
-                    ->whereKey($validated['activity_template_id'])
-                    ->where('is_active', true)
-                    ->lockForUpdate()
-                    ->exists()) {
-                    throw ValidationException::withMessages([
-                        'activity_template_id' => 'Template kegiatan sudah tidak aktif. Muat ulang formulir.',
-                    ]);
+                $activityTemplate = null;
+
+                if (isset($validated['activity_template_id'])) {
+                    $activityTemplate = ActivityTemplate::query()
+                        ->whereKey($validated['activity_template_id'])
+                        ->where('is_active', true)
+                        ->lockForUpdate()
+                        ->first();
+
+                    if ($activityTemplate === null) {
+                        throw ValidationException::withMessages([
+                            'activity_template_id' => 'Template kegiatan sudah tidak aktif. Muat ulang formulir.',
+                        ]);
+                    }
                 }
 
                 $oldValues = [
                     'name' => $lockedActivity->name,
-                    'operational_category' => $lockedActivity->operational_category?->value,
                     'activity_date' => $lockedActivity->activity_date->toDateString(),
                 ];
 
                 $lockedActivity->update([
                     'activity_template_id' => $validated['activity_template_id'] ?? null,
                     'name' => $validated['name'],
-                    'operational_category' => $validated['operational_category'],
+                    'category' => $validated['category'],
                     'activity_date' => $validated['activity_date'],
                     'start_time' => $validated['start_time'] ?? null,
                     'description' => $validated['description'] ?? null,
@@ -286,7 +296,6 @@ class ActivityController extends Controller
                     'old_values' => $oldValues,
                     'new_values' => [
                         'name' => $lockedActivity->name,
-                        'operational_category' => $lockedActivity->operational_category?->value,
                         'activity_date' => $lockedActivity->activity_date->toDateString(),
                     ],
                     'ip_address' => $request->ip(),
@@ -300,7 +309,7 @@ class ActivityController extends Controller
         }
 
         return redirect()
-            ->route('admin.kegiatan.show', $activity)
+            ->route($this->routeName('show'), $activity)
             ->with('status', 'Kegiatan internal berhasil diperbarui.');
     }
 
@@ -336,7 +345,7 @@ class ActivityController extends Controller
         });
 
         return redirect()
-            ->route('admin.kegiatan')
+            ->route($this->routeName())
             ->with('status', 'Kegiatan internal berhasil dihapus.');
     }
 
@@ -376,5 +385,23 @@ class ActivityController extends Controller
         if ($activity->type !== ActivityType::Internal) {
             throw new NotFoundHttpException;
         }
+    }
+
+    /** @return array{activityRoutePrefix: string, activityLayout: string} */
+    private function viewContext(): array
+    {
+        $isSuperAdmin = request()->routeIs('super_admin.*');
+
+        return [
+            'activityRoutePrefix' => $isSuperAdmin ? 'super_admin.kegiatan' : 'admin.kegiatan',
+            'activityLayout' => $isSuperAdmin ? 'layouts.super_admin' : 'layouts.admin',
+        ];
+    }
+
+    private function routeName(?string $action = null): string
+    {
+        $routePrefix = request()->routeIs('super_admin.*') ? 'super_admin.kegiatan' : 'admin.kegiatan';
+
+        return $action === null ? $routePrefix : "{$routePrefix}.{$action}";
     }
 }

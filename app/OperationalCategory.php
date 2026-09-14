@@ -16,14 +16,14 @@ enum OperationalCategory: string
     public function label(): string
     {
         return match ($this) {
-            self::PublicOrderPatrol => 'Patroli Ketertiban Umum',
-            self::OfficialSecurityEscort => 'Pengamanan dan Pengawalan Pejabat',
-            self::EventSecurity => 'Pengamanan Acara atau Kegiatan',
-            self::PublicComplaintHandling => 'Penanganan Pengaduan Masyarakat',
-            self::RegionalRegulationCompliance => 'Kepatuhan Perda dan Perkada',
-            self::AttributeSupervision => 'Pembinaan dan Pengawasan Atribut',
-            self::JudicialEnforcement => 'Penegakan Yustisial',
-            self::NonJudicialEnforcement => 'Penegakan Non-Yustisial',
+            self::PublicOrderPatrol => 'Patroli ketertiban umum, ketentraman, dan perlindungan masyarakat',
+            self::OfficialSecurityEscort => 'Pengamanan dan pengawalan pejabat daerah',
+            self::EventSecurity => 'Pengamanan acara atau event',
+            self::PublicComplaintHandling => 'Penanganan pengaduan pelanggaran ketertiban umum/masyarakat',
+            self::RegionalRegulationCompliance => 'Pembinaan dan pengawasan kepatuhan terhadap Perda dan Perkada',
+            self::AttributeSupervision => 'Pembinaan dan pengawasan atribut',
+            self::JudicialEnforcement => 'Penegakan peraturan daerah dan peraturan kepala daerah yustisi',
+            self::NonJudicialEnforcement => 'Penegakan peraturan daerah dan peraturan kepala daerah non yustisi',
         };
     }
 }

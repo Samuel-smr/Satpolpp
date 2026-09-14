@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends($activityLayout ?? 'layouts.admin')
 
 @section('title', isset($activity) ? 'Edit Kegiatan Internal' : 'Tambah Kegiatan Internal')
 
@@ -13,7 +13,8 @@
         $defaultOfficerIds = $isEditing ? $editingActivity->officers->pluck('id')->all() : [];
         $selectedOfficerIds = array_map('strval', old('officer_ids', $defaultOfficerIds));
         $existingDocumentationCount = $isEditing ? $editingActivity->attachments->count() : 0;
-        $closeRoute = route('admin.kegiatan');
+        $activityRoutePrefix = $activityRoutePrefix ?? 'admin.kegiatan';
+        $closeRoute = route($activityRoutePrefix);
     @endphp
 
     <div class="fixed inset-y-0 left-64 right-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="activity-modal-title">
@@ -42,7 +43,7 @@
             </div>
         @endif
 
-        <form action="{{ $isEditing ? route('admin.kegiatan.update', $editingActivity) : route('admin.kegiatan.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+        <form action="{{ $isEditing ? route($activityRoutePrefix.'.update', $editingActivity) : route($activityRoutePrefix.'.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
             @if ($isEditing)
                 @method('PUT')
@@ -57,22 +58,26 @@
                         <select id="activity_template_id" name="activity_template_id" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:border-sidebar-active focus:bg-white focus:outline-none focus:ring-1 focus:ring-sidebar-active">
                             <option value="">Tanpa template</option>
                             @foreach ($activityTemplates as $template)
-                                <option value="{{ $template->id }}" data-name="{{ $template->name }}" data-category="{{ $template->operational_category?->value }}" data-description="{{ $template->default_description }}" @selected((string) old('activity_template_id', $editingActivity?->activity_template_id) === (string) $template->id)>{{ $template->name }}</option>
+                                <option value="{{ $template->id }}" data-name="{{ $template->name }}" data-category="{{ $template->name }}" data-description="{{ $template->default_description }}" @selected((string) old('activity_template_id', $editingActivity?->activity_template_id) === (string) $template->id)>{{ $template->name }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div class="sm:col-span-2">
-                        <label for="activity_name" class="mb-1.5 block text-sm font-semibold text-slate-700">Nama kegiatan</label>
-                        <input id="activity_name" name="name" type="text" maxlength="255" required value="{{ old('name', $editingActivity?->name) }}" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:border-sidebar-active focus:bg-white focus:outline-none focus:ring-1 focus:ring-sidebar-active">
-                    </div>
-                    <div>
-                        <label for="operational_category" class="mb-1.5 block text-sm font-semibold text-slate-700">Kategori operasional</label>
-                        <select id="operational_category" name="operational_category" required class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:border-sidebar-active focus:bg-white focus:outline-none focus:ring-1 focus:ring-sidebar-active">
+                        <label for="activity_category" class="mb-1.5 block text-sm font-semibold text-slate-700">Kategori kegiatan</label>
+                        <select id="activity_category" name="category" required class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:border-sidebar-active focus:bg-white focus:outline-none focus:ring-1 focus:ring-sidebar-active">
                             <option value="">Pilih kategori</option>
-                            @foreach ($operationalCategories as $category)
-                                <option value="{{ $category->value }}" @selected(old('operational_category', $editingActivity?->operational_category?->value) === $category->value)>{{ $category->label() }}</option>
+                            @foreach ($activityTemplates as $template)
+                                <option value="{{ $template->name }}" @selected(old('category', $editingActivity?->category) === $template->name)>{{ $template->name }}</option>
                             @endforeach
                         </select>
+                        <p class="mt-1.5 text-xs text-slate-400">Kategori mengikuti template yang dipilih dan tetap dapat diubah manual.</p>
+                        @error('category')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label for="activity_name" class="mb-1.5 block text-sm font-semibold text-slate-700">Nama kegiatan</label>
+                        <input id="activity_name" name="name" type="text" maxlength="255" required value="{{ old('name', $editingActivity?->name) }}" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:border-sidebar-active focus:bg-white focus:outline-none focus:ring-1 focus:ring-sidebar-active">
                     </div>
                     <div>
                         <label for="activity_date" class="mb-1.5 block text-sm font-semibold text-slate-700">Tanggal pelaksanaan</label>
@@ -169,7 +174,7 @@
                                         <p class="truncate font-medium text-slate-700">{{ $attachment->original_name }}</p>
                                         <p class="text-xs text-slate-400">Dokumentasi tersimpan</p>
                                     </div>
-                                    <a href="{{ route('admin.kegiatan.attachments.show', [$editingActivity, $attachment]) }}" target="_blank" rel="noopener" title="Pratinjau dokumentasi" class="rounded-lg p-1 text-slate-400 transition-colors hover:bg-blue-50 hover:text-blue-600">
+                                    <a href="{{ route($activityRoutePrefix.'.attachments.show', [$editingActivity, $attachment]) }}" target="_blank" rel="noopener" title="Pratinjau dokumentasi" class="rounded-lg p-1 text-slate-400 transition-colors hover:bg-blue-50 hover:text-blue-600">
                                         <span class="material-symbols-outlined text-[19px]">visibility</span>
                                     </a>
                                     <button type="submit" form="delete-attachment-{{ $attachment->id }}" title="Hapus dokumentasi" class="rounded-lg p-1 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600">
@@ -199,7 +204,7 @@
 
         @if ($isEditing)
             @foreach ($editingActivity->attachments as $attachment)
-                <form id="delete-attachment-{{ $attachment->id }}" action="{{ route('admin.kegiatan.attachments.destroy', [$editingActivity, $attachment]) }}" method="POST" data-confirm-delete="Hapus dokumentasi ini secara permanen?">
+                <form id="delete-attachment-{{ $attachment->id }}" action="{{ route($activityRoutePrefix.'.attachments.destroy', [$editingActivity, $attachment]) }}" method="POST" data-confirm-delete="Hapus dokumentasi ini secara permanen?">
                     @csrf
                     @method('DELETE')
                     <input type="hidden" name="return_to" value="edit">
@@ -291,7 +296,7 @@
             }
 
             document.getElementById('activity_name').value = selectedTemplate.dataset.name || '';
-            document.getElementById('operational_category').value = selectedTemplate.dataset.category || '';
+            document.getElementById('activity_category').value = selectedTemplate.dataset.category || '';
             document.getElementById('activity_description').value = selectedTemplate.dataset.description || '';
         });
 

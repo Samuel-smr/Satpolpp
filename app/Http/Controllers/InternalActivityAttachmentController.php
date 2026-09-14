@@ -117,9 +117,10 @@ class InternalActivityAttachmentController extends Controller
             Storage::disk('local')->delete($quarantinePath);
         }
 
+        $routePrefix = $request->routeIs('super_admin.*') ? 'super_admin.kegiatan' : 'admin.kegiatan';
         $redirectRoute = $request->string('return_to')->toString() === 'edit'
-            ? 'admin.kegiatan.edit'
-            : 'admin.kegiatan.show';
+            ? "{$routePrefix}.edit"
+            : "{$routePrefix}.show";
 
         return redirect()
             ->route($redirectRoute, $activity)

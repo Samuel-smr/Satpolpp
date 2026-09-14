@@ -47,10 +47,13 @@ class SuperAdminActivityExportTest extends TestCase
             ->assertSee('Kegiatan berjalan baik.')
             ->assertSee('Personel Ekspor')
             ->assertSee('patroli.jpg')
-            ->assertSee("kegiatan\\/{$activity->id}\\/attachments\\/{$attachment->id}", false)
+            ->assertSee('export-attachments', false)
             ->assertSee('LAPORAN KEGIATAN')
             ->assertSee("'Tindakan dan Hasil'", false)
-            ->assertSee('getExportPeriod(list)');
+            ->assertSee('const pdfImageSize', false)
+            ->assertSee('image.width * scale', false)
+            ->assertSee('image.height * scale', false)
+            ->assertSee('const period =', false);
     }
 
     public function test_super_admin_can_load_an_activity_image_for_pdf_export(): void

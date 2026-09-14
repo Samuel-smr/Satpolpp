@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends($reportLayout ?? 'layouts.admin')
 
 @section('title', 'Detail Pengaduan')
 
@@ -16,9 +16,9 @@
         };
     @endphp
 
-    <a href="{{ route('admin.pengaduan') }}" class="inline-flex items-center gap-2 text-sidebar-active font-medium hover:underline mb-6">
+    <a href="{{ route($reportBackRoute ?? 'admin.pengaduan') }}" class="inline-flex items-center gap-2 text-sidebar-active font-medium hover:underline mb-6">
         <span class="material-symbols-outlined text-[18px]">arrow_back</span>
-        <span>Kembali ke daftar pengaduan</span>
+        <span>{{ ($reportReadOnly ?? false) ? 'Kembali ke daftar kegiatan' : 'Kembali ke daftar pengaduan' }}</span>
     </a>
 
     @if (session('status'))
@@ -54,10 +54,6 @@
                         <dd class="font-medium text-slate-800">{{ $report->type->label() }}</dd>
                     </div>
                     <div>
-                        <dt class="text-slate-400">Kategori</dt>
-                        <dd class="font-medium text-slate-800">{{ $report->category?->label() ?? '-' }}</dd>
-                    </div>
-                    <div>
                         <dt class="text-slate-400">Sumber</dt>
                         <dd class="font-medium text-slate-800">
                             {{ $report->source->label() }}{{ $report->source_platform ? ' · '.$report->source_platform->label() : '' }}
@@ -80,14 +76,12 @@
                         <dd class="font-medium text-slate-800">{{ $report->maskedReporterNik() ?? 'Tidak dicantumkan' }}</dd>
                     </div>
                     <div>
-                        <dt class="text-slate-400">Koordinat</dt>
-                        <dd class="font-medium text-slate-800">
-                            @if ($report->latitude !== null && $report->longitude !== null)
-                                {{ $report->latitude }}, {{ $report->longitude }}
-                            @else
-                                Tidak dicantumkan
-                            @endif
-                        </dd>
+                        <dt class="text-slate-400">Latitude</dt>
+                        <dd class="font-medium text-slate-800">{{ $report->latitude ?? 'Tidak dicantumkan' }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-slate-400">Longitude</dt>
+                        <dd class="font-medium text-slate-800">{{ $report->longitude ?? 'Tidak dicantumkan' }}</dd>
                     </div>
                     <div class="sm:col-span-2">
                         <dt class="text-slate-400">Lokasi</dt>
@@ -112,10 +106,6 @@
 
                     <dl class="grid gap-4 rounded-xl border border-emerald-100 bg-white p-4 text-sm sm:grid-cols-2">
                         <div>
-                            <dt class="text-slate-400">Kategori operasional</dt>
-                            <dd class="font-medium text-slate-800">{{ $report->activity->operational_category?->label() ?? '-' }}</dd>
-                        </div>
-                        <div>
                             <dt class="text-slate-400">Pelaksanaan</dt>
                             <dd class="font-medium text-slate-800">
                                 {{ $report->activity->activity_date->format('d/m/Y') }}
@@ -128,6 +118,14 @@
                             <dt class="text-slate-400">Lokasi</dt>
                             <dd class="whitespace-pre-line font-medium text-slate-800">{{ $report->activity->location_address }}</dd>
                         </div>
+                        <div>
+                            <dt class="text-slate-400">Latitude</dt>
+                            <dd class="font-medium text-slate-800">{{ $report->activity->latitude }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-slate-400">Longitude</dt>
+                            <dd class="font-medium text-slate-800">{{ $report->activity->longitude }}</dd>
+                        </div>
                         @if ($report->activity->description)
                             <div class="sm:col-span-2">
                                 <dt class="text-slate-400">Deskripsi kegiatan</dt>
@@ -139,6 +137,13 @@
                             <dd class="whitespace-pre-line font-medium text-slate-800">{{ $report->activity->handling_result }}</dd>
                         </div>
                     </dl>
+
+                    @if ($report->status === \App\ReportStatus::Completed)
+                        <div class="mt-5">
+                            <h3 class="mb-2 text-sm font-semibold text-slate-700">Peta lokasi penanganan</h3>
+                            <div id="completed-activity-map" class="h-80 overflow-hidden rounded-xl border border-emerald-100 bg-slate-100" aria-label="Peta lokasi penanganan yang telah selesai"></div>
+                        </div>
+                    @endif
 
                     <div class="mt-5 grid gap-5 sm:grid-cols-2">
                         <div>
@@ -154,18 +159,27 @@
                         </div>
                         <div>
                             <h3 class="mb-2 text-sm font-semibold text-slate-700">Bukti penanganan</h3>
-                            <div class="space-y-2">
-                                @foreach ($report->activity->attachments as $attachment)
-                                    <div class="rounded-xl border border-emerald-100 bg-white px-4 py-3 text-sm">
-                                        <p class="truncate font-semibold text-slate-700" title="{{ $attachment->original_name }}">{{ $attachment->original_name }}</p>
-                                        <p class="text-xs text-slate-400">{{ $attachment->mime_type }} · {{ \App\Support\FileSize::format($attachment->file_size) }}</p>
+                            <div class="grid gap-3">
+                                @forelse ($report->activity->attachments as $attachment)
+                                    <div class="overflow-hidden rounded-xl border border-emerald-100 bg-white text-sm">
+                                        <a href="{{ route($activityAttachmentRoute ?? 'admin.kegiatan.export-attachments.show', [$report->activity, $attachment]) }}" target="_blank" rel="noopener" class="block aspect-video bg-slate-100">
+                                            <img src="{{ route($activityAttachmentRoute ?? 'admin.kegiatan.export-attachments.show', [$report->activity, $attachment]) }}" alt="Bukti penanganan {{ $attachment->original_name }}" loading="lazy" class="h-full w-full object-cover transition-transform hover:scale-105">
+                                        </a>
+                                        <div class="px-4 py-3">
+                                            <p class="truncate font-semibold text-slate-700" title="{{ $attachment->original_name }}">{{ $attachment->original_name }}</p>
+                                            <p class="text-xs text-slate-400">{{ $attachment->mime_type }} · {{ \App\Support\FileSize::format($attachment->file_size) }}</p>
+                                        </div>
                                     </div>
-                                @endforeach
+                                @empty
+                                    <div class="rounded-xl border border-dashed border-emerald-200 bg-white p-6 text-center text-sm text-slate-400">
+                                        Tidak ada foto bukti penanganan.
+                                    </div>
+                                @endforelse
                             </div>
                         </div>
                     </div>
                 </section>
-            @elseif ($report->status === \App\ReportStatus::InProgress)
+            @elseif ($report->status === \App\ReportStatus::InProgress && ! ($reportReadOnly ?? false))
                 @php
                     $selectedOfficerIds = array_map('strval', old('officer_ids', []));
                 @endphp
@@ -185,7 +199,7 @@
                                 <select id="activity_template_id" name="activity_template_id" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:border-sidebar-active focus:outline-none focus:ring-1 focus:ring-sidebar-active">
                                     <option value="">Tanpa template</option>
                                     @foreach ($activityTemplates as $template)
-                                        <option value="{{ $template->id }}" data-name="{{ $template->name }}" data-category="{{ $template->operational_category?->value }}" data-description="{{ $template->default_description }}" @selected((string) old('activity_template_id') === (string) $template->id)>
+                                        <option value="{{ $template->id }}" data-name="{{ $template->name }}" data-description="{{ $template->default_description }}" @selected((string) old('activity_template_id') === (string) $template->id)>
                                             {{ $template->name }}
                                         </option>
                                     @endforeach
@@ -194,14 +208,6 @@
                             <div class="sm:col-span-2">
                                 <label for="activity_name" class="mb-1.5 block text-sm font-semibold text-slate-700">Nama kegiatan</label>
                                 <input id="activity_name" name="name" type="text" maxlength="255" required value="{{ old('name', 'Penanganan '.$report->code) }}" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:border-sidebar-active focus:outline-none focus:ring-1 focus:ring-sidebar-active">
-                            </div>
-                            <div>
-                                <label for="operational_category" class="mb-1.5 block text-sm font-semibold text-slate-700">Kategori operasional</label>
-                                <select id="operational_category" name="operational_category" required class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:border-sidebar-active focus:outline-none focus:ring-1 focus:ring-sidebar-active">
-                                    @foreach ($operationalCategories as $category)
-                                        <option value="{{ $category->value }}" @selected(old('operational_category', \App\OperationalCategory::PublicComplaintHandling->value) === $category->value)>{{ $category->label() }}</option>
-                                    @endforeach
-                                </select>
                             </div>
                             <div>
                                 <label for="activity_date" class="mb-1.5 block text-sm font-semibold text-slate-700">Tanggal pelaksanaan</label>
@@ -298,8 +304,8 @@
                     @forelse ($report->attachments as $attachment)
                         <div class="overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
                             @if ($attachment->file_type === 'image' && in_array($attachment->mime_type, ['image/jpeg', 'image/png', 'image/webp'], true))
-                                <a href="{{ route('admin.pengaduan.attachments.show', [$report, $attachment]) }}" target="_blank" rel="noopener" class="block aspect-video bg-slate-100">
-                                    <img src="{{ route('admin.pengaduan.attachments.show', [$report, $attachment]) }}" alt="Lampiran {{ $attachment->original_name }}" class="h-full w-full object-cover transition-transform hover:scale-105">
+                                <a href="{{ route($reportAttachmentRoute ?? 'admin.pengaduan.attachments.show', [$report, $attachment]) }}" target="_blank" rel="noopener" class="block aspect-video bg-slate-100">
+                                    <img src="{{ route($reportAttachmentRoute ?? 'admin.pengaduan.attachments.show', [$report, $attachment]) }}" alt="Lampiran {{ $attachment->original_name }}" class="h-full w-full object-cover transition-transform hover:scale-105">
                                 </a>
                             @else
                                 <div class="flex h-32 items-center justify-center bg-white text-sidebar-active">
@@ -312,7 +318,7 @@
                                     <p class="mt-0.5 text-xs text-slate-400">{{ $attachment->mime_type }} · {{ \App\Support\FileSize::format($attachment->file_size) }}</p>
                                 </div>
                                 @if ($attachment->file_type === 'image')
-                                    <a href="{{ route('admin.pengaduan.attachments.show', [$report, $attachment]) }}" target="_blank" rel="noopener" title="Buka lampiran" class="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-blue-50 hover:text-blue-600">
+                                    <a href="{{ route($reportAttachmentRoute ?? 'admin.pengaduan.attachments.show', [$report, $attachment]) }}" target="_blank" rel="noopener" title="Buka lampiran" class="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-blue-50 hover:text-blue-600">
                                         <span class="material-symbols-outlined text-[20px]">open_in_new</span>
                                     </a>
                                 @endif
@@ -377,7 +383,10 @@
         <aside>
             <div class="sticky top-24 rounded-2xl border bg-slate-800 p-6 text-white shadow-sm">
                 <h2 class="font-headline font-bold mb-2">Tindak Lanjut</h2>
-                @if ($report->status->nextProcessingStatus() !== null)
+                @if ($reportReadOnly ?? false)
+                    <p class="text-sm text-slate-300">Detail laporan ini ditampilkan dalam mode baca-saja untuk Super Admin.</p>
+                    <a href="{{ route('super_admin.kegiatan', ['type' => 'external']) }}" class="mt-5 block w-full rounded-xl bg-white/10 py-2.5 text-center font-medium text-white hover:bg-white/20">Kembali ke Kegiatan</a>
+                @elseif ($report->status->nextProcessingStatus() !== null)
                     <p class="text-sm text-slate-300">
                         Lanjutkan ke status <strong class="text-white">{{ $report->status->nextProcessingStatus()->label() }}</strong>.
                     </p>
@@ -405,11 +414,13 @@
                     @endif
                 @endif
 
-                <form method="POST" action="{{ route('admin.pengaduan.destroy', $report) }}" class="mt-5" data-confirm-delete="Hapus laporan ini? Riwayat dan berkas tetap disimpan untuk audit, tetapi laporan tidak dapat diakses lagi.">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="w-full rounded-xl border border-red-400/40 py-2.5 font-medium text-red-300 transition-colors hover:bg-red-500/10 hover:text-red-200">Hapus Laporan</button>
-                </form>
+                @unless ($reportReadOnly ?? false)
+                    <form method="POST" action="{{ route('admin.pengaduan.destroy', $report) }}" class="mt-5" data-confirm-delete="Hapus laporan ini? Riwayat dan berkas tetap disimpan untuk audit, tetapi laporan tidak dapat diakses lagi.">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="w-full rounded-xl border border-red-400/40 py-2.5 font-medium text-red-300 transition-colors hover:bg-red-500/10 hover:text-red-200">Hapus Laporan</button>
+                    </form>
+                @endunless
 
                 <div class="mt-5 border-t border-white/10 pt-5">
                     <p class="text-xs text-slate-400">Status saat ini</p>
@@ -433,7 +444,6 @@
             }
 
             document.getElementById('activity_name').value = selectedTemplate.dataset.name || '';
-            document.getElementById('operational_category').value = selectedTemplate.dataset.category || '';
             document.getElementById('activity_description').value = selectedTemplate.dataset.description || '';
         });
 
@@ -503,6 +513,27 @@
         });
 
         renderCompletionOfficers();
+
+        const completedActivityMapElement = document.getElementById('completed-activity-map');
+
+        if (window.L && completedActivityMapElement) {
+            const completedLatitude = @js($report->activity?->latitude);
+            const completedLongitude = @js($report->activity?->longitude);
+            const completedActivityMap = L.map(completedActivityMapElement);
+
+            if (window.KulonProgoMap) {
+                window.KulonProgoMap.setup(completedActivityMap);
+            } else {
+                completedActivityMap.setView([completedLatitude, completedLongitude], 15);
+            }
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap'
+            }).addTo(completedActivityMap);
+            L.marker([completedLatitude, completedLongitude]).addTo(completedActivityMap);
+            completedActivityMap.setView([completedLatitude, completedLongitude], 15);
+        }
 
         if (window.L && document.getElementById('completion-map')) {
             const latitudeInput = document.getElementById('latitude');

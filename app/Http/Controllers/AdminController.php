@@ -8,7 +8,6 @@ use App\Models\ActivityTemplate;
 use App\Models\Officer;
 use App\Models\Report;
 use App\OfficerStatus;
-use App\OperationalCategory;
 use App\ReportStatus;
 use App\ReportType;
 use Illuminate\Http\Request;
@@ -166,7 +165,7 @@ class AdminController extends Controller
         return view('admin.pengaduan', compact('reports', 'selectedType', 'statistics', 'filters'));
     }
 
-    public function pengaduanDetail(Report $report): View
+    public function pengaduanDetail(Request $request, Report $report): View
     {
         $report->load([
             'statusHistories' => fn ($query) => $query
@@ -186,32 +185,49 @@ class AdminController extends Controller
             $activityTemplates = ActivityTemplate::query()
                 ->where('is_active', true)
                 ->orderBy('sort_order')
-                ->get(['id', 'name', 'operational_category', 'default_description']);
+                ->get(['id', 'name', 'default_description']);
             $activeOfficers = Officer::query()
                 ->where('status', OfficerStatus::Active)
                 ->orderBy('name')
                 ->get(['id', 'name', 'employee_number', 'position']);
         }
 
-        $operationalCategories = OperationalCategory::cases();
+        $reportReadOnly = $request->routeIs('super_admin.*');
+        $reportLayout = $reportReadOnly ? 'layouts.super_admin' : 'layouts.admin';
+        $reportBackRoute = $reportReadOnly ? 'super_admin.kegiatan' : 'admin.pengaduan';
+        $activityAttachmentRoute = $reportReadOnly
+            ? 'super_admin.kegiatan.export-attachments.show'
+            : 'admin.kegiatan.export-attachments.show';
+        $reportAttachmentRoute = $reportReadOnly
+            ? 'super_admin.pengaduan.attachments.show'
+            : 'admin.pengaduan.attachments.show';
 
         return view('admin.pengaduan-detail', compact(
             'report',
             'activityTemplates',
             'activeOfficers',
-            'operationalCategories',
+            'reportReadOnly',
+            'reportLayout',
+            'reportBackRoute',
+            'activityAttachmentRoute',
+            'reportAttachmentRoute',
         ));
     }
 
     public function kegiatan(Request $request): View
     {
+        $activityRoutePrefix = $request->routeIs('super_admin.*') ? 'super_admin.kegiatan' : 'admin.kegiatan';
+        $activityLayout = $request->routeIs('super_admin.*') ? 'layouts.super_admin' : 'layouts.admin';
+        $reportAttachmentRoute = $request->routeIs('super_admin.*')
+            ? 'super_admin.pengaduan.attachments.show'
+            : 'admin.pengaduan.attachments.show';
         $filters = $request->validate([
             'month' => ['nullable', 'date_format:Y-m'],
             'date_start' => ['nullable', 'date_format:Y-m-d'],
             'date_end' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:date_start'],
             'type' => ['nullable', 'string', Rule::enum(ActivityType::class)],
             'search' => ['nullable', 'string', 'max:100'],
-            'operational_category' => ['nullable', Rule::enum(OperationalCategory::class)],
+            'category' => ['nullable', 'string', 'max:255'],
         ], [
             'month.date_format' => 'Format bulan kegiatan tidak valid.',
             'date_start.date_format' => 'Format tanggal mulai tidak valid.',
@@ -238,10 +254,10 @@ class AdminController extends Controller
             ->when($filters['date_start'] ?? null, fn ($query, string $date) => $query->whereDate('activity_date', '>=', $date))
             ->when($filters['date_end'] ?? null, fn ($query, string $date) => $query->whereDate('activity_date', '<=', $date))
             ->when($filters['type'] ?? null, fn ($query, string $type) => $query->where('type', $type))
-            ->when($filters['operational_category'] ?? null, fn ($query, string $category) => $query->where('operational_category', $category));
+            ->when($filters['category'] ?? null, fn ($query, string $category) => $query->where('category', $category));
 
         $activities = (clone $activityQuery)
-            ->select(['id', 'report_id', 'name', 'type', 'operational_category', 'activity_date', 'start_time', 'location_address'])
+            ->select(['id', 'report_id', 'name', 'type', 'category', 'activity_date', 'start_time', 'location_address'])
             ->with('report:id,code')
             ->withCount('officers')
             ->orderByDesc('activity_date')
@@ -274,7 +290,7 @@ class AdminController extends Controller
                 'dievaluasi_oleh' => $activity->evaluatedByUser?->name,
                 'nama' => $activity->name,
                 'jenis' => $activity->type->label(),
-                'kategori' => $activity->operational_category?->label(),
+                'kategori' => $activity->category,
                 'tanggal' => $activity->activity_date->toDateString(),
                 'waktu' => $activity->start_time?->format('H:i'),
                 'deskripsi' => $activity->description,
@@ -294,7 +310,7 @@ class AdminController extends Controller
                         && in_array($attachment->mime_type, ['image/jpeg', 'image/png', 'image/webp'], true))
                     ->map(fn ($attachment): array => [
                         'nama' => $attachment->original_name,
-                        'url' => route('admin.kegiatan.export-attachments.show', [$activity, $attachment]),
+                        'url' => route("{$activityRoutePrefix}.export-attachments.show", [$activity, $attachment]),
                     ])
                     ->concat(
                         $activity->report?->attachments
@@ -303,7 +319,7 @@ class AdminController extends Controller
                                 && in_array($attachment->mime_type, ['image/jpeg', 'image/png', 'image/webp'], true))
                             ->map(fn ($attachment): array => [
                                 'nama' => $attachment->original_name,
-                                'url' => route('admin.pengaduan.attachments.show', [$activity->report, $attachment]),
+                                'url' => route($reportAttachmentRoute, [$activity->report, $attachment]),
                             ]) ?? collect(),
                     )
                     ->unique('url')
@@ -316,7 +332,9 @@ class AdminController extends Controller
             'exportActivities' => $exportActivities,
             'filters' => $filters,
             'activityTypes' => ActivityType::cases(),
-            'operationalCategories' => OperationalCategory::cases(),
+            'categories' => ActivityTemplate::query()->where('is_active', true)->orderBy('sort_order')->pluck('name'),
+            'activityRoutePrefix' => $activityRoutePrefix,
+            'activityLayout' => $activityLayout,
         ]);
     }
 

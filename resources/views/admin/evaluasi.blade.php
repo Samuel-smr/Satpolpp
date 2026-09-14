@@ -173,13 +173,24 @@
                 </div>
 
                 <div>
+                    <label for="evaluation-category" class="mb-1 block text-sm font-medium">Kategori</label>
+                    <select id="evaluation-category" onchange="filterKegiatan()"
+                        class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active">
+                        <option value="">Semua kategori</option>
+                        @foreach ($availableCategories as $category)
+                            <option value="{{ $category }}">{{ $category }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
                     <label for="activity-id" class="mb-1 block text-sm font-medium">Nama Kegiatan <span
                             class="text-red-500">*</span></label>
                     <select name="activity_id" id="activity-id" required disabled
                         class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active">
                         <option value="">Pilih Sumber Terlebih Dahulu</option>
                         @foreach ($availableActivities as $activity)
-                            <option value="{{ $activity->id }}" data-source="{{ $activity->type->value }}"
+                            <option value="{{ $activity->id }}" data-source="{{ $activity->type->value }}" data-category="{{ $activity->category ?? '' }}"
                                 @selected((int) old('activity_id') === $activity->id)>
                                 {{ $activity->name }} — {{ $activity->activity_date->format('d/m/Y') }}
                                 @if ($activity->report)
@@ -188,8 +199,7 @@
                             </option>
                         @endforeach
                     </select>
-                    <p id="activity-empty" class="mt-1 hidden text-xs text-slate-500">Belum ada kegiatan yang dapat
-                        dievaluasi untuk sumber ini.</p>
+                    <p id="activity-empty" class="mt-1 hidden text-xs text-slate-500">Belum ada kegiatan pada kategori ini.</p>
                     @error('activity_id')
                         <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                     @enderror
@@ -280,6 +290,7 @@
     <script>
         const modalEvaluasi = document.getElementById('modal');
         const sumberEvaluasi = document.getElementById('evaluation-source');
+        const kategoriEvaluasi = document.getElementById('evaluation-category');
         const kegiatanEvaluasi = document.getElementById('activity-id');
         const pesanKegiatanKosong = document.getElementById('activity-empty');
         const semuaPilihanKegiatan = Array.from(kegiatanEvaluasi.options).slice(1);
@@ -289,21 +300,38 @@
 
         function filterKegiatan() {
             const sumber = sumberEvaluasi.value;
+            const kategori = kategoriEvaluasi.value;
             const nilaiLama = kegiatanEvaluasi.value;
+            const sumberEksternal = sumber === 'external';
 
-            semuaPilihanKegiatan.forEach((pilihan) => pilihan.hidden = pilihan.dataset.source !== sumber);
+            kategoriEvaluasi.disabled = sumberEksternal;
 
-            const pilihanTersedia = semuaPilihanKegiatan.filter((pilihan) => pilihan.dataset.source === sumber);
+            if (sumberEksternal) {
+                kategoriEvaluasi.value = '';
+            }
+
+            semuaPilihanKegiatan.forEach((pilihan) => {
+                const sesuaiSumber = pilihan.dataset.source === sumber;
+                const sesuaiKategori = !kategori
+                    || (kategori === '__uncategorized__' && !pilihan.dataset.category)
+                    || pilihan.dataset.category === kategori;
+
+                pilihan.hidden = !sesuaiSumber || !sesuaiKategori;
+            });
+
+            const pilihanTersedia = semuaPilihanKegiatan.filter((pilihan) => !pilihan.hidden);
             kegiatanEvaluasi.disabled = !sumber || pilihanTersedia.length === 0;
-            pesanKegiatanKosong.classList.toggle('hidden', !sumber || pilihanTersedia.length > 0);
+            pesanKegiatanKosong.classList.toggle('hidden', sumber !== 'internal' || pilihanTersedia.length > 0);
 
             if (!pilihanTersedia.some((pilihan) => pilihan.value === nilaiLama)) {
                 kegiatanEvaluasi.value = '';
             }
 
-            kegiatanEvaluasi.options[0].textContent = sumber
-                ? (pilihanTersedia.length ? 'Pilih Kegiatan' : 'Belum ada kegiatan')
-                : 'Pilih Sumber Terlebih Dahulu';
+            kegiatanEvaluasi.options[0].textContent = !sumber
+                ? 'Pilih Sumber Terlebih Dahulu'
+                : pilihanTersedia.length
+                    ? 'Pilih Kegiatan'
+                    : 'Belum ada kegiatan';
         }
 
         function bukaTambah() {
@@ -329,6 +357,7 @@
 
         if (kegiatanEvaluasi.value) {
             sumberEvaluasi.value = kegiatanEvaluasi.selectedOptions[0]?.dataset.source ?? '';
+            kategoriEvaluasi.value = kegiatanEvaluasi.selectedOptions[0]?.dataset.category || '__uncategorized__';
         }
 
         filterKegiatan();

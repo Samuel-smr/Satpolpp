@@ -4,9 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UpsertOfficerRequest;
 use App\Models\Officer;
-use App\Models\OperationalZone;
-use App\Models\OrganizationalUnit;
 use App\OfficerStatus;
+use App\Support\OfficerOptions;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -16,15 +15,14 @@ class OfficerController extends Controller
     public function index(): View
     {
         $officers = Officer::query()
-            ->with(['organizationalUnit:id,name', 'operationalZone:id,name'])
             ->orderBy('name')
             ->get();
 
         return view('super_admin.petugas', [
             'officers' => $officers,
-            'units' => OrganizationalUnit::query()->where('is_active', true)->orderBy('name')->get(['id', 'name']),
-            'zones' => OperationalZone::query()->where('is_active', true)->orderBy('name')->get(['id', 'name']),
-            'statuses' => OfficerStatus::cases(),
+            'positions' => OfficerOptions::positions(),
+            'workUnits' => OfficerOptions::workUnits(),
+            'units' => OfficerOptions::units(),
             'statistics' => [
                 'total' => $officers->count(),
                 'active' => $officers->where('status', OfficerStatus::Active)->count(),
@@ -36,7 +34,7 @@ class OfficerController extends Controller
 
     public function store(UpsertOfficerRequest $request): RedirectResponse
     {
-        Officer::create($request->validated());
+        Officer::create([...$request->validated(), 'status' => OfficerStatus::Active]);
 
         return redirect()->route('super_admin.petugas')->with('status', 'Petugas berhasil ditambahkan.');
     }

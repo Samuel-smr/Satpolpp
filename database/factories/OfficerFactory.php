@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Officer;
 use App\OfficerStatus;
+use App\Support\OfficerOptions;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -24,12 +25,9 @@ class OfficerFactory extends Factory
             'operational_zone_id' => null,
             'name' => fake()->name(),
             'employee_number' => fake()->unique()->numerify('PP-######'),
-            'rank' => fake()->randomElement(['Pengatur', 'Penata Muda']),
-            'position' => fake()->randomElement(['Anggota', 'Kepala Regu']),
-            'email' => fake()->unique()->safeEmail(),
-            'phone' => fake()->numerify('08##########'),
-            'address' => fake()->address(),
-            'joined_at' => fake()->date(),
+            'position' => fake()->randomElement(OfficerOptions::positions()),
+            'work_unit_name' => fake()->randomElement(OfficerOptions::workUnits()),
+            'unit_name' => fake()->randomElement(OfficerOptions::units()),
             'status' => OfficerStatus::Active,
         ];
     }

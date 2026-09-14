@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\ReportCategory;
 use App\ReportSource;
 use App\ReportSourcePlatform;
 use App\ReportType;
@@ -20,7 +19,6 @@ class StoreAdminReportRequest extends FormRequest
     {
         return [
             'type' => ['required', Rule::enum(ReportType::class)],
-            'category' => ['required', Rule::enum(ReportCategory::class)],
             'source' => ['required', Rule::enum(ReportSource::class)],
             'source_platform' => [Rule::requiredIf($this->input('source') === ReportSource::Online->value), 'nullable', Rule::enum(ReportSourcePlatform::class)],
             'reporter_name' => ['nullable', 'string', 'max:255'],
@@ -40,7 +38,6 @@ class StoreAdminReportRequest extends FormRequest
     {
         return [
             'type.required' => 'Jenis laporan wajib dipilih.',
-            'category.required' => 'Kategori laporan wajib dipilih.',
             'source.required' => 'Sumber laporan wajib dipilih.',
             'source_platform.required' => 'Platform online wajib dipilih.',
             'reporter_phone.required' => 'Nomor telepon wajib diisi.',

@@ -24,6 +24,8 @@
                         'super-sidebar': '#240d05',
                         'super-active': '#2b4f7c',
                         'super-hover': '#33170c',
+                        'sidebar-active': '#2b4f7c',
+                        'sidebar-hover': '#234a70',
                         brand: {
                             50:  '#eef4fb',
                             100: '#d9e6f5',

@@ -9,7 +9,6 @@ use App\Models\Officer;
 use App\Models\Report;
 use App\Models\User;
 use App\OfficerStatus;
-use App\OperationalCategory;
 use App\ReportStatus;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -79,7 +78,7 @@ class CompleteReportController extends Controller
                     'evaluated_by_user_id' => null,
                     'name' => $validated['name'],
                     'type' => ActivityType::External,
-                    'operational_category' => $validated['operational_category'],
+                    'category' => null,
                     'activity_date' => $validated['activity_date'],
                     'start_time' => $validated['start_time'] ?? null,
                     'description' => $validated['description'] ?? null,
@@ -109,6 +108,8 @@ class CompleteReportController extends Controller
                 $lockedReport->update([
                     'status' => ReportStatus::Completed,
                     'completed_at' => now(),
+                    'latitude' => $validated['latitude'],
+                    'longitude' => $validated['longitude'],
                 ]);
                 $lockedReport->statusHistories()->create([
                     'changed_by_user_id' => $user->id,
@@ -148,7 +149,6 @@ class CompleteReportController extends Controller
      *   current_status: string,
      *   activity_template_id?: int|null,
      *   name: string,
-     *   operational_category: string,
      *   activity_date: string,
      *   start_time?: string|null,
      *   description?: string|null,
@@ -170,7 +170,6 @@ class CompleteReportController extends Controller
                 Rule::exists('activity_templates', 'id')->where(fn (Builder $query): Builder => $query->where('is_active', true)),
             ],
             'name' => ['required', 'string', 'max:255'],
-            'operational_category' => ['required', 'string', Rule::enum(OperationalCategory::class)],
             'activity_date' => ['required', 'date', 'before_or_equal:today'],
             'start_time' => ['nullable', 'date_format:H:i'],
             'description' => ['nullable', 'string', 'max:5000'],

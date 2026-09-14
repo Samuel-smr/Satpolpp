@@ -8,7 +8,6 @@ use App\Models\GuestAccess;
 use App\Models\Report;
 use App\Models\User;
 use App\Notifications\NewReportNotification;
-use App\ReportCategory;
 use App\ReportStatus;
 use App\UserRole;
 use App\UserStatus;
@@ -34,9 +33,7 @@ class PelaporController extends Controller
 
     public function lapor(): View
     {
-        return view('pelapor.lapor', [
-            'reportCategories' => ReportCategory::cases(),
-        ]);
+        return view('pelapor.lapor');
     }
 
     public function store(StoreGuestReportRequest $request): RedirectResponse
@@ -67,7 +64,7 @@ class PelaporController extends Controller
                     'guest_access_id' => $guestAccess->id,
                     'created_by_user_id' => null,
                     'type' => $validated['jenis'],
-                    'category' => $validated['kategori'],
+                    'category' => null,
                     'source' => 'online',
                     'source_platform' => 'website',
                     'reporter_name' => null,

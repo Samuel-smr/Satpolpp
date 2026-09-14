@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\ReportCategory;
 use App\ReportType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -26,7 +25,6 @@ class StoreGuestReportRequest extends FormRequest
     {
         return [
             'jenis' => ['required', 'string', Rule::enum(ReportType::class)],
-            'kategori' => ['required', 'string', Rule::enum(ReportCategory::class)],
             'telepon' => ['required', 'string', 'regex:/^\+?[0-9][0-9\s-]{8,18}$/'],
             'nik' => ['nullable', 'digits:16', 'required_if:jenis,'.ReportType::Emergency->value],
             'deskripsi' => ['required', 'string', 'max:5000'],
@@ -43,8 +41,6 @@ class StoreGuestReportRequest extends FormRequest
         return [
             'jenis.required' => 'Jenis pengaduan wajib dipilih.',
             'jenis.enum' => 'Jenis pengaduan tidak valid.',
-            'kategori.required' => 'Kategori laporan wajib dipilih.',
-            'kategori.enum' => 'Kategori laporan tidak valid.',
             'telepon.required' => 'Nomor WhatsApp atau telepon wajib diisi.',
             'telepon.regex' => 'Format nomor WhatsApp atau telepon tidak valid.',
             'nik.required_if' => 'NIK wajib diisi untuk laporan darurat.',

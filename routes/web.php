@@ -18,7 +18,6 @@ use App\Http\Controllers\PelaporController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportAttachmentController;
 use App\Http\Controllers\ReportStatusController;
-use App\Http\Controllers\SuperAdminActivityAttachmentController;
 use App\Http\Controllers\SuperAdminController;
 use Illuminate\Support\Facades\Route;
 
@@ -85,8 +84,18 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:access-admin'])
 // Super Admin Routes (Tampilan Sementara / Prototyping)
 Route::prefix('super-admin')->name('super_admin.')->middleware(['auth', 'can:access-super-admin'])->group(function () {
     Route::get('/dashboard', [SuperAdminController::class, 'dashboard'])->name('dashboard');
-    Route::get('/kegiatan', [SuperAdminController::class, 'kegiatan'])->name('kegiatan');
-    Route::get('/kegiatan/{activity}/attachments/{attachment}', [SuperAdminActivityAttachmentController::class, 'show'])->name('kegiatan.attachments.show');
+    Route::get('/kegiatan', [AdminController::class, 'kegiatan'])->name('kegiatan');
+    Route::get('/kegiatan/{activity}/export-attachments/{attachment}', [AdminActivityExportAttachmentController::class, 'show'])->name('kegiatan.export-attachments.show');
+    Route::get('/kegiatan/create', [ActivityController::class, 'create'])->name('kegiatan.create');
+    Route::post('/kegiatan', [ActivityController::class, 'store'])->name('kegiatan.store');
+    Route::get('/kegiatan/{activity}/edit', [ActivityController::class, 'edit'])->name('kegiatan.edit');
+    Route::put('/kegiatan/{activity}', [ActivityController::class, 'update'])->name('kegiatan.update');
+    Route::delete('/kegiatan/{activity}', [ActivityController::class, 'destroy'])->name('kegiatan.destroy');
+    Route::get('/kegiatan/{activity}', [ActivityController::class, 'show'])->name('kegiatan.show');
+    Route::get('/kegiatan/{activity}/attachments/{attachment}', [InternalActivityAttachmentController::class, 'show'])->name('kegiatan.attachments.show');
+    Route::delete('/kegiatan/{activity}/attachments/{attachment}', [InternalActivityAttachmentController::class, 'destroy'])->name('kegiatan.attachments.destroy');
+    Route::get('/pengaduan/{report:code}', [AdminController::class, 'pengaduanDetail'])->name('pengaduan.detail');
+    Route::get('/pengaduan/{report:code}/attachments/{attachment}', [ReportAttachmentController::class, 'show'])->name('pengaduan.attachments.show');
     Route::get('/user', [SuperAdminController::class, 'user'])->name('user');
     Route::post('/user', [SuperAdminController::class, 'storeUser'])->name('user.store');
     Route::put('/user/{user}', [SuperAdminController::class, 'updateUser'])->name('user.update');

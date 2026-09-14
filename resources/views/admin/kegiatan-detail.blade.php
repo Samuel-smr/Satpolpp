@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends($activityLayout ?? 'layouts.admin')
 
 @section('title', 'Detail Kegiatan Internal')
 
@@ -8,7 +8,7 @@
 
 @section('content')
     <div class="fixed inset-y-0 left-64 right-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="activity-detail-modal-title">
-        <a href="{{ route('admin.kegiatan') }}" class="absolute inset-0 bg-black/40" aria-label="Tutup detail kegiatan"></a>
+        <a href="{{ route($activityRoutePrefix ?? 'admin.kegiatan') }}" class="absolute inset-0 bg-black/40" aria-label="Tutup detail kegiatan"></a>
 
         <div class="relative flex max-h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
             <div class="flex shrink-0 flex-col gap-4 border-b border-slate-100 px-6 py-4 sm:flex-row sm:items-start sm:justify-between">
@@ -18,11 +18,11 @@
                     <p class="mt-1 text-sm text-slate-500">Dibuat oleh {{ $activity->createdByUser->name }} pada {{ $activity->created_at->format('d/m/Y H:i') }}</p>
                 </div>
                 <div class="flex items-center gap-2 self-end sm:self-start">
-                    <a href="{{ route('admin.kegiatan.edit', $activity) }}" class="inline-flex items-center justify-center gap-2 rounded-xl bg-sidebar-active px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-sidebar-hover">
+                    <a href="{{ route(($activityRoutePrefix ?? 'admin.kegiatan').'.edit', $activity) }}" class="inline-flex items-center justify-center gap-2 rounded-xl bg-sidebar-active px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-sidebar-hover">
                         <span class="material-symbols-outlined text-[18px]">edit</span>
                         Edit Kegiatan
                     </a>
-                    <form action="{{ route('admin.kegiatan.destroy', $activity) }}" method="POST" data-confirm-delete="Hapus kegiatan ini? Data akan disembunyikan dari daftar, tetapi tetap tersimpan sebagai arsip.">
+                    <form action="{{ route(($activityRoutePrefix ?? 'admin.kegiatan').'.destroy', $activity) }}" method="POST" data-confirm-delete="Hapus kegiatan ini? Data akan disembunyikan dari daftar, tetapi tetap tersimpan sebagai arsip.">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl border border-red-200 bg-white px-4 py-2.5 text-sm font-semibold text-red-600 shadow-sm transition-colors hover:bg-red-50">
@@ -30,7 +30,7 @@
                             Hapus
                         </button>
                     </form>
-                    <a href="{{ route('admin.kegiatan') }}" aria-label="Tutup detail kegiatan" class="rounded-full p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600">
+                    <a href="{{ route($activityRoutePrefix ?? 'admin.kegiatan') }}" aria-label="Tutup detail kegiatan" class="rounded-full p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600">
                         <span class="material-symbols-outlined">close</span>
                     </a>
                 </div>
@@ -43,10 +43,6 @@
                 <section class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
                     <h2 class="mb-5 font-headline text-lg font-bold text-slate-800">Informasi Kegiatan</h2>
                     <dl class="grid gap-4 text-sm sm:grid-cols-2">
-                        <div>
-                            <dt class="text-slate-400">Kategori operasional</dt>
-                            <dd class="font-medium text-slate-800">{{ $activity->operational_category?->label() ?? '-' }}</dd>
-                        </div>
                         <div>
                             <dt class="text-slate-400">Template</dt>
                             <dd class="font-medium text-slate-800">{{ $activity->template?->name ?? 'Tanpa template' }}</dd>
@@ -77,24 +73,26 @@
                     </div>
                     <div class="grid gap-3 sm:grid-cols-2">
                         @forelse ($activity->attachments as $attachment)
-                            <div class="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
-                                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white text-sidebar-active shadow-sm">
-                                    <span class="material-symbols-outlined">image</span>
-                                </div>
-                                <div class="min-w-0 flex-1">
-                                    <p class="truncate text-sm font-semibold text-slate-700" title="{{ $attachment->original_name }}">{{ $attachment->original_name }}</p>
-                                    <p class="mt-0.5 text-xs text-slate-400">{{ $attachment->mime_type }} · {{ \App\Support\FileSize::format($attachment->file_size) }}</p>
-                                </div>
-                                <a href="{{ route('admin.kegiatan.attachments.show', [$activity, $attachment]) }}" target="_blank" rel="noopener" title="Pratinjau dokumentasi" class="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-blue-50 hover:text-blue-600">
-                                    <span class="material-symbols-outlined text-[20px]">visibility</span>
+                            <div class="overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+                                <a href="{{ route(($activityRoutePrefix ?? 'admin.kegiatan').'.attachments.show', [$activity, $attachment]) }}" target="_blank" rel="noopener" class="block aspect-video bg-slate-100">
+                                    <img src="{{ route(($activityRoutePrefix ?? 'admin.kegiatan').'.attachments.show', [$activity, $attachment]) }}" alt="Dokumentasi {{ $attachment->original_name }}" loading="lazy" class="h-full w-full object-cover transition-transform hover:scale-105">
                                 </a>
-                                <form action="{{ route('admin.kegiatan.attachments.destroy', [$activity, $attachment]) }}" method="POST" data-confirm-delete="Hapus dokumentasi ini secara permanen?">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" title="Hapus dokumentasi" class="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600">
-                                        <span class="material-symbols-outlined text-[20px]">delete</span>
-                                    </button>
-                                </form>
+                                <div class="flex items-center gap-3 p-4">
+                                    <div class="min-w-0 flex-1">
+                                        <p class="truncate text-sm font-semibold text-slate-700" title="{{ $attachment->original_name }}">{{ $attachment->original_name }}</p>
+                                        <p class="mt-0.5 text-xs text-slate-400">{{ $attachment->mime_type }} · {{ \App\Support\FileSize::format($attachment->file_size) }}</p>
+                                    </div>
+                                    <a href="{{ route(($activityRoutePrefix ?? 'admin.kegiatan').'.attachments.show', [$activity, $attachment]) }}" target="_blank" rel="noopener" title="Buka dokumentasi" class="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-blue-50 hover:text-blue-600">
+                                        <span class="material-symbols-outlined text-[20px]">open_in_new</span>
+                                    </a>
+                                    <form action="{{ route(($activityRoutePrefix ?? 'admin.kegiatan').'.attachments.destroy', [$activity, $attachment]) }}" method="POST" data-confirm-delete="Hapus dokumentasi ini secara permanen?">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" title="Hapus dokumentasi" class="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600">
+                                            <span class="material-symbols-outlined text-[20px]">delete</span>
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         @empty
                             <p class="rounded-xl border border-dashed border-slate-200 p-8 text-center text-sm text-slate-400 sm:col-span-2">Belum ada dokumentasi kegiatan.</p>
@@ -121,7 +119,7 @@
                             <div class="rounded-xl border border-slate-200 bg-slate-50 p-3">
                                 <p class="text-sm font-semibold text-slate-700">{{ $officer->name }}</p>
                                 <p class="mt-0.5 text-xs text-slate-400">{{ $officer->employee_number }}</p>
-                                <p class="mt-1 text-xs text-slate-500">{{ $officer->rank ?: '-' }}{{ $officer->position ? ' · '.$officer->position : '' }}</p>
+                                <p class="mt-1 text-xs text-slate-500">{{ $officer->position ?: '-' }}</p>
                             </div>
                         @endforeach
                     </div>

@@ -54,7 +54,7 @@ class AdminReportController extends Controller
                     'guest_access_id' => null,
                     'created_by_user_id' => $request->user()->id,
                     'type' => $validated['type'],
-                    'category' => $validated['category'],
+                    'category' => null,
                     'source' => $validated['source'],
                     'source_platform' => $validated['source_platform'] ?? null,
                     'reporter_name' => $validated['reporter_name'] ?? null,

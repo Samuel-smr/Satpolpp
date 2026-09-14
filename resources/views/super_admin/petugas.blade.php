@@ -75,39 +75,29 @@
             <table class="w-full text-sm">
                 <thead>
                     <tr class="border-b border-slate-100 text-left text-xs text-slate-400 uppercase tracking-wider">
-                        <th class="px-6 py-3 font-semibold">Petugas</th>
-                        <th class="px-6 py-3 font-semibold">NIP / KTA</th>
-                        <th class="px-6 py-3 font-semibold">Pangkat / Jabatan</th>
-                        <th class="px-6 py-3 font-semibold">Regu</th>
-                        <th class="px-6 py-3 font-semibold">Zona</th>
-                        <th class="px-6 py-3 font-semibold">Status</th>
+                        <th class="px-6 py-3 font-semibold">NIP</th>
+                        <th class="px-6 py-3 font-semibold">Nama</th>
+                        <th class="px-6 py-3 font-semibold">Jabatan</th>
+                        <th class="px-6 py-3 font-semibold">Nama Satuan Kerja</th>
+                        <th class="px-6 py-3 font-semibold">Unit Kerja</th>
                         <th class="px-6 py-3 font-semibold text-right">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($officers as $officer)
-                        @php
-                            $statusClass = match ($officer->status) {
-                                \App\OfficerStatus::Active => 'bg-emerald-50 text-emerald-700 border-emerald-200',
-                                \App\OfficerStatus::Leave => 'bg-amber-50 text-amber-700 border-amber-200',
-                                \App\OfficerStatus::Inactive => 'bg-red-50 text-red-700 border-red-200',
-                            };
-                        @endphp
                         <tr class="border-b border-slate-50 hover:bg-slate-50/50">
-                            <td class="px-6 py-3.5"><div class="flex items-center gap-3"><div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-super-active/10 text-xs font-bold text-slate-700">{{ collect(explode(' ', $officer->name))->take(2)->map(fn ($word) => mb_substr($word, 0, 1))->join('') }}</div><span class="font-medium text-slate-800">{{ $officer->name }}</span></div></td>
                             <td class="px-6 py-3.5 font-mono text-xs text-slate-500">{{ $officer->employee_number }}</td>
-                            <td class="px-6 py-3.5 text-slate-500">{{ collect([$officer->rank, $officer->position])->filter()->join(' / ') ?: '-' }}</td>
-                            <td class="px-6 py-3.5 text-slate-500">{{ $officer->organizationalUnit?->name ?? '-' }}</td>
-                            <td class="px-6 py-3.5 text-slate-500">{{ $officer->operationalZone?->name ?? '-' }}</td>
-                            <td class="px-6 py-3.5"><span class="rounded-full border px-2.5 py-1 text-xs font-semibold {{ $statusClass }}">{{ $officer->status->label() }}</span></td>
+                            <td class="px-6 py-3.5"><div class="flex items-center gap-3"><div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-super-active/10 text-xs font-bold text-slate-700">{{ collect(explode(' ', $officer->name))->take(2)->map(fn ($word) => mb_substr($word, 0, 1))->join('') }}</div><span class="font-medium text-slate-800">{{ $officer->name }}</span></div></td>
+                            <td class="min-w-80 px-6 py-3.5 text-slate-500">{{ $officer->position }}</td>
+                            <td class="min-w-56 px-6 py-3.5 text-slate-500">{{ $officer->work_unit_name }}</td>
+                            <td class="min-w-56 px-6 py-3.5 text-slate-500">{{ $officer->unit_name }}</td>
                             <td class="px-6 py-3.5 text-right whitespace-nowrap">
-                                <button type="button" onclick="toggleStatus({{ $officer->id }})" class="p-1.5 text-slate-400 hover:text-super-active hover:bg-super-active/10 rounded-lg" title="Ubah status"><span class="material-symbols-outlined text-[20px]">swap_vert</span></button>
-                                <button type="button" onclick="bukaEdit(@js(['id' => $officer->id, 'name' => $officer->name, 'employee_number' => $officer->employee_number, 'rank' => $officer->rank, 'position' => $officer->position, 'organizational_unit_id' => $officer->organizational_unit_id, 'operational_zone_id' => $officer->operational_zone_id, 'email' => $officer->email, 'phone' => $officer->phone, 'address' => $officer->address, 'joined_at' => $officer->joined_at?->toDateString(), 'status' => $officer->status->value]))" class="p-1.5 text-slate-400 hover:text-super-active hover:bg-super-active/10 rounded-lg" title="Edit"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+                                <button type="button" onclick="bukaEdit(@js(['id' => $officer->id, 'name' => $officer->name, 'employee_number' => $officer->employee_number, 'position' => $officer->position, 'work_unit_name' => $officer->work_unit_name, 'unit_name' => $officer->unit_name]))" class="p-1.5 text-slate-400 hover:text-super-active hover:bg-super-active/10 rounded-lg" title="Edit"><span class="material-symbols-outlined text-[20px]">edit</span></button>
                                 <button type="button" onclick="hapusPetugas({{ $officer->id }}, @js($officer->name))" class="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg" title="Hapus"><span class="material-symbols-outlined text-[20px]">delete</span></button>
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="7" class="px-6 py-12 text-center text-slate-400">Belum ada data petugas.</td></tr>
+                        <tr><td colspan="6" class="px-6 py-12 text-center text-slate-400">Belum ada data petugas.</td></tr>
                     @endforelse
                 </tbody>
             </table>
@@ -126,7 +116,7 @@
                 </button>
             </div>
 
-            <form id="petugas-form" class="p-6 space-y-4 overflow-y-auto" onsubmit="simpanPetugas(event)">
+            <form id="petugas-form" method="POST" class="p-6 space-y-4 overflow-y-auto" onsubmit="simpanPetugas(event)">
                 @csrf
                 <input type="hidden" name="edit_index" value="">
                 <input type="hidden" name="_method" value="POST">
@@ -136,52 +126,33 @@
                         class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none">
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-1">NIP / KTA <span class="text-red-500">*</span></label>
-                        <input type="text" name="employee_number" required maxlength="50" placeholder="Contoh: PP-001"
-                            class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Pangkat</label>
-                        <input type="text" name="rank" maxlength="100" placeholder="Contoh: Penata Muda"
-                            class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Jabatan</label>
-                        <input type="text" name="position" maxlength="150" placeholder="Contoh: Anggota"
-                            class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Regu / Unit</label>
-                        <select name="organizational_unit_id" class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none bg-white"><option value="">Tanpa unit</option>@foreach ($units as $unit)<option value="{{ $unit->id }}">{{ $unit->name }}</option>@endforeach</select>
-                    </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">NIP <span class="text-red-500">*</span></label>
+                    <input type="text" name="employee_number" required maxlength="50" placeholder="Masukkan NIP petugas"
+                        class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none">
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium mb-1">Zona Operasi</label>
-                    <select name="operational_zone_id" class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none bg-white"><option value="">Tanpa zona</option>@foreach ($zones as $zone)<option value="{{ $zone->id }}">{{ $zone->name }}</option>@endforeach</select>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div><label class="block text-sm font-medium mb-1">Email</label><input type="email" name="email" class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none"></div>
-                    <div><label class="block text-sm font-medium mb-1">Nomor HP</label><input type="tel" name="phone" inputmode="tel" maxlength="20" pattern="\+?[0-9][0-9\s-]{8,18}" title="Masukkan 9–19 digit; boleh diawali + serta menggunakan spasi atau tanda hubung." placeholder="Contoh: 081234567890" class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none"></div>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div><label class="block text-sm font-medium mb-1">Tanggal Bergabung</label><input type="date" name="joined_at" max="{{ now()->toDateString() }}" class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none"></div>
-                    <div><label class="block text-sm font-medium mb-1">Alamat</label><input type="text" name="address" maxlength="2000" class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none"></div>
+                    <label class="block text-sm font-medium mb-1">Jabatan <span class="text-red-500">*</span></label>
+                    <select name="position" required class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none bg-white">
+                        <option value="">Pilih Jabatan</option>
+                        @foreach ($positions as $position)<option value="{{ $position }}">{{ $position }}</option>@endforeach
+                    </select>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium mb-1">Status <span class="text-red-500">*</span></label>
-                    <select name="status" required
-                        class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none bg-white">
-                        <option value="">Pilih Status</option>
-                        @foreach ($statuses as $status)<option value="{{ $status->value }}">{{ $status->label() }}</option>@endforeach
+                    <label class="block text-sm font-medium mb-1">Nama Satuan Kerja <span class="text-red-500">*</span></label>
+                    <select name="work_unit_name" required class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none bg-white">
+                        <option value="">Pilih Nama Satuan Kerja</option>
+                        @foreach ($workUnits as $workUnit)<option value="{{ $workUnit }}">{{ $workUnit }}</option>@endforeach
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-1">Unit Kerja <span class="text-red-500">*</span></label>
+                    <select name="unit_name" required class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none bg-white">
+                        <option value="">Pilih Unit Kerja</option>
+                        @foreach ($units as $unit)<option value="{{ $unit }}">{{ $unit }}</option>@endforeach
                     </select>
                 </div>
 
@@ -339,12 +310,15 @@
     // Daftar petugas dirender oleh Blade dari database.
 --}}
 <script>
+    window.tutupModal = function () {
+        document.getElementById('modal')?.classList.add('hidden');
+    };
+
     function bukaTambah() {
         const form = document.getElementById('petugas-form');
         form.reset();
         form.elements.edit_index.value = '';
         form.elements._method.value = 'POST';
-        form.elements.status.value = 'active';
         document.getElementById('modal-judul').textContent = 'Tambah Petugas';
         document.getElementById('modal').classList.remove('hidden');
     }
@@ -354,11 +328,9 @@
         form.reset();
         form.elements.edit_index.value = officer.id;
         form.elements._method.value = 'PUT';
-        ['name', 'employee_number', 'rank', 'position', 'email', 'phone', 'address', 'joined_at', 'status'].forEach((field) => {
+        ['name', 'employee_number', 'position', 'work_unit_name', 'unit_name'].forEach((field) => {
             form.elements[field].value = officer[field] || '';
         });
-        form.elements.organizational_unit_id.value = officer.organizational_unit_id || '';
-        form.elements.operational_zone_id.value = officer.operational_zone_id || '';
         document.getElementById('modal-judul').textContent = 'Ubah Petugas';
         document.getElementById('modal').classList.remove('hidden');
     }

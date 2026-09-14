@@ -201,11 +201,11 @@ class DevelopmentSeeder extends Seeder
 
         DB::table('officers')->updateOrInsert(
             ['employee_number' => 'PP-001'],
-            ['user_id' => $adminId, 'organizational_unit_id' => $unitOneId, 'operational_zone_id' => $watesZoneId, 'name' => 'Ahmad Fauzi', 'rank' => 'Penata Muda', 'position' => 'Kepala Regu A', 'email' => 'ahmad.fauzi@sipraja.test', 'phone' => '081111111111', 'address' => 'Wates, Kulon Progo', 'joined_at' => '2020-01-15', 'status' => 'active', 'created_at' => $now, 'updated_at' => $now, 'deleted_at' => null],
+            ['user_id' => $adminId, 'organizational_unit_id' => $unitOneId, 'operational_zone_id' => $watesZoneId, 'name' => 'Ahmad Fauzi', 'position' => 'Kepala Seksi Pengendalian dan Operasional, Bidang Ketentraman dan Ketertiban Umum', 'work_unit_name' => 'Seksi Pengendalian dan Operasional', 'unit_name' => 'Bidang Ketentraman dan Ketertiban Umum', 'status' => 'active', 'created_at' => $now, 'updated_at' => $now, 'deleted_at' => null],
         );
         DB::table('officers')->updateOrInsert(
             ['employee_number' => 'PP-002'],
-            ['user_id' => null, 'organizational_unit_id' => $unitTwoId, 'operational_zone_id' => $pengasihZoneId, 'name' => 'Siti Aminah', 'rank' => 'Pengatur', 'position' => 'Anggota', 'email' => 'siti.aminah@sipraja.test', 'phone' => '082222222222', 'address' => 'Pengasih, Kulon Progo', 'joined_at' => '2021-06-01', 'status' => 'active', 'created_at' => $now, 'updated_at' => $now, 'deleted_at' => null],
+            ['user_id' => null, 'organizational_unit_id' => $unitTwoId, 'operational_zone_id' => $pengasihZoneId, 'name' => 'Siti Aminah', 'position' => 'Operator Layanan Operasional pada Seksi Perlindungan Masyarakat, Bidang Ketentraman dan Ketertiban Umum', 'work_unit_name' => 'Seksi Perlindungan Masyarakat', 'unit_name' => 'Bidang Ketentraman dan Ketertiban Umum', 'status' => 'active', 'created_at' => $now, 'updated_at' => $now, 'deleted_at' => null],
         );
 
         $officerOneId = (int) DB::table('officers')->where('employee_number', 'PP-001')->value('id');
@@ -218,11 +218,11 @@ class DevelopmentSeeder extends Seeder
 
         DB::table('activities')->updateOrInsert(
             ['report_id' => $reportOneId],
-            ['activity_template_id' => $patrolTemplateId, 'created_by_user_id' => $adminId, 'evaluated_by_user_id' => $superAdminId, 'name' => 'Penertiban PKL Pasar Wates', 'type' => 'external', 'operational_category' => 'patroli_ketertiban_umum', 'activity_date' => $now->copy()->subDay()->toDateString(), 'start_time' => '08:00:00', 'description' => 'Tindak lanjut laporan warga mengenai akses trotoar.', 'handling_result' => 'Akses trotoar kembali dapat digunakan oleh pejalan kaki.', 'location_address' => 'Pasar Wates, Kabupaten Kulon Progo', 'latitude' => -7.8578000, 'longitude' => 110.1589000, 'evaluation_notes' => 'Kegiatan berjalan tertib.', 'evaluation_obstacles' => 'Area pasar cukup ramai.', 'evaluated_at' => $now, 'created_at' => $now->copy()->subDay(), 'updated_at' => $now, 'deleted_at' => null],
+            ['activity_template_id' => $patrolTemplateId, 'created_by_user_id' => $adminId, 'evaluated_by_user_id' => $superAdminId, 'name' => 'Penertiban PKL Pasar Wates', 'type' => 'external', 'category' => null, 'activity_date' => $now->copy()->subDay()->toDateString(), 'start_time' => '08:00:00', 'description' => 'Tindak lanjut laporan warga mengenai akses trotoar.', 'handling_result' => 'Akses trotoar kembali dapat digunakan oleh pejalan kaki.', 'location_address' => 'Pasar Wates, Kabupaten Kulon Progo', 'latitude' => -7.8578000, 'longitude' => 110.1589000, 'evaluation_notes' => 'Kegiatan berjalan tertib.', 'evaluation_obstacles' => 'Area pasar cukup ramai.', 'evaluated_at' => $now, 'created_at' => $now->copy()->subDay(), 'updated_at' => $now, 'deleted_at' => null],
         );
         DB::table('activities')->updateOrInsert(
             ['name' => 'Patroli Rutin Kawasan Pengasih'],
-            ['report_id' => null, 'activity_template_id' => $securityTemplateId, 'created_by_user_id' => $adminId, 'evaluated_by_user_id' => null, 'type' => 'internal', 'operational_category' => 'patroli_ketertiban_umum', 'activity_date' => $now->toDateString(), 'start_time' => '19:00:00', 'description' => 'Patroli rutin untuk memantau ketertiban fasilitas umum.', 'handling_result' => 'Situasi aman dan terkendali.', 'location_address' => 'Kecamatan Pengasih, Kabupaten Kulon Progo', 'latitude' => -7.8462000, 'longitude' => 110.1730000, 'evaluation_notes' => null, 'evaluation_obstacles' => null, 'evaluated_at' => null, 'created_at' => $now, 'updated_at' => $now, 'deleted_at' => null],
+            ['report_id' => null, 'activity_template_id' => $securityTemplateId, 'created_by_user_id' => $adminId, 'evaluated_by_user_id' => null, 'type' => 'internal', 'category' => 'Pelaksanaan Bantuan Pengamanan Kegiatan', 'activity_date' => $now->toDateString(), 'start_time' => '19:00:00', 'description' => 'Patroli rutin untuk memantau ketertiban fasilitas umum.', 'handling_result' => 'Situasi aman dan terkendali.', 'location_address' => 'Kecamatan Pengasih, Kabupaten Kulon Progo', 'latitude' => -7.8462000, 'longitude' => 110.1730000, 'evaluation_notes' => null, 'evaluation_obstacles' => null, 'evaluated_at' => null, 'created_at' => $now, 'updated_at' => $now, 'deleted_at' => null],
         );
 
         $externalActivityId = (int) DB::table('activities')->where('report_id', $reportOneId)->value('id');

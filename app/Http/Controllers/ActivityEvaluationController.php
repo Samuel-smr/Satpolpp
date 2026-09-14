@@ -6,6 +6,7 @@ use App\ActivityType;
 use App\Http\Requests\StoreActivityEvaluationRequest;
 use App\Http\Requests\UpdateActivityEvaluationRequest;
 use App\Models\Activity;
+use App\Models\ActivityTemplate;
 use App\Models\AuditLog;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -70,9 +71,15 @@ class ActivityEvaluationController extends Controller
             ? Activity::query()->whereNotNull('evaluated_at')->find($editingEvaluationId)
             : null;
 
+        $availableCategories = ActivityTemplate::query()
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->pluck('name');
+
         return view('admin.evaluasi', [
             'evaluations' => $evaluations,
             'availableActivities' => $availableActivities,
+            'availableCategories' => $availableCategories,
             'evaluationSummary' => [
                 'total' => (int) $summary->total,
                 'internal' => (int) $summary->internal,

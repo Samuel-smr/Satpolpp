@@ -37,12 +37,6 @@
                             @foreach (\App\ReportType::cases() as $type)<option value="{{ $type->value }}" @selected(old('type') === $type->value)>{{ $type->label() }}</option>@endforeach
                         </select>
                     </label>
-                    <label class="block text-sm font-semibold text-slate-700">Kategori
-                        <select name="category" required class="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 focus:border-sidebar-active focus:bg-white focus:outline-none focus:ring-1 focus:ring-sidebar-active">
-                            <option value="">Pilih kategori</option>
-                            @foreach (\App\ReportCategory::cases() as $category)<option value="{{ $category->value }}" @selected(old('category') === $category->value)>{{ $category->label() }}</option>@endforeach
-                        </select>
-                    </label>
                     <label class="block text-sm font-semibold text-slate-700">Sumber laporan
                         <select id="source" name="source" required class="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 focus:border-sidebar-active focus:bg-white focus:outline-none focus:ring-1 focus:ring-sidebar-active">
                             @foreach (\App\ReportSource::cases() as $source)<option value="{{ $source->value }}" @selected(old('source', 'offline') === $source->value)>{{ $source->label() }}</option>@endforeach

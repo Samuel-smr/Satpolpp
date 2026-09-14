@@ -6,7 +6,6 @@ use App\Models\GuestAccess;
 use App\Models\Report;
 use App\Models\User;
 use App\Notifications\NewReportNotification;
-use App\ReportCategory;
 use App\ReportStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -25,7 +24,8 @@ class GuestReportTest extends TestCase
             ->assertSee('inputmode="numeric"', false)
             ->assertSee('pattern="[0-9]{16}"', false)
             ->assertSee('name="telepon"', false)
-            ->assertSee('inputmode="tel"', false);
+            ->assertSee('inputmode="tel"', false)
+            ->assertDontSee('name="kategori"', false);
     }
 
     public function test_guest_can_submit_report_and_receive_browser_session_cookie(): void
@@ -37,7 +37,6 @@ class GuestReportTest extends TestCase
 
         $response = $this->post(route('pelapor.store'), [
             'jenis' => 'information',
-            'kategori' => ReportCategory::PublicOrder->value,
             'telepon' => '081234567890',
             'deskripsi' => 'Ada aktivitas yang mengganggu ketertiban umum.',
             'lokasi' => 'Alun-alun Wates',
@@ -50,6 +49,7 @@ class GuestReportTest extends TestCase
         $response->assertSessionHas('report_code', $report->code);
         $response->assertCookie('sipraja_guest_token');
         $this->assertSame(ReportStatus::Submitted, $report->status);
+        $this->assertNull($report->category);
         $this->assertDatabaseCount('guest_accesses', 1);
         $this->assertDatabaseCount('report_status_histories', 1);
         $this->assertDatabaseCount('attachments', 1);
@@ -96,7 +96,6 @@ class GuestReportTest extends TestCase
 
         $response = $this->from(route('pelapor.lapor'))->post(route('pelapor.store'), [
             'jenis' => 'emergency',
-            'kategori' => ReportCategory::Security->value,
             'telepon' => '081234567890',
             'nik' => '123',
             'deskripsi' => 'Laporan darurat.',

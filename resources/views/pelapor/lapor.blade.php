@@ -87,16 +87,6 @@
 
                 <div class="grid grid-cols-1 gap-4">
                     <div>
-                        <label for="kategori" class="block text-sm font-medium mb-1">Kategori Laporan <span class="text-red-500">*</span></label>
-                        <select id="kategori" name="kategori" required class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none">
-                            <option value="">Pilih kategori laporan</option>
-                            @foreach ($reportCategories as $category)
-                                <option value="{{ $category->value }}" @selected(old('kategori') === $category->value)>{{ $category->label() }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div>
                         <label class="block text-sm font-medium mb-1">Nomor WhatsApp / Telepon <span
                                 class="text-red-500">*</span></label>
                         <input type="tel" name="telepon" required inputmode="tel" maxlength="20" pattern="\+?[0-9][0-9\s-]{8,18}" title="Masukkan 9–19 digit; boleh diawali + serta menggunakan spasi atau tanda hubung." placeholder="Contoh: 081234567890"
@@ -282,10 +272,9 @@
 
         // Validasi step 2 (field wajib): telepon, deskripsi, lokasi (+ NIK jika darurat)
         function nextFromDetail() {
-            const required = ['kategori', 'telepon', 'deskripsi', 'lokasi'];
+            const required = ['telepon', 'deskripsi', 'lokasi'];
             if (document.getElementById('jenis').value === 'emergency') required.push('nik');
             const labels = {
-                kategori: 'Kategori Laporan',
                 telepon: 'Nomor WhatsApp / Telepon',
                 nik: 'NIK (wajib untuk laporan darurat)',
                 deskripsi: 'Deskripsi Singkat',

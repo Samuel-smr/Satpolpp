@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\ActivityType;
-use App\OperationalCategory;
 use Database\Factories\ActivityFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -20,7 +19,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'evaluated_by_user_id',
     'name',
     'type',
-    'operational_category',
+    'category',
     'activity_date',
     'start_time',
     'description',
@@ -80,7 +79,6 @@ class Activity extends Model
     {
         return [
             'type' => ActivityType::class,
-            'operational_category' => OperationalCategory::class,
             'activity_date' => 'date',
             'start_time' => 'datetime:H:i',
             'latitude' => 'decimal:7',

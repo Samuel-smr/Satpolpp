@@ -64,7 +64,7 @@ class SuperAdminController extends Controller
                 'dievaluasiOleh' => $activity->evaluatedByUser?->name,
                 'deskripsi' => $activity->description,
                 'hasil' => $activity->handling_result,
-                'kategoriOperasional' => $activity->operational_category?->label(),
+                'kategori' => $activity->category,
                 'lokasi' => $activity->location_address,
                 'lat' => $activity->latitude,
                 'lng' => $activity->longitude,

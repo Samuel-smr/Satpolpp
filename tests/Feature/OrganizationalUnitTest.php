@@ -13,6 +13,16 @@ class OrganizationalUnitTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_add_and_cancel_controls_are_connected_to_the_active_modal_script(): void
+    {
+        $superAdmin = User::factory()->superAdmin()->create();
+
+        $this->actingAs($superAdmin)->get(route('super_admin.organisasi'))
+            ->assertOk()
+            ->assertSee('window.tutupModal = function', false)
+            ->assertSee('onclick="tutupModal()"', false);
+    }
+
     public function test_super_admin_can_create_and_view_organizational_unit(): void
     {
         $superAdmin = User::factory()->superAdmin()->create();

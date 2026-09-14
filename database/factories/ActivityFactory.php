@@ -6,7 +6,6 @@ use App\ActivityType;
 use App\Models\Activity;
 use App\Models\ActivityTemplate;
 use App\Models\User;
-use App\OperationalCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -28,7 +27,7 @@ class ActivityFactory extends Factory
             'evaluated_by_user_id' => null,
             'name' => fake()->sentence(4),
             'type' => ActivityType::Internal,
-            'operational_category' => fake()->randomElement(OperationalCategory::cases()),
+            'category' => fake()->sentence(4),
             'activity_date' => fake()->date(),
             'start_time' => '08:00:00',
             'description' => fake()->sentence(),

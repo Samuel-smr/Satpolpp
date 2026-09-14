@@ -17,12 +17,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'operational_zone_id',
     'name',
     'employee_number',
-    'rank',
     'position',
-    'email',
-    'phone',
-    'address',
-    'joined_at',
+    'work_unit_name',
+    'unit_name',
     'status',
 ])]
 class Officer extends Model
@@ -52,7 +49,6 @@ class Officer extends Model
     protected function casts(): array
     {
         return [
-            'joined_at' => 'date',
             'status' => OfficerStatus::class,
         ];
     }

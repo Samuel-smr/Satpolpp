@@ -823,7 +823,11 @@
                                 canvas.height = image.naturalHeight;
                                 canvas.getContext('2d').drawImage(image, 0, 0);
                                 URL.revokeObjectURL(objectUrl);
-                                resolve(canvas.toDataURL('image/jpeg', 0.82));
+                                resolve({
+                                    data: canvas.toDataURL('image/jpeg', 0.82),
+                                    width: image.naturalWidth,
+                                    height: image.naturalHeight,
+                                });
                             };
                             image.onerror = () => {
                                 URL.revokeObjectURL(objectUrl);
@@ -893,7 +897,7 @@
                                 'Tanggal': item.tanggal,
                                 'Waktu': item.waktu ? item.waktu + ' WIB' : '-',
                                 'Jenis': item.jenis,
-                                'Kategori Operasional': item.kategoriOperasional || '-',
+                                'Kategori': item.kategori || '-',
                                 'Deskripsi': item.deskripsi || '-',
                                 'Tindakan dan Hasil': item.hasil || '-',
                                 'Lokasi': item.lokasi,
@@ -962,6 +966,16 @@
                         );
 
                         const tableHeaders = [['Nomor', 'Tanggal/Waktu', 'Personel', 'Tindakan dan Hasil', 'Dokumentasi']];
+                        const pdfImageSize = (image, cellWidth) => {
+                            const maximumWidth = Math.min(52, cellWidth - 6);
+                            const maximumHeight = 30;
+                            const scale = Math.min(maximumWidth / image.width, maximumHeight / image.height);
+
+                            return {
+                                width: image.width * scale,
+                                height: image.height * scale,
+                            };
+                        };
                         const pdfImages = [];
                         const tableBody = await Promise.all(list.map(async (item, index) => {
                             const datetime = item.tanggal + (item.waktu ? '\n' + item.waktu + ' WIB' : '');
@@ -969,7 +983,7 @@
                                 this.getPdfDocumentation(item)
                                     .slice(0, 4)
                                     .map(photo => this.imageToDataUrl(photo.url || photo))
-                            )).filter(image => image && image.startsWith('data:image/'));
+                            )).filter(image => image?.data?.startsWith('data:image/'));
                             pdfImages[index] = images;
                             return [
                                 index + 1,
@@ -979,7 +993,6 @@
                                 images.length > 0 ? '\n' : '-'
                             ];
                         }));
-
                         doc.autoTable({
                             head: tableHeaders,
                             body: tableBody,
@@ -1010,17 +1023,21 @@
                             },
                             margin: { left: 14, right: 14 },
                             didParseCell: function (data) {
-                                if (data.section === 'body' && data.column.index === 4 && pdfImages[data.row.index]?.length) {
-                                    data.cell.styles.minCellHeight = (pdfImages[data.row.index].length * 34) + 6;
-                                }
+                                if (data.section !== 'body' || data.column.index !== 4 || !pdfImages[data.row.index]?.length) return;
+
+                                data.cell.styles.minCellHeight = pdfImages[data.row.index].reduce((height, image, index) => (
+                                    height + pdfImageSize(image, data.cell.width).height + (index > 0 ? 4 : 0)
+                                ), 6);
                             },
                             didDrawCell: function (data) {
                                 if (data.section !== 'body' || data.column.index !== 4) return;
 
                                 const images = pdfImages[data.row.index] || [];
-                                const imageWidth = Math.min(52, data.cell.width - 6);
-                                images.forEach((image, imageIndex) => {
-                                    doc.addImage(image, 'JPEG', data.cell.x + 3, data.cell.y + 3 + (imageIndex * 34), imageWidth, 30);
+                                let imageY = data.cell.y + 3;
+                                images.forEach(image => {
+                                    const size = pdfImageSize(image, data.cell.width);
+                                    doc.addImage(image.data, 'JPEG', data.cell.x + ((data.cell.width - size.width) / 2), imageY, size.width, size.height);
+                                    imageY += size.height + 4;
                                 });
                             },
                             didDrawPage: function (data) {

@@ -33,6 +33,10 @@ class AssetManagementTest extends TestCase
         $response->assertSeeText('Mobil Database');
         $response->assertSeeText('Radio Database');
         $response->assertSeeText('Data Database');
+        $response->assertSee('id="asset-filter-category"', false);
+        $response->assertSee('id="asset-category" name="category" required', false);
+        $response->assertSee("const kategoriAset = document.getElementById('asset-category');", false);
+        $response->assertSee('id="kendaraan-fields"', false);
         $response->assertDontSeeText('Mobil Pick Up Operasional');
         $response->assertViewHas('assetSummary', [
             'total' => 2,

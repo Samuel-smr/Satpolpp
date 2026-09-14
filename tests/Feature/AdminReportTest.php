@@ -8,7 +8,6 @@ use App\Models\Attachment;
 use App\Models\Report;
 use App\Models\User;
 use App\Notifications\NewReportNotification;
-use App\ReportCategory;
 use App\ReportSource;
 use App\ReportSourcePlatform;
 use App\ReportStatus;
@@ -30,7 +29,8 @@ class AdminReportTest extends TestCase
             ->assertSee('name="reporter_nik"', false)
             ->assertSee('pattern="[0-9]{16}"', false)
             ->assertSee('name="reporter_phone"', false)
-            ->assertSee('type="tel"', false);
+            ->assertSee('type="tel"', false)
+            ->assertDontSee('name="category"', false);
     }
 
     public function test_admin_can_soft_delete_report_while_retaining_history_files_and_linked_activity(): void
@@ -99,7 +99,6 @@ class AdminReportTest extends TestCase
 
         $response = $this->actingAs($admin)->post(route('admin.pengaduan.store'), [
             'type' => ReportType::Information->value,
-            'category' => ReportCategory::Security->value,
             'source' => ReportSource::Offline->value,
             'reporter_name' => 'Pelapor Offline',
             'reporter_phone' => '081234567890',
@@ -115,6 +114,7 @@ class AdminReportTest extends TestCase
             'source' => ReportSource::Offline->value,
             'reporter_phone' => '081234567890',
             'status' => ReportStatus::Submitted->value,
+            'category' => null,
         ]);
         $this->assertDatabaseHas('notifications', [
             'type' => NewReportNotification::class,
@@ -137,7 +137,6 @@ class AdminReportTest extends TestCase
         $admin = User::factory()->create();
         $data = [
             'type' => ReportType::Information->value,
-            'category' => ReportCategory::Security->value,
             'source' => ReportSource::Online->value,
             'reporter_phone' => '081234567890',
             'description' => 'Laporan dari WhatsApp.',

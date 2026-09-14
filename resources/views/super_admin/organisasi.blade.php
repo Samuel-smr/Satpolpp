@@ -308,6 +308,10 @@
     // Daftar dirender oleh Blade dari database.
 --}}
 <script>
+    window.tutupModal = function () {
+        document.getElementById('modal')?.classList.add('hidden');
+    };
+
     function bukaTambah() {
         const form = document.getElementById('unit-form');
         form.reset();

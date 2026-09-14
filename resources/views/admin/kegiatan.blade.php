@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends($activityLayout ?? 'layouts.admin')
 
 @section('title', 'Acara & Kegiatan')
 
@@ -18,7 +18,7 @@
                     <span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
                     Ekspor PDF
                 </button>
-                <a href="{{ route('admin.kegiatan.create') }}" class="flex items-center gap-2 rounded-xl bg-sidebar-active px-4 py-2.5 text-sm font-semibold text-white shadow-md transition-colors hover:bg-sidebar-hover">
+                <a href="{{ route(($activityRoutePrefix ?? 'admin.kegiatan').'.create') }}" class="flex items-center gap-2 rounded-xl bg-sidebar-active px-4 py-2.5 text-sm font-semibold text-white shadow-md transition-colors hover:bg-sidebar-hover">
                     <span class="material-symbols-outlined text-[18px]">add</span>
                     Tambah Kegiatan
                 </a>
@@ -35,7 +35,7 @@
             </div>
         @endif
 
-        <form action="{{ route('admin.kegiatan') }}" method="GET" class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm">
+        <form action="{{ route($activityRoutePrefix ?? 'admin.kegiatan') }}" method="GET" class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm">
             <div class="grid grid-cols-1 items-end gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <div>
                     <label for="activity-search" class="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500">Pencarian</label>
@@ -63,15 +63,15 @@
                     </select>
                 </div>
                 <div>
-                    <label for="operational-category" class="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500">Kategori</label>
-                    <select id="operational-category" name="operational_category" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm"><option value="">Semua kategori</option>@foreach ($operationalCategories as $category)<option value="{{ $category->value }}" @selected(($filters['operational_category'] ?? '') === $category->value)>{{ $category->label() }}</option>@endforeach</select>
+                    <label for="category" class="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500">Kategori</label>
+                    <select id="category" name="category" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm"><option value="">Semua kategori</option>@foreach ($categories as $category)<option value="{{ $category }}" @selected(($filters['category'] ?? '') === $category)>{{ $category }}</option>@endforeach</select>
                 </div>
                 <div class="flex gap-2">
                     <button type="submit" class="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-sidebar-active px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-sidebar-hover">
                         <span class="material-symbols-outlined text-[18px]">filter_alt</span>
                         Terapkan
                     </button>
-                    <a href="{{ route('admin.kegiatan') }}" title="Reset filter" class="flex items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-slate-600 transition-colors hover:bg-slate-50">
+                    <a href="{{ route($activityRoutePrefix ?? 'admin.kegiatan') }}" title="Reset filter" class="flex items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-slate-600 transition-colors hover:bg-slate-50">
                         <span class="material-symbols-outlined text-[18px]">restart_alt</span>
                     </a>
                 </div>
@@ -138,7 +138,7 @@
                                     ])>{{ $activity->type->label() }}</span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <span class="line-clamp-2 min-w-[160px]">{{ $activity->operational_category?->label() ?? '-' }}</span>
+                                    <span class="line-clamp-2 min-w-[160px]">{{ $activity->category ?? '-' }}</span>
                                 </td>
                                 <td class="max-w-[240px] px-6 py-4">
                                     <span class="line-clamp-2" title="{{ $activity->location_address }}">{{ $activity->location_address }}</span>
@@ -148,19 +148,23 @@
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center justify-center">
-                                        @if ($activity->report !== null)
+                                        @if ($activity->report !== null && ($activityRoutePrefix ?? 'admin.kegiatan') === 'admin.kegiatan')
                                             <a href="{{ route('admin.pengaduan.detail', $activity->report) }}" title="Lihat laporan dan kegiatan" class="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-blue-50 hover:text-blue-600">
+                                                <span class="material-symbols-outlined text-[20px]">visibility</span>
+                                            </a>
+                                        @elseif ($activity->report !== null)
+                                            <a href="{{ route('super_admin.pengaduan.detail', $activity->report) }}" title="Lihat laporan dan kegiatan" class="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-blue-50 hover:text-blue-600">
                                                 <span class="material-symbols-outlined text-[20px]">visibility</span>
                                             </a>
                                         @else
                                             <div class="flex items-center gap-1">
-                                                <a href="{{ route('admin.kegiatan.show', $activity) }}" title="Lihat detail kegiatan" class="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-blue-50 hover:text-blue-600">
+                                                <a href="{{ route(($activityRoutePrefix ?? 'admin.kegiatan').'.show', $activity) }}" title="Lihat detail kegiatan" class="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-blue-50 hover:text-blue-600">
                                                     <span class="material-symbols-outlined text-[20px]">visibility</span>
                                                 </a>
-                                                <a href="{{ route('admin.kegiatan.edit', $activity) }}" title="Edit kegiatan" class="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-amber-50 hover:text-amber-600">
+                                                <a href="{{ route(($activityRoutePrefix ?? 'admin.kegiatan').'.edit', $activity) }}" title="Edit kegiatan" class="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-amber-50 hover:text-amber-600">
                                                     <span class="material-symbols-outlined text-[20px]">edit</span>
                                                 </a>
-                                                <form action="{{ route('admin.kegiatan.destroy', $activity) }}" method="POST" data-confirm-delete="Hapus kegiatan ini? Data akan disembunyikan dari daftar, tetapi tetap tersimpan sebagai arsip.">
+                                                <form action="{{ route(($activityRoutePrefix ?? 'admin.kegiatan').'.destroy', $activity) }}" method="POST" data-confirm-delete="Hapus kegiatan ini? Data akan disembunyikan dari daftar, tetapi tetap tersimpan sebagai arsip.">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" title="Hapus kegiatan" class="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600">
@@ -248,7 +252,11 @@
                             canvas.height = image.naturalHeight;
                             canvas.getContext('2d').drawImage(image, 0, 0);
                             URL.revokeObjectURL(url);
-                            resolve(canvas.toDataURL('image/jpeg', 0.82));
+                            resolve({
+                                data: canvas.toDataURL('image/jpeg', 0.82),
+                                width: image.naturalWidth,
+                                height: image.naturalHeight,
+                            });
                         };
                         image.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
                         image.src = url;
@@ -256,6 +264,16 @@
                 } catch (_) {
                     return null;
                 }
+            };
+            const pdfImageSize = (image, cellWidth) => {
+                const maximumWidth = Math.min(52, cellWidth - 6);
+                const maximumHeight = 30;
+                const scale = Math.min(maximumWidth / image.width, maximumHeight / image.height);
+
+                return {
+                    width: image.width * scale,
+                    height: image.height * scale,
+                };
             };
 
             excelButton.addEventListener('click', async () => {
@@ -268,7 +286,7 @@
                         'Kode Laporan': activity.kode_laporan || '-', 'ID Template': activity.id_template || '-',
                         'Nama Template': activity.nama_template || '-', 'Dibuat Oleh': activity.dibuat_oleh || '-',
                         'Dievaluasi Oleh': activity.dievaluasi_oleh || '-', 'Nama Kegiatan': activity.nama,
-                        'Jenis': activity.jenis, 'Kategori Operasional': activity.kategori || '-', 'Tanggal': activity.tanggal,
+                        'Jenis': activity.jenis, 'Kategori': activity.kategori || '-', 'Tanggal': activity.tanggal,
                         'Waktu': activity.waktu ? `${activity.waktu} WIB` : '-', 'Deskripsi/Tindakan': activity.deskripsi || '-',
                         'Hasil': activity.hasil || '-', 'Lokasi': activity.lokasi, 'Lintang': activity.lintang,
                         'Bujur': activity.bujur, 'Jumlah Personel': activity.personel.length,
@@ -320,11 +338,21 @@
                         bodyStyles: { fontSize: 8, cellPadding: 3 },
                         columnStyles: { 0: { cellWidth: 12, halign: 'center' }, 1: { cellWidth: 30, halign: 'center' }, 2: { cellWidth: 48 }, 3: { cellWidth: 116 }, 4: { cellWidth: 62, halign: 'center' } },
                         didParseCell: data => {
-                            if (data.section === 'body' && data.column.index === 4 && images[data.row.index]?.length) data.cell.styles.minCellHeight = (images[data.row.index].length * 34) + 6;
+                            if (data.section !== 'body' || data.column.index !== 4 || !images[data.row.index]?.length) return;
+
+                            data.cell.styles.minCellHeight = images[data.row.index].reduce((height, image, index) => (
+                                height + pdfImageSize(image, data.cell.width).height + (index > 0 ? 4 : 0)
+                            ), 6);
                         },
                         didDrawCell: data => {
                             if (data.section !== 'body' || data.column.index !== 4) return;
-                            (images[data.row.index] || []).forEach((image, index) => documentPdf.addImage(image, 'JPEG', data.cell.x + 3, data.cell.y + 3 + (index * 34), Math.min(52, data.cell.width - 6), 30));
+
+                            let imageY = data.cell.y + 3;
+                            (images[data.row.index] || []).forEach(image => {
+                                const size = pdfImageSize(image, data.cell.width);
+                                documentPdf.addImage(image.data, 'JPEG', data.cell.x + ((data.cell.width - size.width) / 2), imageY, size.width, size.height);
+                                imageY += size.height + 4;
+                            });
                         },
                     });
 

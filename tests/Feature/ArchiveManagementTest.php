@@ -34,6 +34,14 @@ class ArchiveManagementTest extends TestCase
         $response->assertOk();
         $response->assertSeeText('Dokumen Database');
         $response->assertSeeText('Foto Database');
+        $response->assertSeeText('Patroli ketertiban umum, ketentraman, dan perlindungan masyarakat');
+        $response->assertSeeText('Pengamanan dan pengawalan pejabat daerah');
+        $response->assertSeeText('Pengamanan acara atau event');
+        $response->assertSeeText('Penanganan pengaduan pelanggaran ketertiban umum/masyarakat');
+        $response->assertSeeText('Pembinaan dan pengawasan kepatuhan terhadap Perda dan Perkada');
+        $response->assertSeeText('Pembinaan dan pengawasan atribut');
+        $response->assertSeeText('Penegakan peraturan daerah dan peraturan kepala daerah yustisi');
+        $response->assertSeeText('Penegakan peraturan daerah dan peraturan kepala daerah non yustisi');
         $response->assertDontSeeText('BAP_Pasar_Senen.pdf');
         $response->assertViewHas('archiveSummary', [
             'total' => 2,

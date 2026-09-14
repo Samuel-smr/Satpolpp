@@ -4,6 +4,7 @@ namespace Tests\Feature\Admin;
 
 use App\ActivityType;
 use App\Models\Activity;
+use App\Models\ActivityTemplate;
 use App\Models\Report;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -30,6 +31,19 @@ class ActivityEvaluationTest extends TestCase
             'name' => 'Penanganan Terbaru',
             'activity_date' => '2026-09-09',
         ]);
+        $internalActivity = Activity::factory()->create([
+            'type' => ActivityType::Internal,
+            'name' => 'Patroli Internal',
+            'category' => 'Patroli Ketertiban Umum',
+        ]);
+        ActivityTemplate::factory()->create([
+            'name' => 'Patroli Ketertiban Umum',
+            'sort_order' => 1,
+        ]);
+        ActivityTemplate::factory()->create([
+            'name' => 'Kategori Tanpa Kegiatan',
+            'sort_order' => 2,
+        ]);
         Activity::factory()->create([
             'type' => ActivityType::External,
             'report_id' => null,
@@ -41,6 +55,14 @@ class ActivityEvaluationTest extends TestCase
         $response->assertOk();
         $response->assertSeeInOrder([$latestActivity->name, $olderActivity->name]);
         $response->assertSeeText('LAP-LATEST');
+        $response->assertSee('id="evaluation-category"', false);
+        $response->assertSeeText('Patroli Ketertiban Umum');
+        $response->assertSeeText('Kategori Tanpa Kegiatan');
+        $response->assertSee('data-category="Patroli Ketertiban Umum"', false);
+        $response->assertSee('const kategori = kategoriEvaluasi.value;', false);
+        $response->assertSee('sumberEksternal', false);
+        $response->assertSee('kategoriEvaluasi.disabled = sumberEksternal;', false);
+        $response->assertSee('Belum ada kegiatan pada kategori ini.', false);
         $response->assertDontSeeText('Eksternal Tanpa Laporan');
         $response->assertDontSeeText('Tindak lanjut laporan PKL liar');
     }

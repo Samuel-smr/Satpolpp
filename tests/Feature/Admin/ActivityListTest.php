@@ -8,7 +8,6 @@ use App\Models\Attachment;
 use App\Models\Officer;
 use App\Models\Report;
 use App\Models\User;
-use App\OperationalCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -25,7 +24,7 @@ class ActivityListTest extends TestCase
         $externalActivity = Activity::factory()->for($report)->create([
             'name' => 'Penanganan Laporan Pasar',
             'type' => ActivityType::External,
-            'operational_category' => OperationalCategory::PublicComplaintHandling,
+            'category' => 'Penanganan Pengaduan Masyarakat',
             'activity_date' => '2026-09-09',
             'start_time' => '08:15:00',
             'location_address' => 'Pasar Wates',
@@ -167,6 +166,9 @@ class ActivityListTest extends TestCase
             ->assertSee('LAPORAN KEGIATAN')
             ->assertSee('BUDI HARTONO, S.Si, M.Si')
             ->assertSee('NIP. 19690318 199603 1 003')
+            ->assertSee('const pdfImageSize', false)
+            ->assertSee('image.width * scale', false)
+            ->assertSee('image.height * scale', false)
             ->assertSee('XLSX.writeFile', false)
             ->assertSee('documentPdf.save', false);
         $response->assertViewHas('exportActivities', fn ($activities): bool => $activities->count() === 2);

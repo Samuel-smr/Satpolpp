@@ -9,7 +9,6 @@ use App\Models\AuditLog;
 use App\Models\Officer;
 use App\Models\Report;
 use App\Models\User;
-use App\OperationalCategory;
 use App\ReportStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -32,14 +31,23 @@ class CompleteReportTest extends TestCase
         ]);
         $template = ActivityTemplate::factory()->create();
         $officers = Officer::factory()->count(2)->create();
+        $expectedLatitude = '-7.8123456';
+        $expectedLongitude = '110.1234567';
 
-        $response = $this->actingAs($admin)->post(
-            route('admin.pengaduan.complete.store', $report),
-            $this->validPayload($report, $officers->pluck('id')->all(), [
-                UploadedFile::fake()->image('bukti-satu.jpg'),
-                UploadedFile::fake()->image('bukti-dua.png'),
-            ], $template->id),
-        );
+        $this->actingAs($admin)
+            ->get(route('admin.pengaduan.detail', $report))
+            ->assertOk()
+            ->assertSee('form-penyelesaian', false)
+            ->assertDontSee('name="operational_category"', false);
+
+        $payload = $this->validPayload($report, $officers->pluck('id')->all(), [
+            UploadedFile::fake()->image('bukti-satu.jpg'),
+            UploadedFile::fake()->image('bukti-dua.png'),
+        ], $template->id);
+        $payload['latitude'] = $expectedLatitude;
+        $payload['longitude'] = $expectedLongitude;
+
+        $response = $this->actingAs($admin)->post(route('admin.pengaduan.complete.store', $report), $payload);
 
         $response->assertRedirectToRoute('admin.pengaduan.detail', $report);
         $response->assertSessionHas('status', 'Laporan berhasil diselesaikan dan dicatat sebagai kegiatan eksternal.');
@@ -48,13 +56,15 @@ class CompleteReportTest extends TestCase
         $this->assertSame(ReportStatus::Completed, $freshReport->status);
         $this->assertSame('2026-09-09 10:30:00', $freshReport->completed_at->format('Y-m-d H:i:s'));
         $this->assertSame('Laporan warga tetap tersimpan.', $freshReport->description);
+        $this->assertSame($expectedLatitude, $freshReport->latitude);
+        $this->assertSame($expectedLongitude, $freshReport->longitude);
 
         $activity = Activity::query()->sole();
         $this->assertSame($report->id, $activity->report_id);
         $this->assertSame($template->id, $activity->activity_template_id);
         $this->assertSame($admin->id, $activity->created_by_user_id);
         $this->assertSame(ActivityType::External, $activity->type);
-        $this->assertSame(OperationalCategory::PublicComplaintHandling, $activity->operational_category);
+        $this->assertNull($activity->category);
         $this->assertDatabaseCount('reports', 1);
         $this->assertDatabaseCount('activities', 1);
         $this->assertDatabaseCount('activity_officer', 2);
@@ -83,7 +93,13 @@ class CompleteReportTest extends TestCase
             ->assertOk()
             ->assertSee('Kegiatan eksternal')
             ->assertSee("Terhubung ke {$report->code}")
+            ->assertSee('Latitude')
+            ->assertSee('Longitude')
+            ->assertSee('completed-activity-map', false)
+            ->assertSee(route('admin.kegiatan.export-attachments.show', [$activity, $activity->attachments->first()]), false)
+            ->assertSee('alt="Bukti penanganan bukti-satu.jpg"', false)
             ->assertSee('Lokasi sudah kembali tertib.')
+            ->assertDontSee('Kategori operasional')
             ->assertDontSee('form-penyelesaian');
 
         $this->get(route('admin.kegiatan'))
@@ -202,7 +218,6 @@ class CompleteReportTest extends TestCase
             'current_status' => $currentStatus->value,
             'activity_template_id' => $templateId,
             'name' => "Penanganan {$report->code}",
-            'operational_category' => OperationalCategory::PublicComplaintHandling->value,
             'activity_date' => now()->toDateString(),
             'start_time' => '09:15',
             'description' => 'Tindak lanjut laporan masyarakat.',

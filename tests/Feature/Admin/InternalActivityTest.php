@@ -23,7 +23,10 @@ class InternalActivityTest extends TestCase
     public function test_create_form_lists_only_active_templates_and_officers(): void
     {
         $admin = User::factory()->create();
-        $activeTemplate = ActivityTemplate::factory()->create(['name' => 'Template Aktif']);
+        $activeTemplate = ActivityTemplate::factory()->create([
+            'name' => 'Template Aktif',
+            'operational_category' => OperationalCategory::EventSecurity,
+        ]);
         ActivityTemplate::factory()->inactive()->create(['name' => 'Template Nonaktif']);
         $activeOfficer = Officer::factory()->create(['name' => 'Petugas Aktif']);
         Officer::factory()->inactive()->create(['name' => 'Petugas Nonaktif']);
@@ -35,6 +38,8 @@ class InternalActivityTest extends TestCase
         $response->assertDontSeeText('Template Nonaktif');
         $response->assertSeeText($activeOfficer->name);
         $response->assertDontSeeText('Petugas Nonaktif');
+        $response->assertSee('name="category"', false);
+        $response->assertSee('data-category="Template Aktif"', false);
     }
 
     public function test_admin_can_create_internal_activity_with_officers_and_internal_documentation(): void
@@ -44,11 +49,14 @@ class InternalActivityTest extends TestCase
         $admin = User::factory()->create();
         $otherUser = User::factory()->create();
         $report = Report::factory()->create();
-        $template = ActivityTemplate::factory()->create();
+        $template = ActivityTemplate::factory()->create([
+            'operational_category' => OperationalCategory::EventSecurity,
+        ]);
         $officers = Officer::factory()->count(2)->create();
 
         $response = $this->actingAs($admin)->post(route('admin.kegiatan.store'), [
             ...$this->validPayload($officers->pluck('id')->all(), $template->id),
+            'category' => $template->name,
             'activity_date' => '2026-09-15',
             'documentation' => [
                 UploadedFile::fake()->image('dokumentasi-satu.jpg'),
@@ -66,6 +74,7 @@ class InternalActivityTest extends TestCase
         $this->assertSame($admin->id, $activity->created_by_user_id);
         $this->assertSame(ActivityType::Internal, $activity->type);
         $this->assertSame($template->id, $activity->activity_template_id);
+        $this->assertSame($template->name, $activity->category);
         $this->assertSame('2026-09-15', $activity->activity_date->toDateString());
         $this->assertDatabaseCount('activity_officer', 2);
         $this->assertDatabaseCount('attachments', 2);
@@ -76,6 +85,15 @@ class InternalActivityTest extends TestCase
             $this->assertSame($admin->id, $attachment->uploaded_by_user_id);
             Storage::disk('local')->assertExists($attachment->file_path);
         }
+
+        $firstAttachment = $activity->attachments->first();
+
+        $this->actingAs($admin)
+            ->get(route('admin.kegiatan.show', $activity))
+            ->assertOk()
+            ->assertDontSee('Kategori operasional')
+            ->assertSee(route('admin.kegiatan.attachments.show', [$activity, $firstAttachment]), false)
+            ->assertSee('alt="Dokumentasi dokumentasi-satu.jpg"', false);
 
         $auditLog = AuditLog::query()->sole();
         $this->assertSame('activity', $auditLog->subject_type);
@@ -201,7 +219,7 @@ class InternalActivityTest extends TestCase
         $activity = Activity::factory()->for($admin, 'createdByUser')->create([
             'name' => 'Nama Lama',
             'type' => ActivityType::Internal,
-            'operational_category' => OperationalCategory::PublicOrderPatrol,
+            'category' => 'Kategori Lama',
             'activity_date' => '2026-09-10',
         ]);
         $activity->officers()->attach($oldOfficer, ['assignment_role' => 'Petugas Kegiatan']);
@@ -222,7 +240,6 @@ class InternalActivityTest extends TestCase
             ...$this->validPayload([$newOfficer->id]),
             'current_updated_at' => $currentUpdatedAt,
             'name' => 'Nama Kegiatan Baru',
-            'operational_category' => OperationalCategory::EventSecurity->value,
             'activity_date' => '2026-09-20',
             'handling_result' => 'Kegiatan selesai dengan tertib.',
             'documentation' => [UploadedFile::fake()->image('baru.png')],
@@ -239,7 +256,7 @@ class InternalActivityTest extends TestCase
         $this->assertSame(ActivityType::Internal, $freshActivity->type);
         $this->assertNull($freshActivity->report_id);
         $this->assertSame($admin->id, $freshActivity->created_by_user_id);
-        $this->assertSame(OperationalCategory::EventSecurity, $freshActivity->operational_category);
+        $this->assertSame('Kategori Manual', $freshActivity->category);
         $this->assertSame('2026-09-20', $freshActivity->activity_date->toDateString());
         $this->assertSame('Kegiatan selesai dengan tertib.', $freshActivity->handling_result);
         $this->assertDatabaseMissing('activity_officer', [
@@ -411,10 +428,13 @@ class InternalActivityTest extends TestCase
      */
     private function validPayload(array $officerIds, ?int $templateId = null): array
     {
+        $category = ActivityTemplate::query()->find($templateId)?->name
+            ?? ActivityTemplate::factory()->create(['name' => 'Kategori Manual'])->name;
+
         return [
             'activity_template_id' => $templateId,
             'name' => 'Patroli Internal Terjadwal',
-            'operational_category' => OperationalCategory::PublicOrderPatrol->value,
+            'category' => $category,
             'activity_date' => now()->toDateString(),
             'start_time' => '08:30',
             'description' => 'Patroli rutin wilayah operasional.',

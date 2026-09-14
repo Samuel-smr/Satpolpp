@@ -3,10 +3,9 @@
 namespace Tests\Feature;
 
 use App\Models\Officer;
-use App\Models\OperationalZone;
-use App\Models\OrganizationalUnit;
 use App\Models\User;
 use App\OfficerStatus;
+use App\Support\OfficerOptions;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -14,43 +13,46 @@ class OfficerManagementTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_officer_form_uses_a_phone_specific_input(): void
+    public function test_officer_form_only_shows_requested_personnel_fields(): void
     {
         $superAdmin = User::factory()->superAdmin()->create();
 
         $this->actingAs($superAdmin)->get(route('super_admin.petugas'))
             ->assertOk()
-            ->assertSee('name="phone"', false)
-            ->assertSee('type="tel"', false)
-            ->assertSee('inputmode="tel"', false)
+            ->assertSee('name="employee_number"', false)
+            ->assertSee('id="petugas-form" method="POST"', false)
+            ->assertSee('name="position"', false)
+            ->assertSee('name="work_unit_name"', false)
+            ->assertSee('name="unit_name"', false)
+            ->assertSee('window.tutupModal = function', false)
+            ->assertSee('onclick="tutupModal()"', false)
+            ->assertDontSee('name="phone"', false)
+            ->assertDontSee('name="rank"', false)
             ->assertDontSee('function getPetugas()', false)
             ->assertDontSee('function saveAll()', false);
     }
 
-    public function test_super_admin_can_create_officer_with_unit_and_zone(): void
+    public function test_super_admin_can_create_officer_with_work_structure(): void
     {
         $superAdmin = User::factory()->superAdmin()->create();
-        $unit = OrganizationalUnit::factory()->create();
-        $zone = OperationalZone::factory()->create();
+        $position = OfficerOptions::positions()[0];
+        $workUnit = OfficerOptions::workUnits()[0];
+        $unit = OfficerOptions::units()[0];
 
         $this->actingAs($superAdmin)->post(route('super_admin.petugas.store'), [
             'name' => 'Petugas Database',
             'employee_number' => 'PP-DB-001',
-            'rank' => 'Penata Muda',
-            'position' => 'Anggota',
-            'organizational_unit_id' => $unit->id,
-            'operational_zone_id' => $zone->id,
-            'email' => 'petugas@example.test',
-            'phone' => '081234567890',
-            'address' => 'Wates',
-            'joined_at' => now()->toDateString(),
-            'status' => OfficerStatus::Active->value,
+            'position' => $position,
+            'work_unit_name' => $workUnit,
+            'unit_name' => $unit,
         ])->assertRedirect(route('super_admin.petugas'));
 
         $this->assertDatabaseHas('officers', [
             'employee_number' => 'PP-DB-001',
-            'organizational_unit_id' => $unit->id,
-            'operational_zone_id' => $zone->id,
+            'position' => $position,
+            'work_unit_name' => $workUnit,
+            'unit_name' => $unit,
+            'status' => OfficerStatus::Active->value,
         ]);
     }
 
@@ -75,32 +77,25 @@ class OfficerManagementTest extends TestCase
         $this->actingAs($superAdmin)->put(route('super_admin.petugas.update', $officer), [
             'name' => 'Nama Baru',
             'employee_number' => $officer->employee_number,
-            'rank' => 'Penata',
-            'position' => 'Komandan Regu',
-            'organizational_unit_id' => null,
-            'operational_zone_id' => null,
-            'email' => 'petugas.baru@example.test',
-            'phone' => '0812-3456-7890',
-            'address' => 'Wates',
-            'joined_at' => now()->toDateString(),
-            'status' => OfficerStatus::Active->value,
+            'position' => OfficerOptions::positions()[1],
+            'work_unit_name' => OfficerOptions::workUnits()[1],
+            'unit_name' => OfficerOptions::units()[1],
         ])->assertRedirect(route('super_admin.petugas'));
 
-        $this->assertDatabaseHas('officers', ['id' => $officer->id, 'name' => 'Nama Baru', 'phone' => '0812-3456-7890']);
+        $this->assertDatabaseHas('officers', ['id' => $officer->id, 'name' => 'Nama Baru', 'work_unit_name' => OfficerOptions::workUnits()[1]]);
     }
 
-    public function test_officer_rejects_invalid_email_phone_and_future_join_date(): void
+    public function test_officer_rejects_values_outside_the_official_options(): void
     {
         $superAdmin = User::factory()->superAdmin()->create();
 
         $this->actingAs($superAdmin)->post(route('super_admin.petugas.store'), [
             'name' => 'Petugas Invalid',
             'employee_number' => 'INVALID-001',
-            'email' => 'bukan-email',
-            'phone' => 'nomor-hp',
-            'joined_at' => now()->addDay()->toDateString(),
-            'status' => OfficerStatus::Active->value,
-        ])->assertSessionHasErrors(['email', 'phone', 'joined_at']);
+            'position' => 'Jabatan Tidak Resmi',
+            'work_unit_name' => 'Satuan Tidak Resmi',
+            'unit_name' => 'Unit Tidak Resmi',
+        ])->assertSessionHasErrors(['position', 'work_unit_name', 'unit_name']);
 
         $this->assertDatabaseMissing('officers', ['employee_number' => 'INVALID-001']);
     }

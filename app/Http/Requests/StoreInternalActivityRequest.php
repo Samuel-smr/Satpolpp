@@ -4,7 +4,6 @@ namespace App\Http\Requests;
 
 use App\Models\User;
 use App\OfficerStatus;
-use App\OperationalCategory;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Http\FormRequest;
@@ -19,7 +18,8 @@ class StoreInternalActivityRequest extends FormRequest
     {
         $user = $this->user();
 
-        return $user instanceof User && $user->can('access-admin');
+        return $user instanceof User
+            && ($user->can('access-admin') || $user->can('access-super-admin'));
     }
 
     /**
@@ -38,7 +38,14 @@ class StoreInternalActivityRequest extends FormRequest
                 ),
             ],
             'name' => ['required', 'string', 'max:255'],
-            'operational_category' => ['required', 'string', Rule::enum(OperationalCategory::class)],
+            'category' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::exists('activity_templates', 'name')->where(
+                    fn (Builder $query): Builder => $query->where('is_active', true),
+                ),
+            ],
             'activity_date' => ['required', 'date'],
             'start_time' => ['nullable', 'date_format:H:i'],
             'description' => ['nullable', 'string', 'max:5000'],
@@ -68,8 +75,8 @@ class StoreInternalActivityRequest extends FormRequest
         return [
             'activity_template_id.exists' => 'Template kegiatan tidak aktif atau tidak tersedia.',
             'name.required' => 'Nama kegiatan wajib diisi.',
-            'operational_category.required' => 'Kategori operasional wajib dipilih.',
-            'operational_category.enum' => 'Kategori operasional tidak valid.',
+            'category.required' => 'Kategori kegiatan wajib dipilih.',
+            'category.exists' => 'Kategori kegiatan tidak aktif atau tidak tersedia.',
             'activity_date.required' => 'Tanggal pelaksanaan wajib diisi.',
             'start_time.date_format' => 'Format waktu mulai tidak valid.',
             'location_address.required' => 'Lokasi kegiatan wajib diisi.',
