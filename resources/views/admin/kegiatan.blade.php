@@ -271,6 +271,32 @@
                     return null;
                 }
             };
+            const logoData = async (source) => {
+                try {
+                    const response = await fetch(source, { credentials: 'same-origin' });
+                    if (!response.ok) return null;
+                    const url = URL.createObjectURL(await response.blob());
+                    return await new Promise(resolve => {
+                        const image = new Image();
+                        image.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = image.naturalWidth;
+                            canvas.height = image.naturalHeight;
+                            canvas.getContext('2d').drawImage(image, 0, 0);
+                            URL.revokeObjectURL(url);
+                            resolve({
+                                data: canvas.toDataURL('image/png'),
+                                width: image.naturalWidth,
+                                height: image.naturalHeight,
+                            });
+                        };
+                        image.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+                        image.src = url;
+                    });
+                } catch (_) {
+                    return null;
+                }
+            };
             const photoThumb = 18;
             const photoGap = 3;
             const photoPad = 3;
@@ -325,13 +351,28 @@
                     if (!window.jspdf.jsPDF.prototype.autoTable) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js');
                     const { jsPDF } = window.jspdf;
                     const documentPdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+                    const logos = (await Promise.all([
+                        logoData('{{ asset("images/logo-kulonprogo.png") }}'),
+                        logoData('{{ asset("images/logo-satpolpp.png") }}'),
+                        logoData('{{ asset("images/logo-linmas.png") }}'),
+                    ])).filter(Boolean);
+                    const logoHeight = 22;
+                    const logoGap = 5;
+                    const logoY = 40;
+                    let logoX = 14;
+                    const logoWidths = logos.map(logo => logoHeight * (logo.width / logo.height));
+                    logos.forEach((logo, index) => {
+                        documentPdf.addImage(logo.data, 'PNG', logoX, logoY, logoWidths[index], logoHeight);
+                        logoX += logoWidths[index] + logoGap;
+                    });
+                    const titleX = logoX - logoGap + 8;
                     const [start, end] = period();
                     documentPdf.setFont('helvetica', 'bold');
                     documentPdf.setFontSize(14);
                     ['LAPORAN KEGIATAN', 'SATUAN POLISI PAMONG PRAJA', 'KABUPATEN KULON PROGO'].forEach((line, index) =>
-                        documentPdf.text(line, 148.5, 13 + (index * 6), { align: 'center' }));
+                        documentPdf.text(line, titleX, 40 + (index * 6), { align: 'left' }));
                     documentPdf.setFontSize(11);
-                    documentPdf.text(`${dateLabel(start)}-${dateLabel(end)}`, 148.5, 33, { align: 'center' });
+                    documentPdf.text(`${dateLabel(start)}-${dateLabel(end)}`, titleX, 62, { align: 'left' });
                     const images = [];
                     const body = await Promise.all(activities.map(async (activity, index) => {
                         images[index] = (await Promise.all(activity.dokumentasi.map(item => imageData(item.url)))).filter(Boolean);
@@ -342,7 +383,7 @@
                     }));
                     documentPdf.autoTable({
                         head: [['No', 'Tanggal/Waktu', 'Personel', 'Tindakan dan Hasil', 'Dokumentasi']], body,
-                        startY: 39, theme: 'grid', rowPageBreak: 'avoid', margin: { left: 14, right: 14 },
+                        startY: 76, theme: 'grid', rowPageBreak: 'avoid', margin: { left: 14, right: 14 },
                         headStyles: { fillColor: [43, 79, 124], halign: 'center', fontStyle: 'bold' },
                         bodyStyles: { fontSize: 8, cellPadding: 3 },
                         columnStyles: { 0: { cellWidth: 12, halign: 'center' }, 1: { cellWidth: 30, halign: 'center' }, 2: { cellWidth: 48 }, 3: { cellWidth: 116 }, 4: { cellWidth: 62, halign: 'center' } },
