@@ -358,7 +358,7 @@
                     ])).filter(Boolean);
                     const logoHeight = 22;
                     const logoGap = 5;
-                    const logoY = 40;
+                    const logoY = 12;
                     let logoX = 14;
                     const logoWidths = logos.map(logo => logoHeight * (logo.width / logo.height));
                     logos.forEach((logo, index) => {
@@ -370,9 +370,9 @@
                     documentPdf.setFont('helvetica', 'bold');
                     documentPdf.setFontSize(14);
                     ['LAPORAN KEGIATAN', 'SATUAN POLISI PAMONG PRAJA', 'KABUPATEN KULON PROGO'].forEach((line, index) =>
-                        documentPdf.text(line, titleX, 40 + (index * 6), { align: 'left' }));
+                        documentPdf.text(line, titleX, 17 + (index * 6), { align: 'left' }));
                     documentPdf.setFontSize(11);
-                    documentPdf.text(`${dateLabel(start)}-${dateLabel(end)}`, titleX, 62, { align: 'left' });
+                    documentPdf.text(`${dateLabel(start)}-${dateLabel(end)}`, titleX, 38, { align: 'left' });
                     const images = [];
                     const body = await Promise.all(activities.map(async (activity, index) => {
                         images[index] = (await Promise.all(activity.dokumentasi.map(item => imageData(item.url)))).filter(Boolean);
@@ -383,7 +383,7 @@
                     }));
                     documentPdf.autoTable({
                         head: [['No', 'Tanggal/Waktu', 'Personel', 'Tindakan dan Hasil', 'Dokumentasi']], body,
-                        startY: 76, theme: 'grid', rowPageBreak: 'avoid', margin: { left: 14, right: 14 },
+                        startY: 50, theme: 'grid', rowPageBreak: 'avoid', margin: { left: 14, right: 14 },
                         headStyles: { fillColor: [43, 79, 124], halign: 'center', fontStyle: 'bold' },
                         bodyStyles: { fontSize: 8, cellPadding: 3 },
                         columnStyles: { 0: { cellWidth: 12, halign: 'center' }, 1: { cellWidth: 30, halign: 'center' }, 2: { cellWidth: 48 }, 3: { cellWidth: 116 }, 4: { cellWidth: 62, halign: 'center' } },
