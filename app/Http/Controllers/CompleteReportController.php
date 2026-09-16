@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\ActivityType;
+use App\FindingType;
+use App\FindingUnit;
 use App\Models\Activity;
 use App\Models\AuditLog;
 use App\Models\Officer;
@@ -88,6 +90,8 @@ class CompleteReportController extends Controller
                     'longitude' => $validated['longitude'],
                 ]);
 
+                $activity->findings()->createMany($validated['findings'] ?? []);
+
                 $officerAssignments = $officerIds->mapWithKeys(
                     fn (int $officerId): array => [$officerId => ['assignment_role' => 'Petugas Penanganan']],
                 )->all();
@@ -153,6 +157,7 @@ class CompleteReportController extends Controller
      *   start_time?: string|null,
      *   description?: string|null,
      *   handling_result: string,
+     *   findings?: list<array{type: string, quantity: int|string, unit: string}>,
      *   location_address: string,
      *   latitude: numeric-string|float|int,
      *   longitude: numeric-string|float|int,
@@ -174,6 +179,10 @@ class CompleteReportController extends Controller
             'start_time' => ['nullable', 'date_format:H:i'],
             'description' => ['nullable', 'string', 'max:5000'],
             'handling_result' => ['required', 'string', 'max:5000'],
+            'findings' => ['nullable', 'array', 'max:50'],
+            'findings.*.type' => ['required', Rule::enum(FindingType::class)],
+            'findings.*.quantity' => ['required', 'integer', 'min:1'],
+            'findings.*.unit' => ['required', Rule::enum(FindingUnit::class)],
             'location_address' => ['required', 'string', 'max:2000'],
             'latitude' => ['required', 'numeric', 'between:-90,90'],
             'longitude' => ['required', 'numeric', 'between:-180,180'],
@@ -193,6 +202,14 @@ class CompleteReportController extends Controller
         ], [
             'activity_template_id.exists' => 'Template kegiatan tidak aktif atau tidak tersedia.',
             'activity_date.before_or_equal' => 'Tanggal pelaksanaan tidak boleh melewati hari ini.',
+            'findings.max' => 'Temuan maksimal 50 baris.',
+            'findings.*.type.required' => 'Jenis pada setiap temuan wajib dipilih.',
+            'findings.*.type.enum' => 'Jenis temuan tidak valid.',
+            'findings.*.quantity.required' => 'Jumlah pada setiap temuan wajib diisi.',
+            'findings.*.quantity.integer' => 'Jumlah temuan harus berupa angka bulat.',
+            'findings.*.quantity.min' => 'Jumlah temuan minimal satu.',
+            'findings.*.unit.required' => 'Satuan pada setiap temuan wajib dipilih.',
+            'findings.*.unit.enum' => 'Satuan temuan tidak valid.',
             'officer_ids.required' => 'Pilih minimal satu petugas.',
             'officer_ids.min' => 'Pilih minimal satu petugas.',
             'officer_ids.*.exists' => 'Petugas yang dipilih tidak aktif atau tidak tersedia.',

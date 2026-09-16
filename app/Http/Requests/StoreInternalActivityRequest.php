@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\FindingType;
+use App\FindingUnit;
 use App\Models\User;
 use App\OfficerStatus;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -50,6 +52,10 @@ class StoreInternalActivityRequest extends FormRequest
             'start_time' => ['nullable', 'date_format:H:i'],
             'description' => ['nullable', 'string', 'max:5000'],
             'handling_result' => ['nullable', 'string', 'max:5000'],
+            'findings' => ['nullable', 'array', 'max:50'],
+            'findings.*.type' => ['required', Rule::enum(FindingType::class)],
+            'findings.*.quantity' => ['required', 'integer', 'min:1'],
+            'findings.*.unit' => ['required', Rule::enum(FindingUnit::class)],
             'location_address' => ['required', 'string', 'max:2000'],
             'latitude' => ['required', 'numeric', 'between:-90,90'],
             'longitude' => ['required', 'numeric', 'between:-180,180'],
@@ -79,6 +85,14 @@ class StoreInternalActivityRequest extends FormRequest
             'category.exists' => 'Kategori kegiatan tidak aktif atau tidak tersedia.',
             'activity_date.required' => 'Tanggal pelaksanaan wajib diisi.',
             'start_time.date_format' => 'Format waktu mulai tidak valid.',
+            'findings.max' => 'Temuan maksimal 50 baris.',
+            'findings.*.type.required' => 'Jenis pada setiap temuan wajib dipilih.',
+            'findings.*.type.enum' => 'Jenis temuan tidak valid.',
+            'findings.*.quantity.required' => 'Jumlah pada setiap temuan wajib diisi.',
+            'findings.*.quantity.integer' => 'Jumlah temuan harus berupa angka bulat.',
+            'findings.*.quantity.min' => 'Jumlah temuan minimal satu.',
+            'findings.*.unit.required' => 'Satuan pada setiap temuan wajib dipilih.',
+            'findings.*.unit.enum' => 'Satuan temuan tidak valid.',
             'location_address.required' => 'Lokasi kegiatan wajib diisi.',
             'latitude.required' => 'Latitude wajib diisi.',
             'latitude.between' => 'Latitude harus berada antara -90 dan 90.',

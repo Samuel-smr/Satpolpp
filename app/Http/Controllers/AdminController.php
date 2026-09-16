@@ -175,6 +175,7 @@ class AdminController extends Controller
             'activity' => fn ($query) => $query->with([
                 'attachments' => fn ($attachmentQuery) => $attachmentQuery->oldest('created_at'),
                 'officers:id,name,employee_number,position',
+                'findings' => fn ($findingQuery) => $findingQuery->oldest('id'),
             ]),
         ]);
 
@@ -259,6 +260,7 @@ class AdminController extends Controller
         $activities = (clone $activityQuery)
             ->select(['id', 'report_id', 'name', 'type', 'category', 'activity_date', 'start_time', 'location_address'])
             ->with('report:id,code')
+            ->with('findings:id,activity_id,type,quantity,unit')
             ->withCount('officers')
             ->orderByDesc('activity_date')
             ->orderByDesc('start_time')
@@ -275,6 +277,7 @@ class AdminController extends Controller
                 'evaluatedByUser:id,name',
                 'officers:id,name,position',
                 'attachments:id,attachable_type,attachable_id,original_name,mime_type,file_type,audience',
+                'findings:id,activity_id,type,quantity,unit',
             ])
             ->orderBy('activity_date')
             ->orderBy('start_time')
@@ -295,6 +298,11 @@ class AdminController extends Controller
                 'waktu' => $activity->start_time?->format('H:i'),
                 'deskripsi' => $activity->description,
                 'hasil' => $activity->handling_result,
+                'temuan' => $activity->findings->map(fn ($finding): array => [
+                    'jenis' => $finding->type->label(),
+                    'jumlah' => $finding->quantity,
+                    'satuan' => $finding->unit->label(),
+                ])->all(),
                 'lokasi' => $activity->location_address,
                 'lintang' => $activity->latitude,
                 'bujur' => $activity->longitude,
