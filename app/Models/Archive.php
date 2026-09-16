@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\ArchiveConfidentiality;
-use App\OperationalCategory;
 use Database\Factories\ArchiveFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -38,7 +37,6 @@ class Archive extends Model
     protected function casts(): array
     {
         return [
-            'operational_category' => OperationalCategory::class,
             'confidentiality' => ArchiveConfidentiality::class,
             'file_size' => 'integer',
         ];

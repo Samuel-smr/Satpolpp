@@ -107,7 +107,17 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-3.5 text-slate-500">
-                                    {{ $asset->category === \App\AssetCategory::Vehicle && $asset->next_oil_service_km !== null ? number_format($asset->next_oil_service_km, 0, ',', '.').' km' : '-' }}
+                                    @if ($asset->category === \App\AssetCategory::Vehicle && $asset->next_oil_service_km !== null)
+                                        {{ number_format($asset->next_oil_service_km, 0, ',', '.').' km' }}
+                                        @if ($asset->last_oil_service_date && $asset->last_oil_service_date->diffInMonths(now()) >= 3)
+                                            <span class="ml-1 inline-block rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-700">GANTI OLI</span>
+                                        @endif
+                                        @if ($asset->last_oil_service_date)
+                                            <p class="mt-0.5 text-xs text-slate-400">Servis terakhir: {{ $asset->last_oil_service_date->format('d/m/Y') }}</p>
+                                        @endif
+                                    @else
+                                        -
+                                    @endif
                                 </td>
                                 <td class="px-6 py-3.5 text-right">
                                     <div class="flex items-center justify-end gap-1">
@@ -122,6 +132,7 @@
                                                 'acquisition_year' => $asset->acquisition_year,
                                                 'tax_due_date' => $asset->tax_due_date?->toDateString(),
                                                 'next_oil_service_km' => $asset->next_oil_service_km,
+                                                'last_oil_service_date' => $asset->last_oil_service_date?->toDateString(),
                                             ]))"
                                             class="rounded-lg p-1.5 text-slate-400 hover:bg-amber-50 hover:text-amber-600"
                                             title="Edit aset">
@@ -230,6 +241,12 @@
                             class="w-full rounded-xl border border-slate-300 px-3 py-2 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active">
                         @error('next_oil_service_km')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                     </div>
+                    <div>
+                        <label for="last-oil-service" class="mb-1 block text-sm font-medium">Tanggal Servis Oli Terakhir</label>
+                        <input id="last-oil-service" type="date" name="last_oil_service_date" value="{{ old('last_oil_service_date') }}"
+                            class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active">
+                        @error('last_oil_service_date')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                    </div>
                 </div>
 
                 <div class="flex justify-end gap-3 pt-2">
@@ -276,6 +293,7 @@
             formAset.elements.acquisition_year.value = asset.acquisition_year ?? '';
             formAset.elements.tax_due_date.value = asset.tax_due_date ?? '';
             formAset.elements.next_oil_service_km.value = asset.next_oil_service_km ?? '';
+            formAset.elements.last_oil_service_date.value = asset.last_oil_service_date ?? '';
             document.getElementById('asset-modal-title').textContent = 'Edit Aset';
             document.getElementById('asset-submit-label').textContent = 'Simpan Perubahan';
             toggleKendaraanFields();
@@ -294,6 +312,7 @@
             if (!kendaraanDipilih) {
                 formAset.elements.tax_due_date.value = '';
                 formAset.elements.next_oil_service_km.value = '';
+                formAset.elements.last_oil_service_date.value = '';
             }
         }
 
@@ -310,6 +329,7 @@
                 'acquisition_year' => old('acquisition_year', $editingAsset->acquisition_year),
                 'tax_due_date' => old('tax_due_date', $editingAsset->tax_due_date?->toDateString()),
                 'next_oil_service_km' => old('next_oil_service_km', $editingAsset->next_oil_service_km),
+                'last_oil_service_date' => old('last_oil_service_date', $editingAsset->last_oil_service_date?->toDateString()),
             ]));
         @endif
     </script>

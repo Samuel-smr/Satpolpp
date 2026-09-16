@@ -98,6 +98,7 @@ class AssetController extends Controller
         if ($attributes['category'] !== AssetCategory::Vehicle->value) {
             $attributes['tax_due_date'] = null;
             $attributes['next_oil_service_km'] = null;
+            $attributes['last_oil_service_date'] = null;
         }
 
         $asset->update($attributes);
@@ -152,6 +153,7 @@ class AssetController extends Controller
             'acquisition_year',
             'tax_due_date',
             'next_oil_service_km',
+            'last_oil_service_date',
         ];
     }
 }

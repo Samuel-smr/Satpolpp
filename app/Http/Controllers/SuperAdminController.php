@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreAdminUserRequest;
 use App\Http\Requests\UpdateAdminUserRequest;
 use App\Models\Activity;
+use App\Models\Asset;
 use App\Models\AuditLog;
 use App\Models\Officer;
 use App\Models\OrganizationalUnit;
@@ -174,7 +175,6 @@ class SuperAdminController extends Controller
 
     public function monitoring(): View
     {
-        $logs = $this->systemLogs(100);
         $activityByDate = AuditLog::query()
             ->where('created_at', '>=', now()->subDays(6)->startOfDay())
             ->get(['actor_user_id', 'created_at'])
@@ -196,7 +196,27 @@ class SuperAdminController extends Controller
             'modules' => AuditLog::query()->distinct()->count('module'),
         ];
 
-        return view('super_admin.monitoring', compact('logs', 'chart', 'monitoringStats'));
+        return view('super_admin.monitoring', compact('chart', 'monitoringStats'));
+    }
+
+    /**
+     * Notifikasi super admin: peringatan pemeliharaan aset dari database aset.
+     */
+    public function assetAlerts(): JsonResponse
+    {
+        $alerts = Asset::vehicleAlerts();
+
+        return response()->json([
+            'unread_count' => $alerts->count(),
+            'notifications' => $alerts->map(fn (array $alert): array => [
+                'title' => $alert['title'],
+                'message' => $alert['message'],
+                'time' => 'Perlu tindakan',
+                'unread' => true,
+                'asset' => true,
+                'level' => $alert['level'],
+            ])->all(),
+        ]);
     }
 
     public function peta(): View

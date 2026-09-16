@@ -116,4 +116,5 @@ Route::prefix('super-admin')->name('super_admin.')->middleware(['auth', 'can:acc
 
     Route::get('/monitoring', [SuperAdminController::class, 'monitoring'])->name('monitoring');
     Route::get('/peta', [SuperAdminController::class, 'peta'])->name('peta');
+    Route::get('/asset-alerts', [SuperAdminController::class, 'assetAlerts'])->name('asset-alerts');
 });

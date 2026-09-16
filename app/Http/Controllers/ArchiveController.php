@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\ArchiveCategory;
 use App\ArchiveConfidentiality;
 use App\Http\Requests\UpsertArchiveRequest;
 use App\Models\Archive;
 use App\Models\AuditLog;
-use App\OperationalCategory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -28,10 +28,10 @@ class ArchiveController extends Controller
     {
         $filters = $request->validate([
             'search' => ['nullable', 'string', 'max:100'],
-            'category' => ['nullable', Rule::enum(OperationalCategory::class)],
+            'category' => ['nullable', 'string', 'max:255', Rule::in(ArchiveCategory::all()->all())],
             'type' => ['nullable', Rule::in(['document', 'media'])],
         ], [
-            'category.enum' => 'Kategori arsip tidak valid.',
+            'category.in' => 'Kategori arsip tidak valid.',
             'type.in' => 'Jenis arsip tidak valid.',
         ]);
 
@@ -66,7 +66,7 @@ class ArchiveController extends Controller
         return view('admin.arsip', [
             'archives' => $archives,
             'filters' => $filters,
-            'operationalCategories' => OperationalCategory::cases(),
+            'categories' => ArchiveCategory::all(),
             'confidentialities' => ArchiveConfidentiality::cases(),
             'archiveSummary' => [
                 'total' => (int) $summary->total,

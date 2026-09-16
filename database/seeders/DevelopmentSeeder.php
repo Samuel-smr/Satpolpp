@@ -241,15 +241,15 @@ class DevelopmentSeeder extends Seeder
     {
         DB::table('archives')->updateOrInsert(
             ['title' => 'SOP Penertiban PKL'],
-            ['created_by_user_id' => $adminId, 'operational_category' => 'kepatuhan_perda_dan_perkada', 'description' => 'Contoh dokumen prosedur penertiban pedagang kaki lima.', 'confidentiality' => 'public', 'file_path' => 'dummy/archives/sop-penertiban.txt', 'original_name' => 'sop-penertiban.txt', 'mime_type' => 'text/plain', 'file_extension' => 'txt', 'file_size' => Storage::disk('local')->size('dummy/archives/sop-penertiban.txt'), 'created_at' => $now, 'updated_at' => $now, 'deleted_at' => null],
+            ['created_by_user_id' => $adminId, 'operational_category' => 'Penegakan Perda dan Perkada', 'description' => 'Contoh dokumen prosedur penertiban pedagang kaki lima.', 'confidentiality' => 'public', 'file_path' => 'dummy/archives/sop-penertiban.txt', 'original_name' => 'sop-penertiban.txt', 'mime_type' => 'text/plain', 'file_extension' => 'txt', 'file_size' => Storage::disk('local')->size('dummy/archives/sop-penertiban.txt'), 'created_at' => $now, 'updated_at' => $now, 'deleted_at' => null],
         );
         DB::table('archives')->updateOrInsert(
             ['title' => 'Laporan Patroli Bulanan'],
-            ['created_by_user_id' => $superAdminId, 'operational_category' => 'patroli_ketertiban_umum', 'description' => 'Contoh rekap kegiatan patroli bulanan.', 'confidentiality' => 'confidential', 'file_path' => 'dummy/archives/laporan-patroli.txt', 'original_name' => 'laporan-patroli.txt', 'mime_type' => 'text/plain', 'file_extension' => 'txt', 'file_size' => Storage::disk('local')->size('dummy/archives/laporan-patroli.txt'), 'created_at' => $now, 'updated_at' => $now, 'deleted_at' => null],
+            ['created_by_user_id' => $superAdminId, 'operational_category' => 'Patroli Ketertiban Umum, Ketenteraman Masyarakat dan Pelindungan Masyarakat', 'description' => 'Contoh rekap kegiatan patroli bulanan.', 'confidentiality' => 'confidential', 'file_path' => 'dummy/archives/laporan-patroli.txt', 'original_name' => 'laporan-patroli.txt', 'mime_type' => 'text/plain', 'file_extension' => 'txt', 'file_size' => Storage::disk('local')->size('dummy/archives/laporan-patroli.txt'), 'created_at' => $now, 'updated_at' => $now, 'deleted_at' => null],
         );
         DB::table('assets')->updateOrInsert(
             ['asset_code' => 'AST-001'],
-            ['created_by_user_id' => $adminId, 'name' => 'Mobil Patroli Dalmas', 'category' => 'vehicle', 'condition' => 'good', 'location' => 'Kantor Satpol PP', 'acquisition_year' => 2022, 'tax_due_date' => '2027-03-15', 'next_oil_service_km' => 45000, 'created_at' => $now, 'updated_at' => $now, 'deleted_at' => null],
+            ['created_by_user_id' => $adminId, 'name' => 'Mobil Patroli Dalmas', 'category' => 'vehicle', 'condition' => 'good', 'location' => 'Kantor Satpol PP', 'acquisition_year' => 2022, 'tax_due_date' => '2027-03-15', 'next_oil_service_km' => 45000, 'last_oil_service_date' => $now->copy()->subMonths(4)->toDateString(), 'created_at' => $now, 'updated_at' => $now, 'deleted_at' => null],
         );
         DB::table('assets')->updateOrInsert(
             ['asset_code' => 'AST-002'],

@@ -47,8 +47,8 @@
             <select name="category"
                 class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active">
                 <option value="">Semua Kategori</option>
-                @foreach ($operationalCategories as $category)
-                    <option value="{{ $category->value }}" @selected(($filters['category'] ?? '') === $category->value)>{{ $category->label() }}</option>
+                @foreach ($categories as $category)
+                    <option value="{{ $category }}" @selected(($filters['category'] ?? '') === $category)>{{ $category }}</option>
                 @endforeach
             </select>
             <select name="type"
@@ -111,7 +111,7 @@
 
                         <p class="mt-4 line-clamp-2 min-h-10 text-sm leading-relaxed text-slate-500">{{ $archive->description ?: 'Tidak ada deskripsi.' }}</p>
                         <div class="mt-4 space-y-1.5 border-t border-slate-100 pt-4 text-xs text-slate-500">
-                            <p><span class="font-semibold text-slate-600">Kategori:</span> {{ $archive->operational_category->label() }}</p>
+                            <p><span class="font-semibold text-slate-600">Kategori:</span> {{ $archive->operational_category }}</p>
                             <p><span class="font-semibold text-slate-600">Ukuran:</span> {{ number_format($archive->file_size / 1048576, 2, ',', '.') }} MB</p>
                             <p><span class="font-semibold text-slate-600">Diunggah:</span> {{ $archive->created_at->format('d/m/Y H:i') }} oleh {{ $archive->createdByUser?->name ?? '-' }}</p>
                         </div>
@@ -129,7 +129,7 @@
                                 onclick="bukaEditArsip(@js([
                                     'id' => $archive->id,
                                     'title' => $archive->title,
-                                    'operational_category' => $archive->operational_category->value,
+                                    'operational_category' => $archive->operational_category,
                                     'description' => $archive->description,
                                     'confidentiality' => $archive->confidentiality->value,
                                     'original_name' => $archive->original_name,
@@ -188,8 +188,8 @@
                         <select id="archive-category" name="operational_category" required
                             class="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active">
                             <option value="">Pilih Kategori</option>
-                            @foreach ($operationalCategories as $category)
-                                <option value="{{ $category->value }}" @selected(old('operational_category') === $category->value)>{{ $category->label() }}</option>
+                            @foreach ($categories as $category)
+                                <option value="{{ $category }}" @selected(old('operational_category') === $category)>{{ $category }}</option>
                             @endforeach
                         </select>
                         @error('operational_category')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
@@ -309,7 +309,7 @@
             bukaEditArsip(@js([
                 'id' => $editingArchive->id,
                 'title' => old('title', $editingArchive->title),
-                'operational_category' => old('operational_category', $editingArchive->operational_category->value),
+                'operational_category' => old('operational_category', $editingArchive->operational_category),
                 'description' => old('description', $editingArchive->description),
                 'confidentiality' => old('confidentiality', $editingArchive->confidentiality->value),
                 'original_name' => $editingArchive->original_name,
