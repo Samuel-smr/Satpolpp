@@ -5,10 +5,10 @@
 @push('styles')
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
     <style>
-        /* Custom map container to fill space */
+        /* Custom map container to fit within the remaining viewport */
         .map-container {
-            height: calc(100vh - 180px); /* Adjust based on header height */
-            min-height: 500px;
+            height: calc(100vh - 285px);
+            min-height: 420px;
         }
         /* Custom popup styling */
         .leaflet-popup-content-wrapper {
@@ -202,7 +202,9 @@
 
                 initPeta() {
                     this.map = L.map('mainMap', {
-                        zoomControl: false
+                        zoomControl: false,
+                        scrollWheelZoom: false,
+                        doubleClickZoom: true
                     });
                     KulonProgoMap.setup(this.map);
 
@@ -302,7 +304,7 @@
                             .addTo(this.map);
                         
                         marker.on('click', () => {
-                            this.map.setView([item.lat, item.lng], 14, { animate: true });
+                            this.map.panTo([item.lat, item.lng], { animate: true });
                         });
 
                         this.markers.push(marker);
