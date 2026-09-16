@@ -2,10 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\ArchiveCategory;
 use App\ArchiveConfidentiality;
+use App\Models\ActivityTemplate;
 use App\Models\Archive;
 use App\Models\User;
-use App\OperationalCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -18,6 +19,10 @@ class ArchiveManagementTest extends TestCase
     public function test_archive_page_lists_database_records_and_statistics(): void
     {
         $admin = User::factory()->create();
+        ActivityTemplate::factory()->create([
+            'name' => 'Patroli Ketentraman dan Perlindungan Masyarakat',
+            'sort_order' => 1,
+        ]);
         Archive::factory()->create([
             'title' => 'Dokumen Database',
             'file_extension' => 'pdf',
@@ -34,14 +39,9 @@ class ArchiveManagementTest extends TestCase
         $response->assertOk();
         $response->assertSeeText('Dokumen Database');
         $response->assertSeeText('Foto Database');
-        $response->assertSeeText('Patroli ketertiban umum, ketentraman, dan perlindungan masyarakat');
-        $response->assertSeeText('Pengamanan dan pengawalan pejabat daerah');
-        $response->assertSeeText('Pengamanan acara atau event');
-        $response->assertSeeText('Penanganan pengaduan pelanggaran ketertiban umum/masyarakat');
-        $response->assertSeeText('Pembinaan dan pengawasan kepatuhan terhadap Perda dan Perkada');
-        $response->assertSeeText('Pembinaan dan pengawasan atribut');
-        $response->assertSeeText('Penegakan peraturan daerah dan peraturan kepala daerah yustisi');
-        $response->assertSeeText('Penegakan peraturan daerah dan peraturan kepala daerah non yustisi');
+        $response->assertSeeText('Patroli Ketentraman dan Perlindungan Masyarakat');
+        $response->assertSeeText(ArchiveCategory::JURIDICAL);
+        $response->assertSeeText(ArchiveCategory::NON_JURIDICAL);
         $response->assertDontSeeText('BAP_Pasar_Senen.pdf');
         $response->assertViewHas('archiveSummary', [
             'total' => 2,
@@ -59,7 +59,7 @@ class ArchiveManagementTest extends TestCase
 
         $response = $this->actingAs($admin)->post(route('admin.arsip.store'), [
             'title' => 'SOP Penertiban',
-            'operational_category' => OperationalCategory::RegionalRegulationCompliance->value,
+            'operational_category' => ArchiveCategory::JURIDICAL,
             'description' => 'Dokumen prosedur penertiban.',
             'confidentiality' => ArchiveConfidentiality::Public->value,
             'file' => $file,
@@ -91,7 +91,7 @@ class ArchiveManagementTest extends TestCase
         $response = $this->actingAs($admin)->put(route('admin.arsip.update', $archive), [
             'archive_context_id' => $archive->id,
             'title' => 'Judul Diperbarui',
-            'operational_category' => OperationalCategory::PublicOrderPatrol->value,
+            'operational_category' => ArchiveCategory::NON_JURIDICAL,
             'description' => 'Deskripsi baru.',
             'confidentiality' => ArchiveConfidentiality::Confidential->value,
         ]);
@@ -115,7 +115,7 @@ class ArchiveManagementTest extends TestCase
         $response = $this->actingAs($admin)->put(route('admin.arsip.update', $archive), [
             'archive_context_id' => $archive->id,
             'title' => $archive->title,
-            'operational_category' => $archive->operational_category->value,
+            'operational_category' => $archive->operational_category,
             'confidentiality' => $archive->confidentiality->value,
             'file' => UploadedFile::fake()->image('new-image.jpg'),
         ]);
@@ -154,7 +154,7 @@ class ArchiveManagementTest extends TestCase
 
         $response = $this->actingAs($admin)->post(route('admin.arsip.store'), [
             'title' => 'File Tidak Aman',
-            'operational_category' => OperationalCategory::PublicOrderPatrol->value,
+            'operational_category' => ArchiveCategory::JURIDICAL,
             'confidentiality' => ArchiveConfidentiality::Public->value,
             'file' => UploadedFile::fake()->create('script.php', 10, 'application/x-php'),
         ]);

@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Activity;
+use App\Models\Asset;
 use App\Models\Report;
 use App\Models\User;
 use App\UserRole;
@@ -40,9 +41,22 @@ class AppServiceProvider extends ServiceProvider
 
         View::composer(['layouts.admin', 'layouts.super_admin'], function ($view): void {
             $user = request()->user();
+            $databaseNotifications = $user?->notifications()->latest()->limit(10)->get() ?? collect();
+
+            if ($view->getName() === 'layouts.super_admin') {
+                $assetAlerts = Asset::vehicleAlerts();
+
+                $view->with([
+                    'assetAlerts' => $assetAlerts,
+                    'layoutNotifications' => $databaseNotifications,
+                    'layoutUnreadNotificationCount' => $assetAlerts->count(),
+                ]);
+
+                return;
+            }
 
             $view->with([
-                'layoutNotifications' => $user?->notifications()->latest()->limit(10)->get() ?? collect(),
+                'layoutNotifications' => $databaseNotifications,
                 'layoutUnreadNotificationCount' => $user?->unreadNotifications()->count() ?? 0,
             ]);
         });

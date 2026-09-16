@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreAdminUserRequest;
 use App\Http\Requests\UpdateAdminUserRequest;
 use App\Models\Activity;
+use App\Models\Asset;
 use App\Models\AuditLog;
 use App\Models\Officer;
 use App\Models\OrganizationalUnit;
@@ -34,6 +35,7 @@ class SuperAdminController extends Controller
                 'monthly_reports' => Report::query()->whereBetween('created_at', [$monthStart, $monthEnd])->count(),
                 'monthly_activities' => Activity::query()->whereBetween('activity_date', [$monthStart->toDateString(), $monthEnd->toDateString()])->count(),
             ],
+            'logs' => $this->systemLogs(12),
         ]);
     }
 
@@ -173,18 +175,6 @@ class SuperAdminController extends Controller
 
     public function monitoring(): View
     {
-        $logs = AuditLog::query()
-            ->with('actorUser:id,name')
-            ->latest('created_at')
-            ->limit(100)
-            ->get()
-            ->map(fn (AuditLog $log): array => [
-                'waktu' => $log->created_at->format('d/m/Y H:i:s'),
-                'aksi' => $log->description,
-                'user' => $log->actorUser?->name ?? 'Sistem',
-                'jenis' => $log->module,
-                'action' => $log->action,
-            ]);
         $activityByDate = AuditLog::query()
             ->where('created_at', '>=', now()->subDays(6)->startOfDay())
             ->get(['actor_user_id', 'created_at'])
@@ -206,7 +196,27 @@ class SuperAdminController extends Controller
             'modules' => AuditLog::query()->distinct()->count('module'),
         ];
 
-        return view('super_admin.monitoring', compact('logs', 'chart', 'monitoringStats'));
+        return view('super_admin.monitoring', compact('chart', 'monitoringStats'));
+    }
+
+    /**
+     * Notifikasi super admin: peringatan pemeliharaan aset dari database aset.
+     */
+    public function assetAlerts(): JsonResponse
+    {
+        $alerts = Asset::vehicleAlerts();
+
+        return response()->json([
+            'unread_count' => $alerts->count(),
+            'notifications' => $alerts->map(fn (array $alert): array => [
+                'title' => $alert['title'],
+                'message' => $alert['message'],
+                'time' => 'Perlu tindakan',
+                'unread' => true,
+                'asset' => true,
+                'level' => $alert['level'],
+            ])->all(),
+        ]);
     }
 
     public function peta(): View
@@ -280,5 +290,25 @@ class SuperAdminController extends Controller
                 ['name' => 'Samigaluh', 'lat' => -7.66, 'lng' => 110.20],
             ],
         ]);
+    }
+
+    /**
+     * @return array<int, array{waktu: string, aksi: string, user: string, jenis: string, action: string}>
+     */
+    private function systemLogs(int $limit): array
+    {
+        return AuditLog::query()
+            ->with('actorUser:id,name')
+            ->latest('created_at')
+            ->limit($limit)
+            ->get()
+            ->map(fn (AuditLog $log): array => [
+                'waktu' => $log->created_at->format('d/m/Y H:i:s'),
+                'aksi' => $log->description,
+                'user' => $log->actorUser?->name ?? 'Sistem',
+                'jenis' => $log->module,
+                'action' => $log->action,
+            ])
+            ->all();
     }
 }

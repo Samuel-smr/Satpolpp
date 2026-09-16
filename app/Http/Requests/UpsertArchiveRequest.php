@@ -2,10 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\ArchiveCategory;
 use App\ArchiveConfidentiality;
 use App\Models\Archive;
 use App\Models\User;
-use App\OperationalCategory;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -32,7 +32,7 @@ class UpsertArchiveRequest extends FormRequest
         return [
             'archive_context_id' => ['nullable', 'integer'],
             'title' => ['required', 'string', 'max:255'],
-            'operational_category' => ['required', 'string', Rule::enum(OperationalCategory::class)],
+            'operational_category' => ['required', 'string', 'max:255', Rule::in(ArchiveCategory::all()->all())],
             'description' => ['nullable', 'string', 'max:5000'],
             'confidentiality' => ['required', 'string', Rule::enum(ArchiveConfidentiality::class)],
             'file' => [
@@ -53,7 +53,7 @@ class UpsertArchiveRequest extends FormRequest
             'title.required' => 'Nama arsip wajib diisi.',
             'title.max' => 'Nama arsip maksimal 255 karakter.',
             'operational_category.required' => 'Kategori arsip wajib dipilih.',
-            'operational_category.enum' => 'Kategori arsip tidak valid.',
+            'operational_category.in' => 'Kategori arsip tidak valid.',
             'confidentiality.required' => 'Sifat dokumen wajib dipilih.',
             'confidentiality.enum' => 'Sifat dokumen tidak valid.',
             'file.required' => 'File arsip wajib diunggah.',

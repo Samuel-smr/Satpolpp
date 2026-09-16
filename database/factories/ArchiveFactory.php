@@ -2,10 +2,10 @@
 
 namespace Database\Factories;
 
+use App\ArchiveCategory;
 use App\ArchiveConfidentiality;
 use App\Models\Archive;
 use App\Models\User;
-use App\OperationalCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -23,7 +23,7 @@ class ArchiveFactory extends Factory
         return [
             'created_by_user_id' => User::factory(),
             'title' => fake()->sentence(4),
-            'operational_category' => fake()->randomElement(OperationalCategory::cases()),
+            'operational_category' => fake()->randomElement(ArchiveCategory::fallback()),
             'description' => fake()->sentence(),
             'confidentiality' => ArchiveConfidentiality::Public,
             'file_path' => 'archives/files/example.pdf',

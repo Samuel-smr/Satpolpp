@@ -59,6 +59,7 @@ class AssetManagementTest extends TestCase
             'acquisition_year' => 2026,
             'tax_due_date' => '2027-09-09',
             'next_oil_service_km' => 15000,
+            'last_oil_service_date' => '2026-06-09',
         ]);
 
         $response->assertRedirectToRoute('admin.aset');
@@ -70,6 +71,8 @@ class AssetManagementTest extends TestCase
             'category' => AssetCategory::Vehicle->value,
             'next_oil_service_km' => 15000,
         ]);
+        $this->assertSame('2027-09-09', Asset::query()->sole()->tax_due_date->toDateString());
+        $this->assertSame('2026-06-09', Asset::query()->sole()->last_oil_service_date->toDateString());
         $this->assertSame('2027-09-09', Asset::query()->sole()->tax_due_date->toDateString());
         $this->assertDatabaseHas('audit_logs', [
             'module' => 'assets',
@@ -87,11 +90,13 @@ class AssetManagementTest extends TestCase
             'condition' => AssetCondition::Good->value,
             'tax_due_date' => '2027-09-09',
             'next_oil_service_km' => 15000,
+            'last_oil_service_date' => '2026-06-09',
         ])->assertRedirectToRoute('admin.aset');
 
         $asset = Asset::query()->sole();
         $this->assertNull($asset->tax_due_date);
         $this->assertNull($asset->next_oil_service_km);
+        $this->assertNull($asset->last_oil_service_date);
     }
 
     public function test_invalid_category_and_future_acquisition_year_are_rejected(): void
@@ -173,6 +178,7 @@ class AssetManagementTest extends TestCase
             'category' => AssetCategory::Vehicle,
             'tax_due_date' => '2027-01-01',
             'next_oil_service_km' => 10000,
+            'last_oil_service_date' => now()->subMonths(3)->toDateString(),
         ]);
 
         $this->actingAs($admin)->put(route('admin.aset.update', $asset), [
@@ -183,12 +189,14 @@ class AssetManagementTest extends TestCase
             'condition' => AssetCondition::Good->value,
             'tax_due_date' => '2028-02-02',
             'next_oil_service_km' => 20000,
+            'last_oil_service_date' => '2026-06-09',
         ])->assertRedirectToRoute('admin.aset');
 
         $asset->refresh();
         $this->assertSame(AssetCategory::Equipment, $asset->category);
         $this->assertNull($asset->tax_due_date);
         $this->assertNull($asset->next_oil_service_km);
+        $this->assertNull($asset->last_oil_service_date);
     }
 
     public function test_asset_code_must_remain_unique_when_updating(): void
