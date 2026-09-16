@@ -34,6 +34,7 @@ class SuperAdminController extends Controller
                 'monthly_reports' => Report::query()->whereBetween('created_at', [$monthStart, $monthEnd])->count(),
                 'monthly_activities' => Activity::query()->whereBetween('activity_date', [$monthStart->toDateString(), $monthEnd->toDateString()])->count(),
             ],
+            'logs' => $this->systemLogs(12),
         ]);
     }
 
@@ -173,18 +174,7 @@ class SuperAdminController extends Controller
 
     public function monitoring(): View
     {
-        $logs = AuditLog::query()
-            ->with('actorUser:id,name')
-            ->latest('created_at')
-            ->limit(100)
-            ->get()
-            ->map(fn (AuditLog $log): array => [
-                'waktu' => $log->created_at->format('d/m/Y H:i:s'),
-                'aksi' => $log->description,
-                'user' => $log->actorUser?->name ?? 'Sistem',
-                'jenis' => $log->module,
-                'action' => $log->action,
-            ]);
+        $logs = $this->systemLogs(100);
         $activityByDate = AuditLog::query()
             ->where('created_at', '>=', now()->subDays(6)->startOfDay())
             ->get(['actor_user_id', 'created_at'])
@@ -265,5 +255,25 @@ class SuperAdminController extends Controller
             'statusChart' => collect(ReportStatus::cases())->map(fn (ReportStatus $status): array => ['label' => $status->label(), 'total' => (int) ($statusCounts[$status->value] ?? 0)]),
             'reportTrend' => $reportTrend,
         ]);
+    }
+
+    /**
+     * @return array<int, array{waktu: string, aksi: string, user: string, jenis: string, action: string}>
+     */
+    private function systemLogs(int $limit): array
+    {
+        return AuditLog::query()
+            ->with('actorUser:id,name')
+            ->latest('created_at')
+            ->limit($limit)
+            ->get()
+            ->map(fn (AuditLog $log): array => [
+                'waktu' => $log->created_at->format('d/m/Y H:i:s'),
+                'aksi' => $log->description,
+                'user' => $log->actorUser?->name ?? 'Sistem',
+                'jenis' => $log->module,
+                'action' => $log->action,
+            ])
+            ->all();
     }
 }

@@ -111,6 +111,9 @@ Route::prefix('super-admin')->name('super_admin.')->middleware(['auth', 'can:acc
     Route::patch('/petugas/{officer}/status', [OfficerController::class, 'toggleStatus'])->name('petugas.status');
     Route::delete('/petugas/{officer}', [OfficerController::class, 'destroy'])->name('petugas.destroy');
 
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
     Route::get('/monitoring', [SuperAdminController::class, 'monitoring'])->name('monitoring');
     Route::get('/peta', [SuperAdminController::class, 'peta'])->name('peta');
 });

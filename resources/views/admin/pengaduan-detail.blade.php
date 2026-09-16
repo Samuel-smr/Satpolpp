@@ -183,13 +183,22 @@
                 @php
                     $selectedOfficerIds = array_map('strval', old('officer_ids', []));
                 @endphp
-                <section id="form-penyelesaian" class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
-                    <div class="mb-5">
-                        <h2 class="font-headline text-lg font-bold text-slate-800">Selesaikan Laporan</h2>
-                        <p class="mt-1 text-sm text-slate-500">Data ini akan membuat kegiatan eksternal yang tetap terhubung ke laporan.</p>
+                <section id="form-penyelesaian" class="overflow-hidden rounded-2xl border border-emerald-200 bg-emerald-50/60 shadow-sm">
+                    <div class="px-6 pt-6">
+                        <div class="flex items-start gap-3">
+                            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600">
+                                <span class="material-symbols-outlined text-[24px]">task_alt</span>
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold uppercase tracking-wider text-emerald-600">Penyelesaian laporan</p>
+                                <h2 class="font-headline text-lg font-bold text-slate-800">Selesaikan Laporan</h2>
+                                <p class="mt-1 text-sm text-slate-500">Lengkapi data kegiatan, petugas, dan bukti penanganan untuk membuat kegiatan eksternal yang tetap terhubung ke laporan.</p>
+                            </div>
+                        </div>
                     </div>
 
-                    <form action="{{ route('admin.pengaduan.complete.store', $report) }}" method="POST" enctype="multipart/form-data" class="space-y-5">
+                    <div class="p-6">
+                    <form action="{{ route('admin.pengaduan.complete.store', $report) }}" method="POST" enctype="multipart/form-data" class="space-y-5 rounded-2xl border border-emerald-100 bg-white p-6">
                         @csrf
                         <input type="hidden" name="current_status" value="{{ $report->status->value }}">
 
@@ -291,6 +300,7 @@
                             Selesaikan dan Buat Kegiatan Eksternal
                         </button>
                     </form>
+                    </div>
                 </section>
             @endif
 

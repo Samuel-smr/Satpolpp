@@ -14,7 +14,10 @@ class UpdateProfileRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()?->can('access-admin') ?? false;
+        $user = $this->user();
+
+        return $user !== null
+            && ($user->can('access-admin') || $user->can('access-super-admin'));
     }
 
     /**

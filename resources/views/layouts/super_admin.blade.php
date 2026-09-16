@@ -110,9 +110,14 @@
 
         <!-- Bottom Action -->
         <div class="px-4 py-4 border-t border-white/10">
+            <a href="{{ route('pelapor.index') }}"
+                class="flex w-full items-center gap-3 px-4 py-2 rounded-lg text-xs font-medium text-slate-400 hover:bg-white/5 hover:text-slate-200 transition-colors">
+                <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+                <span>Kembali ke Portal</span>
+            </a>
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
-                <button type="submit" class="flex w-full items-center gap-3 px-4 py-2 rounded-lg text-xs font-medium text-slate-300 hover:bg-white/5 hover:text-white transition-colors">
+                <button type="submit" class="flex w-full items-center gap-3 px-4 py-2 rounded-lg text-xs font-medium text-slate-400 hover:bg-white/5 hover:text-slate-200 transition-colors">
                     <span class="material-symbols-outlined text-[18px]">logout</span>
                     <span>Logout</span>
                 </button>
@@ -123,9 +128,9 @@
     {{-- Main Area --}}
     <div class="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#f6f7f9]">
         <!-- Top Header Bar -->
-        <header class="bg-white border-b border-slate-200/80 px-8 py-3.5 flex items-center justify-end sticky top-0 z-20 gap-4">
-            <!-- Search Bar -->
-            <div class="w-72"><x-global-search /></div>
+        <header class="bg-white border-b border-slate-200/80 px-8 py-4 flex items-center justify-between sticky top-0 z-20">
+            <!-- Search Input -->
+            <x-global-search />
 
             <!-- Header Action Icons -->
             <div class="flex items-center gap-2 relative">
@@ -157,16 +162,18 @@
                     </div>
                 </div>
 
-                <button class="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors" title="Bantuan">
-                    <span class="material-symbols-outlined text-[20px]">help_outline</span>
-                </button>
-
-                <!-- Profile Avatar -->
-                <div class="pl-2 flex items-center">
-                    <div class="w-8 h-8 rounded-full bg-slate-800 border border-slate-200 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150" alt="Super Admin Avatar" class="w-full h-full object-cover">
+                <!-- Avatar Profile / Topbar Profile Icon -->
+                <a href="{{ route('super_admin.profile') }}">
+                    <div class="flex items-center gap-3 pl-2 border-l border-slate-200">
+                        <div class="w-9 h-9 rounded-full bg-super-active/15 text-super-active ring-2 ring-slate-100 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-[20px]">person</span>
+                        </div>
+                        <div class="hidden md:block text-left">
+                            <div class="text-xs font-bold text-slate-800 leading-tight">{{ auth()->user()->name }}</div>
+                            <div class="text-[10px] text-slate-500">Super Admin</div>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
         </header>
 
