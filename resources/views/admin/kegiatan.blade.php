@@ -100,6 +100,9 @@
                             <th class="px-6 py-4 font-bold">Tanggal</th>
                             <th class="px-6 py-4 font-bold">Jenis</th>
                             <th class="px-6 py-4 font-bold">Kategori</th>
+                            <th class="px-6 py-4 font-bold">Jenis Temuan</th>
+                            <th class="px-6 py-4 text-center font-bold">Jumlah Temuan</th>
+                            <th class="px-6 py-4 font-bold">Satuan Temuan</th>
                             <th class="px-6 py-4 font-bold">Lokasi</th>
                             <th class="px-6 py-4 text-center font-bold">Petugas</th>
                             <th class="px-6 py-4 text-center font-bold">Aksi</th>
@@ -140,6 +143,9 @@
                                 <td class="px-6 py-4">
                                     <span class="line-clamp-2 min-w-[160px]">{{ $activity->category ?? '-' }}</span>
                                 </td>
+                                <td class="px-6 py-4 align-top"><div class="space-y-1">@forelse ($activity->findings as $finding)<div class="whitespace-nowrap">{{ $finding->type->label() }}</div>@empty - @endforelse</div></td>
+                                <td class="px-6 py-4 text-center align-top"><div class="space-y-1">@forelse ($activity->findings as $finding)<div>{{ $finding->quantity }}</div>@empty - @endforelse</div></td>
+                                <td class="px-6 py-4 align-top"><div class="space-y-1">@forelse ($activity->findings as $finding)<div class="whitespace-nowrap">{{ $finding->unit->label() }}</div>@empty - @endforelse</div></td>
                                 <td class="max-w-[240px] px-6 py-4">
                                     <span class="line-clamp-2" title="{{ $activity->location_address }}">{{ $activity->location_address }}</span>
                                 </td>
@@ -178,7 +184,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="px-6 py-14 text-center">
+                                <td colspan="10" class="px-6 py-14 text-center">
                                     <div class="mx-auto flex max-w-sm flex-col items-center">
                                         <div class="flex h-16 w-16 items-center justify-center rounded-full bg-slate-50 text-slate-400">
                                             <span class="material-symbols-outlined text-3xl">calendar_month</span>
@@ -287,6 +293,9 @@
                         'Nama Template': activity.nama_template || '-', 'Dibuat Oleh': activity.dibuat_oleh || '-',
                         'Dievaluasi Oleh': activity.dievaluasi_oleh || '-', 'Nama Kegiatan': activity.nama,
                         'Jenis': activity.jenis, 'Kategori': activity.kategori || '-', 'Tanggal': activity.tanggal,
+                        'Jenis Temuan': activity.temuan.map(item => item.jenis).join(', ') || '-',
+                        'Jumlah Temuan': activity.temuan.map(item => item.jumlah).join(', ') || '-',
+                        'Satuan Temuan': activity.temuan.map(item => item.satuan).join(', ') || '-',
                         'Waktu': activity.waktu ? `${activity.waktu} WIB` : '-', 'Deskripsi/Tindakan': activity.deskripsi || '-',
                         'Hasil': activity.hasil || '-', 'Lokasi': activity.lokasi, 'Lintang': activity.lintang,
                         'Bujur': activity.bujur, 'Jumlah Personel': activity.personel.length,
@@ -328,7 +337,7 @@
                         images[index] = (await Promise.all(activity.dokumentasi.map(item => imageData(item.url)))).filter(Boolean);
                         return [index + 1, `${activity.tanggal}\n${activity.waktu ? activity.waktu + ' WIB' : '-'}`,
                             activity.personel.join(', ') || '-',
-                            `Kegiatan: ${activity.nama}\nLokasi: ${activity.lokasi}\nTindakan: ${activity.deskripsi || '-'}\nHasil: ${activity.hasil || '-'}`,
+                            `Kegiatan: ${activity.nama}\nLokasi: ${activity.lokasi}\nTindakan: ${activity.deskripsi || '-'}\nHasil: ${activity.hasil || '-'}\nTemuan: ${activity.temuan.map(item => `${item.jenis}: ${item.jumlah} ${item.satuan}`).join(', ') || '-'}`,
                             images[index].length ? '\n' : '-'];
                     }));
                     documentPdf.autoTable({

@@ -3,6 +3,8 @@
 namespace Tests\Feature\Admin;
 
 use App\ActivityType;
+use App\FindingType;
+use App\FindingUnit;
 use App\Models\Activity;
 use App\Models\ActivityTemplate;
 use App\Models\Attachment;
@@ -60,6 +62,10 @@ class InternalActivityTest extends TestCase
             ...$this->validPayload($officers->pluck('id')->all(), $template->id),
             'category' => $template->name,
             'activity_date' => '2026-09-15',
+            'findings' => [
+                ['type' => FindingType::Person->value, 'quantity' => 2, 'unit' => FindingUnit::Person->value],
+                ['type' => FindingType::Item->value, 'quantity' => 12, 'unit' => FindingUnit::Bottle->value],
+            ],
             'documentation' => [
                 UploadedFile::fake()->image('dokumentasi-satu.jpg'),
                 UploadedFile::fake()->image('dokumentasi-dua.png'),
@@ -78,6 +84,13 @@ class InternalActivityTest extends TestCase
         $this->assertSame($template->id, $activity->activity_template_id);
         $this->assertSame($template->name, $activity->category);
         $this->assertSame('2026-09-15', $activity->activity_date->toDateString());
+        $this->assertCount(2, $activity->findings);
+        $this->assertSame(FindingType::Person, $activity->findings[0]->type);
+        $this->assertSame(2, $activity->findings[0]->quantity);
+        $this->assertSame(FindingUnit::Person, $activity->findings[0]->unit);
+        $this->assertSame(FindingType::Item, $activity->findings[1]->type);
+        $this->assertSame(12, $activity->findings[1]->quantity);
+        $this->assertSame(FindingUnit::Bottle, $activity->findings[1]->unit);
         $this->assertDatabaseCount('activity_officer', 2);
         $this->assertDatabaseCount('attachments', 2);
 
@@ -94,6 +107,9 @@ class InternalActivityTest extends TestCase
             ->get(route('admin.kegiatan.show', $activity))
             ->assertOk()
             ->assertDontSee('Kategori operasional')
+            ->assertSeeText('Barang')
+            ->assertSeeText('12')
+            ->assertSeeText('Botol')
             ->assertSee(route('admin.kegiatan.attachments.show', [$activity, $firstAttachment]), false)
             ->assertSee('alt="Dokumentasi dokumentasi-satu.jpg"', false);
 
@@ -119,6 +135,7 @@ class InternalActivityTest extends TestCase
         $response->assertRedirectToRoute('admin.kegiatan.show', $activity);
         $this->assertNull($activity->activity_template_id);
         $this->assertNull($activity->handling_result);
+        $this->assertCount(0, $activity->findings);
         $this->assertDatabaseCount('attachments', 0);
         $this->assertSame([], Storage::disk('local')->allFiles('activities/documentation'));
     }
