@@ -138,6 +138,21 @@
                         </div>
                     </dl>
 
+                    <div class="mt-5">
+                        <h3 class="mb-2 text-sm font-semibold text-slate-700">Temuan</h3>
+                        <div class="space-y-2">
+                            @forelse ($report->activity->findings as $finding)
+                                <div class="grid grid-cols-3 gap-3 rounded-xl border border-emerald-100 bg-white/70 p-3 text-sm">
+                                    <span>{{ $finding->type->label() }}</span>
+                                    <span class="font-semibold">{{ $finding->quantity }}</span>
+                                    <span>{{ $finding->unit->label() }}</span>
+                                </div>
+                            @empty
+                                <p class="text-sm text-slate-500">Tidak ada temuan.</p>
+                            @endforelse
+                        </div>
+                    </div>
+
                     @if ($report->status === \App\ReportStatus::Completed)
                         <div class="mt-5">
                             <h3 class="mb-2 text-sm font-semibold text-slate-700">Peta lokasi penanganan</h3>
@@ -252,6 +267,8 @@
                                 <textarea id="handling_result" name="handling_result" rows="4" maxlength="5000" required class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:border-sidebar-active focus:outline-none focus:ring-1 focus:ring-sidebar-active">{{ old('handling_result') }}</textarea>
                             </div>
                         </div>
+
+                        <x-activity-findings-fields prefix="completion" :findings="old('findings', [])" />
 
                         <fieldset>
                             <legend class="mb-3 text-sm font-semibold text-slate-700">Petugas yang menangani</legend>

@@ -5,10 +5,10 @@
 @push('styles')
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
     <style>
-        /* Custom map container to fill space */
+        /* Custom map container to fit within the remaining viewport */
         .map-container {
-            height: calc(100vh - 180px); /* Adjust based on header height */
-            min-height: 500px;
+            height: 100%;
+            min-height: 440px;
         }
         /* Custom popup styling */
         .leaflet-popup-content-wrapper {
@@ -76,56 +76,60 @@
 @section('content')
     <div x-data="petaManager()" x-init="initPeta()" x-cloak class="flex flex-col lg:flex-row gap-6 h-full">
         
-        <!-- Left: Map Area -->
-        <div class="flex-1 flex flex-col bg-white border border-slate-200/80 rounded-2xl shadow-sm overflow-hidden">
-            <!-- Map Header & Filters -->
-            <div class="p-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50">
-                <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-brand-600">map</span>
-                    <h2 class="font-bold text-slate-800">Live Deployment Map</h2>
-                </div>
-                
-                <div class="flex flex-wrap gap-3 items-center">
-                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Filter:</span>
+        <!-- Left: Control Panel + Map -->
+        <div class="flex-1 flex flex-col gap-4 min-w-0">
+            <!-- Kartu Kontrol: Search & Checklist Kategori (terpisah dari peta) -->
+            <div class="bg-white border border-slate-200/80 rounded-2xl shadow-sm">
+                <div class="p-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-brand-600">map</span>
+                        <h2 class="font-bold text-slate-800">Live Deployment Map</h2>
+                    </div>
                     
-                    <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm hover:bg-slate-50 transition-colors">
-                        <input type="checkbox" x-model="filters.laporan" @change="renderMap()" class="w-4 h-4 text-red-500 rounded border-slate-300 focus:ring-red-500">
-                        <span class="text-sm font-semibold text-slate-700 flex items-center gap-1">
-                            <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span> Laporan/Aduan
-                        </span>
-                    </label>
+                    <div class="flex flex-wrap gap-3 items-center">
+                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Filter:</span>
+                        
+                        <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm hover:bg-slate-50 transition-colors">
+                            <input type="checkbox" x-model="filters.laporan" @change="renderMap()" class="w-4 h-4 text-red-500 rounded border-slate-300 focus:ring-red-500">
+                            <span class="text-sm font-semibold text-slate-700 flex items-center gap-1">
+                                <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span> Laporan/Aduan
+                            </span>
+                        </label>
 
-                    <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm hover:bg-slate-50 transition-colors">
-                        <input type="checkbox" x-model="filters.kegiatan_eksternal" @change="renderMap()" class="w-4 h-4 text-blue-500 rounded border-slate-300 focus:ring-blue-500">
-                        <span class="text-sm font-semibold text-slate-700 flex items-center gap-1">
-                            <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Kegiatan Eksternal
-                        </span>
-                    </label>
+                        <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm hover:bg-slate-50 transition-colors">
+                            <input type="checkbox" x-model="filters.kegiatan_eksternal" @change="renderMap()" class="w-4 h-4 text-blue-500 rounded border-slate-300 focus:ring-blue-500">
+                            <span class="text-sm font-semibold text-slate-700 flex items-center gap-1">
+                                <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Kegiatan Eksternal
+                            </span>
+                        </label>
 
-                    <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm hover:bg-slate-50 transition-colors">
-                        <input type="checkbox" x-model="filters.kegiatan_internal" @change="renderMap()" class="w-4 h-4 text-emerald-500 rounded border-slate-300 focus:ring-emerald-500">
-                        <span class="text-sm font-semibold text-slate-700 flex items-center gap-1">
-                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Kegiatan Internal
-                        </span>
-                    </label>
+                        <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm hover:bg-slate-50 transition-colors">
+                            <input type="checkbox" x-model="filters.kegiatan_internal" @change="renderMap()" class="w-4 h-4 text-emerald-500 rounded border-slate-300 focus:ring-emerald-500">
+                            <span class="text-sm font-semibold text-slate-700 flex items-center gap-1">
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Kegiatan Internal
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Search Lokasi -->
+                <div class="p-3 bg-white flex flex-col sm:flex-row gap-2 sm:items-center">
+                    <div class="flex-1 relative">
+                        <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-[18px]">search</span>
+                        <input type="text" x-model="searchQuery" @keyup.enter="searchLocation()" placeholder="Cari lokasi / alamat... mis. Pasar Wates, Kulon Progo"
+                            class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-super-active/20 focus:border-super-active outline-none transition-all text-sm">
+                    </div>
+                    <button type="button" @click="searchLocation()" class="inline-flex items-center justify-center gap-2 bg-super-active hover:bg-super-hover text-white px-5 py-2 rounded-xl text-sm font-semibold shadow-sm transition-colors">
+                        <span class="material-symbols-outlined text-[18px]">search</span>
+                        Cari Lokasi
+                    </button>
                 </div>
             </div>
 
-            <!-- Search Lokasi -->
-            <div class="p-3 border-b border-slate-200 bg-white flex flex-col sm:flex-row gap-2 sm:items-center">
-                <div class="flex-1 relative">
-                    <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-[18px]">search</span>
-                    <input type="text" x-model="searchQuery" @keyup.enter="searchLocation()" placeholder="Cari lokasi / alamat... mis. Pasar Wates, Kulon Progo"
-                        class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-super-active/20 focus:border-super-active outline-none transition-all text-sm">
-                </div>
-                <button type="button" @click="searchLocation()" class="inline-flex items-center justify-center gap-2 bg-super-active hover:bg-super-hover text-white px-5 py-2 rounded-xl text-sm font-semibold shadow-sm transition-colors">
-                    <span class="material-symbols-outlined text-[18px]">search</span>
-                    Cari Lokasi
-                </button>
+            <!-- Kartu Peta (terpisah) -->
+            <div class="flex-1 bg-white border border-slate-200/80 rounded-2xl shadow-sm overflow-hidden flex flex-col">
+                <div id="mainMap" class="w-full flex-1 map-container relative rounded-b-2xl"></div>
             </div>
-
-            <!-- The Map -->
-            <div id="mainMap" class="w-full flex-1 map-container z-10 relative rounded-b-2xl"></div>
         </div>
 
         <!-- Right: Real-time Metrics Sidebar -->
@@ -153,7 +157,7 @@
                     
                     <!-- Chart 1 -->
                     <div>
-                        <h4 class="text-xs font-semibold text-slate-600 mb-3">Kategori Laporan</h4>
+                        <h4 class="text-xs font-semibold text-slate-600 mb-3">Kategori Persebaran</h4>
                         <div class="h-40 w-full relative">
                             <canvas id="incidentChart"></canvas>
                         </div>
@@ -172,6 +176,14 @@
                         <h4 class="text-xs font-semibold text-slate-600 mb-3">Laporan 7 Hari Terakhir</h4>
                         <div class="h-32 w-full relative">
                             <canvas id="responseChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Chart 4 -->
+                    <div>
+                        <h4 class="text-xs font-semibold text-slate-600 mb-3">Distribusi per Kecamatan</h4>
+                        <div class="h-56 w-full relative">
+                            <canvas id="districtChart"></canvas>
                         </div>
                     </div>
 
@@ -202,7 +214,9 @@
 
                 initPeta() {
                     this.map = L.map('mainMap', {
-                        zoomControl: false
+                        zoomControl: false,
+                        scrollWheelZoom: false,
+                        doubleClickZoom: true
                     });
                     KulonProgoMap.setup(this.map);
 
@@ -214,6 +228,14 @@
                         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
                         maxZoom: 19
                     }).addTo(this.map);
+
+                    this.map.getContainer().addEventListener('wheel', (e) => {
+                        if (!e.ctrlKey) return;
+                        e.preventDefault();
+                        const dir = e.deltaY > 0 ? -1 : 1;
+                        const z = this.map.getZoom() + dir;
+                        this.map.setZoom(Math.min(19, Math.max(6, z)));
+                    }, { passive: false });
 
                     this.renderMap();
                     this.initCharts();
@@ -302,7 +324,7 @@
                             .addTo(this.map);
                         
                         marker.on('click', () => {
-                            this.map.setView([item.lat, item.lng], 14, { animate: true });
+                            this.map.panTo([item.lat, item.lng], { animate: true });
                         });
 
                         this.markers.push(marker);
@@ -359,15 +381,28 @@
 
                 // Init Charts
                 initCharts() {
+                    const kategoriMap = {
+                        'laporan': { label: 'Laporan/Aduan', color: '#ef4444' },
+                        'kegiatan_eksternal': { label: 'Kegiatan Eksternal', color: '#3b82f6' },
+                        'kegiatan_internal': { label: 'Kegiatan Internal', color: '#10b981' },
+                    };
+                    const kategoriCounts = {};
+                    this.mapData.forEach(item => {
+                        const key = kategoriMap[item.type] ? item.type : 'laporan';
+                        kategoriCounts[key] = (kategoriCounts[key] || 0) + 1;
+                    });
+                    const kategoriLabels = Object.keys(kategoriMap);
+                    const kategoriData = kategoriLabels.map(k => kategoriCounts[k] || 0);
+
                     const ctxIncident = document.getElementById('incidentChart').getContext('2d');
                     new Chart(ctxIncident, {
                         type: 'bar',
                         data: {
-                            labels: @json($categoryChart->pluck('label')),
+                            labels: kategoriLabels.map(k => kategoriMap[k].label),
                             datasets: [{
-                                label: 'Laporan',
-                                data: @json($categoryChart->pluck('total')),
-                                backgroundColor: '#1e3a8a',
+                                label: 'Jumlah',
+                                data: kategoriData,
+                                backgroundColor: kategoriLabels.map(k => kategoriMap[k].color),
                                 borderRadius: 4,
                             }]
                         },
@@ -433,6 +468,50 @@
                             }
                         }
                     });
+
+                    const stats = this.districts.map((d, i) => ({ label: d, total: this.districtCounts()[i] })).filter(s => s.total > 0);
+
+                    const ctxDistrict = document.getElementById('districtChart').getContext('2d');
+                    new Chart(ctxDistrict, {
+                        type: 'bar',
+                        data: {
+                            labels: stats.map(s => s.label),
+                            datasets: [{
+                                label: 'Jumlah',
+                                data: stats.map(s => s.total),
+                                backgroundColor: 'rgba(45, 92, 138, 0.85)',
+                                borderRadius: 4,
+                                maxBarThickness: 18,
+                                categoryPercentage: 0.6,
+                            }]
+                        },
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                x: { beginAtZero: true, ticks: { precision: 0 }, grid: { display: false } },
+                                y: { grid: { display: false } }
+                            }
+                        }
+                    });
+                },
+                districts: @json($districts),
+                districtCenters: @json($districtCenters),
+                districtCounts() {
+                    const counts = this.districts.map(() => 0);
+                    this.mapData.forEach(item => {
+                        if (item.lat == null || item.lng == null) return;
+                        let bestIdx = 0;
+                        let bestDist = Infinity;
+                        this.districtCenters.forEach((c, idx) => {
+                            const d = Math.pow(item.lat - c.lat, 2) + Math.pow(item.lng - c.lng, 2);
+                            if (d < bestDist) { bestDist = d; bestIdx = idx; }
+                        });
+                        counts[bestIdx]++;
+                    });
+                    return counts;
                 }
             }
         }

@@ -103,6 +103,8 @@ class ActivityController extends Controller
                     'longitude' => $validated['longitude'],
                 ]);
 
+                $activity->findings()->createMany($validated['findings'] ?? []);
+
                 $officerAssignments = $officerIds->mapWithKeys(
                     fn (int $officerId): array => [$officerId => ['assignment_role' => 'Petugas Kegiatan']],
                 )->all();
@@ -155,6 +157,7 @@ class ActivityController extends Controller
             'createdByUser:id,name',
             'officers:id,name,employee_number,position,work_unit_name,unit_name',
             'attachments' => fn ($query) => $query->oldest('created_at'),
+            'findings' => fn ($query) => $query->oldest('id'),
         ]);
 
         return view('admin.kegiatan-detail', ['activity' => $activity, ...$this->viewContext()]);
@@ -166,6 +169,7 @@ class ActivityController extends Controller
         $activity->load([
             'officers:id,name,employee_number,position',
             'attachments' => fn ($query) => $query->oldest('created_at'),
+            'findings' => fn ($query) => $query->oldest('id'),
         ]);
 
         $activityTemplates = ActivityTemplate::query()
@@ -268,6 +272,9 @@ class ActivityController extends Controller
                     'latitude' => $validated['latitude'],
                     'longitude' => $validated['longitude'],
                 ]);
+
+                $lockedActivity->findings()->delete();
+                $lockedActivity->findings()->createMany($validated['findings'] ?? []);
 
                 $officerAssignments = $officerIds->mapWithKeys(
                     fn (int $officerId): array => [$officerId => ['assignment_role' => 'Petugas Kegiatan']],
