@@ -98,6 +98,11 @@
                 </div>
             </section>
 
+            <x-activity-findings-fields
+                prefix="activity"
+                :findings="old('findings', $editingActivity?->findings->map(fn ($finding) => ['type' => $finding->type->value, 'quantity' => $finding->quantity, 'unit' => $finding->unit->value])->all() ?? [])"
+            />
+
             <section class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
                 <h2 class="mb-5 font-headline text-lg font-bold text-slate-800">Lokasi Kegiatan</h2>
                 <div class="space-y-5">

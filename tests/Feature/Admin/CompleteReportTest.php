@@ -3,6 +3,8 @@
 namespace Tests\Feature\Admin;
 
 use App\ActivityType;
+use App\FindingType;
+use App\FindingUnit;
 use App\Models\Activity;
 use App\Models\ActivityTemplate;
 use App\Models\AuditLog;
@@ -46,6 +48,10 @@ class CompleteReportTest extends TestCase
         ], $template->id);
         $payload['latitude'] = $expectedLatitude;
         $payload['longitude'] = $expectedLongitude;
+        $payload['findings'] = [
+            ['type' => FindingType::Person->value, 'quantity' => 3, 'unit' => FindingUnit::Person->value],
+            ['type' => FindingType::Item->value, 'quantity' => 8, 'unit' => FindingUnit::Piece->value],
+        ];
 
         $response = $this->actingAs($admin)->post(route('admin.pengaduan.complete.store', $report), $payload);
 
@@ -65,6 +71,13 @@ class CompleteReportTest extends TestCase
         $this->assertSame($admin->id, $activity->created_by_user_id);
         $this->assertSame(ActivityType::External, $activity->type);
         $this->assertNull($activity->category);
+        $this->assertCount(2, $activity->findings);
+        $this->assertSame(FindingType::Person, $activity->findings[0]->type);
+        $this->assertSame(3, $activity->findings[0]->quantity);
+        $this->assertSame(FindingUnit::Person, $activity->findings[0]->unit);
+        $this->assertSame(FindingType::Item, $activity->findings[1]->type);
+        $this->assertSame(8, $activity->findings[1]->quantity);
+        $this->assertSame(FindingUnit::Piece, $activity->findings[1]->unit);
         $this->assertDatabaseCount('reports', 1);
         $this->assertDatabaseCount('activities', 1);
         $this->assertDatabaseCount('activity_officer', 2);
@@ -99,13 +112,20 @@ class CompleteReportTest extends TestCase
             ->assertSee(route('admin.kegiatan.export-attachments.show', [$activity, $activity->attachments->first()]), false)
             ->assertSee('alt="Bukti penanganan bukti-satu.jpg"', false)
             ->assertSee('Lokasi sudah kembali tertib.')
+            ->assertSeeText('Temuan')
+            ->assertSeeText('Orang')
+            ->assertSeeText('Barang')
+            ->assertSeeText('Buah')
             ->assertDontSee('Kategori operasional')
             ->assertDontSee('form-penyelesaian');
 
         $this->get(route('admin.kegiatan'))
             ->assertOk()
             ->assertSeeText("Penanganan {$report->code}")
-            ->assertSeeText("Dari Laporan {$report->code}");
+            ->assertSeeText("Dari Laporan {$report->code}")
+            ->assertSeeText('Jenis Temuan')
+            ->assertSeeText('Jumlah Temuan')
+            ->assertSeeText('Satuan Temuan');
     }
 
     public function test_report_that_is_not_in_progress_cannot_create_an_activity_and_stored_evidence_is_cleaned(): void

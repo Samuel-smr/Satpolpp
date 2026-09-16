@@ -67,6 +67,21 @@
                 </section>
 
                 <section class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
+                    <h2 class="mb-4 font-headline text-lg font-bold text-slate-800">Temuan</h2>
+                    <div class="space-y-3">
+                        @forelse ($activity->findings as $finding)
+                            <div class="grid grid-cols-3 gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm">
+                                <div><p class="text-slate-400">Jenis</p><p class="font-semibold text-slate-700">{{ $finding->type->label() }}</p></div>
+                                <div><p class="text-slate-400">Jumlah</p><p class="font-semibold text-slate-700">{{ $finding->quantity }}</p></div>
+                                <div><p class="text-slate-400">Satuan</p><p class="font-semibold text-slate-700">{{ $finding->unit->label() }}</p></div>
+                            </div>
+                        @empty
+                            <p class="rounded-xl border border-dashed border-slate-200 p-6 text-center text-sm text-slate-400">Tidak ada temuan.</p>
+                        @endforelse
+                    </div>
+                </section>
+
+                <section class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
                     <div class="mb-4 flex items-center justify-between gap-3">
                         <h2 class="font-headline text-lg font-bold text-slate-800">Dokumentasi</h2>
                         <span class="text-xs font-semibold text-slate-500">{{ $activity->attachments->count() }} file</span>
