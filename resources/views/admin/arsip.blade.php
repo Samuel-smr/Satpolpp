@@ -37,7 +37,7 @@
     </div>
 
     <form method="GET" action="{{ route('admin.arsip') }}" class="mb-6 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm">
-        <div class="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_240px_180px_auto]">
+        <div class="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_240px_auto]">
             <div class="relative">
                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[20px] text-slate-400">search</span>
                 <input type="search" name="search" value="{{ $filters['search'] ?? '' }}" maxlength="100"
@@ -47,15 +47,9 @@
             <select name="category"
                 class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active">
                 <option value="">Semua Kategori</option>
-                @foreach ($operationalCategories as $category)
-                    <option value="{{ $category->value }}" @selected(($filters['category'] ?? '') === $category->value)>{{ $category->label() }}</option>
+                @foreach ($activityTemplates as $activityTemplate)
+                    <option value="{{ $activityTemplate->name }}" @selected(($filters['category'] ?? '') === $activityTemplate->name)>{{ $activityTemplate->name }}</option>
                 @endforeach
-            </select>
-            <select name="type"
-                class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active">
-                <option value="">Semua Jenis</option>
-                <option value="document" @selected(($filters['type'] ?? '') === 'document')>Dokumen</option>
-                <option value="media" @selected(($filters['type'] ?? '') === 'media')>Media</option>
             </select>
             <div class="flex gap-2">
                 <button type="submit" class="rounded-xl bg-sidebar-active px-5 py-2.5 font-semibold text-white hover:bg-sidebar-hover">Filter</button>
@@ -67,7 +61,6 @@
         </div>
         @error('search')<p class="mt-2 text-xs text-red-600">{{ $message }}</p>@enderror
         @error('category')<p class="mt-2 text-xs text-red-600">{{ $message }}</p>@enderror
-        @error('type')<p class="mt-2 text-xs text-red-600">{{ $message }}</p>@enderror
     </form>
 
     <div class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
@@ -84,19 +77,10 @@
         @else
             <div class="grid grid-cols-1 gap-4 p-5 md:grid-cols-2 xl:grid-cols-3">
                 @foreach ($archives as $archive)
-                    @php
-                        $icon = match ($archive->file_extension) {
-                            'pdf' => ['picture_as_pdf', 'bg-red-50 text-red-500'],
-                            'doc', 'docx' => ['description', 'bg-blue-50 text-blue-500'],
-                            'jpg', 'jpeg', 'png' => ['image', 'bg-emerald-50 text-emerald-500'],
-                            'zip' => ['folder_zip', 'bg-purple-50 text-purple-500'],
-                            default => ['draft', 'bg-slate-100 text-slate-500'],
-                        };
-                    @endphp
                     <article class="flex flex-col rounded-2xl border border-slate-200 bg-white p-5 transition-shadow hover:shadow-md">
                         <div class="flex items-start gap-4">
-                            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl {{ $icon[1] }}">
-                                <span class="material-symbols-outlined text-[26px]">{{ $icon[0] }}</span>
+                            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
+                                <span class="material-symbols-outlined text-[26px]">folder</span>
                             </div>
                             <div class="min-w-0 flex-1">
                                 <div class="flex items-start justify-between gap-2">
@@ -105,34 +89,38 @@
                                         <span class="material-symbols-outlined text-[18px] text-amber-500" title="Dokumen rahasia">lock</span>
                                     @endif
                                 </div>
-                                <p class="mt-0.5 truncate text-xs text-slate-400" title="{{ $archive->original_name }}">{{ $archive->original_name }}</p>
+                                <p class="mt-0.5 text-xs text-slate-400">{{ $archive->files->count() }} file</p>
                             </div>
                         </div>
 
                         <p class="mt-4 line-clamp-2 min-h-10 text-sm leading-relaxed text-slate-500">{{ $archive->description ?: 'Tidak ada deskripsi.' }}</p>
                         <div class="mt-4 space-y-1.5 border-t border-slate-100 pt-4 text-xs text-slate-500">
-                            <p><span class="font-semibold text-slate-600">Kategori:</span> {{ $archive->operational_category->label() }}</p>
-                            <p><span class="font-semibold text-slate-600">Ukuran:</span> {{ number_format($archive->file_size / 1048576, 2, ',', '.') }} MB</p>
+                            <p><span class="font-semibold text-slate-600">Kategori:</span> {{ $archive->operational_category }}</p>
+                            <p><span class="font-semibold text-slate-600">Ukuran:</span> {{ number_format($archive->files->sum('file_size') / 1048576, 2, ',', '.') }} MB</p>
                             <p><span class="font-semibold text-slate-600">Diunggah:</span> {{ $archive->created_at->format('d/m/Y H:i') }} oleh {{ $archive->createdByUser?->name ?? '-' }}</p>
                         </div>
 
-                        <div class="mt-5 flex items-center justify-end gap-1 border-t border-slate-100 pt-3">
-                            <a href="{{ route('admin.arsip.show', $archive) }}" target="_blank" rel="noopener"
-                                class="rounded-lg p-2 text-slate-400 hover:bg-blue-50 hover:text-blue-600" title="Lihat file">
-                                <span class="material-symbols-outlined text-[20px]">visibility</span>
-                            </a>
-                            <a href="{{ route('admin.arsip.download', $archive) }}"
-                                class="rounded-lg p-2 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600" title="Unduh file">
-                                <span class="material-symbols-outlined text-[20px]">download</span>
-                            </a>
+                        <div class="mt-4 space-y-2 border-t border-slate-100 pt-4">
+                            @foreach ($archive->files as $archiveFile)
+                                <div class="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-2 text-xs">
+                                    <span class="material-symbols-outlined text-[18px] text-slate-400">description</span>
+                                    <span class="min-w-0 flex-1 truncate" title="{{ $archiveFile->original_name }}">{{ $archiveFile->original_name }}</span>
+                                    <a href="{{ route('admin.arsip.show', [$archive, $archiveFile]) }}" target="_blank" rel="noopener" class="text-blue-600" title="Lihat file"><span class="material-symbols-outlined text-[18px]">visibility</span></a>
+                                    <a href="{{ route('admin.arsip.download', [$archive, $archiveFile]) }}" class="text-emerald-600" title="Unduh file"><span class="material-symbols-outlined text-[18px]">download</span></a>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <div class="mt-4 flex items-center justify-end gap-1 border-t border-slate-100 pt-3">
                             <button type="button"
                                 onclick="bukaEditArsip(@js([
                                     'id' => $archive->id,
                                     'title' => $archive->title,
-                                    'operational_category' => $archive->operational_category->value,
+                                    'operational_category' => $archive->operational_category,
                                     'description' => $archive->description,
                                     'confidentiality' => $archive->confidentiality->value,
-                                    'original_name' => $archive->original_name,
+                                    'file_count' => $archive->files->count(),
+                                    'file_names' => $archive->files->pluck('original_name')->all(),
                                 ]))"
                                 class="rounded-lg p-2 text-slate-400 hover:bg-amber-50 hover:text-amber-600" title="Edit arsip">
                                 <span class="material-symbols-outlined text-[20px]">edit</span>
@@ -188,8 +176,8 @@
                         <select id="archive-category" name="operational_category" required
                             class="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active">
                             <option value="">Pilih Kategori</option>
-                            @foreach ($operationalCategories as $category)
-                                <option value="{{ $category->value }}" @selected(old('operational_category') === $category->value)>{{ $category->label() }}</option>
+                            @foreach ($activityTemplates as $activityTemplate)
+                                <option value="{{ $activityTemplate->name }}" @selected(old('operational_category') === $activityTemplate->name)>{{ $activityTemplate->name }}</option>
                             @endforeach
                         </select>
                         @error('operational_category')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
@@ -219,14 +207,16 @@
                     </label>
                     <label class="flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 p-6 text-center transition-colors hover:bg-slate-100">
                         <span class="material-symbols-outlined mb-2 text-4xl text-slate-400">cloud_upload</span>
-                        <p id="archive-file-name" class="text-sm font-medium text-slate-700">Pilih file arsip</p>
-                        <p class="mt-1 text-xs text-slate-500">PDF, JPG, PNG, DOC, DOCX, atau ZIP. Maksimal 20 MB.</p>
-                        <input id="archive-file" type="file" name="file" required
-                            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.zip" class="sr-only"
+                        <p id="archive-file-name" class="text-sm font-medium text-slate-700">Pilih maksimal 3 file arsip</p>
+                        <p class="mt-1 text-xs text-slate-500">PDF, JPG, PNG, DOC, DOCX, XLS, XLSX, atau ZIP. Maksimal 3 file, masing-masing 20 MB.</p>
+                        <input id="archive-file" type="file" name="files[]" required multiple
+                            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.zip" class="sr-only"
                             onchange="tampilkanNamaFile(this)">
                     </label>
+                    <div id="archive-file-preview" class="mt-3 hidden grid gap-3 sm:grid-cols-3"></div>
                     <p id="archive-current-file" class="mt-2 hidden text-xs text-amber-600"></p>
-                    @error('file')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                    @error('files')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                    @error('files.*')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                 </div>
 
                 <div class="flex justify-end gap-3 border-t border-slate-100 pt-4">
@@ -245,11 +235,21 @@
     <script>
         const modalArsip = document.getElementById('archive-modal');
         const formArsip = document.getElementById('archive-form');
+        const archiveFilePreview = document.getElementById('archive-file-preview');
         const urlTambahArsip = @json(route('admin.arsip.store'));
         const polaUrlEditArsip = @json(route('admin.arsip.update', ['archive' => '__ARCHIVE__']));
+        let archivePreviewUrls = [];
+
+        function bersihkanPreviewArsip() {
+            archivePreviewUrls.forEach((url) => URL.revokeObjectURL(url));
+            archivePreviewUrls = [];
+            archiveFilePreview.replaceChildren();
+            archiveFilePreview.classList.add('hidden');
+        }
 
         function bukaTambahArsip() {
             formArsip.reset();
+            bersihkanPreviewArsip();
             formArsip.action = urlTambahArsip;
             document.getElementById('archive-method').value = 'POST';
             document.getElementById('archive-context-id').value = '';
@@ -257,14 +257,17 @@
             document.getElementById('archive-modal-description').textContent = 'Lengkapi form untuk mengunggah dokumen arsip.';
             document.getElementById('archive-submit-label').textContent = 'Simpan & Unggah';
             document.getElementById('archive-file').required = true;
+            document.getElementById('archive-file').multiple = true;
+            document.getElementById('archive-file').dataset.maximumFiles = '3';
             document.getElementById('archive-file-required').classList.remove('hidden');
             document.getElementById('archive-current-file').classList.add('hidden');
-            document.getElementById('archive-file-name').textContent = 'Pilih file arsip';
+            document.getElementById('archive-file-name').textContent = 'Pilih maksimal 3 file arsip';
             modalArsip.classList.remove('hidden');
         }
 
         function bukaEditArsip(archive) {
             formArsip.reset();
+            bersihkanPreviewArsip();
             formArsip.action = polaUrlEditArsip.replace('__ARCHIVE__', archive.id);
             document.getElementById('archive-method').value = 'PUT';
             document.getElementById('archive-context-id').value = archive.id;
@@ -276,9 +279,11 @@
             document.getElementById('archive-modal-description').textContent = 'Ubah metadata atau unggah file pengganti.';
             document.getElementById('archive-submit-label').textContent = 'Perbarui Arsip';
             document.getElementById('archive-file').required = false;
+            document.getElementById('archive-file').multiple = true;
+            document.getElementById('archive-file').dataset.maximumFiles = String(3 - archive.file_count);
             document.getElementById('archive-file-required').classList.add('hidden');
             const currentFile = document.getElementById('archive-current-file');
-            currentFile.textContent = `File saat ini: ${archive.original_name}. Abaikan unggahan jika tidak ingin mengganti file.`;
+            currentFile.textContent = `File saat ini: ${archive.file_names.join(', ')}. Anda dapat menambahkan sampai ${3 - archive.file_count} file lagi.`;
             currentFile.classList.remove('hidden');
             document.getElementById('archive-file-name').textContent = 'Pilih file pengganti (opsional)';
             modalArsip.classList.remove('hidden');
@@ -289,17 +294,78 @@
         }
 
         function tampilkanNamaFile(input) {
-            document.getElementById('archive-file-name').textContent = input.files[0]?.name ?? 'Pilih file arsip';
+            bersihkanPreviewArsip();
+
+            const maximumFiles = Number.parseInt(input.dataset.maximumFiles || '3', 10);
+            if (input.files.length > maximumFiles) {
+                input.value = '';
+                document.getElementById('archive-file-name').textContent = 'Maksimal 3 file arsip';
+                window.tampilToast?.(`Anda hanya dapat menambahkan ${maximumFiles} file lagi.`, 'warning');
+
+                return;
+            }
+
+            const fileNames = Array.from(input.files).map((file) => file.name);
+            document.getElementById('archive-file-name').textContent = fileNames.length > 0
+                ? `${fileNames.length} file dipilih: ${fileNames.join(', ')}`
+                : (input.multiple ? 'Pilih maksimal 3 file arsip' : 'Pilih file pengganti (opsional)');
+
+            Array.from(input.files).forEach((file, index) => {
+                const card = document.createElement('div');
+                card.className = 'relative overflow-hidden rounded-xl border border-slate-200 bg-slate-50';
+
+                if (file.type.startsWith('image/')) {
+                    const previewUrl = URL.createObjectURL(file);
+                    archivePreviewUrls.push(previewUrl);
+
+                    const image = document.createElement('img');
+                    image.src = previewUrl;
+                    image.alt = `Preview ${file.name}`;
+                    image.className = 'aspect-video w-full object-cover';
+                    card.appendChild(image);
+                } else {
+                    const icon = document.createElement('div');
+                    icon.className = 'flex aspect-video items-center justify-center bg-slate-100 text-slate-400';
+                    icon.innerHTML = '<span class="material-symbols-outlined text-4xl">description</span>';
+                    card.appendChild(icon);
+                }
+
+                const name = document.createElement('p');
+                name.className = 'truncate px-3 py-2 text-xs font-medium text-slate-600';
+                name.textContent = file.name;
+                card.appendChild(name);
+
+                const removeButton = document.createElement('button');
+                removeButton.type = 'button';
+                removeButton.title = 'Hapus file terpilih';
+                removeButton.className = 'absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-red-600 shadow transition-colors hover:bg-red-50';
+                removeButton.innerHTML = '<span class="material-symbols-outlined text-[18px]">close</span>';
+                removeButton.addEventListener('click', () => {
+                    const remainingFiles = new DataTransfer();
+                    Array.from(input.files).forEach((selectedFile, selectedIndex) => {
+                        if (selectedIndex !== index) {
+                            remainingFiles.items.add(selectedFile);
+                        }
+                    });
+                    input.files = remainingFiles.files;
+                    tampilkanNamaFile(input);
+                });
+                card.appendChild(removeButton);
+                archiveFilePreview.appendChild(card);
+            });
+
+            archiveFilePreview.classList.toggle('hidden', input.files.length === 0);
         }
 
         @if ($errors->any() && $editingArchive)
             bukaEditArsip(@js([
                 'id' => $editingArchive->id,
                 'title' => old('title', $editingArchive->title),
-                'operational_category' => old('operational_category', $editingArchive->operational_category->value),
+                'operational_category' => old('operational_category', $editingArchive->operational_category),
                 'description' => old('description', $editingArchive->description),
                 'confidentiality' => old('confidentiality', $editingArchive->confidentiality->value),
-                'original_name' => $editingArchive->original_name,
+                'file_count' => $editingArchive->files()->count(),
+                'file_names' => $editingArchive->files()->pluck('original_name')->all(),
             ]));
         @elseif ($errors->any())
             modalArsip.classList.remove('hidden');

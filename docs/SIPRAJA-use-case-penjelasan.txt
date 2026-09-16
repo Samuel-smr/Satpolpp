@@ -332,8 +332,9 @@ Langkah:
   1. Buka Tambah Kegiatan.
   2. Opsional pilih template: nama, kategori dan deskripsi otomatis diisi; kategori dapat dipilih manual dari nama template aktif.
   3. Isi nama, tanggal, waktu opsional, deskripsi/hasil opsional, alamat dan koordinat.
-  4. Pilih minimal satu petugas aktif; opsional unggah maksimal 3 foto dokumentasi, masing-masing 5 MB.
-  5. Klik simpan; sistem memvalidasi dan menyimpan kegiatan internal, relasi petugas, dokumentasi, dan audit.
+  4. Pilih minimal satu petugas aktif; tambahkan nol atau beberapa temuan berisi jenis, jumlah, dan satuan.
+  5. Opsional pilih maksimal 3 file dokumentasi melalui satu pemilih file; preview dapat dihapus sebelum disimpan.
+  6. Klik simpan; sistem menyimpan kegiatan, petugas, temuan, dokumentasi, dan audit dalam satu proses.
 Alternatif / gagal:
   Kategori tidak aktif, koordinat salah, petugas tidak aktif, atau file tidak sesuai: perbaiki form.
 Hasil akhir:
@@ -348,9 +349,9 @@ Prasyarat   : Kegiatan internal tersedia.
 Langkah:
   1. Buka detail/daftar lalu Edit.
   2. Sistem mengisi form dengan data saat ini.
-  3. Ubah informasi, kategori, lokasi/peta atau petugas; tambahkan dokumentasi bila perlu.
+  3. Ubah informasi, kategori, lokasi/peta, petugas atau daftar temuan; tambahkan dokumentasi bila perlu.
   4. Simpan; sistem memeriksa validasi, perubahan bersamaan, dan total maksimal 3 dokumentasi.
-  5. Sistem memperbarui kegiatan dan relasi petugas serta mencatat audit.
+  5. Sistem memperbarui kegiatan, relasi petugas dan temuan serta mencatat audit.
 Alternatif / gagal:
   Data sudah berubah: muat ulang. Kegiatan eksternal tidak memakai endpoint edit internal.
 Hasil akhir:
@@ -451,31 +452,32 @@ Hasil akhir:
 Sumber kode : ActivityEvaluationController
 ----------------------------------------------------------------------------
 
-R01 — Menambah atau mengedit arsip
+R01 — Menambah atau mengedit folder arsip
 Kelompok    : Operasional admin
 Aktor       : Admin
 Prasyarat   : Sudah login sebagai admin.
 Langkah:
   1. Buka Arsip lalu Tambah atau Edit.
-  2. Isi judul, kategori operasional arsip, sifat dokumen dan deskripsi opsional.
-  3. Tambah: unggah file wajib. Edit: file pengganti opsional.
-  4. Simpan; sistem memvalidasi ekstensi/isi dan ukuran maksimal 20 MB serta menyimpan metadata/file.
+  2. Isi nama folder, kategori dari template kegiatan aktif, sifat dokumen dan deskripsi opsional.
+  3. Pilih 1–3 file melalui satu pemilih file; hapus preview yang keliru sebelum menyimpan.
+  4. Simpan; sistem membuat satu Archive dan satu ArchiveFile untuk setiap file.
+  5. Saat edit, file baru ditambahkan selama jumlah keseluruhan tidak melebihi tiga.
 Alternatif / gagal:
-  Format yang diterima PDF/JPG/JPEG/PNG/DOC/DOCX/ZIP. Melebihi batas aplikasi atau konfigurasi server: unggahan gagal; perbaiki dan ulangi.
+  Format yang diterima PDF/JPG/JPEG/PNG/DOC/DOCX/XLS/XLSX/ZIP, maksimal 20 MB per file. Melebihi batas aplikasi atau konfigurasi server: unggahan gagal.
 Hasil akhir:
   Arsip tersimpan atau diperbarui.
 Sumber kode : ArchiveController; UpsertArchiveRequest
 ----------------------------------------------------------------------------
 
-R02 — Mencari, melihat atau mengunduh arsip
+R02 — Mencari arsip serta melihat atau mengunduh file
 Kelompok    : Operasional admin
 Aktor       : Admin
 Prasyarat   : Arsip dapat diakses oleh admin.
 Langkah:
   1. Buka Arsip.
   2. Cari/filter judul, kategori atau tipe dokumen/media.
-  3. Pilih lihat file atau unduh.
-  4. Sistem mengirim file arsip.
+  3. Buka folder arsip dan pilih salah satu file untuk dilihat atau diunduh.
+  4. Sistem memastikan file tersebut milik arsip lalu mengirimkannya secara aman.
 Alternatif / gagal:
   Arsip atau file tidak ditemukan: tidak dapat ditampilkan/diunduh.
 Hasil akhir:

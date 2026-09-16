@@ -67,6 +67,26 @@ class ActivityEvaluationTest extends TestCase
         $response->assertDontSeeText('Tindak lanjut laporan PKL liar');
     }
 
+    public function test_admin_can_filter_evaluations_by_month(): void
+    {
+        $admin = User::factory()->create();
+        Activity::factory()->create([
+            'name' => 'Evaluasi September',
+            'evaluated_at' => '2026-09-30 10:00:00',
+        ]);
+        Activity::factory()->create([
+            'name' => 'Evaluasi Oktober',
+            'evaluated_at' => '2026-10-01 10:00:00',
+        ]);
+
+        $response = $this->actingAs($admin)->get(route('admin.evaluasi', ['month' => '2026-09']));
+
+        $response->assertOk();
+        $response->assertSee('type="month"', false);
+        $response->assertSeeText('Evaluasi September');
+        $response->assertDontSeeText('Evaluasi Oktober');
+    }
+
     public function test_admin_can_evaluate_an_external_activity_from_a_report(): void
     {
         $this->travelTo('2026-09-09 14:30:00');

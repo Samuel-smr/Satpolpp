@@ -94,8 +94,8 @@ actor "Admin" as ACTOR0
 actor "Super Admin" as ACTOR1
 rectangle "SIPRAJA / Kegiatan bersama" {
   usecase "K01\nMelihat dan memfilter kegiatan" as K01
-  usecase "K02\nMenambah kegiatan internal" as K02
-  usecase "K03\nMengedit kegiatan internal" as K03
+  usecase "K02\nMenambah kegiatan internal, temuan,\ndan maksimal 3 dokumentasi" as K02
+  usecase "K03\nMengedit kegiatan internal, temuan,\ndan menambah dokumentasi" as K03
   usecase "K04\nMenghapus kegiatan internal" as K04
   usecase "K05\nMelihat atau menghapus dokumentasi internal" as K05
   usecase "K06\nMengekspor kegiatan ke PDF atau Excel" as K06
@@ -130,8 +130,8 @@ actor "Admin" as ACTOR0
 rectangle "SIPRAJA / Operasional admin" {
   usecase "E01\nMenambah evaluasi kegiatan" as E01
   usecase "E02\nMelihat, mengedit atau menghapus evaluasi" as E02
-  usecase "R01\nMenambah atau mengedit arsip" as R01
-  usecase "R02\nMencari, melihat atau mengunduh arsip" as R02
+  usecase "R01\nMenambah atau mengedit folder arsip\ndengan maksimal 3 file" as R01
+  usecase "R02\nMencari arsip serta melihat atau\nmengunduh setiap file" as R02
   usecase "R03\nMenghapus arsip" as R03
   usecase "T01\nMenambah atau mengedit aset" as T01
   usecase "T02\nMelihat atau menghapus aset" as T02

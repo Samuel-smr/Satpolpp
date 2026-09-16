@@ -44,6 +44,10 @@ class InternalActivityTest extends TestCase
         $response->assertSee('data-category="Template Aktif"', false);
         $response->assertSee('id="activity-location-search"', false);
         $response->assertSee('id="activity-current-location-button"', false);
+        $this->assertSame(1, substr_count($response->getContent(), 'name="documentation[]"'));
+        $response->assertSee('multiple', false);
+        $response->assertSee('id="documentation-preview"', false);
+        $response->assertSee('Hapus foto terpilih', false);
     }
 
     public function test_admin_can_create_internal_activity_with_officers_and_internal_documentation(): void

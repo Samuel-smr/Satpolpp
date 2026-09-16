@@ -4,8 +4,8 @@ namespace Database\Factories;
 
 use App\ArchiveConfidentiality;
 use App\Models\Archive;
+use App\Models\ArchiveFile;
 use App\Models\User;
-use App\OperationalCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -23,14 +23,18 @@ class ArchiveFactory extends Factory
         return [
             'created_by_user_id' => User::factory(),
             'title' => fake()->sentence(4),
-            'operational_category' => fake()->randomElement(OperationalCategory::cases()),
+            'operational_category' => fake()->words(3, true),
             'description' => fake()->sentence(),
             'confidentiality' => ArchiveConfidentiality::Public,
-            'file_path' => 'archives/files/example.pdf',
-            'original_name' => 'example.pdf',
-            'mime_type' => 'application/pdf',
-            'file_extension' => 'pdf',
-            'file_size' => 1024,
         ];
+    }
+
+    public function configure(): static
+    {
+        return $this->afterCreating(function (Archive $archive): void {
+            if ($archive->files()->doesntExist()) {
+                ArchiveFile::factory()->for($archive)->create();
+            }
+        });
     }
 }

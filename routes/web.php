@@ -69,8 +69,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:access-admin'])
     Route::get('/arsip', [ArchiveController::class, 'index'])->name('arsip');
     Route::post('/arsip', [ArchiveController::class, 'store'])->name('arsip.store');
     Route::put('/arsip/{archive}', [ArchiveController::class, 'update'])->name('arsip.update');
-    Route::get('/arsip/{archive}/file', [ArchiveController::class, 'show'])->name('arsip.show');
-    Route::get('/arsip/{archive}/download', [ArchiveController::class, 'download'])->name('arsip.download');
+    Route::get('/arsip/{archive}/files/{archiveFile}', [ArchiveController::class, 'show'])->name('arsip.show');
+    Route::get('/arsip/{archive}/files/{archiveFile}/download', [ArchiveController::class, 'download'])->name('arsip.download');
     Route::delete('/arsip/{archive}', [ArchiveController::class, 'destroy'])->name('arsip.destroy');
     Route::get('/aset', [AssetController::class, 'index'])->name('aset');
     Route::post('/aset', [AssetController::class, 'store'])->name('aset.store');

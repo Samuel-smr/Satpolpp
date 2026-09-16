@@ -190,7 +190,8 @@
                             @endforeach
                         </div>
                     @endif
-                    <input id="documentation" name="documentation[]" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" multiple @disabled($existingDocumentationCount >= 3) class="block w-full rounded-xl border border-slate-200 p-2 text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:font-semibold file:text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100">
+                    <input id="documentation" name="documentation[]" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" multiple data-maximum-files="{{ 3 - $existingDocumentationCount }}" @disabled($existingDocumentationCount >= 3) class="block w-full rounded-xl border border-slate-200 p-2 text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:font-semibold file:text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100">
+                    <div id="documentation-preview" class="mt-3 hidden grid gap-3 sm:grid-cols-3"></div>
                     <p class="mt-1.5 text-xs text-slate-400">
                         @if ($isEditing)
                             Tersimpan {{ $existingDocumentationCount }} dari 3 foto. Anda dapat menambahkan maksimal {{ 3 - $existingDocumentationCount }} foto lagi.
@@ -292,6 +293,69 @@
         });
 
         renderSelectedOfficers();
+
+        const documentationInput = document.getElementById('documentation');
+        const documentationPreview = document.getElementById('documentation-preview');
+        let documentationPreviewUrls = [];
+
+        const clearDocumentationPreview = () => {
+            documentationPreviewUrls.forEach((url) => URL.revokeObjectURL(url));
+            documentationPreviewUrls = [];
+            documentationPreview.replaceChildren();
+            documentationPreview.classList.add('hidden');
+        };
+
+        documentationInput?.addEventListener('change', () => {
+            clearDocumentationPreview();
+            const files = Array.from(documentationInput.files);
+            const maximumFiles = Number.parseInt(documentationInput.dataset.maximumFiles, 10);
+
+            if (files.length > maximumFiles) {
+                documentationInput.value = '';
+                window.tampilToast?.(`Anda hanya dapat menambahkan ${maximumFiles} foto lagi.`, 'warning');
+
+                return;
+            }
+
+            files.forEach((file, index) => {
+                const previewUrl = URL.createObjectURL(file);
+                documentationPreviewUrls.push(previewUrl);
+
+                const card = document.createElement('div');
+                card.className = 'relative overflow-hidden rounded-xl border border-slate-200 bg-slate-50';
+
+                const image = document.createElement('img');
+                image.src = previewUrl;
+                image.alt = `Preview ${file.name}`;
+                image.className = 'aspect-video w-full object-cover';
+                card.appendChild(image);
+
+                const name = document.createElement('p');
+                name.className = 'truncate px-3 py-2 text-xs font-medium text-slate-600';
+                name.textContent = file.name;
+                card.appendChild(name);
+
+                const removeButton = document.createElement('button');
+                removeButton.type = 'button';
+                removeButton.title = 'Hapus foto terpilih';
+                removeButton.className = 'absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-red-600 shadow transition-colors hover:bg-red-50';
+                removeButton.innerHTML = '<span class="material-symbols-outlined text-[18px]">close</span>';
+                removeButton.addEventListener('click', () => {
+                    const remainingFiles = new DataTransfer();
+                    Array.from(documentationInput.files).forEach((selectedFile, selectedIndex) => {
+                        if (selectedIndex !== index) {
+                            remainingFiles.items.add(selectedFile);
+                        }
+                    });
+                    documentationInput.files = remainingFiles.files;
+                    documentationInput.dispatchEvent(new Event('change'));
+                });
+                card.appendChild(removeButton);
+                documentationPreview.appendChild(card);
+            });
+
+            documentationPreview.classList.toggle('hidden', files.length === 0);
+        });
 
         const templateSelect = document.getElementById('activity_template_id');
         templateSelect?.addEventListener('change', function () {

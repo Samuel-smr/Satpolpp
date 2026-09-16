@@ -46,6 +46,20 @@ class AssetManagementTest extends TestCase
         ]);
     }
 
+    public function test_admin_can_filter_assets_by_acquisition_year(): void
+    {
+        $admin = User::factory()->create();
+        Asset::factory()->create(['name' => 'Aset Tahun 2025', 'acquisition_year' => 2025]);
+        Asset::factory()->create(['name' => 'Aset Tahun 2026', 'acquisition_year' => 2026]);
+
+        $response = $this->actingAs($admin)->get(route('admin.aset', ['year' => 2025]));
+
+        $response->assertOk();
+        $response->assertSee('id="asset-filter-year"', false);
+        $response->assertSeeText('Aset Tahun 2025');
+        $response->assertDontSeeText('Aset Tahun 2026');
+    }
+
     public function test_admin_can_create_vehicle_asset_with_maintenance_fields(): void
     {
         $admin = User::factory()->create();

@@ -17,9 +17,10 @@
         </button>
     </div>
 
-    <form method="GET" action="{{ route('admin.evaluasi') }}" class="mb-6 grid grid-cols-1 items-end gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-5">
+    <form method="GET" action="{{ route('admin.evaluasi') }}" class="mb-6 grid grid-cols-1 items-end gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-2 xl:grid-cols-6">
         <div><label class="mb-1 block text-xs font-semibold text-slate-500" for="evaluation-search">PENCARIAN</label><input id="evaluation-search" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Kegiatan, laporan, hasil" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"></div>
         <div><label class="mb-1 block text-xs font-semibold text-slate-500" for="evaluation-type">SUMBER</label><select id="evaluation-type" name="type" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"><option value="">Semua sumber</option>@foreach ($activityTypes as $type)<option value="{{ $type->value }}" @selected(($filters['type'] ?? '') === $type->value)>{{ $type->label() }}</option>@endforeach</select></div>
+        <div><label class="mb-1 block text-xs font-semibold text-slate-500" for="evaluation-month">BULAN</label><input id="evaluation-month" type="month" name="month" value="{{ $filters['month'] ?? '' }}" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"></div>
         <div><label class="mb-1 block text-xs font-semibold text-slate-500" for="evaluation-start">MULAI</label><input id="evaluation-start" type="date" name="date_start" value="{{ $filters['date_start'] ?? '' }}" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"></div>
         <div><label class="mb-1 block text-xs font-semibold text-slate-500" for="evaluation-end">SAMPAI</label><input id="evaluation-end" type="date" name="date_end" value="{{ $filters['date_end'] ?? '' }}" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"></div>
         <div class="flex gap-2"><button class="flex-1 rounded-xl bg-sidebar-active px-4 py-2 text-sm font-semibold text-white">Terapkan</button><a href="{{ route('admin.evaluasi') }}" class="rounded-xl border border-slate-300 px-4 py-2 text-sm">Reset</a></div>

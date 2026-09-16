@@ -10,6 +10,7 @@ use App\Models\ActivityTemplate;
 use App\Models\AuditLog;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
@@ -23,8 +24,11 @@ class ActivityEvaluationController extends Controller
         $filters = $request->validate([
             'search' => ['nullable', 'string', 'max:100'],
             'type' => ['nullable', Rule::enum(ActivityType::class)],
+            'month' => ['nullable', 'date_format:Y-m'],
             'date_start' => ['nullable', 'date_format:Y-m-d'],
             'date_end' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:date_start'],
+        ], [
+            'month.date_format' => 'Format bulan evaluasi tidak valid.',
         ]);
         $search = addcslashes($filters['search'] ?? '', '%_\\');
 
@@ -36,6 +40,11 @@ class ActivityEvaluationController extends Controller
                     ->orWhereHas('report', fn ($reportQuery) => $reportQuery->where('code', 'like', "%{$search}%"));
             }))
             ->when($filters['type'] ?? null, fn ($query, string $type) => $query->where('type', $type))
+            ->when($filters['month'] ?? null, function ($query, string $month): void {
+                $monthStart = Carbon::createFromFormat('Y-m-d', "{$month}-01")->startOfMonth();
+
+                $query->whereBetween('evaluated_at', [$monthStart, $monthStart->copy()->endOfMonth()]);
+            })
             ->when($filters['date_start'] ?? null, fn ($query, string $date) => $query->whereDate('evaluated_at', '>=', $date))
             ->when($filters['date_end'] ?? null, fn ($query, string $date) => $query->whereDate('evaluated_at', '<=', $date))
             ->with(['report:id,code', 'evaluatedByUser:id,name'])

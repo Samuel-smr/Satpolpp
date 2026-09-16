@@ -93,6 +93,7 @@
                     <table class="w-full text-left text-sm text-slate-600">
                         <thead class="bg-slate-50 border-b border-slate-200 text-slate-700">
                             <tr>
+                                <th class="w-16 px-4 py-4 text-center font-bold">No.</th>
                                 <th class="px-6 py-4 font-bold">Nama Kegiatan</th>
                                 <th class="px-6 py-4 font-bold">Tanggal</th>
                                 <th class="px-6 py-4 font-bold">Jenis</th>
@@ -102,8 +103,9 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
-                            <template x-for="item in filteredKegiatans()" :key="item.id">
+                            <template x-for="(item, index) in filteredKegiatans()" :key="item.id">
                                 <tr class="hover:bg-slate-50/50 transition-colors">
+                                    <td class="px-4 py-4 text-center font-medium text-slate-500" x-text="index + 1"></td>
                                     <td class="px-6 py-4 font-semibold text-slate-800">
                                         <div class="flex items-center gap-2">
                                             <span x-text="item.nama"></span>
@@ -138,7 +140,7 @@
                                 </tr>
                             </template>
                             <tr x-show="filteredKegiatans().length === 0">
-                                <td colspan="5" class="px-6 py-8 text-center text-slate-400">
+                                <td colspan="7" class="px-6 py-8 text-center text-slate-400">
                                     Tidak ada kegiatan yang sesuai dengan filter.
                                 </td>
                             </tr>

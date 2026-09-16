@@ -96,13 +96,11 @@
                 <table class="w-full text-left text-sm text-slate-600">
                     <thead class="border-b border-slate-200 bg-slate-50 text-slate-700">
                         <tr>
+                            <th class="w-16 px-4 py-4 text-center font-bold">No.</th>
                             <th class="px-6 py-4 font-bold">Nama Kegiatan</th>
                             <th class="px-6 py-4 font-bold">Tanggal</th>
                             <th class="px-6 py-4 font-bold">Jenis</th>
                             <th class="px-6 py-4 font-bold">Kategori</th>
-                            <th class="px-6 py-4 font-bold">Jenis Temuan</th>
-                            <th class="px-6 py-4 text-center font-bold">Jumlah Temuan</th>
-                            <th class="px-6 py-4 font-bold">Satuan Temuan</th>
                             <th class="px-6 py-4 font-bold">Lokasi</th>
                             <th class="px-6 py-4 text-center font-bold">Petugas</th>
                             <th class="px-6 py-4 text-center font-bold">Aksi</th>
@@ -111,6 +109,9 @@
                     <tbody class="divide-y divide-slate-100">
                         @forelse ($activities as $activity)
                             <tr class="transition-colors hover:bg-slate-50/50">
+                                <td class="px-4 py-4 text-center font-medium text-slate-500">
+                                    {{ $activities->firstItem() + $loop->index }}
+                                </td>
                                 <td class="px-6 py-4">
                                     <div class="flex min-w-[220px] flex-col gap-1.5">
                                         <span class="font-semibold text-slate-800">{{ $activity->name }}</span>
@@ -143,9 +144,6 @@
                                 <td class="px-6 py-4">
                                     <span class="line-clamp-2 min-w-[160px]">{{ $activity->category ?? '-' }}</span>
                                 </td>
-                                <td class="px-6 py-4 align-top"><div class="space-y-1">@forelse ($activity->findings as $finding)<div class="whitespace-nowrap">{{ $finding->type->label() }}</div>@empty - @endforelse</div></td>
-                                <td class="px-6 py-4 text-center align-top"><div class="space-y-1">@forelse ($activity->findings as $finding)<div>{{ $finding->quantity }}</div>@empty - @endforelse</div></td>
-                                <td class="px-6 py-4 align-top"><div class="space-y-1">@forelse ($activity->findings as $finding)<div class="whitespace-nowrap">{{ $finding->unit->label() }}</div>@empty - @endforelse</div></td>
                                 <td class="max-w-[240px] px-6 py-4">
                                     <span class="line-clamp-2" title="{{ $activity->location_address }}">{{ $activity->location_address }}</span>
                                 </td>
@@ -184,7 +182,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="10" class="px-6 py-14 text-center">
+                                <td colspan="8" class="px-6 py-14 text-center">
                                     <div class="mx-auto flex max-w-sm flex-col items-center">
                                         <div class="flex h-16 w-16 items-center justify-center rounded-full bg-slate-50 text-slate-400">
                                             <span class="material-symbols-outlined text-3xl">calendar_month</span>

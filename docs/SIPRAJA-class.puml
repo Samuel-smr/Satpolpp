@@ -111,6 +111,19 @@ class Activity <<model>> {
   + evaluatedByUser(): BelongsTo<User>
   + officers(): BelongsToMany<Officer>
   + attachments(): MorphMany<Attachment>
+  + findings(): HasMany<ActivityFinding>
+  # casts(): array
+}
+class ActivityFinding <<model>> {
+  id: bigint {PK}
+  activity_id: bigint {FK}
+  type: FindingType
+  quantity: int
+  unit: FindingUnit
+  created_at: DateTime?
+  updated_at: DateTime?
+  --
+  + activity(): BelongsTo<Activity>
   # casts(): array
 }
 class ActivityTemplate <<model>> {
@@ -202,9 +215,20 @@ class Archive <<model>> {
   id: bigint {PK}
   created_by_user_id: bigint {FK}
   title: string
-  operational_category: OperationalCategory
+  operational_category: string
   description: text?
   confidentiality: ArchiveConfidentiality
+  created_at: DateTime?
+  updated_at: DateTime?
+  deleted_at: DateTime?
+  --
+  + createdByUser(): BelongsTo<User>
+  + files(): HasMany<ArchiveFile>
+  # casts(): array
+}
+class ArchiveFile <<model>> {
+  id: bigint {PK}
+  archive_id: bigint {FK}
   file_path: string
   original_name: string
   mime_type: string
@@ -212,9 +236,8 @@ class Archive <<model>> {
   file_size: bigint
   created_at: DateTime?
   updated_at: DateTime?
-  deleted_at: DateTime?
   --
-  + createdByUser(): BelongsTo<User>
+  + archive(): BelongsTo<Archive>
   # casts(): array
 }
 class Asset <<model>> {
@@ -288,12 +311,14 @@ EloquentModel <|-- GuestAccess
 EloquentModel <|-- Report
 EloquentModel <|-- ReportStatusHistory
 EloquentModel <|-- Activity
+EloquentModel <|-- ActivityFinding
 EloquentModel <|-- ActivityTemplate
 EloquentModel <|-- Officer
 EloquentModel <|-- OrganizationalUnit
 EloquentModel <|-- OperationalZone
 EloquentModel <|-- Attachment
 EloquentModel <|-- Archive
+EloquentModel <|-- ArchiveFile
 EloquentModel <|-- Asset
 EloquentModel <|-- AuditLog
 EloquentModel <|-- DatabaseNotification
@@ -303,6 +328,7 @@ Report "1" -- "0..*" ReportStatusHistory : riwayat
 User "0..1" -- "0..*" ReportStatusHistory : pengubah status
 Report "0..1" -- "0..1" Activity : penanganan eksternal
 ActivityTemplate "0..1" -- "0..*" Activity : template
+Activity "1" -- "0..*" ActivityFinding : temuan
 User "1" -- "0..*" Activity : pembuat
 User "0..1" -- "0..*" Activity : evaluator
 Activity "1" -- "0..*" ActivityOfficer : penugasan
@@ -317,6 +343,7 @@ Report "0..1" .. "0..*" Attachment : pemilik {xor Activity}
 Activity "0..1" .. "0..*" Attachment : pemilik {xor Report}
 User "0..1" -- "0..*" Attachment : pengunggah
 User "1" -- "0..*" Archive : pembuat arsip
+Archive "1" -- "1..3" ArchiveFile : file
 User "1" -- "0..*" Asset : pencatat aset
 User "0..1" -- "0..*" AuditLog : pelaku
 User "1" .. "0..*" DatabaseNotification : notifiable {lingkup SIPRAJA}
@@ -342,6 +369,18 @@ enum ActivityType {
 enum ArchiveConfidentiality {
   Public = public
   Confidential = confidential
+  + label(): string
+}
+enum FindingType {
+  Person = person
+  Item = item
+  + label(): string
+}
+enum FindingUnit {
+  Piece = piece
+  Stick = stick
+  Bottle = bottle
+  Person = person
   + label(): string
 }
 enum AssetCategory {

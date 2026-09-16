@@ -317,15 +317,17 @@ opt pilih template
 A -> B : Pilih template kegiatan
 B -> B : Isi nama, kategori dan deskripsi otomatis
 end
-A -> B : Lengkapi tanggal, lokasi, kategori, petugas dan foto
+A -> B : Lengkapi data; tambah temuan opsional dan pilih maks. 3 file
 B -> C : POST kegiatan sesuai role
 C -> C : Validasi StoreInternalActivityRequest
 alt validasi gagal
 C --> B : Kesalahan form
 else valid
-opt ada foto
+opt ada dokumentasi
+loop setiap file (maksimal 3)
 C -> F : Simpan dokumentasi internal
-F --> C : Path foto
+F --> C : Path dan metadata file
+end
 end
 C -> D : BEGIN; kunci dan periksa petugas/template aktif
 alt referensi sudah tidak aktif
@@ -334,7 +336,7 @@ C -> F : Bersihkan foto baru
 C --> B : Minta pilih ulang referensi
 else referensi valid
 C -> D : INSERT kegiatan Internal; report_id NULL
-C -> D : INSERT petugas, lampiran internal, audit; COMMIT
+C -> D : INSERT petugas, temuan, lampiran internal, audit; COMMIT
 C --> B : Redirect detail kegiatan
 end
 end
@@ -359,18 +361,18 @@ C -> D : Ambil kegiatan dan pilihan form
 D --> C : Data tersimpan
 C --> B : Form terisi + current_updated_at
 A -> B : Ubah data dan simpan
-B -> C : PUT kegiatan/{id} + dokumentasi baru
+B -> C : PUT kegiatan/{id} + temuan + dokumentasi baru
 C -> C : Validasi; pastikan Internal
 opt foto baru
 C -> F : Simpan foto baru
 end
-C -> D : BEGIN; kunci kegiatan; periksa versi, jumlah foto, referensi
+C -> D : BEGIN; kunci kegiatan; periksa versi, total maks. 3 file, referensi
 alt konflik / referensi tidak valid / foto berlebih
 C -> D : ROLLBACK
 C -> F : Bersihkan foto baru
 C --> B : Muat ulang atau perbaiki
 else valid
-C -> D : UPDATE kegiatan; sync petugas; tambah lampiran dan audit; COMMIT
+C -> D : UPDATE kegiatan; sync petugas dan temuan; tambah lampiran dan audit; COMMIT
 C --> B : Redirect detail yang diperbarui
 end
 else Hapus kegiatan; konfirmasi
@@ -524,17 +526,19 @@ participant "Halaman / Browser" as B
 participant "ArchiveController" as C
 database "Database / Eloquent" as D
 participant "Storage lokal" as F
-A -> B : Isi judul, kategori, sifat, deskripsi; pilih file
+A -> B : Isi judul, kategori template, sifat, deskripsi; pilih 1-3 file
 B -> C : POST arsip / PUT arsip/{id}
 C -> C : UpsertArchiveRequest: validasi metadata dan file
 alt tidak valid
 C --> B : Kesalahan form
 else valid
-opt Tambah atau Edit dengan file pengganti
-C -> F : Simpan file baru ke archives/files
+opt ada file baru dan total folder maksimal 3
+loop setiap file baru
+C -> F : Simpan file ke archives/files
 F --> C : Path dan metadata file
 end
-C -> D : BEGIN; INSERT/UPDATE arsip dan audit
+end
+C -> D : BEGIN; INSERT/UPDATE archives; INSERT archive_files; audit
 alt transaksi gagal
 C -> D : ROLLBACK
 opt file baru tersimpan
@@ -543,9 +547,6 @@ end
 C --> B : Permintaan gagal
 else transaksi berhasil
 C -> D : COMMIT
-opt Edit dengan file pengganti
-C -> F : Hapus file lama
-end
 C --> B : Redirect daftar; pesan berhasil
 end
 end
@@ -565,11 +566,12 @@ database "Database / Eloquent" as D
 participant "Storage lokal" as F
 A -> B : Cari/filter arsip
 B -> C : GET /admin/arsip dengan filter
-C -> D : Query arsip aktif dan statistik
-D --> C : Data arsip
+C -> D : Query archives beserta archive_files dan statistik
+D --> C : Folder arsip dan daftar file
 C --> B : Render daftar
 alt Lihat / Unduh
-B -> C : GET arsip/{id}/file atau /download
+B -> C : GET arsip/{archive}/files/{archiveFile} atau /download
+C -> C : Pastikan file milik arsip
 C -> F : Periksa file ada
 alt file tidak ada
 C --> B : 404

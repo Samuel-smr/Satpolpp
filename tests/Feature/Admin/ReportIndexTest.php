@@ -54,6 +54,20 @@ class ReportIndexTest extends TestCase
         $response->assertDontSeeText('SPJ-INFORMATION');
     }
 
+    public function test_admin_can_filter_reports_by_month(): void
+    {
+        $admin = User::factory()->create();
+        Report::factory()->create(['code' => 'SPJ-SEPTEMBER', 'created_at' => '2026-09-15 10:00:00']);
+        Report::factory()->create(['code' => 'SPJ-OCTOBER', 'created_at' => '2026-10-01 10:00:00']);
+
+        $response = $this->actingAs($admin)->get(route('admin.pengaduan', ['month' => '2026-09']));
+
+        $response->assertOk();
+        $response->assertSee('type="month"', false);
+        $response->assertSeeText('SPJ-SEPTEMBER');
+        $response->assertDontSeeText('SPJ-OCTOBER');
+    }
+
     public function test_invalid_type_filter_is_not_used_as_a_dynamic_query_value(): void
     {
         $admin = User::factory()->create();

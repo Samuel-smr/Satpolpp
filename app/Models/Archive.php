@@ -3,12 +3,12 @@
 namespace App\Models;
 
 use App\ArchiveConfidentiality;
-use App\OperationalCategory;
 use Database\Factories\ArchiveFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable([
@@ -17,11 +17,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'operational_category',
     'description',
     'confidentiality',
-    'file_path',
-    'original_name',
-    'mime_type',
-    'file_extension',
-    'file_size',
 ])]
 class Archive extends Model
 {
@@ -34,13 +29,16 @@ class Archive extends Model
         return $this->belongsTo(User::class, 'created_by_user_id');
     }
 
+    public function files(): HasMany
+    {
+        return $this->hasMany(ArchiveFile::class);
+    }
+
     /** @return array<string, string> */
     protected function casts(): array
     {
         return [
-            'operational_category' => OperationalCategory::class,
             'confidentiality' => ArchiveConfidentiality::class,
-            'file_size' => 'integer',
         ];
     }
 }

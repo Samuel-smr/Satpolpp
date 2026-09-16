@@ -241,11 +241,21 @@ class DevelopmentSeeder extends Seeder
     {
         DB::table('archives')->updateOrInsert(
             ['title' => 'SOP Penertiban PKL'],
-            ['created_by_user_id' => $adminId, 'operational_category' => 'kepatuhan_perda_dan_perkada', 'description' => 'Contoh dokumen prosedur penertiban pedagang kaki lima.', 'confidentiality' => 'public', 'file_path' => 'dummy/archives/sop-penertiban.txt', 'original_name' => 'sop-penertiban.txt', 'mime_type' => 'text/plain', 'file_extension' => 'txt', 'file_size' => Storage::disk('local')->size('dummy/archives/sop-penertiban.txt'), 'created_at' => $now, 'updated_at' => $now, 'deleted_at' => null],
+            ['created_by_user_id' => $adminId, 'operational_category' => 'Patroli Ketertiban Umum, Ketentraman dan Perlindungan Masyarakat', 'description' => 'Contoh dokumen prosedur penertiban pedagang kaki lima.', 'confidentiality' => 'public', 'created_at' => $now, 'updated_at' => $now, 'deleted_at' => null],
         );
         DB::table('archives')->updateOrInsert(
             ['title' => 'Laporan Patroli Bulanan'],
-            ['created_by_user_id' => $superAdminId, 'operational_category' => 'patroli_ketertiban_umum', 'description' => 'Contoh rekap kegiatan patroli bulanan.', 'confidentiality' => 'confidential', 'file_path' => 'dummy/archives/laporan-patroli.txt', 'original_name' => 'laporan-patroli.txt', 'mime_type' => 'text/plain', 'file_extension' => 'txt', 'file_size' => Storage::disk('local')->size('dummy/archives/laporan-patroli.txt'), 'created_at' => $now, 'updated_at' => $now, 'deleted_at' => null],
+            ['created_by_user_id' => $superAdminId, 'operational_category' => 'Patroli Ketertiban Umum, Ketentraman dan Perlindungan Masyarakat', 'description' => 'Contoh rekap kegiatan patroli bulanan.', 'confidentiality' => 'confidential', 'created_at' => $now, 'updated_at' => $now, 'deleted_at' => null],
+        );
+        $sopArchiveId = (int) DB::table('archives')->where('title', 'SOP Penertiban PKL')->value('id');
+        $patrolArchiveId = (int) DB::table('archives')->where('title', 'Laporan Patroli Bulanan')->value('id');
+        DB::table('archive_files')->updateOrInsert(
+            ['archive_id' => $sopArchiveId, 'original_name' => 'sop-penertiban.txt'],
+            ['file_path' => 'dummy/archives/sop-penertiban.txt', 'mime_type' => 'text/plain', 'file_extension' => 'txt', 'file_size' => Storage::disk('local')->size('dummy/archives/sop-penertiban.txt'), 'created_at' => $now, 'updated_at' => $now],
+        );
+        DB::table('archive_files')->updateOrInsert(
+            ['archive_id' => $patrolArchiveId, 'original_name' => 'laporan-patroli.txt'],
+            ['file_path' => 'dummy/archives/laporan-patroli.txt', 'mime_type' => 'text/plain', 'file_extension' => 'txt', 'file_size' => Storage::disk('local')->size('dummy/archives/laporan-patroli.txt'), 'created_at' => $now, 'updated_at' => $now],
         );
         DB::table('assets')->updateOrInsert(
             ['asset_code' => 'AST-001'],

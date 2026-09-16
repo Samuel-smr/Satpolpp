@@ -16,10 +16,11 @@
         </button>
     </div>
 
-    <form method="GET" action="{{ route('admin.aset') }}" class="mb-6 grid grid-cols-1 items-end gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-4">
+    <form method="GET" action="{{ route('admin.aset') }}" class="mb-6 grid grid-cols-1 items-end gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-2 xl:grid-cols-5">
         <div><label class="mb-1 block text-xs font-semibold text-slate-500" for="asset-search">PENCARIAN</label><input id="asset-search" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Nama, kode, atau lokasi" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"></div>
         <div><label class="mb-1 block text-xs font-semibold text-slate-500" for="asset-filter-category">KATEGORI</label><select id="asset-filter-category" name="category" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"><option value="">Semua kategori</option>@foreach ($assetCategories as $category)<option value="{{ $category->value }}" @selected(($filters['category'] ?? '') === $category->value)>{{ $category->label() }}</option>@endforeach</select></div>
         <div><label class="mb-1 block text-xs font-semibold text-slate-500" for="asset-filter-condition">KONDISI</label><select id="asset-filter-condition" name="condition" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"><option value="">Semua kondisi</option>@foreach ($assetConditions as $condition)<option value="{{ $condition->value }}" @selected(($filters['condition'] ?? '') === $condition->value)>{{ $condition->label() }}</option>@endforeach</select></div>
+        <div><label class="mb-1 block text-xs font-semibold text-slate-500" for="asset-filter-year">TAHUN PEROLEHAN</label><input id="asset-filter-year" type="number" name="year" value="{{ $filters['year'] ?? '' }}" min="1900" max="{{ now()->year }}" placeholder="Semua tahun" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"></div>
         <div class="flex gap-2"><button class="flex-1 rounded-xl bg-sidebar-active px-4 py-2 text-sm font-semibold text-white">Terapkan</button><a href="{{ route('admin.aset') }}" class="rounded-xl border border-slate-300 px-4 py-2 text-sm">Reset</a></div>
     </form>
 

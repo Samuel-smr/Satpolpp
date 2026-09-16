@@ -21,6 +21,11 @@ class AssetController extends Controller
             'search' => ['nullable', 'string', 'max:100'],
             'category' => ['nullable', Rule::enum(AssetCategory::class)],
             'condition' => ['nullable', Rule::enum(AssetCondition::class)],
+            'year' => ['nullable', 'integer', 'min:1900', 'max:'.now()->year],
+        ], [
+            'year.integer' => 'Tahun perolehan harus berupa angka.',
+            'year.min' => 'Tahun perolehan minimal 1900.',
+            'year.max' => 'Tahun perolehan tidak boleh melebihi tahun berjalan.',
         ]);
         $search = addcslashes($filters['search'] ?? '', '%_\\');
 
@@ -32,6 +37,7 @@ class AssetController extends Controller
             }))
             ->when($filters['category'] ?? null, fn ($query, string $category) => $query->where('category', $category))
             ->when($filters['condition'] ?? null, fn ($query, string $condition) => $query->where('condition', $condition))
+            ->when($filters['year'] ?? null, fn ($query, int|string $year) => $query->where('acquisition_year', (int) $year))
             ->latest()
             ->paginate(15)
             ->withQueryString();

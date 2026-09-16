@@ -4,17 +4,18 @@ namespace App\Http\Controllers;
 
 use App\ArchiveConfidentiality;
 use App\Http\Requests\UpsertArchiveRequest;
+use App\Models\ActivityTemplate;
 use App\Models\Archive;
+use App\Models\ArchiveFile;
 use App\Models\AuditLog;
-use App\OperationalCategory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
@@ -28,50 +29,47 @@ class ArchiveController extends Controller
     {
         $filters = $request->validate([
             'search' => ['nullable', 'string', 'max:100'],
-            'category' => ['nullable', Rule::enum(OperationalCategory::class)],
-            'type' => ['nullable', Rule::in(['document', 'media'])],
-        ], [
-            'category.enum' => 'Kategori arsip tidak valid.',
-            'type.in' => 'Jenis arsip tidak valid.',
+            'category' => ['nullable', 'string', 'max:255'],
         ]);
 
         $archives = Archive::query()
-            ->with('createdByUser:id,name')
+            ->with(['createdByUser:id,name', 'files' => fn ($query) => $query->oldest('id')])
             ->when($filters['search'] ?? null, function ($query, string $search): void {
                 $query->where(function ($searchQuery) use ($search): void {
                     $searchQuery->where('title', 'like', "%{$search}%")
-                        ->orWhere('original_name', 'like', "%{$search}%")
+                        ->orWhereHas('files', fn ($fileQuery) => $fileQuery->where('original_name', 'like', "%{$search}%"))
                         ->orWhere('description', 'like', "%{$search}%");
                 });
             })
             ->when($filters['category'] ?? null, fn ($query, string $category) => $query->where('operational_category', $category))
-            ->when(($filters['type'] ?? null) === 'media', fn ($query) => $query->whereIn('file_extension', self::MEDIA_EXTENSIONS))
-            ->when(($filters['type'] ?? null) === 'document', fn ($query) => $query->whereNotIn('file_extension', self::MEDIA_EXTENSIONS))
             ->latest()
             ->paginate(12)
             ->withQueryString();
 
         $summary = Archive::query()
-            ->toBase()
             ->selectRaw('COUNT(*) as total')
-            ->selectRaw("SUM(CASE WHEN file_extension IN ('jpg', 'jpeg', 'png') THEN 1 ELSE 0 END) as media")
             ->selectRaw('SUM(CASE WHEN confidentiality = ? THEN 1 ELSE 0 END) as confidential', [ArchiveConfidentiality::Confidential->value])
             ->first();
+        $mediaCount = Archive::query()->whereHas('files', fn ($query) => $query->whereIn('file_extension', self::MEDIA_EXTENSIONS))->count();
 
         $editingArchiveId = (int) $request->old('archive_context_id', 0);
         $editingArchive = $editingArchiveId > 0
-            ? Archive::query()->find($editingArchiveId)
+            ? Archive::query()->with('files')->find($editingArchiveId)
             : null;
 
         return view('admin.arsip', [
             'archives' => $archives,
             'filters' => $filters,
-            'operationalCategories' => OperationalCategory::cases(),
+            'activityTemplates' => ActivityTemplate::query()
+                ->where('is_active', true)
+                ->orderBy('sort_order')
+                ->orderBy('name')
+                ->get(['id', 'name']),
             'confidentialities' => ArchiveConfidentiality::cases(),
             'archiveSummary' => [
                 'total' => (int) $summary->total,
-                'documents' => (int) $summary->total - (int) $summary->media,
-                'media' => (int) $summary->media,
+                'documents' => (int) $summary->total - $mediaCount,
+                'media' => $mediaCount,
                 'confidential' => (int) $summary->confidential,
             ],
             'editingArchive' => $editingArchive,
@@ -80,21 +78,35 @@ class ArchiveController extends Controller
 
     public function store(UpsertArchiveRequest $request): RedirectResponse
     {
-        $file = $request->file('file');
-        $path = $file->store('archives/files', 'local');
+        /** @var list<UploadedFile> $files */
+        $files = $request->file('files', []);
+        $storedFiles = [];
 
         try {
-            DB::transaction(function () use ($request, $file, $path): void {
+            foreach ($files as $file) {
+                $path = $file->store('archives/files', 'local');
+
+                if ($path === false) {
+                    throw new RuntimeException('File arsip gagal disimpan.');
+                }
+
+                $storedFiles[] = ['file' => $file, 'path' => $path];
+            }
+
+            DB::transaction(function () use ($request, $storedFiles): void {
                 $archive = Archive::create([
                     ...$request->safe()->only(['title', 'operational_category', 'description', 'confidentiality']),
                     'created_by_user_id' => $request->user()->id,
-                    ...$this->fileAttributes($file, $path),
                 ]);
+
+                foreach ($storedFiles as $storedFile) {
+                    $archive->files()->create($this->fileAttributes($storedFile['file'], $storedFile['path']));
+                }
 
                 $this->writeAuditLog($request, $archive, 'created', "Arsip {$archive->title} diunggah.");
             });
         } catch (Throwable $exception) {
-            Storage::disk('local')->delete($path);
+            Storage::disk('local')->delete(array_column($storedFiles, 'path'));
 
             throw $exception;
         }
@@ -104,62 +116,61 @@ class ArchiveController extends Controller
 
     public function update(UpsertArchiveRequest $request, Archive $archive): RedirectResponse
     {
-        $file = $request->file('file');
-        $newPath = $file?->store('archives/files', 'local');
-        $oldPath = $archive->file_path;
+        /** @var list<UploadedFile> $files */
+        $files = $request->file('files', []);
+        $storedFiles = [];
 
         try {
-            DB::transaction(function () use ($request, $archive, $file, $newPath): void {
-                $attributes = $request->safe()->only(['title', 'operational_category', 'description', 'confidentiality']);
-
-                if ($file !== null && $newPath !== null) {
-                    $attributes = [...$attributes, ...$this->fileAttributes($file, $newPath)];
+            foreach ($files as $file) {
+                $path = $file->store('archives/files', 'local');
+                if ($path === false) {
+                    throw new RuntimeException('File arsip gagal disimpan.');
                 }
+                $storedFiles[] = ['file' => $file, 'path' => $path];
+            }
 
-                $archive->update($attributes);
+            DB::transaction(function () use ($request, $archive, $storedFiles): void {
+                $archive->update($request->safe()->only(['title', 'operational_category', 'description', 'confidentiality']));
+                foreach ($storedFiles as $storedFile) {
+                    $archive->files()->create($this->fileAttributes($storedFile['file'], $storedFile['path']));
+                }
                 $this->writeAuditLog($request, $archive, 'updated', "Arsip {$archive->title} diperbarui.");
             });
         } catch (Throwable $exception) {
-            if ($newPath !== null) {
-                Storage::disk('local')->delete($newPath);
-            }
+            Storage::disk('local')->delete(array_column($storedFiles, 'path'));
 
             throw $exception;
-        }
-
-        if ($newPath !== null) {
-            Storage::disk('local')->delete($oldPath);
         }
 
         return redirect()->route('admin.arsip')->with('status', 'Arsip berhasil diperbarui.');
     }
 
-    public function show(Archive $archive): StreamedResponse
+    public function show(Archive $archive, ArchiveFile $archiveFile): StreamedResponse
     {
         Gate::authorize('access-admin');
-        $this->ensureFileExists($archive);
+        $this->ensureArchiveFile($archive, $archiveFile);
 
-        $disposition = in_array($archive->mime_type, ['application/pdf', 'image/jpeg', 'image/png'], true)
+        $disposition = in_array($archiveFile->mime_type, ['application/pdf', 'image/jpeg', 'image/png'], true)
             ? 'inline'
             : 'attachment';
 
         return Storage::disk('local')->response(
-            $archive->file_path,
-            $archive->original_name,
-            $this->secureHeaders($archive),
+            $archiveFile->file_path,
+            $archiveFile->original_name,
+            $this->secureHeaders($archiveFile),
             $disposition,
         );
     }
 
-    public function download(Archive $archive): StreamedResponse
+    public function download(Archive $archive, ArchiveFile $archiveFile): StreamedResponse
     {
         Gate::authorize('access-admin');
-        $this->ensureFileExists($archive);
+        $this->ensureArchiveFile($archive, $archiveFile);
 
         return Storage::disk('local')->download(
-            $archive->file_path,
-            $archive->original_name,
-            $this->secureHeaders($archive),
+            $archiveFile->file_path,
+            $archiveFile->original_name,
+            $this->secureHeaders($archiveFile),
         );
     }
 
@@ -185,19 +196,19 @@ class ArchiveController extends Controller
     }
 
     /** @return array<string, string> */
-    private function secureHeaders(Archive $archive): array
+    private function secureHeaders(ArchiveFile $archiveFile): array
     {
         return [
-            'Content-Type' => $archive->mime_type,
+            'Content-Type' => $archiveFile->mime_type,
             'X-Content-Type-Options' => 'nosniff',
             'Content-Security-Policy' => "default-src 'none'; sandbox",
             'Cache-Control' => 'private, no-store',
         ];
     }
 
-    private function ensureFileExists(Archive $archive): void
+    private function ensureArchiveFile(Archive $archive, ArchiveFile $archiveFile): void
     {
-        if (! Storage::disk('local')->exists($archive->file_path)) {
+        if ($archiveFile->archive_id !== $archive->id || ! Storage::disk('local')->exists($archiveFile->file_path)) {
             throw new NotFoundHttpException;
         }
     }
@@ -212,7 +223,7 @@ class ArchiveController extends Controller
             'action' => $action,
             'description' => $description,
             'old_values' => null,
-            'new_values' => ['file_path' => $archive->file_path],
+            'new_values' => ['file_count' => $archive->files()->count()],
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
         ]);
