@@ -6,7 +6,7 @@
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
             <h1 class="font-headline text-3xl font-bold text-slate-900 tracking-tight">Status &amp; Monitoring Sistem</h1>
-            <p class="text-sm text-slate-500 mt-1">Status server, performa, dan log aktivitas SIPRAJA.</p>
+            <p class="text-sm text-slate-500 mt-1">Status server dan performa SIPRAJA.</p>
         </div>
 
         <button type="button" onclick="simulasiRefresh()"
@@ -106,9 +106,9 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 gap-6">
         {{-- Metrik Real-Time --}}
-        <div class="lg:col-span-1 bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm">
+        <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm">
             <h3 class="font-headline font-bold text-slate-800 mb-4">Ringkasan Audit Hari Ini</h3>
             <div class="space-y-4">
                 <div>
@@ -144,18 +144,6 @@
                 </div>
             </div>
         </div>
-
-        {{-- Log Aktivitas --}}
-        <div class="lg:col-span-2 bg-white border border-slate-200/80 rounded-2xl shadow-sm overflow-hidden">
-            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-                <div>
-                    <h3 class="font-headline font-bold text-slate-800">Log Aktivitas Sistem</h3>
-                    <p class="text-xs text-slate-400">Audit trail terbaru</p>
-                </div>
-                <span class="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-full font-medium">Database</span>
-            </div>
-            <div class="divide-y divide-slate-50 max-h-[340px] overflow-y-auto" id="log-list"></div>
-        </div>
     </div>
 
 
@@ -164,48 +152,7 @@
 
 @push('scripts')
 <script>
-    const databaseLogs = @json($logs);
     const monitoringChart = @json($chart);
-
-    function getLogs() {
-        return databaseLogs;
-    }
-
-    function jenisClass(j) {
-        if (j === 'auth') return 'bg-purple-100 text-purple-700';
-        if (j === 'reports') return 'bg-blue-100 text-blue-700';
-        if (j === 'assets') return 'bg-amber-100 text-amber-700';
-        if (j === 'organization') return 'bg-slate-200 text-slate-700';
-        return 'bg-emerald-100 text-emerald-700';
-    }
-
-    function iconJenis(j) {
-        if (j === 'auth') return 'lock';
-        if (j === 'reports') return 'description';
-        if (j === 'assets') return 'inventory_2';
-        if (j === 'organization') return 'account_balance';
-        return 'badge';
-    }
-
-    function renderLogs() {
-        const logs = getLogs();
-        if (logs.length === 0) {
-            document.getElementById('log-list').innerHTML = '<div class="px-6 py-12 text-center text-sm text-slate-400">Belum ada aktivitas sistem yang tercatat.</div>';
-            return;
-        }
-        document.getElementById('log-list').innerHTML = logs.map(l => `
-            <div class="flex items-center gap-3 px-6 py-3">
-                <div class="w-8 h-8 rounded-full ${jenisClass(l.jenis)} flex items-center justify-center flex-shrink-0">
-                    <span class="material-symbols-outlined text-[16px]">${iconJenis(l.jenis)}</span>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <p class="text-sm text-slate-700 truncate">${l.aksi}</p>
-                    <p class="text-xs text-slate-400">oleh ${l.user}</p>
-                </div>
-                <span class="text-xs text-slate-400 font-mono flex-shrink-0">${l.waktu}</span>
-            </div>
-        `).join('');
-    }
 
     function simulasiRefresh() {
         document.getElementById('last-update').textContent = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -251,7 +198,6 @@
     }
 
     document.getElementById('last-update').textContent = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    renderLogs();
     initCharts();
 </script>
 @endpush

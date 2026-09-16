@@ -269,15 +269,41 @@
                     return null;
                 }
             };
-            const pdfImageSize = (image, cellWidth) => {
-                const maximumWidth = Math.min(52, cellWidth - 6);
-                const maximumHeight = 30;
-                const scale = Math.min(maximumWidth / image.width, maximumHeight / image.height);
-
-                return {
-                    width: image.width * scale,
-                    height: image.height * scale,
-                };
+            const logoData = async (source) => {
+                try {
+                    const response = await fetch(source, { credentials: 'same-origin' });
+                    if (!response.ok) return null;
+                    const url = URL.createObjectURL(await response.blob());
+                    return await new Promise(resolve => {
+                        const image = new Image();
+                        image.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = image.naturalWidth;
+                            canvas.height = image.naturalHeight;
+                            canvas.getContext('2d').drawImage(image, 0, 0);
+                            URL.revokeObjectURL(url);
+                            resolve({
+                                data: canvas.toDataURL('image/png'),
+                                width: image.naturalWidth,
+                                height: image.naturalHeight,
+                            });
+                        };
+                        image.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+                        image.src = url;
+                    });
+                } catch (_) {
+                    return null;
+                }
+            };
+            const photoThumb = 18;
+            const photoGap = 3;
+            const photoPad = 3;
+            const photoPerRow = (cellWidth) => Math.max(1, Math.floor((cellWidth - 6 + photoGap) / (photoThumb + photoGap)));
+            const photoRows = (count, cellWidth) => Math.ceil(Math.max(count, 0) / photoPerRow(cellWidth));
+            const photoCellHeight = (count, cellWidth) => {
+                if (!count) return 0;
+                const rows = photoRows(count, cellWidth);
+                return (photoPad * 2) + (rows * photoThumb) + ((rows - 1) * photoGap);
             };
 
             excelButton.addEventListener('click', async () => {
@@ -286,7 +312,7 @@
                 try {
                     if (typeof XLSX === 'undefined') await loadScript('https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js');
                     const rows = activities.map((activity, index) => ({
-                        'Nomor': index + 1, 'ID Kegiatan': activity.id, 'ID Laporan': activity.id_laporan || '-',
+                        'No': index + 1, 'ID Kegiatan': activity.id, 'ID Laporan': activity.id_laporan || '-',
                         'Kode Laporan': activity.kode_laporan || '-', 'ID Template': activity.id_template || '-',
                         'Nama Template': activity.nama_template || '-', 'Dibuat Oleh': activity.dibuat_oleh || '-',
                         'Dievaluasi Oleh': activity.dievaluasi_oleh || '-', 'Nama Kegiatan': activity.nama,
@@ -323,13 +349,28 @@
                     if (!window.jspdf.jsPDF.prototype.autoTable) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js');
                     const { jsPDF } = window.jspdf;
                     const documentPdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+                    const logos = (await Promise.all([
+                        logoData('{{ asset("images/logo-kulonprogo.png") }}'),
+                        logoData('{{ asset("images/logo-satpolpp.png") }}'),
+                        logoData('{{ asset("images/logo-linmas.png") }}'),
+                    ])).filter(Boolean);
+                    const logoHeight = 22;
+                    const logoGap = 5;
+                    const logoY = 12;
+                    let logoX = 14;
+                    const logoWidths = logos.map(logo => logoHeight * (logo.width / logo.height));
+                    logos.forEach((logo, index) => {
+                        documentPdf.addImage(logo.data, 'PNG', logoX, logoY, logoWidths[index], logoHeight);
+                        logoX += logoWidths[index] + logoGap;
+                    });
+                    const titleX = logoX - logoGap + 8;
                     const [start, end] = period();
                     documentPdf.setFont('helvetica', 'bold');
                     documentPdf.setFontSize(14);
                     ['LAPORAN KEGIATAN', 'SATUAN POLISI PAMONG PRAJA', 'KABUPATEN KULON PROGO'].forEach((line, index) =>
-                        documentPdf.text(line, 148.5, 13 + (index * 6), { align: 'center' }));
+                        documentPdf.text(line, titleX, 17 + (index * 6), { align: 'left' }));
                     documentPdf.setFontSize(11);
-                    documentPdf.text(`${dateLabel(start)}-${dateLabel(end)}`, 148.5, 33, { align: 'center' });
+                    documentPdf.text(`${dateLabel(start)}-${dateLabel(end)}`, titleX, 38, { align: 'left' });
                     const images = [];
                     const body = await Promise.all(activities.map(async (activity, index) => {
                         images[index] = (await Promise.all(activity.dokumentasi.map(item => imageData(item.url)))).filter(Boolean);
@@ -339,28 +380,59 @@
                             images[index].length ? '\n' : '-'];
                     }));
                     documentPdf.autoTable({
-                        head: [['Nomor', 'Tanggal/Waktu', 'Personel', 'Tindakan dan Hasil', 'Dokumentasi']], body,
-                        startY: 39, theme: 'grid', rowPageBreak: 'avoid', margin: { left: 14, right: 14 },
+                        head: [['No', 'Tanggal/Waktu', 'Personel', 'Tindakan dan Hasil', 'Dokumentasi']], body,
+                        startY: 50, theme: 'grid', rowPageBreak: 'avoid', margin: { left: 14, right: 14 },
                         headStyles: { fillColor: [43, 79, 124], halign: 'center', fontStyle: 'bold' },
                         bodyStyles: { fontSize: 8, cellPadding: 3 },
                         columnStyles: { 0: { cellWidth: 12, halign: 'center' }, 1: { cellWidth: 30, halign: 'center' }, 2: { cellWidth: 48 }, 3: { cellWidth: 116 }, 4: { cellWidth: 62, halign: 'center' } },
                         didParseCell: data => {
-                            if (data.section !== 'body' || data.column.index !== 4 || !images[data.row.index]?.length) return;
+                            if (data.section !== 'body' || data.column.index !== 4) return;
 
-                            data.cell.styles.minCellHeight = images[data.row.index].reduce((height, image, index) => (
-                                height + pdfImageSize(image, data.cell.width).height + (index > 0 ? 4 : 0)
-                            ), 6);
+                            const count = images[data.row.index]?.length || 0;
+                            if (count > 0) {
+                                data.cell.styles.minCellHeight = photoCellHeight(count, data.cell.width);
+                            }
                         },
                         didDrawCell: data => {
                             if (data.section !== 'body' || data.column.index !== 4) return;
 
-                            let imageY = data.cell.y + 3;
-                            (images[data.row.index] || []).forEach(image => {
-                                const size = pdfImageSize(image, data.cell.width);
-                                documentPdf.addImage(image.data, 'JPEG', data.cell.x + ((data.cell.width - size.width) / 2), imageY, size.width, size.height);
-                                imageY += size.height + 4;
+                            const photos = images[data.row.index] || [];
+                            if (!photos.length) return;
+
+                            const totalHeight = photoCellHeight(photos.length, data.cell.width);
+                            const startX = data.cell.x + ((data.cell.width - (Math.min(photos.length, photoPerRow(data.cell.width)) * photoThumb + (Math.min(photos.length, photoPerRow(data.cell.width)) - 1) * photoGap)) / 2);
+                            const startY = data.cell.y + ((data.cell.height - totalHeight) / 2);
+                            photos.forEach((photo, index) => {
+                                const col = index % photoPerRow(data.cell.width);
+                                const row = Math.floor(index / photoPerRow(data.cell.width));
+                                const x = startX + col * (photoThumb + photoGap);
+                                const y = startY + photoPad + row * (photoThumb + photoGap);
+                                documentPdf.addImage(photo.data, 'JPEG', x, y, photoThumb, photoThumb);
                             });
                         },
+                    });
+
+                    const templateCounts = activities.reduce((counts, activity) => {
+                        const template = activity.nama_template || 'Tanpa Template';
+                        counts[template] = (counts[template] || 0) + 1;
+                        return counts;
+                    }, {});
+                    const templateEntries = Object.entries(templateCounts).sort((a, b) => b[1] - a[1]);
+                    let summaryY = (documentPdf.lastAutoTable.finalY || 39) + 10;
+                    const pageHeight = documentPdf.internal.pageSize.getHeight();
+                    if (summaryY + (templateEntries.length * 5) + 58 > pageHeight - 10) {
+                        documentPdf.addPage();
+                        summaryY = 20;
+                    }
+                    documentPdf.setFont('helvetica', 'bold');
+                    documentPdf.setFontSize(11);
+                    documentPdf.text('Jumlah Kegiatan per Kategori:', 14, summaryY);
+                    summaryY += 6;
+                    documentPdf.setFont('helvetica', 'normal');
+                    documentPdf.setFontSize(10);
+                    templateEntries.forEach(([template, jumlah]) => {
+                        documentPdf.text(`${template}: ${jumlah}`, 14, summaryY);
+                        summaryY += 5;
                     });
 
                     const exportDate = new Date().toLocaleDateString('id-ID', {
@@ -377,8 +449,7 @@
                         'Pembina Utama Muda, IV/c',
                         'NIP. 19690318 199603 1 003',
                     ];
-                    let signatureY = (documentPdf.lastAutoTable.finalY || 39) + 12;
-                    const pageHeight = documentPdf.internal.pageSize.getHeight();
+                    let signatureY = summaryY + 8;
                     if (signatureY + 58 > pageHeight - 10) {
                         documentPdf.addPage();
                         signatureY = 20;

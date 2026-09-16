@@ -109,7 +109,6 @@
                         <th class="px-6 py-3.5 font-semibold text-left">No. Laporan</th>
                         <th class="px-6 py-3.5 font-semibold text-left">Jenis</th>
                         <th class="px-6 py-3.5 font-semibold text-left">Sumber</th>
-                        <th class="px-6 py-3.5 font-semibold text-left">Kategori</th>
                         <th class="px-6 py-3.5 font-semibold text-left">Lokasi</th>
                         <th class="px-6 py-3.5 font-semibold text-left">Telepon</th>
                         <th class="px-6 py-3.5 font-semibold text-left">Status</th>
@@ -147,7 +146,6 @@
                                     </span>
                                 @endif
                             </td>
-                            <td class="px-6 py-3.5 text-slate-500">{{ $report->category?->label() ?? '-' }}</td>
                             <td class="px-6 py-3.5 text-slate-500 max-w-xs truncate" title="{{ $report->location_address }}">{{ $report->location_address }}</td>
                             <td class="px-6 py-3.5 text-slate-500">{{ $report->reporter_phone }}</td>
                             <td class="px-6 py-3.5">
@@ -161,7 +159,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="px-6 py-12 text-center text-slate-400">
+                            <td colspan="7" class="px-6 py-12 text-center text-slate-400">
                                 <div class="text-4xl mb-2">📭</div>
                                 <p>Belum ada laporan.</p>
                             </td>

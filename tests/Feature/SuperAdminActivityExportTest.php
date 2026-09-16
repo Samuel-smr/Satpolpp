@@ -50,9 +50,9 @@ class SuperAdminActivityExportTest extends TestCase
             ->assertSee('export-attachments', false)
             ->assertSee('LAPORAN KEGIATAN')
             ->assertSee("'Tindakan dan Hasil'", false)
-            ->assertSee('const pdfImageSize', false)
-            ->assertSee('image.width * scale', false)
-            ->assertSee('image.height * scale', false)
+            ->assertSee('const photoCellHeight', false)
+            ->assertSee('const photoPerRow', false)
+            ->assertSee('documentPdf.addImage(photo.data', false)
             ->assertSee('const period =', false);
     }
 

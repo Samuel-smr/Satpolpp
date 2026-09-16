@@ -37,6 +37,7 @@ class StoreAssetRequest extends FormRequest
             'acquisition_year' => ['nullable', 'integer', 'between:1900,'.now()->year],
             'tax_due_date' => ['nullable', Rule::excludeIf($this->input('category') !== AssetCategory::Vehicle->value), 'date'],
             'next_oil_service_km' => ['nullable', Rule::excludeIf($this->input('category') !== AssetCategory::Vehicle->value), 'integer', 'min:0', 'max:4294967295'],
+            'last_oil_service_date' => ['nullable', Rule::excludeIf($this->input('category') !== AssetCategory::Vehicle->value), 'date'],
         ];
     }
 
@@ -54,6 +55,7 @@ class StoreAssetRequest extends FormRequest
             'acquisition_year.between' => 'Tahun perolehan harus antara 1900 sampai tahun ini.',
             'tax_due_date.date' => 'Tanggal jatuh tempo pajak tidak valid.',
             'next_oil_service_km.integer' => 'Kilometer servis oli harus berupa angka bulat.',
+            'last_oil_service_date.date' => 'Tanggal servis oli terakhir tidak valid.',
         ];
     }
 }

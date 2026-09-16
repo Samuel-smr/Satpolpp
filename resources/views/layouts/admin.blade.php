@@ -181,12 +181,6 @@
                     </div>
                 </div>
 
-                <button
-                    class="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors"
-                    title="Bantuan">
-                    <span class="material-symbols-outlined text-[20px]">help_outline</span>
-                </button>
-
                 <!-- Avatar Profile -->
                 <!-- Topbar Profile Icon -->
                 <a href="{{ route('admin.profile') }}">

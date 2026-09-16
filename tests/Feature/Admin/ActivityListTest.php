@@ -166,9 +166,9 @@ class ActivityListTest extends TestCase
             ->assertSee('LAPORAN KEGIATAN')
             ->assertSee('BUDI HARTONO, S.Si, M.Si')
             ->assertSee('NIP. 19690318 199603 1 003')
-            ->assertSee('const pdfImageSize', false)
-            ->assertSee('image.width * scale', false)
-            ->assertSee('image.height * scale', false)
+            ->assertSee('const photoCellHeight', false)
+            ->assertSee('const photoPerRow', false)
+            ->assertSee('documentPdf.addImage(photo.data', false)
             ->assertSee('XLSX.writeFile', false)
             ->assertSee('documentPdf.save', false);
         $response->assertViewHas('exportActivities', fn ($activities): bool => $activities->count() === 2);

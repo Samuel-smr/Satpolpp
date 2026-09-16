@@ -259,7 +259,7 @@ class DevelopmentSeeder extends Seeder
         );
         DB::table('assets')->updateOrInsert(
             ['asset_code' => 'AST-001'],
-            ['created_by_user_id' => $adminId, 'name' => 'Mobil Patroli Dalmas', 'category' => 'vehicle', 'condition' => 'good', 'location' => 'Kantor Satpol PP', 'acquisition_year' => 2022, 'tax_due_date' => '2027-03-15', 'next_oil_service_km' => 45000, 'created_at' => $now, 'updated_at' => $now, 'deleted_at' => null],
+            ['created_by_user_id' => $adminId, 'name' => 'Mobil Patroli Dalmas', 'category' => 'vehicle', 'condition' => 'good', 'location' => 'Kantor Satpol PP', 'acquisition_year' => 2022, 'tax_due_date' => '2027-03-15', 'next_oil_service_km' => 45000, 'last_oil_service_date' => $now->copy()->subMonths(4)->toDateString(), 'created_at' => $now, 'updated_at' => $now, 'deleted_at' => null],
         );
         DB::table('assets')->updateOrInsert(
             ['asset_code' => 'AST-002'],
