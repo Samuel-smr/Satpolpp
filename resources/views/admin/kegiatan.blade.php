@@ -414,6 +414,29 @@
                         },
                     });
 
+                    const templateCounts = activities.reduce((counts, activity) => {
+                        const template = activity.nama_template || 'Tanpa Template';
+                        counts[template] = (counts[template] || 0) + 1;
+                        return counts;
+                    }, {});
+                    const templateEntries = Object.entries(templateCounts).sort((a, b) => b[1] - a[1]);
+                    let summaryY = (documentPdf.lastAutoTable.finalY || 39) + 10;
+                    const pageHeight = documentPdf.internal.pageSize.getHeight();
+                    if (summaryY + (templateEntries.length * 5) + 58 > pageHeight - 10) {
+                        documentPdf.addPage();
+                        summaryY = 20;
+                    }
+                    documentPdf.setFont('helvetica', 'bold');
+                    documentPdf.setFontSize(11);
+                    documentPdf.text('Jumlah Kegiatan per Kategori:', 14, summaryY);
+                    summaryY += 6;
+                    documentPdf.setFont('helvetica', 'normal');
+                    documentPdf.setFontSize(10);
+                    templateEntries.forEach(([template, jumlah]) => {
+                        documentPdf.text(`${template}: ${jumlah}`, 14, summaryY);
+                        summaryY += 5;
+                    });
+
                     const exportDate = new Date().toLocaleDateString('id-ID', {
                         day: '2-digit', month: 'long', year: 'numeric'
                     });
@@ -428,8 +451,7 @@
                         'Pembina Utama Muda, IV/c',
                         'NIP. 19690318 199603 1 003',
                     ];
-                    let signatureY = (documentPdf.lastAutoTable.finalY || 39) + 12;
-                    const pageHeight = documentPdf.internal.pageSize.getHeight();
+                    let signatureY = summaryY + 8;
                     if (signatureY + 58 > pageHeight - 10) {
                         documentPdf.addPage();
                         signatureY = 20;
