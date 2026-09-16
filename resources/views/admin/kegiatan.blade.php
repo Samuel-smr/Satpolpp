@@ -271,15 +271,15 @@
                     return null;
                 }
             };
-            const pdfImageSize = (image, cellWidth) => {
-                const maximumWidth = Math.min(52, cellWidth - 6);
-                const maximumHeight = 30;
-                const scale = Math.min(maximumWidth / image.width, maximumHeight / image.height);
-
-                return {
-                    width: image.width * scale,
-                    height: image.height * scale,
-                };
+            const photoThumb = 18;
+            const photoGap = 3;
+            const photoPad = 3;
+            const photoPerRow = (cellWidth) => Math.max(1, Math.floor((cellWidth - 6 + photoGap) / (photoThumb + photoGap)));
+            const photoRows = (count, cellWidth) => Math.ceil(Math.max(count, 0) / photoPerRow(cellWidth));
+            const photoCellHeight = (count, cellWidth) => {
+                if (!count) return 0;
+                const rows = photoRows(count, cellWidth);
+                return (photoPad * 2) + (rows * photoThumb) + ((rows - 1) * photoGap);
             };
 
             excelButton.addEventListener('click', async () => {
@@ -288,7 +288,7 @@
                 try {
                     if (typeof XLSX === 'undefined') await loadScript('https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js');
                     const rows = activities.map((activity, index) => ({
-                        'Nomor': index + 1, 'ID Kegiatan': activity.id, 'ID Laporan': activity.id_laporan || '-',
+                        'No': index + 1, 'ID Kegiatan': activity.id, 'ID Laporan': activity.id_laporan || '-',
                         'Kode Laporan': activity.kode_laporan || '-', 'ID Template': activity.id_template || '-',
                         'Nama Template': activity.nama_template || '-', 'Dibuat Oleh': activity.dibuat_oleh || '-',
                         'Dievaluasi Oleh': activity.dievaluasi_oleh || '-', 'Nama Kegiatan': activity.nama,
@@ -341,26 +341,34 @@
                             images[index].length ? '\n' : '-'];
                     }));
                     documentPdf.autoTable({
-                        head: [['Nomor', 'Tanggal/Waktu', 'Personel', 'Tindakan dan Hasil', 'Dokumentasi']], body,
+                        head: [['No', 'Tanggal/Waktu', 'Personel', 'Tindakan dan Hasil', 'Dokumentasi']], body,
                         startY: 39, theme: 'grid', rowPageBreak: 'avoid', margin: { left: 14, right: 14 },
                         headStyles: { fillColor: [43, 79, 124], halign: 'center', fontStyle: 'bold' },
                         bodyStyles: { fontSize: 8, cellPadding: 3 },
                         columnStyles: { 0: { cellWidth: 12, halign: 'center' }, 1: { cellWidth: 30, halign: 'center' }, 2: { cellWidth: 48 }, 3: { cellWidth: 116 }, 4: { cellWidth: 62, halign: 'center' } },
                         didParseCell: data => {
-                            if (data.section !== 'body' || data.column.index !== 4 || !images[data.row.index]?.length) return;
+                            if (data.section !== 'body' || data.column.index !== 4) return;
 
-                            data.cell.styles.minCellHeight = images[data.row.index].reduce((height, image, index) => (
-                                height + pdfImageSize(image, data.cell.width).height + (index > 0 ? 4 : 0)
-                            ), 6);
+                            const count = images[data.row.index]?.length || 0;
+                            if (count > 0) {
+                                data.cell.styles.minCellHeight = photoCellHeight(count, data.cell.width);
+                            }
                         },
                         didDrawCell: data => {
                             if (data.section !== 'body' || data.column.index !== 4) return;
 
-                            let imageY = data.cell.y + 3;
-                            (images[data.row.index] || []).forEach(image => {
-                                const size = pdfImageSize(image, data.cell.width);
-                                documentPdf.addImage(image.data, 'JPEG', data.cell.x + ((data.cell.width - size.width) / 2), imageY, size.width, size.height);
-                                imageY += size.height + 4;
+                            const photos = images[data.row.index] || [];
+                            if (!photos.length) return;
+
+                            const totalHeight = photoCellHeight(photos.length, data.cell.width);
+                            const startX = data.cell.x + ((data.cell.width - (Math.min(photos.length, photoPerRow(data.cell.width)) * photoThumb + (Math.min(photos.length, photoPerRow(data.cell.width)) - 1) * photoGap)) / 2);
+                            const startY = data.cell.y + ((data.cell.height - totalHeight) / 2);
+                            photos.forEach((photo, index) => {
+                                const col = index % photoPerRow(data.cell.width);
+                                const row = Math.floor(index / photoPerRow(data.cell.width));
+                                const x = startX + col * (photoThumb + photoGap);
+                                const y = startY + photoPad + row * (photoThumb + photoGap);
+                                documentPdf.addImage(photo.data, 'JPEG', x, y, photoThumb, photoThumb);
                             });
                         },
                     });
