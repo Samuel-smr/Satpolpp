@@ -264,6 +264,21 @@ class SuperAdminController extends Controller
             'categoryChart' => collect(ReportCategory::cases())->map(fn (ReportCategory $category): array => ['label' => $category->label(), 'total' => (int) ($categoryCounts[$category->value] ?? 0)]),
             'statusChart' => collect(ReportStatus::cases())->map(fn (ReportStatus $status): array => ['label' => $status->label(), 'total' => (int) ($statusCounts[$status->value] ?? 0)]),
             'reportTrend' => $reportTrend,
+            'districts' => ['Temon', 'Wates', 'Panjatan', 'Galur', 'Lendah', 'Sentolo', 'Pengasih', 'Kokap', 'Girimulyo', 'Nanggulan', 'Kalibawang', 'Samigaluh'],
+            'districtCenters' => [
+                ['name' => 'Temon', 'lat' => -7.87, 'lng' => 110.07],
+                ['name' => 'Wates', 'lat' => -7.85, 'lng' => 110.16],
+                ['name' => 'Panjatan', 'lat' => -7.88, 'lng' => 110.11],
+                ['name' => 'Galur', 'lat' => -7.95, 'lng' => 110.12],
+                ['name' => 'Lendah', 'lat' => -7.91, 'lng' => 110.18],
+                ['name' => 'Sentolo', 'lat' => -7.84, 'lng' => 110.22],
+                ['name' => 'Pengasih', 'lat' => -7.84, 'lng' => 110.18],
+                ['name' => 'Kokap', 'lat' => -7.80, 'lng' => 110.14],
+                ['name' => 'Girimulyo', 'lat' => -7.78, 'lng' => 110.14],
+                ['name' => 'Nanggulan', 'lat' => -7.74, 'lng' => 110.19],
+                ['name' => 'Kalibawang', 'lat' => -7.69, 'lng' => 110.15],
+                ['name' => 'Samigaluh', 'lat' => -7.66, 'lng' => 110.20],
+            ],
         ]);
     }
 }
