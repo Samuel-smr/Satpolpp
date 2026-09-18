@@ -27,10 +27,11 @@
                     Tanpa registrasi akun, langsung pantau perkembangan laporan Anda.
                 </p>
 
-                <div class="mt-9">
+                <div class="mt-10 flex justify-center">
                     <a href="{{ route('pelapor.lapor') }}"
-                       class="inline-flex items-center justify-center gap-2 bg-accent-500 text-white px-9 py-4 rounded-lg font-semibold shadow-lg shadow-accent-500/30 hover:bg-accent-600 hover:shadow-accent-600/30 transition-all text-xl">
-                        <span class="text-2xl">🚨</span> Lapor Sekarang
+                       class="inline-flex items-center justify-center gap-3 bg-red-600 text-white px-12 py-5 rounded-xl font-bold shadow-lg shadow-red-600/30 hover:bg-red-700 hover:shadow-red-700/30 hover:scale-105 transition-all text-2xl">
+                        <span class="flex items-center justify-center w-9 h-9 rounded-full bg-white/20 text-xl leading-none">!</span>
+                        Lapor Sekarang
                     </a>
                 </div>
             </div>
@@ -51,7 +52,6 @@
                class="group relative bg-white border border-slate-200 rounded-2xl p-6 md:p-7 overflow-hidden hover:shadow-xl hover:-translate-y-1 hover:border-accent-300 transition-all duration-300">
                 <div class="absolute top-0 right-0 w-24 h-24 bg-orange-50 rounded-bl-full opacity-60 group-hover:opacity-100 transition-opacity"></div>
                 <div class="relative">
-                    <div class="w-12 h-12 rounded-xl bg-orange-100 text-accent-600 flex items-center justify-center text-2xl mb-4">🚨</div>
                     <h3 class="font-headline text-lg font-bold text-slate-800 group-hover:text-accent-600 transition-colors">Lapor Darurat</h3>
                     <p class="mt-2 text-sm text-slate-500 leading-relaxed">Kejadian yang membutuhkan respons cepat seperti kerusuhan, kebakaran, atau gangguan ketertiban.</p>
                     <span class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-accent-600">
@@ -66,7 +66,6 @@
                class="group relative bg-white border border-slate-200 rounded-2xl p-6 md:p-7 overflow-hidden hover:shadow-xl hover:-translate-y-1 hover:border-brand-300 transition-all duration-300">
                 <div class="absolute top-0 right-0 w-24 h-24 bg-brand-50 rounded-bl-full opacity-60 group-hover:opacity-100 transition-opacity"></div>
                 <div class="relative">
-                    <div class="w-12 h-12 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center text-2xl mb-4">📋</div>
                     <h3 class="font-headline text-lg font-bold text-slate-800 group-hover:text-brand-600 transition-colors">Informasi &amp; Pengaduan</h3>
                     <p class="mt-2 text-sm text-slate-500 leading-relaxed">Laporan yang tidak membutuhkan respons darurat, misalnya PKL liar, kebisingan, atau ketertiban umum.</p>
                     <span class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-brand-600">
@@ -81,7 +80,6 @@
                class="group relative bg-white border border-slate-200 rounded-2xl p-6 md:p-7 overflow-hidden hover:shadow-xl hover:-translate-y-1 hover:border-brand-300 transition-all duration-300">
                 <div class="absolute top-0 right-0 w-24 h-24 bg-brand-50 rounded-bl-full opacity-60 group-hover:opacity-100 transition-opacity"></div>
                 <div class="relative">
-                    <div class="w-12 h-12 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center text-2xl mb-4">🔎</div>
                     <h3 class="font-headline text-lg font-bold text-slate-800 group-hover:text-brand-600 transition-colors">Cek Status Laporan</h3>
                     <p class="mt-2 text-sm text-slate-500 leading-relaxed">Pantau perkembangan laporan Anda menggunakan nomor / kode pengaduan secara real-time.</p>
                     <span class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-brand-600">
@@ -96,7 +94,6 @@
                class="group relative bg-white border border-slate-200 rounded-2xl p-6 md:p-7 overflow-hidden hover:shadow-xl hover:-translate-y-1 hover:border-brand-300 transition-all duration-300">
                 <div class="absolute top-0 right-0 w-24 h-24 bg-brand-50 rounded-bl-full opacity-60 group-hover:opacity-100 transition-opacity"></div>
                 <div class="relative">
-                    <div class="w-12 h-12 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center text-2xl mb-4">⭐</div>
                     <h3 class="font-headline text-lg font-bold text-slate-800 group-hover:text-brand-600 transition-colors">Survey Kepuasan</h3>
                     <p class="mt-2 text-sm text-slate-500 leading-relaxed">Isi survey kepuasan untuk membantu kami terus meningkatkan layanan.</p>
                     <span class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-brand-600">
@@ -123,17 +120,17 @@
 
                 @php
                     $steps = [
-                        ['1', '📝', 'Pilih Jenis Laporan', 'Darurat atau Informasi & Pengaduan'],
-                        ['2', '📍', 'Isi Detail & Lokasi', 'Sertakan foto/video bila ada'],
-                        ['3', '📤', 'Kirim', 'Laporan Anda terkirim'],
-                        ['4', '📊', 'Pantau Status', 'Cek perkembangan & isi survey kepuasan'],
+                        ['1', 'Pilih Jenis Laporan', 'Darurat atau Informasi & Pengaduan'],
+                        ['2', 'Isi Detail & Lokasi', 'Sertakan foto/video bila ada'],
+                        ['3', 'Kirim', 'Laporan Anda terkirim'],
+                        ['4', 'Pantau Status', 'Cek perkembangan & isi survey kepuasan'],
                     ];
                 @endphp
 
-                @foreach ($steps as $i => [$num, $icon, $title, $desc])
+                @foreach ($steps as $i => [$num, $title, $desc])
                     <div class="relative flex flex-col items-center text-center">
-                        <div class="relative z-10 w-12 h-12 rounded-2xl bg-brand-600 text-white flex items-center justify-center text-xl shadow-lg shadow-brand-600/25">
-                            {{ $icon }}
+                        <div class="relative z-10 w-12 h-12 rounded-2xl bg-brand-600 text-white flex items-center justify-center text-base font-bold shadow-lg shadow-brand-600/25">
+                            {{ $num }}
                         </div>
                         <span class="mt-4 text-xs font-semibold uppercase tracking-wider text-brand-600">Langkah {{ $num }}</span>
                         <h4 class="mt-1 font-semibold text-slate-800">{{ $title }}</h4>
@@ -150,12 +147,10 @@
             <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-8 md:p-10">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 divide-y sm:divide-y-0 sm:divide-x divide-slate-200">
                     <div class="flex flex-col items-center text-center">
-                        <div class="w-12 h-12 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center text-2xl mb-3">📝</div>
                         <div class="font-headline text-3xl md:text-4xl font-bold text-slate-800">12,450</div>
                         <div class="mt-1 text-xs font-medium text-slate-500 uppercase tracking-wider">Total Laporan</div>
                     </div>
                     <div class="flex flex-col items-center text-center">
-                        <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl mb-3">✅</div>
                         <div class="font-headline text-3xl md:text-4xl font-bold text-slate-800">98%</div>
                         <div class="mt-1 text-xs font-medium text-slate-500 uppercase tracking-wider">Tingkat Penyelesaian</div>
                     </div>
@@ -170,9 +165,6 @@
             <div class="relative overflow-hidden bg-gradient-to-r from-red-600 to-red-700 text-white rounded-2xl p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-lg shadow-red-600/20">
                 <div class="absolute -top-10 -right-10 w-48 h-48 bg-white/10 rounded-full blur-2xl"></div>
                 <div class="relative flex items-center gap-4 md:gap-6">
-                    <div class="bg-white/15 border border-white/20 p-4 rounded-2xl">
-                        <div class="text-3xl">🚨</div>
-                    </div>
                     <div>
                         <h2 class="font-headline text-xl md:text-2xl font-bold">Layanan Darurat Ketertiban Umum</h2>
                         <p class="text-red-100 mt-1">Tersedia 24 jam / 7 hari seminggu</p>
