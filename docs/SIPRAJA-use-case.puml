@@ -40,6 +40,7 @@ rectangle "SIPRAJA / Akses bersama" {
   usecase "C03\nMencari data global" as C03
   usecase "C04\nMelihat dan menandai notifikasi" as C04
   usecase "C05\nLogout" as C05
+  usecase "C06\nMengubah profil dan kata sandi sendiri" as C06
 }
 ACTOR0 -- C01
 ACTOR1 -- C01
@@ -51,6 +52,8 @@ ACTOR0 -- C04
 ACTOR1 -- C04
 ACTOR0 -- C05
 ACTOR1 -- C05
+ACTOR0 -- C06
+ACTOR1 -- C06
 @enduml
 
 @startuml SIPRAJA_3
@@ -135,7 +138,6 @@ rectangle "SIPRAJA / Operasional admin" {
   usecase "R03\nMenghapus arsip" as R03
   usecase "T01\nMenambah atau mengedit aset" as T01
   usecase "T02\nMelihat atau menghapus aset" as T02
-  usecase "A08\nMengubah profil dan kata sandi sendiri" as A08
 }
 ACTOR0 -- E01
 ACTOR0 -- E02
@@ -144,7 +146,6 @@ ACTOR0 -- R02
 ACTOR0 -- R03
 ACTOR0 -- T01
 ACTOR0 -- T02
-ACTOR0 -- A08
 @enduml
 
 @startuml SIPRAJA_6
@@ -190,7 +191,9 @@ actor "Super Admin" as ACTOR0
 rectangle "SIPRAJA / Pengawasan super admin" {
   usecase "S09\nMemantau aktivitas sistem" as S09
   usecase "S10\nMelihat peta persebaran" as S10
+  usecase "S11\nMelihat peringatan pajak dan servis kendaraan" as S11
 }
 ACTOR0 -- S09
 ACTOR0 -- S10
+ACTOR0 -- S11
 @enduml

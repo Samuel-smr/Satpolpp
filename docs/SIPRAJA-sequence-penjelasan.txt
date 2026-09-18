@@ -308,7 +308,7 @@ ELSE [input valid]
     13. CompleteReportController --respons--> Halaman / Browser: Tolak; muat ulang/perbaiki form
   ELSE [pemeriksaan lolos]
     14. CompleteReportController --> Database / Eloquent: INSERT kegiatan External, report_id, category NULL
-    15. CompleteReportController --> Database / Eloquent: INSERT relasi petugas dan lampiran public
+    15. CompleteReportController --> Database / Eloquent: INSERT temuan, relasi petugas dan lampiran public
     16. CompleteReportController --> Database / Eloquent: UPDATE laporan Completed, waktu, latitude dan longitude
     17. CompleteReportController --> Database / Eloquent: INSERT riwayat dan audit; COMMIT
     18. CompleteReportController --respons--> Halaman / Browser: Redirect detail laporan selesai
@@ -615,7 +615,7 @@ Aktor: Admin
 Penangan: AssetController
 Referensi use case: T01, T02
 Penjelasan dan aturan:
-Pajak berupa tanggal, servis oli berupa kilometer servis berikutnya. Jika kategori berubah dari kendaraan, kedua field dihapus nilainya pada penyimpanan.
+Pajak berupa tanggal; servis oli memiliki kilometer berikutnya dan tanggal servis terakhir. Jika kategori berubah dari kendaraan, ketiga field dihapus nilainya pada penyimpanan.
 Urutan pesan dan kondisi:
 1. Admin --> Halaman / Browser: Buka Aset
 2. Halaman / Browser --> AssetController: GET /admin/aset
@@ -625,7 +625,7 @@ Urutan pesan dan kondisi:
 ALT [Tambah / Edit]
   6. Admin --> Halaman / Browser: Isi nama, kategori, kondisi dan informasi tambahan
   ALT [Kendaraan]
-    7. Halaman / Browser --> Halaman / Browser: Tampilkan tanggal pajak dan kilometer servis oli
+    7. Halaman / Browser --> Halaman / Browser: Tampilkan tanggal pajak, kilometer dan tanggal servis oli
   ELSE [Selain kendaraan]
     8. Halaman / Browser --> Halaman / Browser: Sembunyikan field kendaraan
   END
@@ -634,7 +634,7 @@ ALT [Tambah / Edit]
   ALT [invalid]
     11. AssetController --respons--> Halaman / Browser: Kesalahan field/kode unik
   ELSE [valid]
-    12. AssetController --> AssetController: Kosongkan data pajak/oli bila bukan kendaraan
+    12. AssetController --> AssetController: Kosongkan pajak, kilometer dan tanggal servis bila bukan kendaraan
     13. AssetController --> Database / Eloquent: INSERT/UPDATE aset; INSERT audit
     14. AssetController --respons--> Halaman / Browser: Redirect daftar
   END
@@ -753,15 +753,15 @@ ELSE [Batal / silang]
 END
 
 =====================================================================================
-SQ20 — Dashboard monitoring dan peta
+SQ20 — Dashboard, monitoring, peta dan peringatan aset
 Aktor: Admin / Super Admin
 Penangan: AdminController / SuperAdminController
-Referensi use case: C02, S09, S10
+Referensi use case: C02, S09, S10, S11
 Penjelasan dan aturan:
-Dashboard tersedia sesuai role. Monitoring dan peta hanya super admin. Monitoring mengambil maksimal 100 audit terbaru dan tren 7 hari, bukan seluruh aktivitas yang tidak tercatat.
+Dashboard tersedia sesuai role. Monitoring, peta, dan peringatan aset hanya super admin. Monitoring mengambil maksimal 100 audit terbaru dan tren 7 hari, bukan seluruh aktivitas yang tidak tercatat.
 Urutan pesan dan kondisi:
 1. Admin / Super Admin --> Halaman / Browser: Pilih menu sesuai hak akses
-2. Halaman / Browser --> AdminController / SuperAdminController: GET dashboard / monitoring / peta
+2. Halaman / Browser --> AdminController / SuperAdminController: GET dashboard / monitoring / peta / asset-alerts
 3. AdminController / SuperAdminController --> AdminController / SuperAdminController: Middleware auth dan Gate role
 ALT [akses ditolak]
   4. AdminController / SuperAdminController --respons--> Halaman / Browser: Redirect login / 403 sesuai kondisi
@@ -782,6 +782,12 @@ ELSE [diizinkan]
     15. Sumber tile/batas peta --respons--> Halaman / Browser: Data visual peta
     16. Admin / Super Admin --> Halaman / Browser: Jelajahi peta; klik marker
     17. Halaman / Browser --respons--> Admin / Super Admin: Tampilkan informasi titik
+  ELSE [Peringatan aset — Super Admin]
+    18. Halaman / Browser --> SuperAdminController: GET /super-admin/asset-alerts
+    19. SuperAdminController --> Database / Eloquent: Baca aset kendaraan dan tanggal pajak/servis terakhir
+    20. Database / Eloquent --respons--> SuperAdminController: Data kendaraan
+    21. SuperAdminController --> SuperAdminController: Hitung peringatan pajak dan servis oli
+    22. SuperAdminController --respons--> Halaman / Browser: JSON jumlah dan daftar peringatan
   END
 END
 
@@ -789,9 +795,9 @@ END
 SQ21 — Pencarian notifikasi dan profil
 Aktor: Admin / Super Admin
 Penangan: GlobalSearch / Notification / ProfileController
-Referensi use case: C03, C04, A08
+Referensi use case: C03, C04, C06
 Penjelasan dan aturan:
-Semua route memerlukan login. Profil mandiri hanya admin. Hasil pencarian diarahkan sesuai role. Notifikasi hanya milik akun sendiri.
+Semua route memerlukan login. Profil tersedia untuk kedua peran. Hasil pencarian diarahkan sesuai role. Notifikasi hanya milik akun sendiri.
 Urutan pesan dan kondisi:
 1. Admin / Super Admin --> Halaman / Browser: Pilih fungsi
 ALT [Pencarian global]
@@ -812,9 +818,9 @@ ELSE [Notifikasi]
     14. GlobalSearch / Notification / ProfileController --> Database / Eloquent: UPDATE read_at milik akun sendiri
     15. GlobalSearch / Notification / ProfileController --respons--> Halaman / Browser: Redirect tautan internal atau halaman sebelumnya
   END
-ELSE [Profil — Admin]
+ELSE [Profil — Admin / Super Admin]
   16. Admin / Super Admin --> Halaman / Browser: Ubah nama/username/email; password opsional
-  17. Halaman / Browser --> GlobalSearch / Notification / ProfileController: PUT /admin/profile
+  17. Halaman / Browser --> GlobalSearch / Notification / ProfileController: PUT /admin/profile atau /super-admin/profile
   18. GlobalSearch / Notification / ProfileController --> GlobalSearch / Notification / ProfileController: Validasi unik; password lama/konfirmasi jika diganti
   ALT [invalid]
     19. GlobalSearch / Notification / ProfileController --respons--> Halaman / Browser: Kesalahan form

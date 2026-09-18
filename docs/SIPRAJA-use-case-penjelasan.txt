@@ -1,5 +1,5 @@
 USE CASE SIPRAJA — PELAPOR, ADMIN, DAN SUPER ADMIN
-Disusun dari kode lokal yang diperiksa pada 14 September 2026.
+Disusun dari kode lokal yang diperiksa pada 18 September 2026.
 
 CARA MEMBUKA
 1. Buka aplikasi draw.io / diagrams.net.
@@ -44,17 +44,18 @@ Pelapor:
   Mengirim laporan tanpa kategori; memantau laporan milik akses tamu; memberi feedback.
 Admin:
   Mengelola laporan/status/penyelesaian, kegiatan internal, evaluasi, arsip, aset,
-  melihat feedback, dan memperbarui profil sendiri.
+  dan melihat feedback.
 Super Admin:
   Mengelola akun, petugas, organisasi, kegiatan internal; melihat laporan terkait
-  kegiatan eksternal; monitoring audit dan peta.
+  kegiatan eksternal; monitoring audit, peta, dan peringatan aset kendaraan.
 Bersama (Admin dan Super Admin):
   Login/logout, dashboard sesuai peran, pencarian global, notifikasi milik sendiri,
-  daftar/detail kegiatan, CRUD internal, dokumentasi internal, ekspor PDF/Excel.
+  daftar/detail kegiatan, CRUD internal, dokumentasi internal, ekspor PDF/Excel,
+  dan memperbarui profil serta kata sandi sendiri.
 Tidak diasumsikan tersedia:
   Registrasi pelapor, pemulihan akses laporan hanya dengan kode, CRUD template kegiatan,
   penolakan laporan, edit kegiatan eksternal melalui form internal, atau perubahan
-  status laporan oleh super admin. Route profil mandiri hanya tersedia untuk admin.
+  status laporan oleh super admin.
 
 PEMILIH LOKASI PADA FORM
 Digunakan pada tambah/edit kegiatan, tambah laporan admin, dan penyelesaian laporan.
@@ -507,7 +508,7 @@ Prasyarat   : Sudah login sebagai admin.
 Langkah:
   1. Buka Aset dan pilih Tambah atau Edit.
   2. Isi nama, kategori dan kondisi; isi kode, lokasi, tahun perolehan bila diperlukan.
-  3. Jika kategori kendaraan, tampilkan dan isi tanggal jatuh tempo pajak serta kilometer servis oli berikutnya bila diperlukan.
+  3. Jika kategori kendaraan, tampilkan dan isi tanggal jatuh tempo pajak, kilometer servis oli berikutnya, serta tanggal servis oli terakhir bila diperlukan.
   4. Simpan; sistem memvalidasi dan menyimpan data.
 Alternatif / gagal:
   Kode ganda, tahun/tanggal/kilometer salah: perbaiki. Field pajak/oli dikecualikan untuk kategori selain kendaraan.
@@ -531,10 +532,10 @@ Hasil akhir:
 Sumber kode : AssetController
 ----------------------------------------------------------------------------
 
-A08 — Mengubah profil dan kata sandi sendiri
-Kelompok    : Operasional admin
-Aktor       : Admin
-Prasyarat   : Sudah login sebagai admin.
+C06 — Mengubah profil dan kata sandi sendiri
+Kelompok    : Akses bersama
+Aktor       : Admin; Super Admin
+Prasyarat   : Sudah login.
 Langkah:
   1. Buka Profil.
   2. Ubah nama, username atau email.
@@ -543,7 +544,7 @@ Langkah:
 Alternatif / gagal:
   Username/email sudah digunakan, kata sandi lama salah atau konfirmasi berbeda: perbaiki.
 Hasil akhir:
-  Profil atau kata sandi admin diperbarui.
+  Profil atau kata sandi akun sendiri diperbarui.
 Sumber kode : ProfileController; UpdateProfileRequest
 ----------------------------------------------------------------------------
 
@@ -699,6 +700,22 @@ Hasil akhir:
   Persebaran laporan dan kegiatan dapat dipantau.
 Sumber kode : SuperAdminController::peta; resources/views/super_admin/peta.blade.php
 ----------------------------------------------------------------------------
+
+S11 — Melihat peringatan pajak dan servis kendaraan
+Kelompok    : Pengawasan super admin
+Aktor       : Super Admin
+Prasyarat   : Sudah login sebagai super admin.
+Langkah:
+  1. Buka dashboard super admin.
+  2. Browser meminta /super-admin/asset-alerts.
+  3. Sistem menghitung peringatan dari tanggal jatuh tempo pajak dan tanggal servis oli terakhir aset kendaraan.
+  4. Tinjau jumlah dan daftar peringatan.
+Alternatif / gagal:
+  Tidak ada aset yang perlu perhatian: daftar kosong.
+Hasil akhir:
+  Peringatan pemeliharaan kendaraan tampil pada dashboard.
+Sumber kode : SuperAdminController::assetAlerts; Asset::vehicleAlerts
+-------------------------------------------------------------------------------
 
 SUMBER PEMETAAN
 - routes/web.php: endpoint aktif dan pembagian peran.

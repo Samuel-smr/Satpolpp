@@ -229,8 +229,12 @@ class PelaporController extends Controller
     {
         $statusIndex = match ($report->status) {
             ReportStatus::Completed => 5,
+            ReportStatus::Rejected => 6,
             default => array_search($report->status, ReportStatus::cases(), true),
         };
+
+        $rejectionReason = $report->statusHistories
+            ->firstWhere('status', ReportStatus::Rejected)?->note;
 
         return [
             'kode' => $report->code,
@@ -241,6 +245,7 @@ class PelaporController extends Controller
             'telepon' => $report->reporter_phone,
             'dibuat' => $report->created_at?->format('d/m/Y H.i'),
             'statusIdx' => $statusIndex === false ? 0 : $statusIndex,
+            'alasanTolak' => $rejectionReason,
             'feedbackSubmitted' => $report->feedback_submitted_at !== null,
             'feedbackRating' => $report->feedback_rating,
             'feedbackComment' => $report->feedback_comment,
