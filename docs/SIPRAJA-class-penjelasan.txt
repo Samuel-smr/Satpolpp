@@ -406,7 +406,7 @@ Metode:
 ================================================================================
 Asset — model
 Tabel: assets
-Data pajak dan kilometer servis oli dipakai untuk kendaraan; diset NULL bila kategori selain kendaraan.
+Data pajak, kilometer servis berikutnya, dan tanggal servis oli terakhir dipakai untuk kendaraan; diset NULL bila kategori selain kendaraan.
 Memakai SoftDeletes.
 Atribut:
   id: bigint {PK}
@@ -419,11 +419,13 @@ Atribut:
   acquisition_year: int?
   tax_due_date: Date?
   next_oil_service_km: int?
+  last_oil_service_date: Date?
   created_at: DateTime?
   updated_at: DateTime?
   deleted_at: DateTime?
 Metode:
   + createdByUser(): BelongsTo<User>
+  + vehicleAlerts(): Collection {static}
   # casts(): array
 
 ================================================================================

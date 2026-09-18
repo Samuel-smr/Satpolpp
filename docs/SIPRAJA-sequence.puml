@@ -250,7 +250,7 @@ C -> F : Hapus foto baru
 C --> B : Tolak; muat ulang/perbaiki form
 else pemeriksaan lolos
 C -> D : INSERT kegiatan External, report_id, category NULL
-C -> D : INSERT relasi petugas dan lampiran public
+C -> D : INSERT temuan, relasi petugas dan lampiran public
 C -> D : UPDATE laporan Completed, waktu, latitude dan longitude
 C -> D : INSERT riwayat dan audit; COMMIT
 C --> B : Redirect detail laporan selesai
@@ -609,7 +609,7 @@ C --> B : Render halaman
 alt Tambah / Edit
 A -> B : Isi nama, kategori, kondisi dan informasi tambahan
 alt Kendaraan
-B -> B : Tampilkan tanggal pajak dan kilometer servis oli
+B -> B : Tampilkan tanggal pajak, kilometer dan tanggal servis oli
 else Selain kendaraan
 B -> B : Sembunyikan field kendaraan
 end
@@ -618,7 +618,7 @@ C -> C : Validasi StoreAssetRequest
 alt invalid
 C --> B : Kesalahan field/kode unik
 else valid
-C -> C : Kosongkan data pajak/oli bila bukan kendaraan
+C -> C : Kosongkan pajak, kilometer dan tanggal servis bila bukan kendaraan
 C -> D : INSERT/UPDATE aset; INSERT audit
 C --> B : Redirect daftar
 end
@@ -783,6 +783,12 @@ B -> G : Muat tile peta dan batas wilayah
 G --> B : Data visual peta
 A -> B : Jelajahi peta; klik marker
 B --> A : Tampilkan informasi titik
+else Peringatan aset — Super Admin
+B -> C : GET /super-admin/asset-alerts
+C -> D : Baca aset kendaraan dan tanggal pajak/servis terakhir
+D --> C : Data kendaraan
+C -> C : Hitung peringatan jatuh tempo pajak dan servis oli
+C --> B : JSON jumlah dan daftar peringatan
 end
 end
 @enduml
@@ -817,9 +823,9 @@ B -> C : POST endpoint read / read-all
 C -> D : UPDATE read_at milik akun sendiri
 C --> B : Redirect tautan internal atau halaman sebelumnya
 end
-else Profil — Admin
+else Profil — Admin / Super Admin
 A -> B : Ubah nama/username/email; password opsional
-B -> C : PUT /admin/profile
+B -> C : PUT /admin/profile atau /super-admin/profile
 C -> C : Validasi unik; password lama/konfirmasi jika diganti
 alt invalid
 C --> B : Kesalahan form

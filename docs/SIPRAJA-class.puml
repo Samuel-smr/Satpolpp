@@ -251,11 +251,13 @@ class Asset <<model>> {
   acquisition_year: int?
   tax_due_date: Date?
   next_oil_service_km: int?
+  last_oil_service_date: Date?
   created_at: DateTime?
   updated_at: DateTime?
   deleted_at: DateTime?
   --
   + createdByUser(): BelongsTo<User>
+  + {static} vehicleAlerts(): Collection
   # casts(): array
 }
 class AuditLog <<model>> {
