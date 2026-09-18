@@ -9,6 +9,7 @@ enum ReportStatus: string
     case Verifying = 'verifying';
     case InProgress = 'in_progress';
     case Completed = 'completed';
+    case Rejected = 'rejected';
 
     public function label(): string
     {
@@ -18,6 +19,7 @@ enum ReportStatus: string
             self::Verifying => 'Sedang diverifikasi',
             self::InProgress => 'Ditindaklanjuti',
             self::Completed => 'Laporan selesai',
+            self::Rejected => 'Laporan ditolak',
         };
     }
 
@@ -29,6 +31,7 @@ enum ReportStatus: string
             self::Verifying => 'Petugas sedang memverifikasi laporan.',
             self::InProgress => 'Laporan sedang ditangani di lapangan.',
             self::Completed => 'Penanganan laporan telah selesai.',
+            self::Rejected => 'Laporan ditolak oleh petugas.',
         };
     }
 
@@ -38,7 +41,7 @@ enum ReportStatus: string
             self::Submitted => self::Received,
             self::Received => self::Verifying,
             self::Verifying => self::InProgress,
-            self::InProgress, self::Completed => null,
+            self::InProgress, self::Completed, self::Rejected => null,
         };
     }
 }

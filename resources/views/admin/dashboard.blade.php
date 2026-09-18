@@ -157,13 +157,22 @@
 
                 <div class="space-y-4">
                     @forelse ($latestReports as $latestReport)
+                        @php
+                            $latestStatusClass = match ($latestReport->status) {
+                                \App\ReportStatus::Completed => 'bg-emerald-50 text-emerald-700',
+                                \App\ReportStatus::InProgress => 'bg-amber-50 text-amber-700',
+                                \App\ReportStatus::Received, \App\ReportStatus::Verifying => 'bg-blue-50 text-blue-700',
+                                \App\ReportStatus::Rejected => 'bg-red-50 text-red-700',
+                                default => 'bg-slate-100 text-slate-600',
+                            };
+                        @endphp
                         <a href="{{ route('admin.pengaduan.detail', $latestReport) }}" class="block rounded-xl border border-slate-200 border-l-4 border-l-sidebar-active bg-white p-4 transition-shadow hover:shadow-md">
                             <div class="flex items-start justify-between gap-2">
                                 <div class="min-w-0">
                                     <h4 class="truncate text-sm font-semibold text-slate-800">{{ $latestReport->category?->label() ?? $latestReport->code }}</h4>
                                     <p class="mt-1 truncate text-xs text-slate-500">{{ $latestReport->location_address }}</p>
                                 </div>
-                                <span class="shrink-0 rounded-full bg-blue-50 px-2.5 py-0.5 text-[11px] font-semibold text-blue-700">{{ $latestReport->status->label() }}</span>
+                                <span class="shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-semibold {{ $latestStatusClass }}">{{ $latestReport->status->label() }}</span>
                             </div>
                             <p class="mt-2 text-xs text-slate-400">{{ $latestReport->code }} · {{ $latestReport->created_at->format('d/m/Y H:i') }}</p>
                         </a>

@@ -79,4 +79,65 @@ class ReportStatusController extends Controller
             ->route('admin.pengaduan.detail', $report)
             ->with('status', "Status berhasil diperbarui menjadi {$nextStatus->label()}.");
     }
+
+    public function reject(Request $request, Report $report): RedirectResponse
+    {
+        $validated = $request->validate([
+            'current_status' => ['required', 'string', Rule::enum(ReportStatus::class)],
+            'alasan_tolak' => ['required', 'string', 'max:1000'],
+        ], [
+            'current_status.required' => 'Status awal laporan tidak tersedia. Muat ulang halaman dan coba lagi.',
+            'current_status.enum' => 'Status awal laporan tidak valid. Muat ulang halaman dan coba lagi.',
+            'alasan_tolak.required' => 'Alasan penolakan wajib diisi agar pelapor memahami penolakan ini.',
+            'alasan_tolak.max' => 'Alasan penolakan maksimal 1000 karakter.',
+        ]);
+
+        /** @var User $user */
+        $user = $request->user();
+
+        DB::transaction(function () use ($report, $request, $user, $validated) {
+            $lockedReport = Report::query()
+                ->whereKey($report->getKey())
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $previousStatus = $lockedReport->status;
+
+            if ($previousStatus !== ReportStatus::from($validated['current_status'])) {
+                throw ValidationException::withMessages([
+                    'status' => 'Status laporan sudah berubah. Muat ulang halaman sebelum melanjutkan.',
+                ]);
+            }
+
+            if ($previousStatus !== ReportStatus::Verifying) {
+                throw ValidationException::withMessages([
+                    'status' => 'Laporan hanya dapat ditolak ketika sedang dalam tahap verifikasi.',
+                ]);
+            }
+
+            $lockedReport->update(['status' => ReportStatus::Rejected]);
+            $lockedReport->statusHistories()->create([
+                'changed_by_user_id' => $user->id,
+                'status' => ReportStatus::Rejected,
+                'note' => $validated['alasan_tolak'],
+            ]);
+
+            AuditLog::create([
+                'actor_user_id' => $user->id,
+                'subject_type' => 'report',
+                'subject_id' => $lockedReport->id,
+                'module' => 'reports',
+                'action' => 'status_updated',
+                'description' => "Status laporan {$lockedReport->code} ditolak. Alasan: {$validated['alasan_tolak']}.",
+                'old_values' => ['status' => $previousStatus->value],
+                'new_values' => ['status' => ReportStatus::Rejected->value],
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ]);
+        });
+
+        return redirect()
+            ->route('admin.pengaduan.detail', $report)
+            ->with('status', 'Laporan berhasil ditolak. Pelapor dapat melihat alasan penolakan pada halaman status laporan.');
+    }
 }
