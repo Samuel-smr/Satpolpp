@@ -1,554 +1,155 @@
-# BRIEF SISTEM SIPRAJA — PATCH 0.1A
+# Brief SIPRAJA — Spesifikasi As-Built
 
-## 1. Konsep Sistem
+Versi dokumen: 21 September 2026
 
-**SIPRAJA** adalah sistem informasi internal Satpol PP yang memiliki 3 fokus utama:
+## Tujuan
 
-1. **Pengaduan masyarakat**
-2. **Kegiatan dan operasional Satpol PP**
-3. **Monitoring dan rekap kinerja**
+SIPRAJA mendukung tiga kebutuhan utama Satpol PP Kulon Progo:
 
-Prinsip utama:
+1. penerimaan dan penanganan laporan masyarakat;
+2. pencatatan kegiatan, evaluasi, arsip, dan petugas;
+3. pengawasan melalui dashboard, peta persebaran, notifikasi, dan audit aktivitas.
 
-> **Simple — Aplikatif — Informatif**
+## Aktor
 
-Sistem harus sederhana untuk masyarakat, tetapi cukup lengkap untuk kebutuhan internal Satpol PP.
+### Pelapor
 
----
+Pelapor adalah pengguna tamu tanpa akun. Pelapor dapat mengirim laporan, memakai Asisten AI, melihat status laporan miliknya, dan memberi feedback setelah selesai.
 
-## 2. Aktor Sistem
+### Admin
 
-### A. Pelapor / Masyarakat
+Admin adalah pelaksana operasional. Admin melihat dan menangani laporan, membuat laporan dari kanal lain, menyelesaikan laporan, serta mengelola kegiatan, evaluasi, arsip, dan feedback.
 
-Tidak perlu membuat akun untuk mengirim laporan.
+### Super Admin
 
-Alur:
+Super Admin melakukan pengawasan dan administrasi akun/petugas. Peta persebaran berada langsung pada dashboard. Super Admin tidak mengubah status laporan dan tidak mengelola struktur organisasi/wilayah.
 
-```text
-Buka SIPRAJA
-    ↓
-Pilih jenis laporan
-    ↓
-Isi nomor WhatsApp/telepon
-    ↓
-Isi deskripsi singkat
-    ↓
-Upload foto/video
-    ↓
-Isi lokasi kejadian
-    ↓
-Kirim laporan
-    ↓
-Mendapat nomor/kode laporan
-    ↓
-Pelapor dapat melihat status laporannya
-```
+## Laporan masyarakat
 
-#### Identitas Pelapor
+### Jenis laporan
 
-- **Nomor telepon/WhatsApp wajib**
-- **NIK opsional**
-- Tidak perlu registrasi akun
-- Nomor telepon digunakan untuk validasi dan komunikasi tindak lanjut
-- Jangan membuat proses pelaporan terlalu panjang
+Hanya ada satu jenis, yaitu **Lapor** (`lapor`). Pilihan Darurat dan Informasi & Pengaduan sudah dihapus.
 
-#### Data laporan minimal
+### Data form publik
 
-- Nomor laporan
-- Nomor telepon pelapor
-- NIK (opsional)
-- Deskripsi singkat
-- Foto/video
-- Lokasi kejadian
-- Waktu laporan
-- Kategori laporan
-- Status laporan
+- Nomor WhatsApp/telepon: wajib.
+- Nama pelapor: opsional.
+- NIK: tidak ditampilkan dan tidak diminta.
+- Deskripsi kejadian: wajib.
+- Alamat/lokasi: wajib sesuai validasi aplikasi.
+- Koordinat: digunakan bila pelapor menentukan titik peta.
+- Foto: opsional sesuai batas format, jumlah, dan ukuran aplikasi.
 
----
+Kolom NIK masih tersedia secara nullable di database hanya untuk kompatibilitas data lama.
 
-## 3. Jenis Laporan
+### Asisten AI
 
-Jangan gunakan istilah:
+Pada halaman Lapor, warga dapat:
+
+- bertanya cara melapor;
+- menjelaskan kejadian secara bertahap;
+- meminta bantuan menyusun draf deskripsi;
+- memakai jawaban yang memang berupa draf sebagai isi deskripsi.
+
+AI wajib menjawab dalam Bahasa Indonesia, menjaga konteks percakapan, tidak meminta data sensitif, tidak mengklaim laporan sudah terkirim, dan mengarahkan ancaman keselamatan langsung ke layanan darurat setempat tanpa mengarang nomor.
+
+Riwayat delapan pesan terakhir dikelola di sesi server dan tidak digunakan setelah 30 menit tidak aktif. Payload riwayat palsu, instruksi sistem, alat, model, dan alamat API dari browser ditolak. Rate limit per IP/global, session lock, redaksi pola data sensitif, pembatasan koneksi ke Google tanpa redirect, dan validasi keluaran membatasi dampak penyalahgunaan. Jawaban tetap teks biasa dan draf memerlukan tindakan warga untuk dikirim; AI tidak memiliki akses CRUD. Pengamanan ini bukan jaminan model kebal semua prompt injection.
+
+### Status
 
 ```text
-Urgent
-Tidak Urgent
+Laporan dibuat → Laporan diterima → Sedang diverifikasi
+→ Ditindaklanjuti → Selesai
 ```
 
-Gunakan:
+Status bergerak satu arah. Penyelesaian membuat kegiatan eksternal yang terhubung ke laporan.
 
-### Fitur Darurat
+### Akses data
 
-Untuk kejadian yang membutuhkan respons cepat.
+- Pelapor hanya melihat laporan miliknya melalui guest token.
+- Admin melihat dan menangani laporan.
+- Super Admin dapat melihat detail laporan secara baca-saja.
+- Masyarakat umum tidak memperoleh daftar seluruh laporan.
 
-Data tambahan:
+## Dashboard Super Admin
 
-- Identitas pelapor
-- Nomor WhatsApp/telepon yang dapat dihubungi
-- Deskripsi kejadian
-- Foto/video
-- Lokasi kejadian
+Dashboard memuat ringkasan sistem dan peta persebaran laporan/kegiatan yang memiliki koordinat. Tidak ada menu Peta terpisah.
 
-### Informasi & Pengaduan
+## Organisasi dan wilayah
 
-Untuk laporan yang tidak membutuhkan respons darurat.
+Fitur Manajemen Organisasi tidak digunakan. `organizational_units` dan `operational_zones` telah dihapus. Petugas tidak memiliki foreign key ke unit organisasi atau zona operasional.
 
-Data dibuat sesederhana mungkin:
+Data petugas yang tetap digunakan:
 
-```text
-Nomor HP
-Deskripsi
-Foto/video
-Lokasi
-```
+- NIP/nomor pegawai;
+- nama;
+- jabatan;
+- nama satuan kerja;
+- nama unit kerja;
+- status aktif/cuti/nonaktif.
 
----
+## Kegiatan
 
-## 4. Validasi Laporan
+- Kegiatan internal dibuat langsung oleh Admin atau Super Admin.
+- Kegiatan eksternal dibuat otomatis ketika Admin menyelesaikan laporan.
+- Kegiatan dapat mempunyai template, lokasi, petugas, temuan, dokumentasi, hasil penanganan, dan evaluasi.
+- Satu laporan maksimal mempunyai satu kegiatan eksternal.
 
-Masalah utama:
+## Modul pendukung
 
-Laporan dari media sosial/WhatsApp sering tidak valid atau sudah terlambat ketika petugas datang.
+- Notifikasi laporan baru untuk Admin aktif.
+- Feedback berupa rating dan komentar setelah laporan selesai.
+- Arsip mendukung beberapa file per folder.
+- Monitoring Super Admin membaca audit log.
+- Pencarian global menyesuaikan hak akses role.
 
-Contoh:
+## Menu akhir
 
-```text
-Masyarakat melapor kejadian
-        ↓
-Petugas menerima laporan
-        ↓
-Petugas datang ke lokasi
-        ↓
-Kejadian/orang sudah tidak ada
-```
+### Publik
 
-Karena itu sistem harus menyimpan:
+- Beranda
+- Lapor
+- Status
+- Feedback
+- Asisten AI pada halaman Lapor
 
-- Nomor telepon pelapor
-- NIK jika tersedia
-- Foto/video
-- Lokasi kejadian
-- Waktu laporan
+### Admin
 
-Tujuannya agar laporan lebih mudah diverifikasi dan dapat dihubungi kembali.
+- Dashboard
+- Pengaduan/Laporan
+- Acara & Kegiatan
+- Evaluasi
+- Arsip
+- Feedback
+- Notifikasi
+- Profil
 
----
+### Super Admin
 
-## 5. Status Laporan
+- Dashboard + Peta Persebaran
+- Kegiatan
+- Manajemen User
+- Petugas
+- Monitoring
+- Notifikasi
+- Profil
 
-Status harus ditampilkan secara bertahap seperti sistem tracking Gojek/Shopee.
+Menu **Peta** terpisah dan **Manajemen Organisasi** tidak ada.
 
-Contoh:
+## Kriteria penerimaan utama
 
-```text
-Laporan dibuat
-      ↓
-Laporan diterima
-      ↓
-Sedang diverifikasi
-      ↓
-Ditindaklanjuti
-      ↓
-Petugas menuju lokasi
-      ↓
-Penanganan selesai
-      ↓
-Laporan selesai
-```
+1. Warga dapat melapor tanpa NIK dan tanpa memilih jenis laporan.
+2. Nilai `reports.type` untuk laporan baru adalah `lapor`.
+3. Admin dapat menuntaskan alur laporan sampai selesai.
+4. Super Admin melihat peta pada dashboard, bukan route/menu tersendiri.
+5. Tidak ada UI, route, model, atau tabel aktif untuk unit organisasi dan zona operasional.
+6. Asisten AI menggunakan API key dari server dan gagal secara aman bila penyedia tidak tersedia.
+7. Hak akses laporan mengikuti role dan kepemilikan guest token.
 
-Status harus bisa dilihat oleh pelapor.
+## Fitur yang dihapus
 
-Pelapor:
-
-- Hanya dapat melihat laporan miliknya sendiri
-- Dapat melihat status laporan
-- Dapat melihat riwayat/rekap laporan miliknya
-
----
-
-## 6. Feedback Masyarakat
-
-Setelah laporan selesai, tampilkan:
-
-```text
-Bagaimana kepuasan Anda terhadap layanan kami?
-```
-
-Sediakan link/form **kepuasan masyarakat**.
-
----
-
-## 7. Statistik Pengaduan
-
-Sistem harus menyediakan statistik internal.
-
-Contoh:
-
-- Jumlah laporan masuk
-- Jumlah laporan selesai
-- Jumlah laporan yang sedang ditindaklanjuti
-- Jumlah laporan berdasarkan kategori
-- Jumlah laporan berdasarkan periode
-- Persentase penyelesaian laporan
-
-Contoh indikator:
-
-```text
-Tingkat penyelesaian laporan =
-Laporan selesai / total laporan × 100%
-```
-
----
-
-## 8. Admin
-
-Admin dapat berjumlah banyak.
-
-Admin dibagi berdasarkan bidang/bagian.
-
-Contoh:
-
-```text
-Admin Bidang A
-Admin Bidang B
-Admin Bidang C
-```
-
-Admin bertugas:
-
-- Melihat laporan
-- Memverifikasi laporan
-- Mengubah status laporan
-- Menindaklanjuti laporan
-- Menginput kegiatan
-- Melihat statistik
-- Membuat rekap
-
-### Notifikasi laporan
-
-Jika terdapat laporan yang belum ditindaklanjuti:
-
-```text
-MERAH → belum ditindaklanjuti
-HIJAU → sudah ditindaklanjuti/selesai
-```
-
-Bisa menggunakan popup/notifikasi pada dashboard admin.
-
----
-
-## 9. Penugasan Petugas
-
-Untuk PATCH 0.1A:
-
-**Tidak perlu memilih personnel secara manual ketika membuat penugasan.**
-
-Sistem cukup membuat tugas/penugasan.
-
-Monitoring perjalanan petugas/GPS:
-
-> **SKIP DULU**
-
-Jangan dibuat pada versi ini.
-
----
-
-## 10. Kegiatan & Acara
-
-Admin dapat menginput kegiatan Satpol PP.
-
-Ketika menu:
-
-```text
-Acara & Kegiatan
-```
-
-dibuka, tampilkan:
-
-- Nama kegiatan
-- Tanggal
-- Waktu
-- Lokasi
-- Kategori
-- Deskripsi
-- Dokumentasi/foto
-
-Contoh kategori:
-
-- Patroli
-- Pengawalan
-- Ketertiban umum
-- Keamanan
-- Kegiatan lainnya
-
----
-
-## 11. Statistik Kegiatan
-
-Sistem harus dapat menampilkan grafik kegiatan.
-
-Contoh pertanyaan yang harus bisa dijawab sistem:
-
-> "Berapa banyak patroli yang dilakukan selama satu bulan?"
-
-Contoh statistik:
-
-```text
-Patroli       : 25
-Pengawalan    : 12
-Ketertiban    : 18
-Keamanan      : 15
-```
-
-Data kegiatan harus dapat direkap berdasarkan:
-
-- Hari
-- Minggu
-- Bulan
-- Tahun
-- Kategori kegiatan
-
----
-
-## 12. Data Internal Satpol PP
-
-Data internal adalah salah satu poin penting sistem.
-
-Sistem tidak hanya menjadi aplikasi pengaduan masyarakat.
-
-Sistem juga menyimpan:
-
-```text
-PENGADUAN
-+
-KEGIATAN
-+
-KINERJA
-+
-DATA INTERNAL
-```
-
-Sehingga seluruh data dapat digunakan untuk statistik dan evaluasi.
-
----
-
-## 13. Personnel / SDM
-
-Data personnel boleh ditampilkan secara sederhana.
-
-Tidak perlu menampilkan:
-
-- Riwayat resign
-- Riwayat pensiun
-- Informasi personnel terlalu detail
-
-Informasi personnel yang aman dapat digunakan untuk kebutuhan internal.
-
----
-
-## 14. Evaluasi Kinerja
-
-Evaluasi tetap digunakan.
-
-Tambahkan data:
-
-- Presensi kedatangan
-- Kegiatan Satpol PP
-- Rekap laporan
-- Aktivitas/kinerja
-
-Admin bertugas memasukkan indikator masing-masing.
-
-Super Admin tidak perlu memasukkan semua data secara manual.
-
----
-
-## 15. Super Admin
-
-Super Admin memiliki akses lebih tinggi.
-
-Fokus Super Admin:
-
-- Mengelola organisasi
-- Mengelola user/admin
-- Melihat data internal
-- Menarik data/statistik
-- Melihat evaluasi
-- Menindaklanjuti hal yang membutuhkan perhatian
-- Melihat rekap kegiatan
-- Melihat rekap pengaduan
-
-Super Admin lebih banyak **monitoring dan mengambil tindakan**, bukan menginput seluruh data.
-
----
-
-## 16. Dashboard Super Admin
-
-Dashboard harus informatif tetapi sederhana.
-
-Contoh:
-
-```text
-TOTAL PENGADUAN
-125
-
-SELESAI
-98
-
-DALAM PROSES
-20
-
-BELUM DITINDAKLANJUTI
-7
-```
-
-Kemudian grafik:
-
-```text
-Statistik Pengaduan
-Statistik Kegiatan
-Statistik Kategori
-Statistik Kinerja
-```
-
-Contoh kategori pengaduan/kegiatan:
-
-- Pengawalan
-- Ketertiban umum
-- Keamanan
-- Patroli
-- Kategori lainnya
-
----
-
-## 17. Landing Page
-
-Landing page harus sederhana.
-
-Jangan menampilkan terlalu banyak informasi internal.
-
-Fokus masyarakat:
-
-```text
-SIPRAJA
-
-LAPOR DARURAT
-INFORMASI & PENGADUAN
-CEK STATUS LAPORAN
-KEPUASAN MASYARAKAT
-```
-
-Untuk:
-
-```text
-Manajemen Organisasi
-SDM
-Evaluasi
-Data internal
-```
-
-tidak perlu ditampilkan di landing page.
-
----
-
-## 18. Prinsip UI/UX
-
-Prioritas:
-
-### SIMPLE
-
-Masyarakat dapat membuat laporan dengan cepat.
-
-### APLIKATIF
-
-Fitur benar-benar sesuai kebutuhan Satpol PP.
-
-### INFORMATIF
-
-Admin dan Super Admin mendapatkan statistik dan informasi yang jelas.
-
-Hindari:
-
-- Registrasi yang panjang
-- Form terlalu banyak
-- Informasi yang tidak diperlukan
-- Fitur GPS petugas untuk sementara
-- Tampilan terlalu kompleks
-
----
-
-## 19. Alur Besar Sistem
-
-```text
-                    SIPRAJA
-                       │
-          ┌────────────┴────────────┐
-          │                         │
-     MASYARAKAT                 INTERNAL
-          │                         │
-          ↓                         ↓
-   LAPOR DARURAT             ADMIN / SUPER ADMIN
-          │                         │
-   INFORMASI &                 ┌────┴─────┐
-   PENGADUAN                   │          │
-          │                PENGADUAN   KEGIATAN
-          ↓                   │          │
-     NOMOR LAPORAN             └────┬─────┘
-          │                         │
-          ↓                         ↓
-     CEK STATUS              STATISTIK & REKAP
-          │                         │
-          ↓                         ↓
-      FEEDBACK                 EVALUASI
-```
-
----
-
-## 20. Prioritas PATCH 0.1A
-
-### PRIORITAS TINGGI
-
-1. Landing page
-2. Laporan tanpa registrasi akun
-3. Nomor telepon wajib
-4. NIK opsional
-5. Darurat
-6. Informasi & Pengaduan
-7. Upload foto/video
-8. Lokasi kejadian
-9. Nomor/kode laporan
-10. Tracking status laporan
-11. Dashboard Admin
-12. Dashboard Super Admin
-13. Rekap pengaduan
-14. Rekap kegiatan
-15. Statistik/grafik
-
-### PRIORITAS RENDAH / NANTI
-
-1. Tracking GPS petugas
-2. Riwayat resign
-3. Riwayat pensiun
-4. Data personnel terlalu detail
-5. Fitur kompleks lainnya
-
----
-
-## 21. Aturan Penting untuk AI Developer
-
-Saat mengembangkan SIPRAJA:
-
-- Jangan membuat fitur di luar kebutuhan tanpa alasan.
-- Utamakan kesederhanaan.
-- Jangan membuat registrasi akun untuk masyarakat.
-- Nomor telepon adalah identitas utama pelapor.
-- NIK bersifat opsional.
-- Foto/video menjadi bagian penting validasi laporan.
-- Status laporan harus bertahap dan jelas.
-- Data pengaduan dan kegiatan harus dapat direkap.
-- Dashboard harus menggunakan statistik/grafik yang mudah dipahami.
-- Pisahkan hak akses **Pelapor, Admin, dan Super Admin**.
-- Monitoring GPS petugas belum dibuat.
-- Jangan menampilkan data internal secara berlebihan di landing page.
-- Nama sistem yang digunakan sementara: **SIPRAJA**.
-- Saat aplikasi dibuka, tampilkan **nama sistem saja**, tidak perlu nama kepemilikan website.
+- Pilihan jenis laporan lama.
+- Input NIK pada form warga.
+- Menu Peta terpisah.
+- Manajemen Organisasi dan wilayah operasional.
+- Fitur Aset, peringatan pajak/servis, dan tabel `assets`.

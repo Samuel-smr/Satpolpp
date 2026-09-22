@@ -91,6 +91,10 @@
         </div>
         <div class="divide-y divide-slate-50 max-h-[420px] overflow-y-auto" id="log-list"></div>
     </div>
+
+    <div class="mt-8">
+        @include('super_admin.peta')
+    </div>
 @endsection
 
 @push('scripts')
@@ -100,7 +104,6 @@
     function jenisClass(j) {
         if (j === 'auth') return 'bg-purple-100 text-purple-700';
         if (j === 'reports') return 'bg-blue-100 text-blue-700';
-        if (j === 'assets') return 'bg-amber-100 text-amber-700';
         if (j === 'organization') return 'bg-slate-200 text-slate-700';
         return 'bg-emerald-100 text-emerald-700';
     }
@@ -108,7 +111,6 @@
     function iconJenis(j) {
         if (j === 'auth') return 'lock';
         if (j === 'reports') return 'description';
-        if (j === 'assets') return 'inventory_2';
         if (j === 'organization') return 'account_balance';
         return 'badge';
     }
@@ -125,10 +127,10 @@
                     <span class="material-symbols-outlined text-[16px]">${iconJenis(l.jenis)}</span>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-sm text-slate-700 truncate">${l.aksi}</p>
-                    <p class="text-xs text-slate-400">oleh ${l.user}</p>
+                    <p class="text-sm text-slate-700 truncate">${escapeHtml(l.aksi)}</p>
+                    <p class="text-xs text-slate-400">oleh ${escapeHtml(l.user)}</p>
                 </div>
-                <span class="text-xs text-slate-400 font-mono flex-shrink-0">${l.waktu}</span>
+                <span class="text-xs text-slate-400 font-mono flex-shrink-0">${escapeHtml(l.waktu)}</span>
             </div>
         `).join('');
     }

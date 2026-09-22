@@ -108,31 +108,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             payload.notifications.forEach((notification) => {
-                if (notification.asset) {
-                    const item = document.createElement('div');
-                    item.className = `flex w-full items-start gap-3 px-4 py-3 ${notification.level === 'danger' ? 'bg-red-50/60' : 'bg-amber-50/60'}`;
-                    const icon = document.createElement('span');
-                    icon.className = `material-symbols-outlined flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[18px] ${notification.level === 'danger' ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-600'}`;
-                    icon.textContent = 'warning';
-                    const content = document.createElement('span');
-                    content.className = 'min-w-0 flex-1';
-                    const title = document.createElement('span');
-                    title.className = 'block text-sm font-medium text-slate-700';
-                    title.textContent = notification.title;
-                    const message = document.createElement('span');
-                    message.className = 'block text-xs text-slate-500';
-                    message.textContent = notification.message;
-                    const time = document.createElement('span');
-                    time.className = 'text-xs text-slate-400';
-                    time.textContent = notification.time || 'Perlu tindakan';
-                    content.append(title, message, time);
-                    const dot = document.createElement('span');
-                    dot.className = 'mt-1.5 h-2 w-2 shrink-0 rounded-full bg-red-500';
-                    item.append(icon, content, dot);
-                    notificationList.append(item);
-                    return;
-                }
-
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.action = `/notifications/${encodeURIComponent(notification.id)}/read`;
@@ -158,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 notificationList.append(form);
             });
 
-            if (notificationsInitialized && payload.notifications.some((n) => !n.asset) && payload.unread_count > previousUnreadCount) {
+            if (notificationsInitialized && payload.notifications.length > 0 && payload.unread_count > previousUnreadCount) {
                 window.tampilToast?.('Ada laporan baru yang masuk.', 'info', 'Notifikasi Baru');
             }
             previousUnreadCount = payload.unread_count;

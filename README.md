@@ -1,58 +1,108 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# SIPRAJA Satpol PP Kulon Progo
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+SIPRAJA adalah aplikasi Laravel untuk menerima laporan masyarakat, mendukung penanganan oleh Admin, dan menyediakan pengawasan operasional bagi Super Admin.
 
-## About Laravel
+## Kondisi sistem saat ini
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Laporan masyarakat hanya memiliki satu jenis: `lapor`.
+- Pelapor tidak perlu login dan tidak diminta memasukkan NIK. Kolom `reports.reporter_nik` masih dipertahankan sebagai nullable untuk kompatibilitas data lama.
+- Pelapor memperoleh kode laporan dan token tamu untuk melihat status serta mengirim feedback setelah laporan selesai.
+- Halaman Lapor menyediakan Asisten AI berbasis Google Gemini untuk panduan dan penyusunan deskripsi. Percakapan dibatasi untuk konteks pelaporan dan tidak boleh meminta data sensitif.
+- Admin menangani laporan, status, penyelesaian, kegiatan, evaluasi, arsip, dan feedback.
+- Super Admin mengelola akun Admin, petugas, kegiatan, monitoring, serta melihat ringkasan dan peta persebaran langsung pada dashboard.
+- Menu Peta terpisah dan Manajemen Organisasi sudah dihapus.
+- Fitur Aset beserta tabel `assets` sudah dihapus.
+- Tabel `operational_zones` dan `organizational_units`, berikut relasinya pada petugas, sudah dihapus.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Teknologi
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP 8.5
+- Laravel 13
+- MySQL
+- Blade, Tailwind CSS, dan Vite
+- PHPUnit
+- Google Gemini API (`gemini-3.1-flash-lite` secara default)
 
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Menjalankan aplikasi
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+composer install
+npm install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --seed
+npm run build
+composer run dev
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Konfigurasikan database serta integrasi AI pada `.env`:
 
-## Contributing
+```dotenv
+AI_API_KEY=
+AI_ENABLED=true
+AI_HOURLY_LIMIT=60
+AI_DAILY_LIMIT=1000
+AI_MODEL=gemini-3.1-flash-lite
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Jangan menyimpan API key asli di Git. Setelah mengubah `.env` pada server yang memakai cache konfigurasi, jalankan:
 
-## Code of Conduct
+```bash
+php artisan config:clear
+php artisan config:cache
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Keamanan chatbot
 
-## Security Vulnerabilities
+Chatbot hanya menerima pesan teks; riwayat delapan pesan terakhir berasal dari sesi server dan tidak dipakai lagi setelah 30 menit tidak aktif. Browser tidak dapat memasok riwayat model, instruksi sistem, alat, atau tujuan API. Gunakan session/cache server seperti database atau Redis yang mendukung atomic locks; semua instance hosting harus berbagi penyimpanan cache untuk kuota global.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Batas bawaan: 10 permintaan/menit/IP, 60/jam/IP, 30/menit seluruh aplikasi, dan 1.000/24 jam seluruh aplikasi. AI_HOURLY_LIMIT mengatur batas per jam/IP dan AI_DAILY_LIMIT mengatur batas global per 24 jam. Batas menghitung permintaan aplikasi, termasuk yang tidak valid; retry dapat membuat maksimal dua panggilan Gemini per permintaan. AI_ENABLED=false menonaktifkan chatbot tanpa menonaktifkan pelaporan.
 
-## License
+Model tidak diberi akses database, berkas server, alat eksekusi, atau tindakan CRUD. Koneksi dibatasi ke HTTPS API Google dan tidak mengikuti redirect. Pola NIK/kredensial tertentu disamarkan; penyamaran ini tidak menjamin semua data pribadi terdeteksi. Jawaban ditampilkan sebagai teks, bukan HTML/Markdown aktif. Prompt injection tetap dapat memengaruhi isi jawaban, sehingga draf harus diperiksa warga sebelum dikirim. Ganti API key yang pernah dibagikan.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Peran dan akses
+
+### Pelapor
+
+- Membuat laporan tanpa akun dan tanpa NIK.
+- Menggunakan Asisten AI untuk bertanya atau menyusun deskripsi.
+- Melihat status laporan miliknya melalui token tamu.
+- Memberikan rating dan komentar setelah laporan selesai.
+
+### Admin
+
+- Melihat dan menangani seluruh laporan.
+- Mencatat laporan dari kanal online/offline.
+- Memajukan status sampai ditindaklanjuti dan menyelesaikan laporan.
+- Mengelola kegiatan internal, evaluasi, arsip, dan melihat feedback.
+
+### Super Admin
+
+- Melihat dashboard, statistik, serta peta persebaran laporan dan kegiatan.
+- Melihat detail laporan secara baca-saja.
+- Mengelola akun Admin dan data petugas.
+- Mengelola kegiatan internal dan memantau audit aktivitas.
+- Tidak mengelola unit organisasi atau wilayah operasional.
+
+## Alur laporan
+
+```text
+Pelapor mengirim laporan
+  → submitted
+  → received
+  → verifying
+  → in_progress
+  → completed
+  → pelapor dapat memberi feedback
+```
+
+Penyelesaian laporan membuat satu kegiatan eksternal, mencatat petugas yang ditugaskan, hasil penanganan, lokasi, dan dokumentasi.
+
+## Pengujian
+
+```bash
+php artisan test --compact
+vendor/bin/pint --dirty --format agent
+```
+
+Dokumentasi rinci, ERD, diagram kelas, sequence, dan use case tersedia di direktori [`docs`](docs).

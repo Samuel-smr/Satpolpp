@@ -51,10 +51,6 @@
 
                 <dl class="grid gap-4 text-sm bg-slate-50 border border-slate-200 rounded-xl p-4 sm:grid-cols-2">
                     <div>
-                        <dt class="text-slate-400">Jenis</dt>
-                        <dd class="font-medium text-slate-800">{{ $report->type->label() }}</dd>
-                    </div>
-                    <div>
                         <dt class="text-slate-400">Sumber</dt>
                         <dd class="font-medium text-slate-800">
                             {{ $report->source->label() }}{{ $report->source_platform ? ' · '.$report->source_platform->label() : '' }}
@@ -74,7 +70,7 @@
                     </div>
                     <div>
                         <dt class="text-slate-400">NIK</dt>
-                        <dd class="font-medium text-slate-800">{{ $report->reporter_nik ?? 'Tidak dicantumkan' }}</dd>
+                        <dd class="font-medium text-slate-800">{{ $report->maskedReporterNik() ?? 'Tidak dicantumkan' }}</dd>
                     </div>
                     <div>
                         <dt class="text-slate-400">Latitude</dt>

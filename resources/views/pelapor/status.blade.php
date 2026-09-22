@@ -49,10 +49,6 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
                     <div>
-                        <span class="text-slate-400">Jenis:</span>
-                        <span class="font-medium" id="d-jenis">--</span>
-                    </div>
-                    <div>
                         <span class="text-slate-400">Lokasi:</span>
                         <span class="font-medium" id="d-lokasi">--</span>
                     </div>
@@ -143,7 +139,6 @@
         return reportsFromDatabase;
     }
 
-    function labelJenis(j) { return j === 'emergency' ? 'Darurat' : 'Informasi & Pengaduan'; }
     function labelStatus(idx) { return STATUSES[idx] ? STATUSES[idx][0] : 'Dikirim'; }
     function badgeClass(idx) {
         if (idx === REJECTED_INDEX) return 'bg-red-100 text-red-700';
@@ -152,16 +147,12 @@
         if (idx >= 1) return 'bg-blue-100 text-blue-700';
         return 'bg-slate-100 text-slate-600';
     }
-    function jenisClass(j) {
-        return j === 'emergency' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700';
-    }
-
     function filterReports() {
         const q = (document.getElementById('search-input').value || '').trim().toLowerCase();
         const all = getReports();
         if (!q) return all;
         return all.filter(r => {
-            const haystack = [r.kode, r.lokasi, r.deskripsi, labelJenis(r.jenis), r.telepon, r.nik].join(' ').toLowerCase();
+            const haystack = [r.kode, r.lokasi, r.deskripsi, r.telepon].join(' ').toLowerCase();
             return haystack.includes(q);
         });
     }
@@ -193,12 +184,11 @@
                 <div class="flex items-start justify-between gap-4">
                     <div>
                         <div class="flex items-center gap-2 mb-2">
-                            <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full ${jenisClass(r.jenis)}">${labelJenis(r.jenis)}</span>
-                            <span class="text-xs text-slate-400">${r.waktu ? (r.dibuat || r.waktu) : ''}</span>
+                            <span class="text-xs text-slate-400">${escapeHtml(r.waktu ? (r.dibuat || r.waktu) : '')}</span>
                         </div>
-                        <h3 class="font-headline font-bold text-slate-800">${r.lokasi || labelJenis(r.jenis)}</h3>
-                        <p class="mt-1 text-sm text-slate-500 line-clamp-2">${r.deskripsi || '-'}</p>
-                        <p class="mt-1 text-xs text-slate-400">${r.kode}</p>
+                        <h3 class="font-headline font-bold text-slate-800">${escapeHtml(r.lokasi || 'Laporan')}</h3>
+                        <p class="mt-1 text-sm text-slate-500 line-clamp-2">${escapeHtml(r.deskripsi || '-')}</p>
+                        <p class="mt-1 text-xs text-slate-400">${escapeHtml(r.kode)}</p>
                     </div>
                     <span class="flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-full ${badgeClass(r.statusIdx)}">${labelStatus(r.statusIdx)}</span>
                 </div>
@@ -214,7 +204,6 @@
         document.getElementById('d-kode').textContent = r.kode;
         document.getElementById('d-badge').textContent = labelStatus(idx);
         document.getElementById('d-badge').className = 'text-sm font-semibold px-3 py-1 rounded-full ' + badgeClass(idx);
-        document.getElementById('d-jenis').textContent = labelJenis(r.jenis);
         document.getElementById('d-lokasi').textContent = r.lokasi || '-';
         document.getElementById('d-waktu').textContent = r.dibuat || r.waktu || '-';
         document.getElementById('d-deskripsi').textContent = r.deskripsi || '-';
@@ -272,7 +261,7 @@
             buktiSection.classList.remove('hidden');
             buktiList.innerHTML = r.buktiSelesai.map((f, i) => `
                 <figure class="relative aspect-video rounded-xl overflow-hidden border border-slate-200 bg-slate-100">
-                    <img src="${f.url}" alt="Bukti penanganan ${i + 1}" class="w-full h-full object-cover">
+                    <img src="${escapeHtml(f.url)}" alt="Bukti penanganan ${i + 1}" class="w-full h-full object-cover">
                     <figcaption class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent px-3 py-2 text-xs text-white">Bukti penanganan ${i + 1}</figcaption>
                 </figure>
             `).join('');

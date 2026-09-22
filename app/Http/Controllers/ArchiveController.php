@@ -14,6 +14,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -130,6 +131,10 @@ class ArchiveController extends Controller
             }
 
             DB::transaction(function () use ($request, $archive, $storedFiles): void {
+                $archive = Archive::query()->whereKey($archive->id)->lockForUpdate()->firstOrFail();
+                if ($archive->files()->count() + count($storedFiles) > 3) {
+                    throw ValidationException::withMessages(['files' => 'Jumlah file dalam satu arsip maksimal tiga file.']);
+                }
                 $archive->update($request->safe()->only(['title', 'operational_category', 'description', 'confidentiality']));
                 foreach ($storedFiles as $storedFile) {
                     $archive->files()->create($this->fileAttributes($storedFile['file'], $storedFile['path']));

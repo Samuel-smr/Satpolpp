@@ -139,6 +139,7 @@
             document.getElementById('mobile-nav').classList.toggle('hidden');
         });
     </script>
+    <script src="{{ asset('js/html-safety.js') }}"></script>
     @stack('scripts')
 </body>
 

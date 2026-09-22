@@ -11,6 +11,7 @@ use App\ReportStatus;
 use App\ReportType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class InitialDomainSchemaTest extends TestCase
@@ -24,19 +25,27 @@ class InitialDomainSchemaTest extends TestCase
 
         $report = Report::factory()
             ->for($guestAccess)
-            ->emergency()
             ->create(['reporter_nik' => $plainNik]);
 
         $storedNik = DB::table('reports')->where('id', $report->id)->value('reporter_nik');
 
         $this->assertTrue($report->guestAccess->is($guestAccess));
         $this->assertNull($report->createdByUser);
-        $this->assertSame(ReportType::Emergency, $report->type);
+        $this->assertSame(ReportType::Report, $report->type);
         $this->assertSame(ReportSource::Online, $report->source);
         $this->assertSame(ReportSourcePlatform::Website, $report->source_platform);
         $this->assertSame(ReportStatus::Submitted, $report->status);
         $this->assertSame($plainNik, $report->reporter_nik);
         $this->assertNotSame($plainNik, $storedNik);
+    }
+
+    public function test_obsolete_domain_tables_and_officer_foreign_keys_are_removed(): void
+    {
+        $this->assertFalse(Schema::hasTable('organizational_units'));
+        $this->assertFalse(Schema::hasTable('operational_zones'));
+        $this->assertFalse(Schema::hasTable('assets'));
+        $this->assertFalse(Schema::hasColumn('officers', 'organizational_unit_id'));
+        $this->assertFalse(Schema::hasColumn('officers', 'operational_zone_id'));
     }
 
     public function test_manual_report_is_attributed_to_the_admin_without_a_guest_identity(): void

@@ -7,6 +7,7 @@ use App\Models\Report;
 use App\Models\User;
 use App\Notifications\NewReportNotification;
 use App\ReportStatus;
+use App\ReportType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -16,7 +17,7 @@ class GuestReportTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_guest_report_form_guides_numeric_nik_and_phone_input(): void
+    public function test_guest_report_form_does_not_request_nik_or_report_type(): void
     {
         $this->get(route('pelapor.lapor'))
             ->assertOk()
@@ -24,12 +25,12 @@ class GuestReportTest extends TestCase
             ->assertSee('method="POST"', false)
             ->assertSee('novalidate', false)
             ->assertSee('invalidField.reportValidity()', false)
-            ->assertSee('nik.required = wajib', false)
-            ->assertSee('name="nik"', false)
-            ->assertSee('inputmode="numeric"', false)
-            ->assertSee('pattern="[0-9]{16}"', false)
             ->assertSee('name="telepon"', false)
             ->assertSee('inputmode="tel"', false)
+            ->assertSee('id="ai-assistant-panel"', false)
+            ->assertSee('id="ai-assistant-form"', false)
+            ->assertDontSee('name="nik"', false)
+            ->assertDontSee('name="jenis_radio"', false)
             ->assertDontSee('name="kategori"', false);
     }
 
@@ -41,11 +42,10 @@ class GuestReportTest extends TestCase
         $superAdmin = User::factory()->superAdmin()->create();
 
         $response = $this->post(route('pelapor.store'), [
-            'jenis' => 'information',
             'telepon' => '081234567890',
             'deskripsi' => 'Ada aktivitas yang mengganggu ketertiban umum.',
             'lokasi' => 'Alun-alun Wates',
-            'bukti' => [UploadedFile::fake()->image('bukti.jpg')],
+            'bukti' => [$this->fakeImage('bukti.png')],
             'setuju' => '1',
         ]);
 
@@ -54,6 +54,8 @@ class GuestReportTest extends TestCase
         $response->assertSessionHas('report_code', $report->code);
         $response->assertCookie('sipraja_guest_token');
         $this->assertSame(ReportStatus::Submitted, $report->status);
+        $this->assertSame(ReportType::Report, $report->type);
+        $this->assertNull($report->reporter_nik);
         $this->assertNull($report->category);
         $this->assertDatabaseCount('guest_accesses', 1);
         $this->assertDatabaseCount('report_status_histories', 1);
@@ -95,27 +97,35 @@ class GuestReportTest extends TestCase
         $response->assertSee($report->description, false);
     }
 
-    public function test_guest_report_validation_rejects_invalid_emergency_nik_and_too_many_files(): void
+    public function test_guest_report_validation_rejects_too_many_files_and_ignores_nik(): void
     {
         Storage::fake('local');
 
         $response = $this->from(route('pelapor.lapor'))->post(route('pelapor.store'), [
-            'jenis' => 'emergency',
             'telepon' => '081234567890',
             'nik' => '123',
             'deskripsi' => 'Laporan darurat.',
             'lokasi' => 'Wates',
             'bukti' => [
-                UploadedFile::fake()->image('satu.jpg'),
-                UploadedFile::fake()->image('dua.jpg'),
-                UploadedFile::fake()->image('tiga.jpg'),
-                UploadedFile::fake()->image('empat.jpg'),
+                $this->fakeImage('satu.png'),
+                $this->fakeImage('dua.png'),
+                $this->fakeImage('tiga.png'),
+                $this->fakeImage('empat.png'),
             ],
             'setuju' => '1',
         ]);
 
         $response->assertRedirect(route('pelapor.lapor'));
-        $response->assertSessionHasErrors(['nik', 'bukti']);
+        $response->assertSessionHasErrors(['bukti']);
+        $response->assertSessionDoesntHaveErrors(['nik']);
         $this->assertDatabaseCount('reports', 0);
+    }
+
+    private function fakeImage(string $name): UploadedFile
+    {
+        return UploadedFile::fake()->createWithContent(
+            $name,
+            base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=', true),
+        );
     }
 }

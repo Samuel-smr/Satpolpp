@@ -212,12 +212,19 @@
             const excelButton = document.getElementById('export-excel');
             const pdfButton = document.getElementById('export-pdf');
 
-            const loadScript = (source) => new Promise((resolve, reject) => {
+            const loadScript = (source, integrity = null) => new Promise((resolve, reject) => {
                 if (document.querySelector(`script[src="${source}"]`)) return resolve();
                 const script = document.createElement('script');
                 script.src = source;
+                if (integrity) {
+                    script.integrity = integrity;
+                    script.crossOrigin = 'anonymous';
+                }
                 script.onload = resolve;
-                script.onerror = () => reject(new Error('Pustaka ekspor gagal dimuat. Periksa koneksi internet.'));
+                script.onerror = () => {
+                    script.remove();
+                    reject(new Error('Pustaka ekspor gagal dimuat. Periksa koneksi internet.'));
+                };
                 document.head.appendChild(script);
             });
             const dateLabel = (date) => new Date(`${date}T00:00:00`).toLocaleDateString('id-ID', {
@@ -310,7 +317,10 @@
                 if (!ensureData()) return;
                 excelButton.disabled = true;
                 try {
-                    if (typeof XLSX === 'undefined') await loadScript('https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js');
+                    if (typeof XLSX === 'undefined') await loadScript(
+                        'https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js',
+                        'sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT',
+                    );
                     const rows = activities.map((activity, index) => ({
                         'No': index + 1, 'ID Kegiatan': activity.id, 'ID Laporan': activity.id_laporan || '-',
                         'Kode Laporan': activity.kode_laporan || '-', 'ID Template': activity.id_template || '-',
@@ -345,8 +355,14 @@
                 if (!ensureData()) return;
                 pdfButton.disabled = true;
                 try {
-                    if (!window.jspdf?.jsPDF) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
-                    if (!window.jspdf.jsPDF.prototype.autoTable) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js');
+                    if (!window.jspdf?.jsPDF) await loadScript(
+                        'https://cdn.jsdelivr.net/npm/jspdf@4.2.1/dist/jspdf.umd.min.js',
+                        'sha384-qovJwSBbRDPP5cEjCp8S0UP66wrvnjaa60XMOGzTNanrThcrGfXfnZkvgY8N1KT3',
+                    );
+                    if (!window.jspdf.jsPDF.API.autoTable) await loadScript(
+                        'https://cdn.jsdelivr.net/npm/jspdf-autotable@5.0.8/dist/jspdf.plugin.autotable.min.js',
+                        'sha384-5jk55M0XWoAw7LyhlXJe19ErOr3doBAPzxw9vahPFbvolqWa2yDk4fhHa2zuYeOa',
+                    );
                     const { jsPDF } = window.jspdf;
                     const documentPdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
                     const logos = (await Promise.all([

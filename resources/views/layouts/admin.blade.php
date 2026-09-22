@@ -105,11 +105,6 @@
                 <span>Arsip</span>
             </a>
 
-            <a href="{{ route('admin.aset') }}"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all {{ request()->routeIs('admin.aset') ? 'bg-sidebar-active text-white shadow-md font-semibold' : 'text-slate-300 hover:bg-sidebar-hover hover:text-white' }}">
-                <span class="material-symbols-outlined text-[20px]">inventory_2</span>
-                <span>Aset</span>
-            </a>
         </nav>
 
         <!-- Sidebar Footer / Logout -->

@@ -42,7 +42,7 @@ class AuthController extends Controller
     {
         $credentials = $request->validate([
             'identifier' => ['required', 'string', 'max:255'],
-            'password' => ['required', 'string'],
+            'password' => ['required', 'string', 'max:4096'],
         ], [
             'identifier.required' => 'Email atau Username wajib diisi.',
             'identifier.max' => 'Email atau Username maksimal 255 karakter.',
