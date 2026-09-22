@@ -5,7 +5,6 @@ namespace Tests\Feature\Admin;
 use App\Models\Report;
 use App\Models\User;
 use App\ReportStatus;
-use App\ReportType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -16,7 +15,7 @@ class ReportIndexTest extends TestCase
     public function test_admin_sees_reports_and_database_statistics(): void
     {
         $admin = User::factory()->create();
-        Report::factory()->emergency()->create([
+        Report::factory()->create([
             'code' => 'SPJ-100001',
             'status' => ReportStatus::Completed,
         ]);
@@ -28,30 +27,41 @@ class ReportIndexTest extends TestCase
         $response = $this->actingAs($admin)->get(route('admin.pengaduan'));
 
         $response->assertOk();
-        $response->assertSeeTextInOrder(['Total Masuk', '2', 'Laporan Darurat', '1']);
+        $response->assertSeeTextInOrder(['Total Masuk', '2', 'Selesai', '1']);
         $response->assertSeeText('SPJ-100001');
         $response->assertSeeText('SPJ-100002');
         $response->assertViewHas('statistics', [
             'total' => 2,
-            'emergency' => 1,
-            'information' => 1,
             'completed' => 1,
         ]);
     }
 
-    public function test_admin_can_filter_reports_by_an_allowed_type(): void
+    public function test_admin_report_list_has_no_type_filter_or_badge(): void
     {
         $admin = User::factory()->create();
-        Report::factory()->emergency()->create(['code' => 'SPJ-EMERGENCY']);
-        Report::factory()->create(['code' => 'SPJ-INFORMATION']);
+        Report::factory()->create(['code' => 'SPJ-LAPOR']);
+
+        $response = $this->actingAs($admin)->get(route('admin.pengaduan'));
+
+        $response->assertSeeText('SPJ-LAPOR');
+        $response->assertDontSeeText('Laporan Darurat');
+        $response->assertDontSeeText('Informasi & Pengaduan');
+        $response->assertDontSeeText('Jenis');
+    }
+
+    public function test_legacy_type_query_does_not_filter_reports(): void
+    {
+        $admin = User::factory()->create();
+        Report::factory()->create(['code' => 'SPJ-100003']);
+        Report::factory()->create(['code' => 'SPJ-100004']);
 
         $response = $this->actingAs($admin)->get(route('admin.pengaduan', [
-            'type' => ReportType::Emergency->value,
+            'type' => "emergency' OR 1=1 --",
         ]));
 
         $response->assertOk();
-        $response->assertSeeText('SPJ-EMERGENCY');
-        $response->assertDontSeeText('SPJ-INFORMATION');
+        $response->assertSeeText('SPJ-100003');
+        $response->assertSeeText('SPJ-100004');
     }
 
     public function test_admin_can_filter_reports_by_month(): void
@@ -66,21 +76,6 @@ class ReportIndexTest extends TestCase
         $response->assertSee('type="month"', false);
         $response->assertSeeText('SPJ-SEPTEMBER');
         $response->assertDontSeeText('SPJ-OCTOBER');
-    }
-
-    public function test_invalid_type_filter_is_not_used_as_a_dynamic_query_value(): void
-    {
-        $admin = User::factory()->create();
-        Report::factory()->emergency()->create(['code' => 'SPJ-100003']);
-        Report::factory()->create(['code' => 'SPJ-100004']);
-
-        $response = $this->actingAs($admin)->get(route('admin.pengaduan', [
-            'type' => "emergency' OR 1=1 --",
-        ]));
-
-        $response->assertOk();
-        $response->assertSeeText('SPJ-100003');
-        $response->assertSeeText('SPJ-100004');
     }
 
     public function test_report_location_is_escaped_in_the_list(): void

@@ -28,7 +28,7 @@ class ReportFactory extends Factory
             'code' => fake()->unique()->numerify('SPJ-######'),
             'guest_access_id' => GuestAccess::factory(),
             'created_by_user_id' => null,
-            'type' => ReportType::Information,
+            'type' => ReportType::Report,
             'category' => fake()->randomElement(ReportCategory::cases()),
             'source' => ReportSource::Online,
             'source_platform' => ReportSourcePlatform::Website,
@@ -45,14 +45,6 @@ class ReportFactory extends Factory
             'feedback_comment' => null,
             'feedback_submitted_at' => null,
         ];
-    }
-
-    public function emergency(): static
-    {
-        return $this->state(fn (array $attributes): array => [
-            'type' => ReportType::Emergency,
-            'reporter_nik' => fake()->numerify('################'),
-        ]);
     }
 
     public function recordedBy(

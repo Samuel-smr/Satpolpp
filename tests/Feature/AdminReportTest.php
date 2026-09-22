@@ -11,7 +11,6 @@ use App\Notifications\NewReportNotification;
 use App\ReportSource;
 use App\ReportSourcePlatform;
 use App\ReportStatus;
-use App\ReportType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -100,7 +99,6 @@ class AdminReportTest extends TestCase
         $blockedAdmin = User::factory()->blocked()->create();
 
         $response = $this->actingAs($admin)->post(route('admin.pengaduan.store'), [
-            'type' => ReportType::Information->value,
             'source' => ReportSource::Offline->value,
             'reporter_name' => 'Pelapor Offline',
             'reporter_phone' => '081234567890',
@@ -138,7 +136,6 @@ class AdminReportTest extends TestCase
     {
         $admin = User::factory()->create();
         $data = [
-            'type' => ReportType::Information->value,
             'source' => ReportSource::Online->value,
             'reporter_phone' => '081234567890',
             'description' => 'Laporan dari WhatsApp.',

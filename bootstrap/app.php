@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\SecurityHeaders;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -13,9 +15,15 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->web(append: [SecurityHeaders::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        $exceptions->render(function (LockTimeoutException $exception, Request $request) {
+            if ($request->routeIs('pelapor.ai-assistant')) {
+                return response()->json(['message' => 'Pesan sebelumnya masih diproses. Tunggu sebentar lalu coba lagi.'], 429)
+                    ->header('Retry-After', '2');
+            }
+        });
         $exceptions->render(function (PostTooLargeException $exception, Request $request) {
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'Ukuran file yang diunggah melebihi batas maksimum server.'], 413);

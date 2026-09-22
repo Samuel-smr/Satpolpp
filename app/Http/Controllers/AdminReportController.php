@@ -8,6 +8,7 @@ use App\Models\Report;
 use App\Models\User;
 use App\Notifications\NewReportNotification;
 use App\ReportStatus;
+use App\ReportType;
 use App\UserRole;
 use App\UserStatus;
 use Illuminate\Http\RedirectResponse;
@@ -53,7 +54,7 @@ class AdminReportController extends Controller
                     'code' => $this->generateReportCode(),
                     'guest_access_id' => null,
                     'created_by_user_id' => $request->user()->id,
-                    'type' => $validated['type'],
+                    'type' => ReportType::Report,
                     'category' => null,
                     'source' => $validated['source'],
                     'source_platform' => $validated['source_platform'] ?? null,
@@ -137,7 +138,7 @@ class AdminReportController extends Controller
     {
         do {
             $code = 'SPJ-'.strtoupper(Str::random(6));
-        } while (Report::query()->where('code', $code)->exists());
+        } while (Report::withTrashed()->where('code', $code)->exists());
 
         return $code;
     }

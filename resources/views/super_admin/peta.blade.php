@@ -1,7 +1,3 @@
-@extends('layouts.super_admin')
-
-@section('title', 'Peta Persebaran')
-
 @push('styles')
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
     <style>
@@ -73,8 +69,7 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 @endpush
 
-@section('content')
-    <div x-data="petaManager()" x-init="initPeta()" x-cloak class="flex flex-col lg:flex-row gap-6 h-full">
+    <div id="peta-persebaran" x-data="petaManager()" x-init="initPeta()" x-cloak class="flex flex-col lg:flex-row gap-6 h-full">
         
         <!-- Left: Control Panel + Map -->
         <div class="flex-1 flex flex-col gap-4 min-w-0">
@@ -137,8 +132,8 @@
             <!-- Stat Cards -->
             <div class="grid grid-cols-2 gap-4">
                 <div class="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm flex flex-col">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Unit Aktif</span>
-                    <span class="text-2xl font-headline font-bold text-slate-800">{{ $mapStatistics['active_units'] }}</span>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Petugas Aktif</span>
+                    <span class="text-2xl font-headline font-bold text-slate-800">{{ $mapStatistics['active_officers'] }}</span>
                 </div>
                 <div class="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm flex flex-col">
                     <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Laporan Terbuka</span>
@@ -516,4 +511,3 @@
             }
         }
     </script>
-@endsection

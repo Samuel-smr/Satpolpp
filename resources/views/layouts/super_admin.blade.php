@@ -83,22 +83,10 @@
                 <span>Manajemen User</span>
             </a>
 
-            <a href="{{ route('super_admin.organisasi') }}"
-               class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all {{ request()->routeIs('super_admin.organisasi') ? 'bg-super-active text-white shadow-md font-semibold' : 'text-slate-300 hover:bg-super-hover hover:text-white' }}">
-                <span class="material-symbols-outlined text-[20px]">account_balance</span>
-                <span>Manajemen Organisasi</span>
-            </a>
-
             <a href="{{ route('super_admin.petugas') }}"
                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all {{ request()->routeIs('super_admin.petugas') ? 'bg-super-active text-white shadow-md font-semibold' : 'text-slate-300 hover:bg-super-hover hover:text-white' }}">
                 <span class="material-symbols-outlined text-[20px]">badge</span>
                 <span>Manajemen Petugas</span>
-            </a>
-
-            <a href="{{ route('super_admin.peta') }}"
-               class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all {{ request()->routeIs('super_admin.peta') ? 'bg-super-active text-white shadow-md font-semibold' : 'text-slate-300 hover:bg-super-hover hover:text-white' }}">
-                <span class="material-symbols-outlined text-[20px]">map</span>
-                <span>Peta Persebaran</span>
             </a>
 
             <a href="{{ route('super_admin.monitoring') }}"
@@ -136,7 +124,7 @@
             <div class="flex items-center gap-2 relative">
                 <!-- Notifikasi -->
                 <div class="relative">
-                    <button onclick="toggleNotif(event)" data-notification-button data-notifications-url="{{ route('super_admin.asset-alerts') }}" class="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors relative" title="Notifikasi">
+                    <button onclick="toggleNotif(event)" data-notification-button data-notifications-url="{{ route('notifications.index') }}" class="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors relative" title="Notifikasi">
                         <span class="material-symbols-outlined text-[20px]">notifications</span>
                         @if ($layoutUnreadNotificationCount > 0)<span data-notification-badge class="absolute right-1 top-1 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>@endif
                     </button>
@@ -144,33 +132,19 @@
                     <div id="notif-panel" class="hidden absolute right-0 top-12 w-80 sm:w-96 bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden z-50">
                         <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100">
                             <h3 class="font-headline font-bold text-slate-800">Notifikasi</h3>
-                            @if (empty($assetAlerts))
-                                <form method="POST" action="{{ route('notifications.read-all') }}">@csrf<button class="text-xs font-medium text-super-active hover:text-brand-600">Tandai semua dibaca</button></form>
-                            @endif
+                            <form method="POST" action="{{ route('notifications.read-all') }}">@csrf<button class="text-xs font-medium text-super-active hover:text-brand-600">Tandai semua dibaca</button></form>
                         </div>
                         <div data-notification-list class="max-h-96 divide-y divide-slate-50 overflow-y-auto">
-                            @forelse ($assetAlerts ?? collect() as $alert)
-                                <div class="flex items-start gap-3 px-4 py-3 {{ $alert['level'] === 'danger' ? 'bg-red-50/60' : 'bg-amber-50/60' }}">
-                                    <span class="material-symbols-outlined flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[18px] {{ $alert['level'] === 'danger' ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-600' }}">warning</span>
-                                    <span class="min-w-0 flex-1">
-                                        <span class="block text-sm font-medium text-slate-700">{{ $alert['title'] }}</span>
-                                        <span class="block text-xs text-slate-500">{{ $alert['message'] }}</span>
-                                        <span class="text-xs text-slate-400">Perlu tindakan</span>
-                                    </span>
-                                    <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-super-active"></span>
-                                </div>
+                            @forelse ($layoutNotifications as $notification)
+                                <form method="POST" action="{{ route('notifications.read', $notification->id) }}">@csrf
+                                    <button class="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-slate-50 {{ $notification->read_at ? '' : 'bg-super-active/5' }}">
+                                        <span class="material-symbols-outlined flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 text-[18px] text-blue-600">notifications</span>
+                                        <span class="min-w-0 flex-1"><span class="block text-sm font-medium text-slate-700">{{ data_get($notification->data, 'title', 'Notifikasi') }}</span><span class="block text-xs text-slate-500">{{ data_get($notification->data, 'message', '-') }}</span><span class="text-xs text-slate-400">{{ $notification->created_at->diffForHumans() }}</span></span>
+                                        @if (!$notification->read_at)<span class="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-super-active"></span>@endif
+                                    </button>
+                                </form>
                             @empty
-                                @forelse ($layoutNotifications as $notification)
-                                    <form method="POST" action="{{ route('notifications.read', $notification->id) }}">@csrf
-                                        <button class="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-slate-50 {{ $notification->read_at ? '' : 'bg-super-active/5' }}">
-                                            <span class="material-symbols-outlined flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 text-[18px] text-blue-600">notifications</span>
-                                            <span class="min-w-0 flex-1"><span class="block text-sm font-medium text-slate-700">{{ data_get($notification->data, 'title', 'Notifikasi') }}</span><span class="block text-xs text-slate-500">{{ data_get($notification->data, 'message', '-') }}</span><span class="text-xs text-slate-400">{{ $notification->created_at->diffForHumans() }}</span></span>
-                                            @if (!$notification->read_at)<span class="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-super-active"></span>@endif
-                                        </button>
-                                    </form>
-                                @empty
-                                    <div class="px-4 py-10 text-center text-slate-400"><div class="mb-2 text-3xl">🔔</div><p class="text-sm">Tidak ada notifikasi.</p></div>
-                                @endforelse
+                                <div class="px-4 py-10 text-center text-slate-400"><div class="mb-2 text-3xl">🔔</div><p class="text-sm">Tidak ada notifikasi.</p></div>
                             @endforelse
                         </div>
                     </div>
@@ -493,6 +467,7 @@
 
     <script src="{{ asset('js/kulon-progo-map.js') }}"></script>
     <script src="{{ asset('js/header-live.js') }}"></script>
+    <script src="{{ asset('js/html-safety.js') }}"></script>
     @stack('scripts')
 </body>
 </html>

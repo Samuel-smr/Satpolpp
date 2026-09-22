@@ -30,7 +30,7 @@ class DistributionMapTest extends TestCase
             'longitude' => 110.17,
         ]);
 
-        $response = $this->actingAs($superAdmin)->get(route('super_admin.peta'));
+        $response = $this->actingAs($superAdmin)->get(route('super_admin.dashboard'));
 
         $response->assertOk()
             ->assertSee('Laporan pada peta database')
@@ -39,10 +39,10 @@ class DistributionMapTest extends TestCase
             ->assertDontSee('Operasi Yustisi KTP');
     }
 
-    public function test_admin_cannot_access_distribution_map(): void
+    public function test_distribution_map_route_is_removed(): void
     {
-        $this->actingAs(User::factory()->create())
-            ->get(route('super_admin.peta'))
-            ->assertForbidden();
+        $this->actingAs(User::factory()->superAdmin()->create())
+            ->get('/super-admin/peta')
+            ->assertNotFound();
     }
 }

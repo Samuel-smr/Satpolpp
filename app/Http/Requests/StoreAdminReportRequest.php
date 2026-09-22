@@ -4,7 +4,6 @@ namespace App\Http\Requests;
 
 use App\ReportSource;
 use App\ReportSourcePlatform;
-use App\ReportType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -18,7 +17,6 @@ class StoreAdminReportRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => ['required', Rule::enum(ReportType::class)],
             'source' => ['required', Rule::enum(ReportSource::class)],
             'source_platform' => [Rule::requiredIf($this->input('source') === ReportSource::Online->value), 'nullable', Rule::enum(ReportSourcePlatform::class)],
             'reporter_name' => ['nullable', 'string', 'max:255'],
@@ -29,7 +27,7 @@ class StoreAdminReportRequest extends FormRequest
             'latitude' => ['required', 'numeric', 'between:-90,90'],
             'longitude' => ['required', 'numeric', 'between:-180,180'],
             'evidence' => ['nullable', 'array', 'max:3'],
-            'evidence.*' => ['file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'evidence.*' => ['file', 'image', 'mimes:jpg,jpeg,png,webp', 'extensions:jpg,jpeg,png,webp', 'max:5120'],
         ];
     }
 
@@ -37,7 +35,6 @@ class StoreAdminReportRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'type.required' => 'Jenis laporan wajib dipilih.',
             'source.required' => 'Sumber laporan wajib dipilih.',
             'source_platform.required' => 'Platform online wajib dipilih.',
             'reporter_phone.required' => 'Nomor telepon wajib diisi.',
@@ -51,6 +48,7 @@ class StoreAdminReportRequest extends FormRequest
             'evidence.max' => 'Bukti laporan maksimal 3 foto.',
             'evidence.*.image' => 'Bukti laporan harus berupa gambar.',
             'evidence.*.mimes' => 'Format bukti hanya JPG, JPEG, PNG, atau WEBP.',
+            'evidence.*.extensions' => 'Ekstensi bukti harus JPG, JPEG, PNG, atau WEBP.',
             'evidence.*.max' => 'Ukuran setiap foto maksimal 5 MB.',
         ];
     }

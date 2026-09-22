@@ -1,650 +1,77 @@
-CLASS DIAGRAM SIPRAJA
-Disusun dari model PHP dan migration lokal yang diperiksa 16 September 2026.
+PENJELASAN CLASS DIAGRAM SIPRAJA
+Pembaruan: 21 September 2026
 
-CARA MEMBUKA
-- draw.io: File > Open From > Device > SIPRAJA-class.drawio.
-- Pilih tab 01–07. Halaman 01 ringkasan relasi; 02–05 detail; 06–07 enum.
-- Setiap kotak dan konektor merupakan objek editable, bukan gambar datar.
-- Alternatif teks: SIPRAJA-class.puml; salin satu blok @startuml sampai @enduml.
-- File ini adalah penjelasan. File draw.io dapat diekspor ke PDF/PNG/SVG.
+1. LAPIS AKTOR DAN AKSES
 
-CAKUPAN DAN DASAR
-Diagram class domain/persistensi, berisi 15 model App\\Models, 1 tabel asosiasi,
-1 model notifikasi Laravel, dan 16 enum. Controller, request, Blade, seeder,
-factory serta tabel teknis cache/jobs/sessions/password_reset_tokens tidak
-dimasukkan sebagai class domain. Perilaku controller telah dirinci pada
-dokumen sequence yang dibuat sebelumnya.
-Skema diturunkan dari migration termasuk perubahan terakhir, bukan dari
-pembacaan data pribadi atau pembuktian semua migration sudah diterapkan di DB aktif.
+Pelapor
+- Aktor tamu, bukan model akun.
+- Memakai GuestAccess untuk kepemilikan laporan di browser.
+- Membuat Report, melihat status miliknya, memberi feedback, dan memakai Asisten AI.
 
-NOTASI
-- Bagian atas: stereotype, nama class dan tabel.
-- Bagian tengah: atribut logis beserta tipe data/cast.
-- Bagian bawah: metode model yang benar-benar dideklarasikan.
-- + = public; # = protected. Atribut tidak diberi visibility palsu karena
-  atribut Eloquent diakses dinamis, bukan properti private yang dideklarasikan.
-- ? = nullable menurut skema, bukan otomatis boleh kosong pada form.
-- PK = primary key; FK = foreign key; unique = batas keunikan DB.
-- 1 = tepat satu; 0..1 = opsional maksimal satu; 0..* = nol sampai banyak.
-  Angka di dekat class menunjukkan jumlah objek class itu per objek lawannya.
-- Relasi tanpa panah = asosiasi; bukan urutan proses dan bukan kepemilikan komposisi.
-- Garis putus-putus bermakna menurut label: polimorfik atau FK skema saja.
-- XOR Attachment: satu lampiran milik tepat satu Report ATAU satu Activity.
-  Tidak berarti lampiran tanpa pemilik atau milik keduanya sekaligus.
-- Angka relasi mengikuti kemungkinan skema, termasuk keadaan belum ada data.
-  Aplikasi dapat menambahkan syarat lebih ketat, misalnya kegiatan baru
-  wajib minimal satu petugas aktif.
-- SoftDeletes = delete logis menggunakan deleted_at.
-- Date/Time/DateTime dan decimal adalah tipe konseptual untuk dokumentasi.
-  Eloquent mengembalikan decimal:7 sebagai string; start_time di SQL adalah
-  TIME dan dicast datetime:H:i. Atribut timestamps() dapat bernilai NULL.
-- Tidak semua tipe hasil relasi mengindikasikan objek langsung: HasMany,
-  BelongsTo, HasOne, MorphTo dan BelongsToMany adalah objek relasi Eloquent.
-- casts() adalah metode protected konfigurasi tipe, bukan fitur pengguna.
-- Metode bawaan save(), delete(), query(), create(), dll diwarisi framework;
-  tidak disalin berulang pada setiap class.
-- DatabaseNotification menampilkan tipe hasil logis method; signature vendor
-  tidak selalu mendeklarasikan return type secara eksplisit.
+Admin dan Super Admin
+- Keduanya direpresentasikan oleh model User dengan enum UserRole.
+- Middleware role membatasi route dan tindakan.
+- Admin menangani Report; Super Admin berfokus pada dashboard, user, officer, kegiatan, dan monitoring.
 
-PEWARISAN DAN TRAIT
-- User extends Illuminate\\Foundation\\Auth\\User (Authenticatable),
-  yang pada akhirnya extends Eloquent Model.
-- Empat belas model lokal selain User extends Eloquent Model.
-- DatabaseNotification adalah class vendor yang extends Model.
-- Seluruh model lokal memakai HasFactory.
-- User memakai Notifiable; relasi notifications()/unreadNotifications()
-  tersedia melalui trait, bukan metode lokal yang dibuat di User.php.
-- Model dengan SoftDeletes: Report, Activity, Officer, OrganizationalUnit,
-  OperationalZone, Archive, Asset.
-- ReportStatusHistory dan AuditLog menggunakan UPDATED_AT = null.
-- ActivityOfficer hanya nama dokumentasi untuk tabel activity_officer;
-  tidak ada file App\\Models\\ActivityOfficer.php.
-- Pewarisan framework juga disertakan pada versi PlantUML; halaman draw.io
-  menekankan domain dan asosiasi agar tidak penuh garis ke satu superclass.
+2. KELAS LAPORAN
 
-PEMETAAN TIGA AKTOR
-Pelapor:
-  Diwakili akses tamu GuestAccess dan atribut identitas pada Report.
-  Tidak ada class login Pelapor atau subclass User untuk pelapor.
-Admin dan Super Admin:
-  Sama-sama objek User; berbeda UserRole.Admin dan UserRole.SuperAdmin.
-  Bukan hubungan pewarisan Admin → SuperAdmin. Hak akses diatur Gate.
+PelaporController
+- Menampilkan form, menyimpan laporan tunggal bertipe lapor, menampilkan status, dan menyimpan feedback.
 
-TEMUAN STRUKTUR TERKINI
-1. Report.feedback_rating, feedback_comment, feedback_submitted_at adalah
-   feedback; tidak ada model/tabel Feedback terpisah.
-2. Activity.evaluation_notes, evaluation_obstacles, evaluated_at dan
-   evaluated_by_user_id adalah evaluasi; tidak ada model Evaluation terpisah.
-3. Activity.category sudah menggantikan operational_category dan berupa
-   nama template/string nullable. activity_template_id adalah FK sebenarnya.
-   Nama kategori bukan FK ke name dan template.name tidak unique pada skema.
-4. ActivityTemplate.operational_category masih menggunakan OperationalCategory.
-   Archive.operational_category sekarang berupa string nama template kegiatan aktif.
-5. Report.category masih ada dan dicast ReportCategory; form create baru
-   tidak mengisinya. Kolom tidak dihilangkan dari diagram hanya karena form
-   tidak menampilkannya.
-6. Officer.employee_number = NIP; position = jabatan; work_unit_name = nama
-   satuan kerja; unit_name = unit kerja. Ketiganya string pilihan, bukan model baru.
-7. Officer.user_id, organizational_unit_id, operational_zone_id dan status
-   masih ada. Form saat ini tidak otomatis memetakan nama satuan/unit ke FK.
-8. Officer rank/email/phone/address/joined_at telah dihapus oleh migration
-   2026_09_14_035025; tidak dicantumkan sebagai atribut terkini.
-9. Officer.user_id adalah FK unique tetapi tidak ada metode user() di model.
-   Diagram menandai relasi ini 'FK saja', tidak mengarang metode baru.
-10. OrganizationalUnit.leader_officer_id dan Officer.organizational_unit_id
-    adalah dua hubungan berbeda: pimpinan dan keanggotaan.
-11. Report–Activity: 0..1 pada kedua ujung. report_id Activity nullable dan unique.
-    Internal tidak punya report; eksternal hasil penyelesaian terkait satu report.
-12. Relasi Activity–Officer adalah many-to-many melalui pivot unik per pasangan.
-13. Attachment menggunakan morphMap report/activity dari AppServiceProvider.
-    Kolom attachable_id tidak memiliki FK SQL lintas tabel; konsistensi pemilik
-    ditegakkan aplikasi. Multiplicity menggambarkan hubungan model yang sah.
-14. AuditLog.subject_type/subject_id adalah metadata; tidak ada subject() MorphTo.
-    Tidak digambar FK/polimorfisme ORM yang sebenarnya tidak dideklarasikan.
-15. Archive bertindak sebagai folder metadata dan mempunyai 1–3 ArchiveFile.
-    Bukti laporan/dokumentasi kegiatan tetap memakai Attachment.
-16. Activity mempunyai nol atau banyak ActivityFinding. Setiap temuan menyimpan
-    jenis (orang/barang), jumlah, dan satuan (buah/batang/botol/orang).
-17. User memiliki notifikasi DatabaseNotification melalui Notifiable.
-    Multiplicity pada halaman menunjukkan penggunaan User di SIPRAJA;
-    struktur notifiable Laravel secara umum dapat menunjuk tipe model lain.
-18. Soft delete tidak menjalankan aksi FK hard delete. nullable/nullOnDelete
-    dapat membuat hubungan pembuat/pelaku opsional, sedangkan restrictOnDelete
-    membatasi penghapusan fisik; detail berada di migration.
+AiAssistantController + AskAiAssistantRequest + GeminiAssistant
+- Memvalidasi pesan/riwayat, meneruskan percakapan ke Gemini dari server, dan mengembalikan JSON aman.
+- API key tidak pernah dikirim ke browser.
 
-DAFTAR CLASS
+AdminReportController
+- Membuat laporan yang dicatat Admin dan melakukan soft delete.
 
-================================================================================
-User — model
-Tabel: users
-Admin dan SuperAdmin adalah nilai UserRole, bukan subclass. extends Authenticatable; memakai HasFactory dan Notifiable.
-Atribut:
-  id: bigint {PK}
-  name: string
-  username: string {unique}
-  email: string? {unique}
-  email_verified_at: DateTime?
-  password: string {hashed, hidden}
-  role: UserRole
-  status: UserStatus
-  remember_token: string? {hidden}
-  created_at: DateTime?
-  updated_at: DateTime?
-Metode:
-  + createdReports(): HasMany<Report>
-  # casts(): array
+ReportStatusController
+- Memajukan status laporan sesuai urutan yang diizinkan.
 
-================================================================================
-GuestAccess — model
-Tabel: guest_accesses
-Akses pelapor publik melalui cookie token. Token mentah tidak disimpan di tabel.
-Atribut:
-  id: bigint {PK}
-  token_hash: string {unique, hidden}
-  last_used_at: DateTime?
-  expires_at: DateTime?
-  created_at: DateTime?
-  updated_at: DateTime?
-Metode:
-  + reports(): HasMany<Report>
-  # casts(): array
+CompleteReportController
+- Menyelesaikan laporan in_progress dan membuat Activity eksternal terkait.
 
-================================================================================
-Report — model
-Tabel: reports
-Feedback merupakan atribut Report. Kolom category tetap ada meskipun form laporan baru tidak memintanya dan menyimpan NULL.
-Memakai SoftDeletes.
-Atribut:
-  id: bigint {PK}
-  code: string {unique}
-  guest_access_id: bigint? {FK}
-  created_by_user_id: bigint? {FK}
-  type: ReportType
-  category: ReportCategory?
-  source: ReportSource
-  source_platform: ReportSourcePlatform?
-  reporter_name: string?
-  reporter_phone: string
-  reporter_nik: string? {encrypted, hidden}
-  description: text
-  location_address: text
-  latitude: decimal(10,7)?
-  longitude: decimal(10,7)?
-  status: ReportStatus
-  completed_at: DateTime?
-  feedback_rating: int?
-  feedback_comment: text?
-  feedback_submitted_at: DateTime?
-  created_at: DateTime?
-  updated_at: DateTime?
-  deleted_at: DateTime?
-Metode:
-  + guestAccess(): BelongsTo<GuestAccess>
-  + createdByUser(): BelongsTo<User>
-  + statusHistories(): HasMany<ReportStatusHistory>
-  + attachments(): MorphMany<Attachment>
-  + activity(): HasOne<Activity>
-  + maskedReporterNik(): ?string
-  # casts(): array
+Report
+- Model inti laporan; mempunyai GuestAccess/User opsional, riwayat status, lampiran, dan Activity opsional.
+- reporter_nik nullable, terenkripsi bila terisi, dan tidak digunakan pada form warga.
 
-================================================================================
-ReportStatusHistory — model
-Tabel: report_status_histories
-Riwayat status; hanya created_at, tanpa updated_at.
-Atribut:
-  id: bigint {PK}
-  report_id: bigint {FK}
-  changed_by_user_id: bigint? {FK}
-  status: ReportStatus
-  note: text?
-  created_at: DateTime
-Metode:
-  + report(): BelongsTo<Report>
-  + changedByUser(): BelongsTo<User>
-  # casts(): array
-  + UPDATED_AT = null {constant}
+3. KELAS KEGIATAN
 
-================================================================================
-Activity — model
-Tabel: activities
-Evaluasi merupakan atribut Activity. Internal: report_id NULL dan kategori nama template; eksternal: report_id terisi, category NULL. start_time SQL TIME, cast Eloquent datetime:H:i.
-Memakai SoftDeletes.
-Atribut:
-  id: bigint {PK}
-  report_id: bigint? {FK, unique}
-  activity_template_id: bigint? {FK}
-  created_by_user_id: bigint {FK}
-  evaluated_by_user_id: bigint? {FK}
-  name: string
-  type: ActivityType
-  category: string?
-  activity_date: Date
-  start_time: Time?
-  description: text?
-  handling_result: text?
-  location_address: text
-  latitude: decimal(10,7)
-  longitude: decimal(10,7)
-  evaluation_notes: text?
-  evaluation_obstacles: text?
-  evaluated_at: DateTime?
-  created_at: DateTime?
-  updated_at: DateTime?
-  deleted_at: DateTime?
-Metode:
-  + report(): BelongsTo<Report>
-  + template(): BelongsTo<ActivityTemplate>
-  + createdByUser(): BelongsTo<User>
-  + evaluatedByUser(): BelongsTo<User>
-  + officers(): BelongsToMany<Officer>
-  + attachments(): MorphMany<Attachment>
-  + findings(): HasMany<ActivityFinding>
-  # casts(): array
+ActivityController
+- CRUD kegiatan internal untuk Admin/Super Admin.
 
-================================================================================
-ActivityFinding — model
-Tabel: activity_findings
-Temuan bersifat opsional dan satu kegiatan dapat mempunyai beberapa baris temuan.
-Atribut:
-  id: bigint {PK}
-  activity_id: bigint {FK}
-  type: FindingType
-  quantity: int
-  unit: FindingUnit
-  created_at: DateTime?
-  updated_at: DateTime?
-Metode:
-  + activity(): BelongsTo<Activity>
-  # casts(): array
+ActivityEvaluationController
+- Menambah, memperbarui, dan menghapus data evaluasi pada Activity.
 
-================================================================================
-ActivityTemplate — model
-Tabel: activity_templates
-Activity.category berisi nama template yang dipilih, bukan nilai enum operational_category. Nama bukan FK dan tidak unique di migrasi.
-Atribut:
-  id: bigint {PK}
-  name: string
-  operational_category: OperationalCategory?
-  default_description: text?
-  is_active: bool
-  sort_order: int
-  created_at: DateTime?
-  updated_at: DateTime?
-Metode:
-  + activities(): HasMany<Activity>
-  # casts(): array
+Activity
+- Mempunyai template opsional, pembuat, evaluator opsional, petugas, temuan, dan lampiran.
+- Activity eksternal mempunyai satu Report; Activity internal tidak mempunyai Report.
 
-================================================================================
-Officer — model
-Tabel: officers
-employee_number adalah NIP. Jabatan, satuan kerja dan unit kerja diwajibkan form, tetapi nullable di skema. user_id tetap ada namun belum memiliki metode user() pada Officer.
-Memakai SoftDeletes.
-Atribut:
-  id: bigint {PK}
-  user_id: bigint? {FK, unique}
-  organizational_unit_id: bigint? {FK}
-  operational_zone_id: bigint? {FK}
-  name: string
-  employee_number: string {unique}
-  position: string?
-  work_unit_name: string?
-  unit_name: string?
-  status: OfficerStatus
-  created_at: DateTime?
-  updated_at: DateTime?
-  deleted_at: DateTime?
-Metode:
-  + organizationalUnit(): BelongsTo<OrganizationalUnit>
-  + operationalZone(): BelongsTo<OperationalZone>
-  + activities(): BelongsToMany<Activity>
-  # casts(): array
+Officer
+- Petugas yang dapat ditugaskan ke banyak Activity.
+- Tidak mempunyai relasi OrganizationalUnit atau OperationalZone.
 
-================================================================================
-OrganizationalUnit — model
-Tabel: organizational_units
-Relasi pimpinan berbeda dari keanggotaan petugas. Siklus induk dicegah validasi aplikasi.
-Memakai SoftDeletes.
-Atribut:
-  id: bigint {PK}
-  parent_id: bigint? {FK self}
-  operational_zone_id: bigint? {FK}
-  leader_officer_id: bigint? {FK}
-  name: string
-  code: string? {unique}
-  type: OrganizationalUnitType
-  description: text?
-  is_active: bool
-  created_at: DateTime?
-  updated_at: DateTime?
-  deleted_at: DateTime?
-Metode:
-  + parent(): BelongsTo<OrganizationalUnit>
-  + children(): HasMany<OrganizationalUnit>
-  + operationalZone(): BelongsTo<OperationalZone>
-  + leader(): BelongsTo<Officer>
-  + officers(): HasMany<Officer>
-  # casts(): array
+4. KELAS ADMINISTRASI
 
-================================================================================
-OperationalZone — model
-Tabel: operational_zones
-Zona dapat berhubungan langsung dengan unit maupun petugas. Model ini tidak mendeklarasikan metode officers().
-Memakai SoftDeletes.
-Atribut:
-  id: bigint {PK}
-  name: string
-  code: string? {unique}
-  description: text?
-  is_active: bool
-  created_at: DateTime?
-  updated_at: DateTime?
-  deleted_at: DateTime?
-Metode:
-  + organizationalUnits(): HasMany<OrganizationalUnit>
-  # casts(): array
+ArchiveController mengelola Archive dan ArchiveFile.
+OfficerController mengelola Officer.
+SuperAdminController mengelola dashboard, akun Admin, monitoring, dan asset alerts.
+AdminController menyediakan dashboard/list/detail laporan, kegiatan, dan feedback.
+ProfileController mengelola profil akun sendiri.
+NotificationController mengelola notifikasi database.
+GlobalSearchController menyediakan pencarian sesuai role.
 
-================================================================================
-Attachment — model
-Tabel: attachments
-Polimorfik: pemilik adalah Report ATAU Activity. attachable_type memakai alias report/activity dari morphMap; bukan FK SQL ke kedua tabel.
-Atribut:
-  id: bigint {PK}
-  attachable_type: string
-  attachable_id: bigint
-  uploaded_by_user_id: bigint? {FK}
-  file_path: string
-  original_name: string
-  file_type: string
-  mime_type: string
-  file_size: bigint
-  audience: string
-  created_at: DateTime?
-  updated_at: DateTime?
-Metode:
-  + attachable(): MorphTo<Model>
-  + uploadedByUser(): BelongsTo<User>
-  # casts(): array
+5. KELAS YANG DIHAPUS
 
-================================================================================
-Archive — model
-Tabel: archives
-Archive menyimpan metadata folder. File fisik dan metadatanya berada pada ArchiveFile.
-Memakai SoftDeletes.
-Atribut:
-  id: bigint {PK}
-  created_by_user_id: bigint {FK}
-  title: string
-  operational_category: string
-  description: text?
-  confidentiality: ArchiveConfidentiality
-  created_at: DateTime?
-  updated_at: DateTime?
-  deleted_at: DateTime?
-Metode:
-  + createdByUser(): BelongsTo<User>
-  + files(): HasMany<ArchiveFile>
-  # casts(): array
+- OrganizationalUnit
+- OperationalZone
+- OrganizationalUnitController
+- UpsertOrganizationalUnitRequest
+- OrganizationalUnitType
+- Asset
+- AssetController
+- StoreAssetRequest
+- AssetCategory
+- AssetCondition
 
-================================================================================
-ArchiveFile — model
-Tabel: archive_files
-Satu baris mewakili satu file di dalam folder Archive; aplikasi membatasi total maksimal tiga file.
-Atribut:
-  id: bigint {PK}
-  archive_id: bigint {FK}
-  file_path: string
-  original_name: string
-  mime_type: string
-  file_extension: string
-  file_size: bigint
-  created_at: DateTime?
-  updated_at: DateTime?
-Metode:
-  + archive(): BelongsTo<Archive>
-  # casts(): array
-
-================================================================================
-Asset — model
-Tabel: assets
-Data pajak, kilometer servis berikutnya, dan tanggal servis oli terakhir dipakai untuk kendaraan; diset NULL bila kategori selain kendaraan.
-Memakai SoftDeletes.
-Atribut:
-  id: bigint {PK}
-  created_by_user_id: bigint {FK}
-  asset_code: string? {unique}
-  name: string
-  category: AssetCategory
-  condition: AssetCondition
-  location: string?
-  acquisition_year: int?
-  tax_due_date: Date?
-  next_oil_service_km: int?
-  last_oil_service_date: Date?
-  created_at: DateTime?
-  updated_at: DateTime?
-  deleted_at: DateTime?
-Metode:
-  + createdByUser(): BelongsTo<User>
-  + vehicleAlerts(): Collection {static}
-  # casts(): array
-
-================================================================================
-AuditLog — model
-Tabel: audit_logs
-subject_type dan subject_id adalah metadata; tidak ada metode subject(): MorphTo. old_values/new_values disimpan JSON; tidak punya updated_at.
-Atribut:
-  id: bigint {PK}
-  actor_user_id: bigint? {FK}
-  subject_type: string?
-  subject_id: bigint?
-  module: string
-  action: string
-  description: text
-  old_values: array?
-  new_values: array?
-  ip_address: string?
-  user_agent: text?
-  created_at: DateTime
-Metode:
-  + actorUser(): BelongsTo<User>
-  # casts(): array
-  + UPDATED_AT = null {constant}
-
-================================================================================
-ActivityOfficer — association table
-Tabel: activity_officer
-Tabel pivot; tidak ada class App\Models\ActivityOfficer. Unique gabungan (activity_id, officer_id). Ditampilkan sebagai association table untuk memperjelas atribut relasi.
-Atribut:
-  id: bigint {PK}
-  activity_id: bigint {FK}
-  officer_id: bigint {FK}
-  assignment_role: string?
-  notes: text?
-  created_at: DateTime?
-  updated_at: DateTime?
-Metode:
-  Tidak ada metode class lokal khusus.
-
-================================================================================
-DatabaseNotification — framework
-Tabel: notifications
-Class vendor Illuminate\Notifications\DatabaseNotification; data disimpan text JSON lalu cast array. Relasi User berasal dari trait Notifiable. Return type ditulis sebagai tipe hasil dokumentasi, tidak semuanya ditulis eksplisit di vendor.
-Atribut:
-  id: UUID {PK}
-  type: string
-  notifiable_type: string
-  notifiable_id: bigint
-  data: array
-  read_at: DateTime?
-  created_at: DateTime?
-  updated_at: DateTime?
-Metode:
-  + notifiable(): MorphTo<Model>
-  + markAsRead(): void
-  + markAsUnread(): void
-  + read(): bool
-  + unread(): bool
-
-RELASI DAN MULTIPLICITY
-1. GuestAccess [0..1] -- Report [0..*]: akses tamu (orm).
-2. User [0..1] -- Report [0..*]: pencatat (orm).
-3. Report [1] -- ReportStatusHistory [0..*]: riwayat (orm).
-4. User [0..1] -- ReportStatusHistory [0..*]: pengubah status (orm).
-5. Report [0..1] -- Activity [0..1]: penanganan eksternal (orm).
-6. ActivityTemplate [0..1] -- Activity [0..*]: template (orm).
-7. Activity [1] -- ActivityFinding [0..*]: temuan (orm).
-8. User [1] -- Activity [0..*]: pembuat (orm).
-9. User [0..1] -- Activity [0..*]: evaluator (orm).
-10. Activity [1] -- ActivityOfficer [0..*]: penugasan (pivot).
-11. Officer [1] -- ActivityOfficer [0..*]: penugasan (pivot).
-11. User [0..1] -- Officer [0..1]: akun petugas {FK saja} (fk).
-12. OrganizationalUnit [0..1] -- Officer [0..*]: keanggotaan (orm).
-13. Officer [0..1] -- OrganizationalUnit [0..*]: pimpinan (orm).
-14. OrganizationalUnit [0..1] -- OrganizationalUnit [0..*]: induk / bawahan (orm).
-15. OperationalZone [0..1] -- OrganizationalUnit [0..*]: zona unit (orm).
-16. OperationalZone [0..1] -- Officer [0..*]: zona petugas (orm).
-17. Report [0..1] -- Attachment [0..*]: pemilik {xor Activity} (morph).
-18. Activity [0..1] -- Attachment [0..*]: pemilik {xor Report} (morph).
-19. User [0..1] -- Attachment [0..*]: pengunggah (orm).
-20. User [1] -- Archive [0..*]: pembuat arsip (orm).
-21. Archive [1] -- ArchiveFile [1..3]: file dalam folder arsip (orm; batas 1..3 oleh validasi aplikasi).
-21. User [1] -- Asset [0..*]: pencatat aset (orm).
-22. User [0..1] -- AuditLog [0..*]: pelaku (orm).
-23. User [1] -- DatabaseNotification [0..*]: notifiable {lingkup SIPRAJA} (morph).
-
-ENUM
-
-ActivityType
-  Internal = internal
-  External = external
-+ label(): string
-
-ArchiveConfidentiality
-  Public = public
-  Confidential = confidential
-+ label(): string
-
-FindingType
-  Person = person (label Orang)
-  Item = item (label Barang)
-+ label(): string
-
-FindingUnit
-  Piece = piece (label Buah)
-  Stick = stick (label Batang)
-  Bottle = bottle (label Botol)
-  Person = person (label Orang)
-+ label(): string
-
-FindingType
-  Person = orang
-  Item = barang
-+ label(): string
-
-FindingUnit
-  Piece = buah
-  Stick = batang
-  Bottle = botol
-  Person = orang
-+ label(): string
-
-AssetCategory
-  Vehicle = vehicle
-  Supplies = supplies
-  Equipment = equipment
-  Infrastructure = infrastructure
-  Other = other
-+ label(): string
-
-AssetCondition
-  Good = good
-  NeedsRepair = needs_repair
-  SeverelyDamaged = severely_damaged
-+ label(): string
-
-OfficerStatus
-  Active = active
-  Leave = leave
-  Inactive = inactive
-+ label(): string
-
-OperationalCategory
-  PublicOrderPatrol = patroli_ketertiban_umum
-  OfficialSecurityEscort = pengamanan_pengawalan_pejabat
-  EventSecurity = pengamanan_acara_kegiatan
-  PublicComplaintHandling = penanganan_pengaduan_masyarakat
-  RegionalRegulationCompliance = kepatuhan_perda_dan_perkada
-  AttributeSupervision = pembinaan_pengawasan_atribut
-  JudicialEnforcement = penegakan_yustisial
-  NonJudicialEnforcement = penegakan_non_yustisial
-+ label(): string
-
-OrganizationalUnitType
-  Division = division
-  Team = team
-  Post = post
-+ label(): string
-
-ReportCategory
-  PublicOrder = public_order
-  EnvironmentalCleanliness = environmental_cleanliness
-  Security = security
-+ label(): string
-
-ReportSource
-  Online = online
-  Offline = offline
-+ label(): string
-
-ReportSourcePlatform
-  Website = website
-  WhatsApp = whatsapp
-  Instagram = instagram
-  X = x
-  Facebook = facebook
-  TikTok = tiktok
-  Other = other
-+ label(): string
-
-ReportStatus
-  Submitted = submitted
-  Received = received
-  Verifying = verifying
-  InProgress = in_progress
-  Completed = completed
-+ label(): string
-+ description(): string
-+ nextProcessingStatus(): ?self
-
-ReportType
-  Emergency = emergency
-  Information = information
-+ label(): string
-
-UserRole
-  Admin = admin
-  SuperAdmin = super_admin
-
-
-UserStatus
-  Active = active
-  Blocked = blocked
-
-
-SUMBER
-- app/Models/*.php: atribut fillable, casts, relasi, metode, trait.
-- app/*.php: 16 enum nilai.
-- database/migrations/*: tipe, nullable, unique, FK, timestamps dan pivot.
-- Migration 2026_09_14_021722 dan 2026_09_14_023151: Activity.category.
-- Migration 2026_09_14_035025: struktur field Officer terkini.
-- app/Providers/AppServiceProvider.php: morphMap dan Gate.
-- vendor/laravel/framework/src/Illuminate/Notifications/DatabaseNotification.php:
-  class notifikasi framework, hubungan notifiable dan metode baca.
-- app/Http/Requests/UpsertOfficerRequest.php dan StoreInternalActivityRequest.php:
-  perbedaan kewajiban form dengan nullable pada skema.
-
-CATATAN PEMAKAIAN
-Diagram adalah representasi implementasi, bukan usulan refactor. Nama class
-memakai nama PHP agar dapat dicocokkan dengan kode. Nama layar Indonesia dijelaskan
-pada dokumen pendamping use case/sequence. Satu class yang muncul pada beberapa
-halaman adalah class yang sama, bukan class duplikat dalam aplikasi.
+Diagram kelas tidak boleh lagi menampilkan ketergantungan Officer terhadap unit organisasi atau wilayah operasional.

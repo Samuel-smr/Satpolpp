@@ -26,10 +26,6 @@ class DatabaseSeederTest extends TestCase
         $completedReportId = DB::table('reports')->where('code', 'LAP-2026-0001')->value('id');
 
         $this->assertDatabaseHas('activities', ['report_id' => $completedReportId, 'type' => 'external']);
-        $this->assertDatabaseHas('organizational_units', [
-            'code' => 'REGU-A',
-            'leader_officer_id' => DB::table('officers')->where('employee_number', 'PP-001')->value('id'),
-        ]);
         Storage::disk('local')->assertExists('dummy/reports/laporan-pkl.txt');
         Storage::disk('local')->assertExists('dummy/archives/sop-penertiban.txt');
     }
@@ -47,12 +43,9 @@ class DatabaseSeederTest extends TestCase
             'attachments',
             'activity_templates',
             'activities',
-            'operational_zones',
-            'organizational_units',
             'officers',
             'activity_officer',
             'archives',
-            'assets',
             'notifications',
             'audit_logs',
         ];
