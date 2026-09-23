@@ -138,7 +138,7 @@
                         <h3 class="mb-2 text-sm font-semibold text-slate-700">Temuan</h3>
                         <div class="space-y-2">
                             @forelse ($report->activity->findings as $finding)
-                                <div class="grid grid-cols-3 gap-3 rounded-xl border border-emerald-100 bg-white/70 p-3 text-sm">
+                                <div class="grid grid-cols-1 gap-3 rounded-xl border sm:grid-cols-3 border-emerald-100 bg-white/70 p-3 text-sm">
                                     <span>{{ $finding->type->label() }}</span>
                                     <span class="font-semibold">{{ $finding->quantity }}</span>
                                     <span>{{ $finding->unit->label() }}</span>

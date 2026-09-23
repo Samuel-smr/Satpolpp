@@ -42,7 +42,7 @@
 
             <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
                 {{-- Header laporan --}}
-                <div class="flex items-center justify-between gap-4 mb-5">
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-5">
                     <h2 class="font-headline font-bold text-lg text-slate-800" id="d-kode">--</h2>
                     <span class="text-sm font-semibold bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full" id="d-badge">--</span>
                 </div>

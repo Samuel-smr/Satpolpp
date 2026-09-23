@@ -7,10 +7,10 @@
 @endpush
 
 @section('content')
-    <div class="fixed inset-y-0 left-64 right-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="activity-detail-modal-title">
+    <div class="fixed inset-y-0 left-0 right-0 lg:left-64 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="activity-detail-modal-title">
         <a href="{{ route($activityRoutePrefix ?? 'admin.kegiatan') }}" class="absolute inset-0 bg-black/40" aria-label="Tutup detail kegiatan"></a>
 
-        <div class="relative flex max-h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+        <div class="relative flex max-h-[92dvh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
             <div class="flex shrink-0 flex-col gap-4 border-b border-slate-100 px-6 py-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                     <span class="inline-flex rounded-full border border-indigo-100 bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-600">Kegiatan Internal</span>
@@ -70,7 +70,7 @@
                     <h2 class="mb-4 font-headline text-lg font-bold text-slate-800">Temuan</h2>
                     <div class="space-y-3">
                         @forelse ($activity->findings as $finding)
-                            <div class="grid grid-cols-3 gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm">
+                            <div class="grid grid-cols-1 gap-3 rounded-xl border sm:grid-cols-3 border-slate-200 bg-slate-50 p-4 text-sm">
                                 <div><p class="text-slate-400">Jenis</p><p class="font-semibold text-slate-700">{{ $finding->type->label() }}</p></div>
                                 <div><p class="text-slate-400">Jumlah</p><p class="font-semibold text-slate-700">{{ $finding->quantity }}</p></div>
                                 <div><p class="text-slate-400">Satuan</p><p class="font-semibold text-slate-700">{{ $finding->unit->label() }}</p></div>
