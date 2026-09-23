@@ -6,6 +6,7 @@ use App\Models\AuditLog;
 use App\Models\Report;
 use App\Models\User;
 use App\ReportStatus;
+use App\Services\WhatsAppService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -75,6 +76,8 @@ class ReportStatusController extends Controller
             return $nextStatus;
         });
 
+        app(WhatsAppService::class)->sendReportStatusUpdate($report, $nextStatus->label(), $validated['note'] ?? null);
+
         return redirect()
             ->route('admin.pengaduan.detail', $report)
             ->with('status', "Status berhasil diperbarui menjadi {$nextStatus->label()}.");
@@ -135,6 +138,12 @@ class ReportStatusController extends Controller
                 'user_agent' => $request->userAgent(),
             ]);
         });
+
+        app(WhatsAppService::class)->sendReportStatusUpdate(
+            $report,
+            ReportStatus::Rejected->label(),
+            $validated['alasan_tolak'],
+        );
 
         return redirect()
             ->route('admin.pengaduan.detail', $report)

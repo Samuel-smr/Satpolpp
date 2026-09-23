@@ -12,6 +12,7 @@ use App\Models\Report;
 use App\Models\User;
 use App\OfficerStatus;
 use App\ReportStatus;
+use App\Services\WhatsAppService;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -142,6 +143,12 @@ class CompleteReportController extends Controller
 
             throw $exception;
         }
+
+        app(WhatsAppService::class)->sendReportStatusUpdate(
+            $report,
+            ReportStatus::Completed->label(),
+            $validated['handling_result'],
+        );
 
         return redirect()
             ->route('admin.pengaduan.detail', $report)
