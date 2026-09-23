@@ -14,6 +14,9 @@
 /.zed
 /auth.json
 /node_modules
+/wa-bot/node_modules
+/wa-bot/session
+/wa-bot/.wwebjs_cache
 /public/build
 /public/fonts-manifest.dev.json
 /public/hot

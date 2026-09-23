@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Notifications\NewReportNotification;
 use App\ReportStatus;
 use App\ReportType;
+use App\Services\WhatsAppService;
 use App\UserRole;
 use App\UserStatus;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -109,6 +110,8 @@ class PelaporController extends Controller
             ->where('status', UserStatus::Active)
             ->get();
         Notification::send($administrators, new NewReportNotification($report));
+
+        app(WhatsAppService::class)->sendReportCreated($report);
 
         return redirect()
             ->route('pelapor.lapor')
