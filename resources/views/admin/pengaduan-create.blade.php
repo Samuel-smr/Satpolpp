@@ -3,9 +3,9 @@
 @section('title', 'Tambah Laporan')
 
 @section('content')
-    <div class="fixed inset-y-0 left-64 right-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="report-modal-title">
+    <div class="fixed inset-y-0 left-0 right-0 lg:left-64 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="report-modal-title">
         <a href="{{ route('admin.pengaduan') }}" class="absolute inset-0 bg-black/40" aria-label="Tutup formulir"></a>
-        <div class="relative flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+        <div class="relative flex max-h-[92dvh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
             <div class="flex shrink-0 items-start justify-between gap-4 border-b border-slate-100 px-6 py-4">
                 <div>
                     <h1 id="report-modal-title" class="font-headline text-xl font-bold text-slate-900">Tambah Laporan</h1>
@@ -32,11 +32,6 @@
             <section class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
                 <h2 class="mb-5 font-headline text-lg font-bold text-slate-800">Informasi Laporan</h2>
                 <div class="mt-5 grid grid-cols-1 gap-4">
-                    <label class="block text-sm font-semibold text-slate-700">Jenis laporan
-                        <select name="type" required class="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 focus:border-sidebar-active focus:bg-white focus:outline-none focus:ring-1 focus:ring-sidebar-active">
-                            @foreach (\App\ReportType::cases() as $type)<option value="{{ $type->value }}" @selected(old('type') === $type->value)>{{ $type->label() }}</option>@endforeach
-                        </select>
-                    </label>
                     <label class="block text-sm font-semibold text-slate-700">Sumber laporan
                         <select id="source" name="source" required class="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 focus:border-sidebar-active focus:bg-white focus:outline-none focus:ring-1 focus:ring-sidebar-active">
                             @foreach (\App\ReportSource::cases() as $source)<option value="{{ $source->value }}" @selected(old('source', 'offline') === $source->value)>{{ $source->label() }}</option>@endforeach

@@ -9,6 +9,8 @@ use App\Models\Report;
 use App\Models\User;
 use App\Notifications\NewReportNotification;
 use App\ReportStatus;
+use App\ReportType;
+use App\Services\WhatsAppService;
 use App\UserRole;
 use App\UserStatus;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -63,13 +65,13 @@ class PelaporController extends Controller
                     'code' => $this->generateReportCode(),
                     'guest_access_id' => $guestAccess->id,
                     'created_by_user_id' => null,
-                    'type' => $validated['jenis'],
+                    'type' => ReportType::Report,
                     'category' => null,
                     'source' => 'online',
                     'source_platform' => 'website',
                     'reporter_name' => null,
                     'reporter_phone' => $validated['telepon'],
-                    'reporter_nik' => $validated['nik'] ?? null,
+                    'reporter_nik' => null,
                     'description' => $validated['deskripsi'],
                     'location_address' => $validated['lokasi'],
                     'latitude' => null,
@@ -108,6 +110,8 @@ class PelaporController extends Controller
             ->where('status', UserStatus::Active)
             ->get();
         Notification::send($administrators, new NewReportNotification($report));
+
+        app(WhatsAppService::class)->sendReportCreated($report);
 
         return redirect()
             ->route('pelapor.lapor')
@@ -219,7 +223,7 @@ class PelaporController extends Controller
     {
         do {
             $code = 'SPJ-'.strtoupper(Str::random(6));
-        } while (Report::query()->where('code', $code)->exists());
+        } while (Report::withTrashed()->where('code', $code)->exists());
 
         return $code;
     }
@@ -238,7 +242,6 @@ class PelaporController extends Controller
 
         return [
             'kode' => $report->code,
-            'jenis' => $report->type->value,
             'kategori' => $report->category?->label(),
             'deskripsi' => $report->description,
             'lokasi' => $report->location_address,

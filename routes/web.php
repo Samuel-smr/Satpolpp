@@ -5,15 +5,14 @@ use App\Http\Controllers\ActivityEvaluationController;
 use App\Http\Controllers\AdminActivityExportAttachmentController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminReportController;
+use App\Http\Controllers\AiAssistantController;
 use App\Http\Controllers\ArchiveController;
-use App\Http\Controllers\AssetController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CompleteReportController;
 use App\Http\Controllers\GlobalSearchController;
 use App\Http\Controllers\InternalActivityAttachmentController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OfficerController;
-use App\Http\Controllers\OrganizationalUnitController;
 use App\Http\Controllers\PelaporController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportAttachmentController;
@@ -24,16 +23,20 @@ use Illuminate\Support\Facades\Route;
 // Landing / Role Pelapor (masyarakat)
 Route::get('/', [PelaporController::class, 'index'])->name('pelapor.index');
 Route::get('/lapor', [PelaporController::class, 'lapor'])->name('pelapor.lapor');
-Route::post('/lapor', [PelaporController::class, 'store'])->name('pelapor.store');
+Route::post('/lapor', [PelaporController::class, 'store'])->middleware('throttle:guest-reports')->name('pelapor.store');
+Route::post('/lapor/asisten-ai', AiAssistantController::class)
+    ->middleware('throttle:ai-assistant')
+    ->block(30, 0)
+    ->name('pelapor.ai-assistant');
 Route::get('/status', [PelaporController::class, 'status'])->name('pelapor.status');
-Route::post('/status/{report:code}/feedback', [PelaporController::class, 'storeFeedback'])->name('pelapor.feedback.store');
+Route::post('/status/{report:code}/feedback', [PelaporController::class, 'storeFeedback'])->middleware('throttle:guest-feedback')->name('pelapor.feedback.store');
 Route::get('/feedback', [PelaporController::class, 'feedback'])->name('pelapor.feedback');
 
 // Auth Routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->name('login.store');
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login-ip')->name('login.store');
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'can:access-internal'])->group(function () {
     Route::get('/global-search', GlobalSearchController::class)->middleware('throttle:60,1')->name('global-search');
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
@@ -73,11 +76,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:access-admin'])
     Route::get('/arsip/{archive}/files/{archiveFile}', [ArchiveController::class, 'show'])->name('arsip.show');
     Route::get('/arsip/{archive}/files/{archiveFile}/download', [ArchiveController::class, 'download'])->name('arsip.download');
     Route::delete('/arsip/{archive}', [ArchiveController::class, 'destroy'])->name('arsip.destroy');
-    Route::get('/aset', [AssetController::class, 'index'])->name('aset');
-    Route::post('/aset', [AssetController::class, 'store'])->name('aset.store');
-    Route::put('/aset/{asset}', [AssetController::class, 'update'])->name('aset.update');
-    Route::delete('/aset/{asset}', [AssetController::class, 'destroy'])->name('aset.destroy');
-
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
@@ -102,10 +100,6 @@ Route::prefix('super-admin')->name('super_admin.')->middleware(['auth', 'can:acc
     Route::put('/user/{user}', [SuperAdminController::class, 'updateUser'])->name('user.update');
     Route::patch('/user/{user}/status', [SuperAdminController::class, 'toggleUserStatus'])->name('user.status');
     Route::delete('/user/{user}', [SuperAdminController::class, 'destroyUser'])->name('user.destroy');
-    Route::get('/organisasi', [OrganizationalUnitController::class, 'index'])->name('organisasi');
-    Route::post('/organisasi', [OrganizationalUnitController::class, 'store'])->name('organisasi.store');
-    Route::put('/organisasi/{organizationalUnit}', [OrganizationalUnitController::class, 'update'])->name('organisasi.update');
-    Route::delete('/organisasi/{organizationalUnit}', [OrganizationalUnitController::class, 'destroy'])->name('organisasi.destroy');
     Route::get('/petugas', [OfficerController::class, 'index'])->name('petugas');
     Route::post('/petugas', [OfficerController::class, 'store'])->name('petugas.store');
     Route::put('/petugas/{officer}', [OfficerController::class, 'update'])->name('petugas.update');
@@ -116,6 +110,4 @@ Route::prefix('super-admin')->name('super_admin.')->middleware(['auth', 'can:acc
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
     Route::get('/monitoring', [SuperAdminController::class, 'monitoring'])->name('monitoring');
-    Route::get('/peta', [SuperAdminController::class, 'peta'])->name('peta');
-    Route::get('/asset-alerts', [SuperAdminController::class, 'assetAlerts'])->name('asset-alerts');
 });

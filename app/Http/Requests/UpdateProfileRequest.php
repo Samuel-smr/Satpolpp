@@ -33,8 +33,8 @@ class UpdateProfileRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'username' => ['required', 'string', 'max:100', 'regex:/^[A-Za-z0-9._-]+$/', Rule::unique('users', 'username')->ignore($user instanceof User ? $user->id : null)],
             'email' => ['nullable', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user instanceof User ? $user->id : null)],
-            'current_password' => [Rule::requiredIf($this->filled('password')), 'nullable', 'current_password'],
-            'password' => ['nullable', 'confirmed', Password::min(8)],
+            'current_password' => ['bail', Rule::requiredIf($this->filled('password')), 'nullable', 'string', 'max:4096', 'current_password'],
+            'password' => ['bail', 'nullable', 'string', 'regex:/\A[^\x00]{1,72}\z/s', 'confirmed', Password::min(8)],
         ];
     }
 
@@ -52,6 +52,7 @@ class UpdateProfileRequest extends FormRequest
             'current_password.current_password' => 'Password saat ini tidak sesuai.',
             'password.confirmed' => 'Konfirmasi password baru tidak sesuai.',
             'password.min' => 'Password baru minimal 8 karakter.',
+            'password.regex' => 'Password maksimal 72 byte dan tidak boleh mengandung karakter null.',
         ];
     }
 }

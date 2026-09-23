@@ -21,8 +21,6 @@ class OfficerFactory extends Factory
     {
         return [
             'user_id' => null,
-            'organizational_unit_id' => null,
-            'operational_zone_id' => null,
             'name' => fake()->name(),
             'employee_number' => fake()->unique()->numerify('PP-######'),
             'position' => fake()->randomElement(OfficerOptions::positions()),

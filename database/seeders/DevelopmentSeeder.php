@@ -45,8 +45,8 @@ class DevelopmentSeeder extends Seeder
             $this->seedReportHistories($adminId, $reportOneId, $reportTwoId, $now);
             $this->seedReportAttachments($reportOneId, $reportTwoId, $now);
             $this->seedActivityTemplates($now);
-            $this->seedOrganizationAndActivities($adminId, $superAdminId, $reportOneId, $now);
-            $this->seedArchivesAndAssets($adminId, $superAdminId, $now);
+            $this->seedOfficersAndActivities($adminId, $superAdminId, $reportOneId, $now);
+            $this->seedArchives($adminId, $superAdminId, $now);
             $this->seedNotificationsAndAuditLogs($adminId, $superAdminId, $reportOneId, $reportTwoId, $now);
         });
     }
@@ -88,7 +88,7 @@ class DevelopmentSeeder extends Seeder
             [
                 'guest_access_id' => $guestOneId,
                 'created_by_user_id' => null,
-                'type' => ReportType::Emergency->value,
+                'type' => ReportType::Report->value,
                 'category' => ReportCategory::PublicOrder->value,
                 'source' => ReportSource::Online->value,
                 'source_platform' => ReportSourcePlatform::Website->value,
@@ -114,7 +114,7 @@ class DevelopmentSeeder extends Seeder
             [
                 'guest_access_id' => $guestTwoId,
                 'created_by_user_id' => null,
-                'type' => ReportType::Information->value,
+                'type' => ReportType::Report->value,
                 'category' => ReportCategory::EnvironmentalCleanliness->value,
                 'source' => ReportSource::Online->value,
                 'source_platform' => ReportSourcePlatform::WhatsApp->value,
@@ -173,46 +173,19 @@ class DevelopmentSeeder extends Seeder
         );
     }
 
-    private function seedOrganizationAndActivities(int $adminId, int $superAdminId, int $reportOneId, CarbonInterface $now): void
+    private function seedOfficersAndActivities(int $adminId, int $superAdminId, int $reportOneId, CarbonInterface $now): void
     {
-        DB::table('operational_zones')->updateOrInsert(
-            ['code' => 'ZONA-WATES'],
-            ['name' => 'Kecamatan Wates', 'description' => 'Wilayah operasional Kecamatan Wates.', 'is_active' => true, 'created_at' => $now, 'updated_at' => $now, 'deleted_at' => null],
-        );
-        DB::table('operational_zones')->updateOrInsert(
-            ['code' => 'ZONA-PENGASIH'],
-            ['name' => 'Kecamatan Pengasih', 'description' => 'Wilayah operasional Kecamatan Pengasih.', 'is_active' => true, 'created_at' => $now, 'updated_at' => $now, 'deleted_at' => null],
-        );
-
-        $watesZoneId = (int) DB::table('operational_zones')->where('code', 'ZONA-WATES')->value('id');
-        $pengasihZoneId = (int) DB::table('operational_zones')->where('code', 'ZONA-PENGASIH')->value('id');
-
-        DB::table('organizational_units')->updateOrInsert(
-            ['code' => 'REGU-A'],
-            ['parent_id' => null, 'operational_zone_id' => $watesZoneId, 'leader_officer_id' => null, 'name' => 'Regu A - Patroli', 'type' => 'team', 'description' => 'Regu patroli wilayah Wates.', 'is_active' => true, 'created_at' => $now, 'updated_at' => $now, 'deleted_at' => null],
-        );
-        DB::table('organizational_units')->updateOrInsert(
-            ['code' => 'REGU-B'],
-            ['parent_id' => null, 'operational_zone_id' => $pengasihZoneId, 'leader_officer_id' => null, 'name' => 'Regu B - Patroli', 'type' => 'team', 'description' => 'Regu patroli wilayah Pengasih.', 'is_active' => true, 'created_at' => $now, 'updated_at' => $now, 'deleted_at' => null],
-        );
-
-        $unitOneId = (int) DB::table('organizational_units')->where('code', 'REGU-A')->value('id');
-        $unitTwoId = (int) DB::table('organizational_units')->where('code', 'REGU-B')->value('id');
-
         DB::table('officers')->updateOrInsert(
             ['employee_number' => 'PP-001'],
-            ['user_id' => $adminId, 'organizational_unit_id' => $unitOneId, 'operational_zone_id' => $watesZoneId, 'name' => 'Ahmad Fauzi', 'position' => 'Kepala Seksi Pengendalian dan Operasional, Bidang Ketentraman dan Ketertiban Umum', 'work_unit_name' => 'Seksi Pengendalian dan Operasional', 'unit_name' => 'Bidang Ketentraman dan Ketertiban Umum', 'status' => 'active', 'created_at' => $now, 'updated_at' => $now, 'deleted_at' => null],
+            ['user_id' => $adminId, 'name' => 'Ahmad Fauzi', 'position' => 'Kepala Seksi Pengendalian dan Operasional, Bidang Ketentraman dan Ketertiban Umum', 'work_unit_name' => 'Seksi Pengendalian dan Operasional', 'unit_name' => 'Bidang Ketentraman dan Ketertiban Umum', 'status' => 'active', 'created_at' => $now, 'updated_at' => $now, 'deleted_at' => null],
         );
         DB::table('officers')->updateOrInsert(
             ['employee_number' => 'PP-002'],
-            ['user_id' => null, 'organizational_unit_id' => $unitTwoId, 'operational_zone_id' => $pengasihZoneId, 'name' => 'Siti Aminah', 'position' => 'Operator Layanan Operasional pada Seksi Perlindungan Masyarakat, Bidang Ketentraman dan Ketertiban Umum', 'work_unit_name' => 'Seksi Perlindungan Masyarakat', 'unit_name' => 'Bidang Ketentraman dan Ketertiban Umum', 'status' => 'active', 'created_at' => $now, 'updated_at' => $now, 'deleted_at' => null],
+            ['user_id' => null, 'name' => 'Siti Aminah', 'position' => 'Operator Layanan Operasional pada Seksi Perlindungan Masyarakat, Bidang Ketentraman dan Ketertiban Umum', 'work_unit_name' => 'Seksi Perlindungan Masyarakat', 'unit_name' => 'Bidang Ketentraman dan Ketertiban Umum', 'status' => 'active', 'created_at' => $now, 'updated_at' => $now, 'deleted_at' => null],
         );
 
         $officerOneId = (int) DB::table('officers')->where('employee_number', 'PP-001')->value('id');
         $officerTwoId = (int) DB::table('officers')->where('employee_number', 'PP-002')->value('id');
-        DB::table('organizational_units')->where('id', $unitOneId)->update(['leader_officer_id' => $officerOneId]);
-        DB::table('organizational_units')->where('id', $unitTwoId)->update(['leader_officer_id' => $officerTwoId]);
-
         $patrolTemplateId = (int) DB::table('activity_templates')->where('sort_order', 1)->value('id');
         $securityTemplateId = (int) DB::table('activity_templates')->where('sort_order', 2)->value('id');
 
@@ -237,7 +210,7 @@ class DevelopmentSeeder extends Seeder
         );
     }
 
-    private function seedArchivesAndAssets(int $adminId, int $superAdminId, CarbonInterface $now): void
+    private function seedArchives(int $adminId, int $superAdminId, CarbonInterface $now): void
     {
         DB::table('archives')->updateOrInsert(
             ['title' => 'SOP Penertiban PKL'],
@@ -256,14 +229,6 @@ class DevelopmentSeeder extends Seeder
         DB::table('archive_files')->updateOrInsert(
             ['archive_id' => $patrolArchiveId, 'original_name' => 'laporan-patroli.txt'],
             ['file_path' => 'dummy/archives/laporan-patroli.txt', 'mime_type' => 'text/plain', 'file_extension' => 'txt', 'file_size' => Storage::disk('local')->size('dummy/archives/laporan-patroli.txt'), 'created_at' => $now, 'updated_at' => $now],
-        );
-        DB::table('assets')->updateOrInsert(
-            ['asset_code' => 'AST-001'],
-            ['created_by_user_id' => $adminId, 'name' => 'Mobil Patroli Dalmas', 'category' => 'vehicle', 'condition' => 'good', 'location' => 'Kantor Satpol PP', 'acquisition_year' => 2022, 'tax_due_date' => '2027-03-15', 'next_oil_service_km' => 45000, 'last_oil_service_date' => $now->copy()->subMonths(4)->toDateString(), 'created_at' => $now, 'updated_at' => $now, 'deleted_at' => null],
-        );
-        DB::table('assets')->updateOrInsert(
-            ['asset_code' => 'AST-002'],
-            ['created_by_user_id' => $adminId, 'name' => 'Tenda Penertiban', 'category' => 'equipment', 'condition' => 'good', 'location' => 'Gudang Satpol PP', 'acquisition_year' => 2023, 'tax_due_date' => null, 'next_oil_service_km' => null, 'created_at' => $now, 'updated_at' => $now, 'deleted_at' => null],
         );
     }
 

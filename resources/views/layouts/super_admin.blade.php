@@ -50,8 +50,11 @@
 </head>
 <body class="h-full font-sans antialiased text-slate-800 flex overflow-hidden">
 
+    <button id="sidebar-backdrop" type="button" class="fixed inset-0 z-30 hidden bg-slate-900/50 lg:hidden" aria-label="Tutup menu" onclick="toggleSidebar(false)"></button>
+
     {{-- Sidebar --}}
-    <aside class="w-64 bg-super-sidebar text-slate-200 flex flex-col flex-shrink-0 z-30 transition-all duration-300">
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 flex w-64 -translate-x-full flex-col bg-super-sidebar text-slate-200 transition-transform duration-300 lg:static lg:translate-x-0">
+        <button type="button" class="absolute right-3 top-3 rounded-lg p-2 text-slate-300 hover:bg-white/10 lg:hidden" aria-label="Tutup menu" onclick="toggleSidebar(false)"><span class="material-symbols-outlined">close</span></button>
         <!-- Logo Section -->
         <div class="px-6 py-6 flex items-center gap-3">
             <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center p-1.5 flex-shrink-0">
@@ -83,22 +86,10 @@
                 <span>Manajemen User</span>
             </a>
 
-            <a href="{{ route('super_admin.organisasi') }}"
-               class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all {{ request()->routeIs('super_admin.organisasi') ? 'bg-super-active text-white shadow-md font-semibold' : 'text-slate-300 hover:bg-super-hover hover:text-white' }}">
-                <span class="material-symbols-outlined text-[20px]">account_balance</span>
-                <span>Manajemen Organisasi</span>
-            </a>
-
             <a href="{{ route('super_admin.petugas') }}"
                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all {{ request()->routeIs('super_admin.petugas') ? 'bg-super-active text-white shadow-md font-semibold' : 'text-slate-300 hover:bg-super-hover hover:text-white' }}">
                 <span class="material-symbols-outlined text-[20px]">badge</span>
                 <span>Manajemen Petugas</span>
-            </a>
-
-            <a href="{{ route('super_admin.peta') }}"
-               class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all {{ request()->routeIs('super_admin.peta') ? 'bg-super-active text-white shadow-md font-semibold' : 'text-slate-300 hover:bg-super-hover hover:text-white' }}">
-                <span class="material-symbols-outlined text-[20px]">map</span>
-                <span>Peta Persebaran</span>
             </a>
 
             <a href="{{ route('super_admin.monitoring') }}"
@@ -128,49 +119,38 @@
     {{-- Main Area --}}
     <div class="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#f6f7f9]">
         <!-- Top Header Bar -->
-        <header class="bg-white border-b border-slate-200/80 px-8 py-4 flex items-center justify-between sticky top-0 z-20">
+        <header class="sticky top-0 z-20 flex flex-wrap items-center gap-3 border-b border-slate-200/80 bg-white px-4 py-3 sm:px-6 lg:px-8 lg:py-4">
+            <button type="button" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100 lg:hidden" aria-label="Buka menu" aria-controls="sidebar" aria-expanded="false" data-sidebar-toggle onclick="toggleSidebar(true)">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
             <!-- Search Input -->
-            <x-global-search />
+            <div class="order-3 w-full min-w-0 lg:order-none lg:flex-1"><x-global-search /></div>
 
             <!-- Header Action Icons -->
-            <div class="flex items-center gap-2 relative">
+            <div class="relative ml-auto flex items-center gap-2">
                 <!-- Notifikasi -->
                 <div class="relative">
-                    <button onclick="toggleNotif(event)" data-notification-button data-notifications-url="{{ route('super_admin.asset-alerts') }}" class="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors relative" title="Notifikasi">
+                    <button onclick="toggleNotif(event)" data-notification-button data-notifications-url="{{ route('notifications.index') }}" class="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors relative" title="Notifikasi">
                         <span class="material-symbols-outlined text-[20px]">notifications</span>
                         @if ($layoutUnreadNotificationCount > 0)<span data-notification-badge class="absolute right-1 top-1 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>@endif
                     </button>
 
-                    <div id="notif-panel" class="hidden absolute right-0 top-12 w-80 sm:w-96 bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden z-50">
+                    <div id="notif-panel" class="hidden fixed left-4 right-4 top-16 w-auto sm:absolute sm:left-auto sm:right-0 sm:top-12 sm:w-96 bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden z-50">
                         <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100">
                             <h3 class="font-headline font-bold text-slate-800">Notifikasi</h3>
-                            @if (empty($assetAlerts))
-                                <form method="POST" action="{{ route('notifications.read-all') }}">@csrf<button class="text-xs font-medium text-super-active hover:text-brand-600">Tandai semua dibaca</button></form>
-                            @endif
+                            <form method="POST" action="{{ route('notifications.read-all') }}">@csrf<button class="text-xs font-medium text-super-active hover:text-brand-600">Tandai semua dibaca</button></form>
                         </div>
                         <div data-notification-list class="max-h-96 divide-y divide-slate-50 overflow-y-auto">
-                            @forelse ($assetAlerts ?? collect() as $alert)
-                                <div class="flex items-start gap-3 px-4 py-3 {{ $alert['level'] === 'danger' ? 'bg-red-50/60' : 'bg-amber-50/60' }}">
-                                    <span class="material-symbols-outlined flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[18px] {{ $alert['level'] === 'danger' ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-600' }}">warning</span>
-                                    <span class="min-w-0 flex-1">
-                                        <span class="block text-sm font-medium text-slate-700">{{ $alert['title'] }}</span>
-                                        <span class="block text-xs text-slate-500">{{ $alert['message'] }}</span>
-                                        <span class="text-xs text-slate-400">Perlu tindakan</span>
-                                    </span>
-                                    <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-super-active"></span>
-                                </div>
+                            @forelse ($layoutNotifications as $notification)
+                                <form method="POST" action="{{ route('notifications.read', $notification->id) }}">@csrf
+                                    <button class="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-slate-50 {{ $notification->read_at ? '' : 'bg-super-active/5' }}">
+                                        <span class="material-symbols-outlined flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 text-[18px] text-blue-600">notifications</span>
+                                        <span class="min-w-0 flex-1"><span class="block text-sm font-medium text-slate-700">{{ data_get($notification->data, 'title', 'Notifikasi') }}</span><span class="block text-xs text-slate-500">{{ data_get($notification->data, 'message', '-') }}</span><span class="text-xs text-slate-400">{{ $notification->created_at->diffForHumans() }}</span></span>
+                                        @if (!$notification->read_at)<span class="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-super-active"></span>@endif
+                                    </button>
+                                </form>
                             @empty
-                                @forelse ($layoutNotifications as $notification)
-                                    <form method="POST" action="{{ route('notifications.read', $notification->id) }}">@csrf
-                                        <button class="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-slate-50 {{ $notification->read_at ? '' : 'bg-super-active/5' }}">
-                                            <span class="material-symbols-outlined flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 text-[18px] text-blue-600">notifications</span>
-                                            <span class="min-w-0 flex-1"><span class="block text-sm font-medium text-slate-700">{{ data_get($notification->data, 'title', 'Notifikasi') }}</span><span class="block text-xs text-slate-500">{{ data_get($notification->data, 'message', '-') }}</span><span class="text-xs text-slate-400">{{ $notification->created_at->diffForHumans() }}</span></span>
-                                            @if (!$notification->read_at)<span class="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-super-active"></span>@endif
-                                        </button>
-                                    </form>
-                                @empty
-                                    <div class="px-4 py-10 text-center text-slate-400"><div class="mb-2 text-3xl">🔔</div><p class="text-sm">Tidak ada notifikasi.</p></div>
-                                @endforelse
+                                <div class="px-4 py-10 text-center text-slate-400"><div class="mb-2 text-3xl">🔔</div><p class="text-sm">Tidak ada notifikasi.</p></div>
                             @endforelse
                         </div>
                     </div>
@@ -192,7 +172,7 @@
         </header>
 
         <!-- Main Scrollable Content -->
-        <main class="flex-1 overflow-y-auto p-8">
+        <main class="min-w-0 flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
             @yield('content')
         </main>
     </div>
@@ -493,6 +473,8 @@
 
     <script src="{{ asset('js/kulon-progo-map.js') }}"></script>
     <script src="{{ asset('js/header-live.js') }}"></script>
+    <script src="{{ asset('js/mobile-sidebar.js') }}"></script>
+    <script src="{{ asset('js/html-safety.js') }}"></script>
     @stack('scripts')
 </body>
 </html>

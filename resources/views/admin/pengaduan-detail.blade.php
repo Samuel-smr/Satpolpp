@@ -51,10 +51,6 @@
 
                 <dl class="grid gap-4 text-sm bg-slate-50 border border-slate-200 rounded-xl p-4 sm:grid-cols-2">
                     <div>
-                        <dt class="text-slate-400">Jenis</dt>
-                        <dd class="font-medium text-slate-800">{{ $report->type->label() }}</dd>
-                    </div>
-                    <div>
                         <dt class="text-slate-400">Sumber</dt>
                         <dd class="font-medium text-slate-800">
                             {{ $report->source->label() }}{{ $report->source_platform ? ' · '.$report->source_platform->label() : '' }}
@@ -74,7 +70,7 @@
                     </div>
                     <div>
                         <dt class="text-slate-400">NIK</dt>
-                        <dd class="font-medium text-slate-800">{{ $report->reporter_nik ?? 'Tidak dicantumkan' }}</dd>
+                        <dd class="font-medium text-slate-800">{{ $report->maskedReporterNik() ?? 'Tidak dicantumkan' }}</dd>
                     </div>
                     <div>
                         <dt class="text-slate-400">Latitude</dt>
@@ -143,7 +139,7 @@
                         <h3 class="mb-2 text-sm font-semibold text-slate-700">Temuan</h3>
                         <div class="space-y-2">
                             @forelse ($report->activity->findings as $finding)
-                                <div class="grid grid-cols-3 gap-3 rounded-xl border border-emerald-100 bg-white/70 p-3 text-sm">
+                                <div class="grid grid-cols-1 gap-3 rounded-xl border sm:grid-cols-3 border-emerald-100 bg-white/70 p-3 text-sm">
                                     <span>{{ $finding->type->label() }}</span>
                                     <span class="font-semibold">{{ $finding->quantity }}</span>
                                     <span>{{ $finding->unit->label() }}</span>
