@@ -108,12 +108,13 @@ class SuperAdminController extends Controller
         $users = User::query()
             ->whereIn('role', ['admin', 'super_admin'])
             ->orderBy('name')
-            ->get(['id', 'name', 'username', 'email', 'role', 'status', 'created_at'])
+            ->get(['id', 'name', 'username', 'email', 'phone', 'role', 'status', 'created_at'])
             ->map(fn (User $user): array => [
                 'id' => $user->id,
                 'nama' => $user->name,
                 'username' => $user->username,
                 'email' => $user->email,
+                'phone' => $user->phone,
                 'role' => $user->role->value,
                 'status' => $user->status->value,
                 'dibuat' => $user->created_at?->format('d/m/Y'),

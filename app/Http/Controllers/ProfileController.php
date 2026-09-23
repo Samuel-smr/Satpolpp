@@ -28,14 +28,14 @@ class ProfileController extends Controller
     public function update(UpdateProfileRequest $request): RedirectResponse
     {
         $user = $request->user();
-        $validated = $request->safe()->only(['name', 'username', 'email', 'password']);
+        $validated = $request->safe()->only(['name', 'username', 'email', 'phone', 'password']);
         $passwordChanged = ($validated['password'] ?? '') !== '';
 
         if (! $passwordChanged) {
             unset($validated['password']);
         }
 
-        $oldValues = $user->only(['name', 'username', 'email']);
+        $oldValues = $user->only(['name', 'username', 'email', 'phone']);
         $user->update($validated);
 
         AuditLog::create([
@@ -47,7 +47,7 @@ class ProfileController extends Controller
             'description' => "Profil akun {$user->username} diperbarui.",
             'old_values' => $oldValues,
             'new_values' => [
-                ...$user->only(['name', 'username', 'email']),
+                ...$user->only(['name', 'username', 'email', 'phone']),
                 'password_changed' => $passwordChanged,
             ],
             'ip_address' => $request->ip(),

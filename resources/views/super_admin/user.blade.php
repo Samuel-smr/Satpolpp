@@ -126,6 +126,12 @@
                         <input type="email" name="email" placeholder="andi@example.com"
                             class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none">
                     </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">No. WhatsApp</label>
+                        <input type="tel" name="phone" placeholder="Contoh: 08xxxxxxxxxx" maxlength="25"
+                            class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none">
+                        <p class="text-xs text-slate-400 mt-1">Menerima notifikasi WhatsApp saat ada laporan baru.</p>
+                    </div>
                 </div>
 
                 <div>
@@ -204,7 +210,7 @@
                             </div>
                             <div>
                                 <div class="font-medium text-slate-800">${escapeHtml(u.nama)}</div>
-                                <div class="text-xs text-slate-400">${escapeHtml(u.email || '-')}</div>
+                                <div class="text-xs text-slate-400">${escapeHtml(u.email || '-')}${u.phone ? ` &middot; ${escapeHtml(u.phone)}` : ''}</div>
                             </div>
                         </div>
                     </td>
@@ -249,6 +255,7 @@
         f.nama.value = u.nama;
         f.username.value = u.username;
         f.email.value = u.email || '';
+        f.phone.value = u.phone || '';
         f.password.required = false;
         document.getElementById('pw-hint').classList.remove('hidden');
         document.getElementById('modal').classList.remove('hidden');

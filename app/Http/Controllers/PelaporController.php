@@ -112,6 +112,7 @@ class PelaporController extends Controller
         Notification::send($administrators, new NewReportNotification($report));
 
         app(WhatsAppService::class)->sendReportCreated($report);
+        app(WhatsAppService::class)->sendNewReportToAdmins($report);
 
         return redirect()
             ->route('pelapor.lapor')

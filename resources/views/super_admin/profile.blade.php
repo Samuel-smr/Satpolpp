@@ -90,6 +90,13 @@
                     </dd>
                 </div>
                 <div>
+                    <dt class="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">No. WhatsApp</dt>
+                    <dd class="flex items-center gap-1.5 text-sm font-semibold text-slate-800">
+                        <span class="material-symbols-outlined text-[16px] text-slate-400">phone</span>
+                        {{ $profileUser->phone ?: 'Belum diisi' }}
+                    </dd>
+                </div>
+                <div>
                     <dt class="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Akun Dibuat</dt>
                     <dd class="text-sm font-semibold text-slate-800">{{ $profileUser->created_at->format('d/m/Y H:i') }}</dd>
                 </div>
@@ -136,6 +143,13 @@
                         <input id="profile-email" type="email" name="email" value="{{ old('email', $profileUser->email) }}" maxlength="255"
                             class="w-full rounded-xl border border-slate-300 px-4 py-2.5 outline-none focus:border-super-active focus:ring-1 focus:ring-super-active">
                         @error('email')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                    </div>
+                    <div>
+                        <label for="profile-phone" class="mb-1.5 block text-sm font-semibold text-slate-700">No. WhatsApp</label>
+                        <input id="profile-phone" type="tel" name="phone" value="{{ old('phone', $profileUser->phone) }}" maxlength="25" placeholder="Contoh: 08xxxxxxxxxx"
+                            class="w-full rounded-xl border border-slate-300 px-4 py-2.5 outline-none focus:border-super-active focus:ring-1 focus:ring-super-active">
+                        <p class="mt-1 text-xs text-slate-400">Nomor ini akan menerima notifikasi WhatsApp saat ada laporan baru.</p>
+                        @error('phone')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                     </div>
                 </div>
 

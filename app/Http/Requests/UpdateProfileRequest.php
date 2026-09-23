@@ -33,6 +33,7 @@ class UpdateProfileRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'username' => ['required', 'string', 'max:100', 'regex:/^[A-Za-z0-9._-]+$/', Rule::unique('users', 'username')->ignore($user instanceof User ? $user->id : null)],
             'email' => ['nullable', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user instanceof User ? $user->id : null)],
+            'phone' => ['nullable', 'string', 'max:25', 'regex:/^[0-9+()][0-9+\-\s()]*$/'],
             'current_password' => ['bail', Rule::requiredIf($this->filled('password')), 'nullable', 'string', 'max:4096', 'current_password'],
             'password' => ['bail', 'nullable', 'string', 'regex:/\A[^\x00]{1,72}\z/s', 'confirmed', Password::min(8)],
         ];
@@ -48,6 +49,7 @@ class UpdateProfileRequest extends FormRequest
             'username.unique' => 'Username sudah digunakan.',
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Email sudah digunakan.',
+            'phone.regex' => 'Format nomor telepon tidak valid.',
             'current_password.required' => 'Password saat ini wajib diisi untuk mengganti password.',
             'current_password.current_password' => 'Password saat ini tidak sesuai.',
             'password.confirmed' => 'Konfirmasi password baru tidak sesuai.',

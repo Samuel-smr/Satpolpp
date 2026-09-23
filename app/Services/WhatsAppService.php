@@ -3,6 +3,9 @@
 namespace App\Services;
 
 use App\Models\Report;
+use App\Models\User;
+use App\UserRole;
+use App\UserStatus;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
@@ -99,6 +102,25 @@ class WhatsAppService
         $this->attempt($report, $message);
     }
 
+    public function sendNewReportToAdmins(Report $report): void
+    {
+        $admins = User::query()
+            ->where('role', UserRole::Admin)
+            ->where('status', UserStatus::Active)
+            ->whereNotNull('phone')
+            ->where('phone', '!=', '')
+            ->get(['id', 'phone']);
+
+        foreach ($admins as $admin) {
+            $message = "Laporan Baru Masuk SIPRAJA\n\n"
+                ."Kode Laporan: {$report->code}\n"
+                ."Lokasi: {$report->location_address}\n\n"
+                .'Segera periksa dan tindak lanjuti laporan pada panel admin.';
+
+            $this->attemptPhone($admin->phone, $message, "notifikasi laporan baru untuk admin #{$admin->id}");
+        }
+    }
+
     public function normalizePhone(string $phone): string
     {
         $digits = preg_replace('/\D+/', '', $phone) ?? '';
@@ -116,10 +138,15 @@ class WhatsAppService
 
     private function attempt(Report $report, string $message): void
     {
+        $this->attemptPhone((string) $report->reporter_phone, $message, "notifikasi WhatsApp untuk laporan {$report->code}");
+    }
+
+    private function attemptPhone(string $phone, string $message, string $context): void
+    {
         try {
-            $this->send((string) $report->reporter_phone, $message);
+            $this->send($phone, $message);
         } catch (Throwable $exception) {
-            Log::warning("Gagal mengirim notifikasi WhatsApp untuk laporan {$report->code}.", [
+            Log::warning("Gagal mengirim {$context}.", [
                 'error' => $exception->getMessage(),
             ]);
         }
