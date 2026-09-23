@@ -1,0 +1,101 @@
+DAFTAR FITUR SIPRAJA — KONDISI AKTUAL
+Pembaruan: 21 September 2026
+
+1. PELAPOR / WARGA
+
+- Mengakses aplikasi tanpa login.
+- Mengirim satu jenis laporan, yaitu Lapor.
+- Mengisi nomor telepon, nama opsional, deskripsi, lokasi, titik peta, dan foto pendukung.
+- Tidak memasukkan NIK. Kolom NIK di database hanya dipertahankan nullable untuk data lama.
+- Bertanya kepada Asisten AI di halaman Lapor.
+- Meminta AI menyusun deskripsi berdasarkan percakapan berkelanjutan.
+- Menerima kode laporan dan token akses tamu.
+- Melihat status dan riwayat laporan miliknya.
+- Memberi rating dan komentar setelah laporan selesai.
+
+2. ADMIN
+
+Umum:
+- Login dengan username/email dan kata sandi.
+- Melihat dashboard, notifikasi, pencarian global, dan profil.
+- Menandai notifikasi satu per satu atau seluruhnya sebagai dibaca.
+
+Laporan:
+- Melihat, mencari, memfilter, dan membuka detail laporan.
+- Mencatat laporan dari kanal online atau offline tanpa mewajibkan NIK.
+- Memajukan status: dibuat, diterima, diverifikasi, ditindaklanjuti, selesai.
+- Menghapus laporan secara soft delete.
+- Menyelesaikan laporan dengan hasil penanganan, lokasi, petugas, dan bukti.
+- Penyelesaian otomatis membuat satu kegiatan eksternal yang terkait.
+
+Kegiatan:
+- Melihat dan memfilter kegiatan internal maupun eksternal.
+- Menambah, mengubah, dan menghapus kegiatan internal.
+- Menentukan lokasi, petugas, temuan, dokumentasi, dan hasil.
+- Melihat/menghapus lampiran internal sesuai otorisasi.
+- Mengevaluasi kegiatan.
+
+Operasional lain:
+- Mengelola folder arsip dan beberapa file arsip.
+- Melihat feedback masyarakat.
+- Mengubah profil dan kata sandi sendiri.
+
+3. SUPER ADMIN
+
+- Melihat dashboard statistik dan peta persebaran dalam satu halaman.
+- Melihat detail laporan melalui konteks yang tersedia secara baca-saja.
+- Melihat dan mengelola kegiatan internal.
+- Mengelola akun Admin: tambah, ubah, blokir/aktifkan, dan hapus sesuai aturan.
+- Mengelola petugas: tambah, ubah, status, dan hapus.
+- Melihat monitoring audit aktivitas.
+- Melihat notifikasi serta mengubah profil/kata sandi sendiri.
+- Tidak mempunyai menu Peta terpisah.
+- Tidak mempunyai Manajemen Organisasi.
+- Tidak mengubah status atau menyelesaikan laporan.
+
+4. ASISTEN AI
+
+- Endpoint publik: POST /lapor/asisten-ai.
+- Provider: Google Gemini; model default gemini-3.1-flash-lite.
+- API key hanya berada di server melalui AI_API_KEY.
+- Pesan maksimal 600 karakter; riwayat maksimal 8 pesan.
+- Rate limit 10 permintaan per menit.
+- Bahasa utama Indonesia dan jawaban diarahkan pada pelaporan SIPRAJA.
+- Tidak meminta NIK, kata sandi, rekening, atau data sensitif.
+- Memiliki timeout dan retry terbatas; kegagalan provider dikembalikan sebagai pesan aman.
+
+5. MODEL DATA UTAMA
+
+- User: akun Admin/Super Admin.
+- GuestAccess: token akses pelapor.
+- Report: laporan tunggal bertipe lapor, status, lokasi, feedback.
+- ReportStatusHistory: riwayat perubahan status.
+- Attachment: lampiran polimorfik laporan/kegiatan.
+- ActivityTemplate: template kegiatan.
+- Activity: kegiatan internal atau eksternal.
+- ActivityFinding: daftar temuan kegiatan.
+- Officer: data petugas tanpa relasi organisasi/wilayah.
+- ActivityOfficer: penugasan petugas pada kegiatan.
+- Archive dan ArchiveFile: arsip multi-file.
+- AuditLog: aktivitas penting sistem.
+- Notification: notifikasi database Laravel.
+
+6. FITUR YANG SUDAH DIHAPUS
+
+- Pilihan Lapor Darurat.
+- Pilihan Informasi & Pengaduan.
+- Input NIK pada form warga.
+- Menu Peta terpisah pada Super Admin.
+- Manajemen Organisasi.
+- Tabel operational_zones dan organizational_units.
+- Relasi organizational_unit_id dan operational_zone_id pada officers.
+- Fitur Aset, menu Aset, peringatan kendaraan, dan tabel assets.
+
+Sumber acuan:
+- routes/web.php
+- app/Http/Controllers
+- app/Http/Requests
+- app/Models
+- database/migrations
+- resources/views
+- tests/Feature

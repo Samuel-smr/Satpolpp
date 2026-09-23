@@ -5,10 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreAdminUserRequest;
 use App\Http\Requests\UpdateAdminUserRequest;
 use App\Models\Activity;
-use App\Models\Asset;
 use App\Models\AuditLog;
 use App\Models\Officer;
-use App\Models\OrganizationalUnit;
 use App\Models\Report;
 use App\Models\User;
 use App\OfficerStatus;
@@ -36,6 +34,7 @@ class SuperAdminController extends Controller
                 'monthly_activities' => Activity::query()->whereBetween('activity_date', [$monthStart->toDateString(), $monthEnd->toDateString()])->count(),
             ],
             'logs' => $this->systemLogs(12),
+            ...$this->mapDashboardData(),
         ]);
     }
 
@@ -47,8 +46,7 @@ class SuperAdminController extends Controller
                 'template:id,name',
                 'createdByUser:id,name',
                 'evaluatedByUser:id,name',
-                'officers:id,name,position,organizational_unit_id',
-                'officers.organizationalUnit:id,name',
+                'officers:id,name,position,work_unit_name',
                 'attachments:id,attachable_type,attachable_id,original_name,mime_type,file_type,audience',
             ])
             ->orderByDesc('activity_date')
@@ -93,14 +91,13 @@ class SuperAdminController extends Controller
                     ->all(),
             ]);
         $officers = Officer::query()
-            ->with('organizationalUnit:id,name')
             ->orderBy('name')
-            ->get(['id', 'name', 'position', 'organizational_unit_id'])
+            ->get(['id', 'name', 'position', 'work_unit_name'])
             ->map(fn (Officer $officer): array => [
                 'id' => $officer->id,
                 'nama' => $officer->name,
                 'jabatan' => $officer->position ?? '-',
-                'seksi' => $officer->organizationalUnit?->name ?? '-',
+                'seksi' => $officer->work_unit_name ?? '-',
             ]);
 
         return view('super_admin.kegiatan', compact('activities', 'officers'));
@@ -163,11 +160,6 @@ class SuperAdminController extends Controller
         return response()->json(['message' => 'Akun berhasil dihapus.']);
     }
 
-    public function organisasi()
-    {
-        return view('super_admin.organisasi');
-    }
-
     public function petugas()
     {
         return view('super_admin.petugas');
@@ -199,27 +191,8 @@ class SuperAdminController extends Controller
         return view('super_admin.monitoring', compact('chart', 'monitoringStats'));
     }
 
-    /**
-     * Notifikasi super admin: peringatan pemeliharaan aset dari database aset.
-     */
-    public function assetAlerts(): JsonResponse
-    {
-        $alerts = Asset::vehicleAlerts();
-
-        return response()->json([
-            'unread_count' => $alerts->count(),
-            'notifications' => $alerts->map(fn (array $alert): array => [
-                'title' => $alert['title'],
-                'message' => $alert['message'],
-                'time' => 'Perlu tindakan',
-                'unread' => true,
-                'asset' => true,
-                'level' => $alert['level'],
-            ])->all(),
-        ]);
-    }
-
-    public function peta(): View
+    /** @return array<string, mixed> */
+    private function mapDashboardData(): array
     {
         $reportPoints = Report::query()
             ->whereNotNull('latitude')
@@ -265,10 +238,10 @@ class SuperAdminController extends Controller
             return ['label' => $date->translatedFormat('D'), 'total' => (int) ($dailyReports[$date->toDateString()] ?? 0)];
         });
 
-        return view('super_admin.peta', [
+        return [
             'mapPoints' => $reportPoints->concat($activityPoints)->values(),
             'mapStatistics' => [
-                'active_units' => OrganizationalUnit::query()->where('is_active', true)->count(),
+                'active_officers' => Officer::query()->where('status', OfficerStatus::Active)->count(),
                 'open_reports' => Report::query()->where('status', '!=', ReportStatus::Completed)->count(),
             ],
             'categoryChart' => collect(ReportCategory::cases())->map(fn (ReportCategory $category): array => ['label' => $category->label(), 'total' => (int) ($categoryCounts[$category->value] ?? 0)]),
@@ -289,7 +262,7 @@ class SuperAdminController extends Controller
                 ['name' => 'Kalibawang', 'lat' => -7.69, 'lng' => 110.15],
                 ['name' => 'Samigaluh', 'lat' => -7.66, 'lng' => 110.20],
             ],
-        ]);
+        ];
     }
 
     /**

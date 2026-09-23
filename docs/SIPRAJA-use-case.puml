@@ -1,199 +1,54 @@
-' USE CASE SIPRAJA
-' Pilih SATU blok @startuml ... @enduml untuk disalin ke editor PlantUML.
-' Berkas draw.io pendamping berisi objek native yang bisa diedit.
-
-@startuml SIPRAJA_1
+@startuml
+title Use Case SIPRAJA — As-Built 21 September 2026
 left to right direction
-skinparam packageStyle rectangle
-skinparam shadowing false
-skinparam usecase {
-  BackgroundColor #EFF6FF
-  BorderColor #2563EB
-}
-title Use Case SIPRAJA - Pelapor
-actor "Pelapor" as ACTOR0
-rectangle "SIPRAJA / Pelapor" {
-  usecase "P01\nMengirim laporan masyarakat" as P01
-  usecase "P02\nMelihat status laporan sendiri" as P02
-  usecase "P03\nMemberi feedback penanganan" as P03
-}
-ACTOR0 -- P01
-ACTOR0 -- P02
-ACTOR0 -- P03
-P03 ..> P02 : <<extend>>\n[selesai dan belum feedback]
-@enduml
+actor Pelapor
+actor Admin
+actor "Super Admin" as SuperAdmin
 
-@startuml SIPRAJA_2
-left to right direction
-skinparam packageStyle rectangle
-skinparam shadowing false
-skinparam usecase {
-  BackgroundColor #EFF6FF
-  BorderColor #2563EB
-}
-title Use Case SIPRAJA - Akses bersama
-actor "Admin" as ACTOR0
-actor "Super Admin" as ACTOR1
-rectangle "SIPRAJA / Akses bersama" {
-  usecase "C01\nLogin" as C01
-  usecase "C02\nMelihat dashboard" as C02
-  usecase "C03\nMencari data global" as C03
-  usecase "C04\nMelihat dan menandai notifikasi" as C04
-  usecase "C05\nLogout" as C05
-  usecase "C06\nMengubah profil dan kata sandi sendiri" as C06
-}
-ACTOR0 -- C01
-ACTOR1 -- C01
-ACTOR0 -- C02
-ACTOR1 -- C02
-ACTOR0 -- C03
-ACTOR1 -- C03
-ACTOR0 -- C04
-ACTOR1 -- C04
-ACTOR0 -- C05
-ACTOR1 -- C05
-ACTOR0 -- C06
-ACTOR1 -- C06
-@enduml
+rectangle SIPRAJA {
+  usecase "Membuat laporan\n(satu jenis, tanpa NIK)" as UC1
+  usecase "Berkonsultasi dengan\nAsisten AI" as UC2
+  usecase "Melihat status sendiri" as UC3
+  usecase "Memberi feedback" as UC4
 
-@startuml SIPRAJA_3
-left to right direction
-skinparam packageStyle rectangle
-skinparam shadowing false
-skinparam usecase {
-  BackgroundColor #EFF6FF
-  BorderColor #2563EB
-}
-title Use Case SIPRAJA - Laporan admin
-actor "Admin" as ACTOR0
-rectangle "SIPRAJA / Laporan admin" {
-  usecase "A01\nMelihat dan memfilter pengaduan" as A01
-  usecase "A02\nMencatat laporan online atau offline" as A02
-  usecase "A03\nMemajukan status penanganan" as A03
-  usecase "A04\nMenyelesaikan laporan" as A04
-  usecase "A05\nMembuat kegiatan eksternal dari penyelesaian" as A05
-  usecase "A06\nMenghapus laporan" as A06
-  usecase "A07\nMelihat feedback masyarakat" as A07
-}
-ACTOR0 -- A01
-ACTOR0 -- A02
-ACTOR0 -- A03
-ACTOR0 -- A04
-ACTOR0 -- A06
-ACTOR0 -- A07
-A04 ..> A05 : <<include>>
-@enduml
+  usecase "Melihat dan menangani laporan" as UC5
+  usecase "Menyelesaikan laporan" as UC6
+  usecase "Mengelola kegiatan\ndan evaluasi" as UC7
+  usecase "Mengelola arsip" as UC8
+  usecase "Melihat feedback\ndan notifikasi" as UC9
 
-@startuml SIPRAJA_4
-left to right direction
-skinparam packageStyle rectangle
-skinparam shadowing false
-skinparam usecase {
-  BackgroundColor #EFF6FF
-  BorderColor #2563EB
+  usecase "Melihat dashboard\ndan peta persebaran" as UC10
+  usecase "Melihat detail laporan\nsecara baca-saja" as UC11
+  usecase "Mengelola akun Admin" as UC12
+  usecase "Mengelola petugas" as UC13
+  usecase "Memantau audit" as UC14
+  usecase "Mengelola profil" as UC15
 }
-title Use Case SIPRAJA - Kegiatan bersama
-actor "Admin" as ACTOR0
-actor "Super Admin" as ACTOR1
-rectangle "SIPRAJA / Kegiatan bersama" {
-  usecase "K01\nMelihat dan memfilter kegiatan" as K01
-  usecase "K02\nMenambah kegiatan internal, temuan,\ndan maksimal 3 dokumentasi" as K02
-  usecase "K03\nMengedit kegiatan internal, temuan,\ndan menambah dokumentasi" as K03
-  usecase "K04\nMenghapus kegiatan internal" as K04
-  usecase "K05\nMelihat atau menghapus dokumentasi internal" as K05
-  usecase "K06\nMengekspor kegiatan ke PDF atau Excel" as K06
-  usecase "K07\nMelihat laporan terkait kegiatan eksternal" as K07
-}
-ACTOR0 -- K01
-ACTOR1 -- K01
-ACTOR0 -- K02
-ACTOR1 -- K02
-ACTOR0 -- K03
-ACTOR1 -- K03
-ACTOR0 -- K04
-ACTOR1 -- K04
-ACTOR0 -- K05
-ACTOR1 -- K05
-ACTOR0 -- K06
-ACTOR1 -- K06
-ACTOR0 -- K07
-ACTOR1 -- K07
-@enduml
 
-@startuml SIPRAJA_5
-left to right direction
-skinparam packageStyle rectangle
-skinparam shadowing false
-skinparam usecase {
-  BackgroundColor #EFF6FF
-  BorderColor #2563EB
-}
-title Use Case SIPRAJA - Operasional admin
-actor "Admin" as ACTOR0
-rectangle "SIPRAJA / Operasional admin" {
-  usecase "E01\nMenambah evaluasi kegiatan" as E01
-  usecase "E02\nMelihat, mengedit atau menghapus evaluasi" as E02
-  usecase "R01\nMenambah atau mengedit folder arsip\ndengan maksimal 3 file" as R01
-  usecase "R02\nMencari arsip serta melihat atau\nmengunduh setiap file" as R02
-  usecase "R03\nMenghapus arsip" as R03
-  usecase "T01\nMenambah atau mengedit aset" as T01
-  usecase "T02\nMelihat atau menghapus aset" as T02
-}
-ACTOR0 -- E01
-ACTOR0 -- E02
-ACTOR0 -- R01
-ACTOR0 -- R02
-ACTOR0 -- R03
-ACTOR0 -- T01
-ACTOR0 -- T02
-@enduml
+Pelapor -- UC1
+Pelapor -- UC2
+Pelapor -- UC3
+Pelapor -- UC4
 
-@startuml SIPRAJA_6
-left to right direction
-skinparam packageStyle rectangle
-skinparam shadowing false
-skinparam usecase {
-  BackgroundColor #EFF6FF
-  BorderColor #2563EB
-}
-title Use Case SIPRAJA - Administrasi super admin
-actor "Super Admin" as ACTOR0
-rectangle "SIPRAJA / Administrasi super admin" {
-  usecase "S01\nMelihat dan menambah akun admin" as S01
-  usecase "S02\nMengedit akun pengguna" as S02
-  usecase "S03\nMemblokir atau mengaktifkan akun" as S03
-  usecase "S04\nMenghapus akun pengguna" as S04
-  usecase "S05\nMelihat, menambah atau mengedit petugas" as S05
-  usecase "S06\nMengubah status atau menghapus petugas" as S06
-  usecase "S07\nMelihat, menambah atau mengedit unit organisasi" as S07
-  usecase "S08\nMenghapus unit organisasi" as S08
-}
-ACTOR0 -- S01
-ACTOR0 -- S02
-ACTOR0 -- S03
-ACTOR0 -- S04
-ACTOR0 -- S05
-ACTOR0 -- S06
-ACTOR0 -- S07
-ACTOR0 -- S08
-@enduml
+Admin -- UC5
+Admin -- UC6
+Admin -- UC7
+Admin -- UC8
+Admin -- UC9
+Admin -- UC15
 
-@startuml SIPRAJA_7
-left to right direction
-skinparam packageStyle rectangle
-skinparam shadowing false
-skinparam usecase {
-  BackgroundColor #EFF6FF
-  BorderColor #2563EB
-}
-title Use Case SIPRAJA - Pengawasan super admin
-actor "Super Admin" as ACTOR0
-rectangle "SIPRAJA / Pengawasan super admin" {
-  usecase "S09\nMemantau aktivitas sistem" as S09
-  usecase "S10\nMelihat peta persebaran" as S10
-  usecase "S11\nMelihat peringatan pajak dan servis kendaraan" as S11
-}
-ACTOR0 -- S09
-ACTOR0 -- S10
-ACTOR0 -- S11
+SuperAdmin -- UC7
+SuperAdmin -- UC9
+SuperAdmin -- UC10
+SuperAdmin -- UC11
+SuperAdmin -- UC12
+SuperAdmin -- UC13
+SuperAdmin -- UC14
+SuperAdmin -- UC15
+
+note bottom of SIPRAJA
+  Tidak tersedia: pilihan jenis laporan lama,
+  input NIK warga, organisasi/wilayah,
+  menu Peta terpisah, dan fitur Aset.
+end note
 @enduml

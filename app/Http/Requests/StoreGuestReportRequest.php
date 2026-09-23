@@ -2,9 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\ReportType;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class StoreGuestReportRequest extends FormRequest
 {
@@ -24,13 +22,11 @@ class StoreGuestReportRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'jenis' => ['required', 'string', Rule::enum(ReportType::class)],
             'telepon' => ['required', 'string', 'regex:/^\+?[0-9][0-9\s-]{8,18}$/'],
-            'nik' => ['nullable', 'digits:16', 'required_if:jenis,'.ReportType::Emergency->value],
             'deskripsi' => ['required', 'string', 'max:5000'],
             'lokasi' => ['required', 'string', 'max:1000'],
             'bukti' => ['nullable', 'array', 'max:3'],
-            'bukti.*' => ['file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'bukti.*' => ['file', 'image', 'mimes:jpg,jpeg,png,webp', 'extensions:jpg,jpeg,png,webp', 'max:5120'],
             'setuju' => ['accepted'],
         ];
     }
@@ -39,12 +35,8 @@ class StoreGuestReportRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'jenis.required' => 'Jenis pengaduan wajib dipilih.',
-            'jenis.enum' => 'Jenis pengaduan tidak valid.',
             'telepon.required' => 'Nomor WhatsApp atau telepon wajib diisi.',
             'telepon.regex' => 'Format nomor WhatsApp atau telepon tidak valid.',
-            'nik.required_if' => 'NIK wajib diisi untuk laporan darurat.',
-            'nik.digits' => 'NIK harus terdiri dari 16 digit.',
             'deskripsi.required' => 'Deskripsi laporan wajib diisi.',
             'deskripsi.max' => 'Deskripsi laporan maksimal 5000 karakter.',
             'lokasi.required' => 'Lokasi kejadian wajib diisi.',
@@ -53,6 +45,7 @@ class StoreGuestReportRequest extends FormRequest
             'bukti.max' => 'Bukti laporan maksimal 3 foto.',
             'bukti.*.image' => 'Bukti laporan harus berupa gambar.',
             'bukti.*.mimes' => 'Format bukti hanya boleh JPG, JPEG, PNG, atau WEBP.',
+            'bukti.*.extensions' => 'Ekstensi bukti harus JPG, JPEG, PNG, atau WEBP.',
             'bukti.*.max' => 'Ukuran setiap bukti maksimal 5 MB.',
             'setuju.accepted' => 'Pernyataan kebenaran data wajib disetujui.',
         ];

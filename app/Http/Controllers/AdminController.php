@@ -9,7 +9,6 @@ use App\Models\Officer;
 use App\Models\Report;
 use App\OfficerStatus;
 use App\ReportStatus;
-use App\ReportType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
@@ -115,13 +114,8 @@ class AdminController extends Controller
         ], [
             'month.date_format' => 'Format bulan pengaduan tidak valid.',
         ]);
-        $selectedType = ReportType::tryFrom($request->string('type')->toString());
         $search = addcslashes($filters['search'] ?? '', '%_\\');
         $reportQuery = Report::query();
-
-        if ($selectedType !== null) {
-            $reportQuery->where('type', $selectedType);
-        }
 
         $reportQuery
             ->when($search !== '', fn ($query) => $query->where(function ($nestedQuery) use ($search): void {
@@ -158,19 +152,15 @@ class AdminController extends Controller
         $reportCounts = Report::query()
             ->toBase()
             ->selectRaw('COUNT(*) as total')
-            ->selectRaw('SUM(CASE WHEN type = ? THEN 1 ELSE 0 END) as emergency', [ReportType::Emergency->value])
-            ->selectRaw('SUM(CASE WHEN type = ? THEN 1 ELSE 0 END) as information', [ReportType::Information->value])
             ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as completed', [ReportStatus::Completed->value])
             ->first();
 
         $statistics = [
             'total' => (int) $reportCounts->total,
-            'emergency' => (int) $reportCounts->emergency,
-            'information' => (int) $reportCounts->information,
             'completed' => (int) $reportCounts->completed,
         ];
 
-        return view('admin.pengaduan', compact('reports', 'selectedType', 'statistics', 'filters'));
+        return view('admin.pengaduan', compact('reports', 'statistics', 'filters'));
     }
 
     public function pengaduanDetail(Request $request, Report $report): View

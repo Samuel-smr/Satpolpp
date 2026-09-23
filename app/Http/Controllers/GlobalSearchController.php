@@ -29,7 +29,7 @@ class GlobalSearchController extends Controller
                 'description' => str($report->description)->limit(70)->toString(),
                 'url' => $isAdmin
                     ? route('admin.pengaduan.detail', $report, absolute: false)
-                    : route('super_admin.peta', ['search' => $report->code], false),
+                    : route('super_admin.dashboard', ['search' => $report->code], false).'#peta-persebaran',
             ]);
 
         $activities = Activity::query()
@@ -43,9 +43,11 @@ class GlobalSearchController extends Controller
                 $url = route('super_admin.kegiatan', ['search' => $activity->name], false);
 
                 if ($isAdmin) {
-                    $url = $activity->type === ActivityType::External && $activity->report_id !== null
-                        ? route('admin.pengaduan.detail', $activity->report, false)
-                        : route('admin.kegiatan.show', $activity, false);
+                    $url = $activity->type === ActivityType::Internal
+                        ? route('admin.kegiatan.show', $activity, false)
+                        : ($activity->report !== null
+                            ? route('admin.pengaduan.detail', $activity->report, false)
+                            : route('admin.kegiatan', ['search' => $activity->name], false));
                 }
 
                 return ['type' => 'Kegiatan', 'title' => $activity->name, 'description' => $activity->location_address, 'url' => $url];

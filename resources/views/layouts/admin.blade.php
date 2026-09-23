@@ -53,8 +53,11 @@
 
 <body class="h-full font-sans antialiased text-slate-800 flex overflow-hidden">
 
+    <button id="sidebar-backdrop" type="button" class="fixed inset-0 z-30 hidden bg-slate-900/50 lg:hidden" aria-label="Tutup menu" onclick="toggleSidebar(false)"></button>
+
     {{-- Sidebar --}}
-    <aside class="w-64 bg-sidebar text-slate-200 flex flex-col flex-shrink-0 z-30 transition-all duration-300">
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 flex w-64 -translate-x-full flex-col bg-sidebar text-slate-200 transition-transform duration-300 lg:static lg:translate-x-0">
+        <button type="button" class="absolute right-3 top-3 rounded-lg p-2 text-slate-300 hover:bg-white/10 lg:hidden" aria-label="Tutup menu" onclick="toggleSidebar(false)"><span class="material-symbols-outlined">close</span></button>
         <!-- Logo Section -->
         <div class="px-6 py-6 flex items-center gap-3">
             <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center p-1.5 flex-shrink-0">
@@ -105,11 +108,6 @@
                 <span>Arsip</span>
             </a>
 
-            <a href="{{ route('admin.aset') }}"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all {{ request()->routeIs('admin.aset') ? 'bg-sidebar-active text-white shadow-md font-semibold' : 'text-slate-300 hover:bg-sidebar-hover hover:text-white' }}">
-                <span class="material-symbols-outlined text-[20px]">inventory_2</span>
-                <span>Aset</span>
-            </a>
         </nav>
 
         <!-- Sidebar Footer / Logout -->
@@ -134,12 +132,15 @@
     <div class="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#f4f5f7]">
         <!-- Top Header Bar -->
         <header
-            class="bg-white border-b border-slate-200/80 px-8 py-4 flex items-center justify-between sticky top-0 z-20">
+            class="sticky top-0 z-20 flex flex-wrap items-center gap-3 border-b border-slate-200/80 bg-white px-4 py-3 sm:px-6 lg:px-8 lg:py-4">
+            <button type="button" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100 lg:hidden" aria-label="Buka menu" aria-controls="sidebar" aria-expanded="false" data-sidebar-toggle onclick="toggleSidebar(true)">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
             <!-- Search Input -->
-            <x-global-search />
+            <div class="order-3 w-full min-w-0 lg:order-none lg:flex-1"><x-global-search /></div>
 
             <!-- Right Actions / Profile -->
-            <div class="flex items-center gap-2 relative">
+            <div class="relative ml-auto flex items-center gap-2">
                 <!-- Notifikasi -->
                 <div class="relative">
                     <button onclick="toggleNotif(event)" data-notification-button data-notifications-url="{{ route('notifications.index') }}"
@@ -152,7 +153,7 @@
                     </button>
 
                     <div id="notif-panel"
-                        class="hidden absolute right-0 top-12 w-80 sm:w-96 bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden z-50">
+                        class="hidden fixed left-4 right-4 top-16 w-auto sm:absolute sm:left-auto sm:right-0 sm:top-12 sm:w-96 bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden z-50">
                         <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100">
                             <h3 class="font-headline font-bold text-slate-800">Notifikasi</h3>
                             <form method="POST" action="{{ route('notifications.read-all') }}">
@@ -199,13 +200,13 @@
         </header>
 
         <!-- Main Scrollable Content -->
-        <main class="flex-1 overflow-y-auto p-8">
+        <main class="min-w-0 flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
             @yield('content')
         </main>
     </div>
 
     <!-- Global Modal Konfirmasi Hapus Data -->
-    <div id="global-modal-konfirmasi-hapus" class="hidden fixed inset-y-0 left-64 right-0 z-[100] flex items-center justify-center p-4">
+    <div id="global-modal-konfirmasi-hapus" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
         <!-- Backdrop transparan tanpa blur -->
         <div class="fixed inset-0 bg-black/40 transition-opacity" onclick="tutupKonfirmasiHapus()"></div>
 
@@ -495,6 +496,7 @@
 
     <script src="{{ asset('js/kulon-progo-map.js') }}"></script>
     <script src="{{ asset('js/header-live.js') }}"></script>
+    <script src="{{ asset('js/mobile-sidebar.js') }}"></script>
     @stack('scripts')
 </body>
 

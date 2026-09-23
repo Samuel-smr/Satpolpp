@@ -49,7 +49,6 @@
                         <div>
                             <div class="flex items-center gap-2 flex-wrap">
                                 <span class="text-sm font-semibold text-slate-800">{{ $f->code }}</span>
-                                <span class="text-xs font-semibold {{ $f->type->value === 'emergency' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700' }} px-2.5 py-1 rounded-full">{{ $f->type->label() }}</span>
                                 <span class="text-xs text-slate-400">{{ $f->feedback_submitted_at?->diffForHumans() }}</span>
                             </div>
                             <div class="flex items-center gap-2 mt-1.5">

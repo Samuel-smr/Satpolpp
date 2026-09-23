@@ -777,7 +777,7 @@
                     return suffix;
                 },
 
-                loadScript(src) {
+                loadScript(src, integrity = null) {
                     return new Promise((resolve, reject) => {
                         if (document.querySelector(`script[src="${src}"]`)) {
                             resolve();
@@ -785,8 +785,15 @@
                         }
                         const script = document.createElement('script');
                         script.src = src;
+                        if (integrity) {
+                            script.integrity = integrity;
+                            script.crossOrigin = 'anonymous';
+                        }
                         script.onload = resolve;
-                        script.onerror = () => reject(new Error('Gagal memuat pustaka dari CDN: ' + src));
+                        script.onerror = () => {
+                            script.remove();
+                            reject(new Error('Gagal memuat pustaka dari CDN: ' + src));
+                        };
                         document.head.appendChild(script);
                     });
                 },
@@ -882,7 +889,10 @@
                     this.isExportingExcel = true;
                     try {
                         if (typeof XLSX === 'undefined') {
-                            await this.loadScript('https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js');
+                            await this.loadScript(
+                                'https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js',
+                                'sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT',
+                            );
                         }
 
                         const dataRows = list.map((item, index) => {
@@ -943,10 +953,16 @@
                     this.isExportingPdf = true;
                     try {
                         if (!window.jspdf || !window.jspdf.jsPDF) {
-                            await this.loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+                            await this.loadScript(
+                                'https://cdn.jsdelivr.net/npm/jspdf@4.2.1/dist/jspdf.umd.min.js',
+                                'sha384-qovJwSBbRDPP5cEjCp8S0UP66wrvnjaa60XMOGzTNanrThcrGfXfnZkvgY8N1KT3',
+                            );
                         }
-                        if (!window.jspdf || !window.jspdf.jsPDF.prototype.autoTable) {
-                            await this.loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js');
+                        if (!window.jspdf || !window.jspdf.jsPDF.API.autoTable) {
+                            await this.loadScript(
+                                'https://cdn.jsdelivr.net/npm/jspdf-autotable@5.0.8/dist/jspdf.plugin.autotable.min.js',
+                                'sha384-5jk55M0XWoAw7LyhlXJe19ErOr3doBAPzxw9vahPFbvolqWa2yDk4fhHa2zuYeOa',
+                            );
                         }
 
                         const { jsPDF } = window.jspdf;

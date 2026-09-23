@@ -20,7 +20,7 @@ class DashboardTest extends TestCase
     {
         $this->travelTo('2026-09-09 10:00:00');
         $admin = User::factory()->create();
-        Report::factory()->emergency()->create([
+        Report::factory()->create([
             'created_at' => now()->setTime(8, 0),
             'status' => ReportStatus::Submitted,
         ]);

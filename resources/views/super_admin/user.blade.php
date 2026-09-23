@@ -200,19 +200,19 @@
                     <td class="px-6 py-3.5">
                         <div class="flex items-center gap-3">
                             <div class="w-9 h-9 rounded-full bg-super-active/10 text-super-active flex items-center justify-center font-bold text-xs flex-shrink-0">
-                                ${u.nama.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()}
+                                ${escapeHtml(u.nama.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase())}
                             </div>
                             <div>
-                                <div class="font-medium text-slate-800">${u.nama}</div>
-                                <div class="text-xs text-slate-400">${u.email || '-'}</div>
+                                <div class="font-medium text-slate-800">${escapeHtml(u.nama)}</div>
+                                <div class="text-xs text-slate-400">${escapeHtml(u.email || '-')}</div>
                             </div>
                         </div>
                     </td>
-                    <td class="px-6 py-3.5 text-slate-500">${u.username}</td>
+                    <td class="px-6 py-3.5 text-slate-500">${escapeHtml(u.username)}</td>
                     <td class="px-6 py-3.5">
                         <span class="text-xs font-semibold px-2.5 py-1 rounded-full border ${statusClass(u.status)}">${u.status === 'active' ? 'Aktif' : 'Terblokir'}</span>
                     </td>
-                    <td class="px-6 py-3.5 text-slate-500">${u.dibuat || '-'}</td>
+                    <td class="px-6 py-3.5 text-slate-500">${escapeHtml(u.dibuat || '-')}</td>
                     <td class="px-6 py-3.5 text-right whitespace-nowrap">
                         <button type="button" onclick="toggleStatus(${gi})" class="p-1.5 text-slate-400 hover:text-super-active hover:bg-super-active/10 rounded-lg transition-colors" title="Ubah status">
                             <span class="material-symbols-outlined text-[20px]">${u.status === 'active' ? 'block' : 'check_circle'}</span>

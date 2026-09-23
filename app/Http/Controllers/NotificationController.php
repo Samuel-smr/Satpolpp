@@ -38,9 +38,13 @@ class NotificationController extends Controller
 
         $destination = data_get($databaseNotification->data, 'url');
 
-        return is_string($destination) && str_starts_with($destination, '/')
+        return is_string($destination)
+            && str_starts_with($destination, '/')
+            && ! str_starts_with($destination, '//')
+            && ! str_contains($destination, '\\')
+            && ! preg_match('/[\x00-\x20]/', $destination)
             ? redirect()->to($destination)
-            : back();
+            : redirect()->to('/');
     }
 
     public function readAll(Request $request): RedirectResponse

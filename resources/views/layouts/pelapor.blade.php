@@ -70,7 +70,7 @@
             </div>
 
             <div class="md:hidden">
-                <button id="nav-toggle" class="text-slate-700 p-2" aria-label="Menu">
+                <button id="nav-toggle" type="button" class="text-slate-700 p-2" aria-label="Menu" aria-controls="mobile-nav" aria-expanded="false">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
@@ -118,7 +118,7 @@
                 {{-- Kontak --}}
                 <div class="space-y-2.5 text-sm">
                     <p>Telp. 0274 2890234 – Fax. 0</p>
-                    <p>Email: <a href="mailto:polpp@kulonprogokab.go.id" class="hover:text-white">polpp@kulonprogokab.go.id</a></p>
+                    <p>Email: <a href="mailto:polpp@kulonprogokab.go.id" class="break-all hover:text-white">polpp@kulonprogokab.go.id</a></p>
                     <p>Call Center : 0</p>
                     <div class="pt-2 flex flex-wrap gap-6">
                         <a href="#" class="hover:text-white">Tentang</a>
@@ -136,9 +136,12 @@
 
     <script>
         document.getElementById('nav-toggle').addEventListener('click', function() {
-            document.getElementById('mobile-nav').classList.toggle('hidden');
+            const menu = document.getElementById('mobile-nav');
+            const isOpen = menu.classList.toggle('hidden') === false;
+            this.setAttribute('aria-expanded', String(isOpen));
         });
     </script>
+    <script src="{{ asset('js/html-safety.js') }}"></script>
     @stack('scripts')
 </body>
 

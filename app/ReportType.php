@@ -4,14 +4,10 @@ namespace App;
 
 enum ReportType: string
 {
-    case Emergency = 'emergency';
-    case Information = 'information';
+    case Report = 'lapor';
 
     public function label(): string
     {
-        return match ($this) {
-            self::Emergency => 'Lapor Darurat',
-            self::Information => 'Informasi & Pengaduan',
-        };
+        return 'Lapor';
     }
 }

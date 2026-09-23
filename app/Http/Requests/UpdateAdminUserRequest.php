@@ -22,7 +22,13 @@ class UpdateAdminUserRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'username' => ['required', 'string', 'max:100', 'regex:/^[A-Za-z0-9._-]+$/', Rule::unique('users', 'username')->ignore($user instanceof User ? $user->id : null)],
             'email' => ['nullable', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user instanceof User ? $user->id : null)],
-            'password' => ['nullable', Password::min(8)],
+            'password' => ['bail', 'nullable', 'string', 'regex:/\A[^\x00]{1,72}\z/s', Password::min(8)],
         ];
+    }
+
+    /** @return array<string, string> */
+    public function messages(): array
+    {
+        return ['password.regex' => 'Password maksimal 72 byte dan tidak boleh mengandung karakter null.'];
     }
 }
