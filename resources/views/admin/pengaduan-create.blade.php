@@ -3,9 +3,9 @@
 @section('title', 'Tambah Laporan')
 
 @section('content')
-    <div class="fixed inset-y-0 left-64 right-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="report-modal-title">
+    <div class="fixed inset-y-0 left-0 right-0 lg:left-64 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="report-modal-title">
         <a href="{{ route('admin.pengaduan') }}" class="absolute inset-0 bg-black/40" aria-label="Tutup formulir"></a>
-        <div class="relative flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+        <div class="relative flex max-h-[92dvh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
             <div class="flex shrink-0 items-start justify-between gap-4 border-b border-slate-100 px-6 py-4">
                 <div>
                     <h1 id="report-modal-title" class="font-headline text-xl font-bold text-slate-900">Tambah Laporan</h1>

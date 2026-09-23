@@ -107,12 +107,12 @@
                         dapat dipertanggungjawabkan.</label>
                 </div>
 
-                <div class="flex justify-between">
+                <div class="flex flex-col gap-3 sm:flex-row sm:justify-between">
                     <button type="button" onclick="goStep(1)"
-                        class="border border-slate-300 text-slate-600 px-6 py-2.5 rounded-lg font-medium hover:bg-slate-50 transition-colors">←
+                        class="w-full border border-slate-300 text-slate-600 px-6 py-2.5 rounded-lg sm:w-auto font-medium hover:bg-slate-50 transition-colors">←
                         Sebelumnya</button>
                     <button type="submit"
-                        class="bg-brand-600 text-white px-8 py-2.5 rounded-lg font-medium hover:bg-brand-700 transition-colors flex items-center gap-2">
+                        class="flex w-full items-center justify-center gap-2 rounded-lg bg-brand-600 px-8 py-2.5 font-medium text-white transition-colors hover:bg-brand-700 sm:w-auto">
                         Kirim Laporan
                     </button>
                 </div>
@@ -127,7 +127,7 @@
         </button>
 
         <section id="ai-assistant-panel"
-            class="fixed bottom-20 right-4 z-50 hidden w-[calc(100%-2rem)] max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
+            class="fixed bottom-20 left-4 right-4 z-50 hidden w-auto max-w-md sm:left-auto sm:w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
             aria-label="Asisten AI SIPRAJA">
             <header class="flex items-center justify-between bg-brand-600 px-4 py-3 text-white">
                 <div class="flex items-center gap-3">

@@ -9,7 +9,7 @@
             <p class="text-sm text-slate-500 mt-1">Kelola dan pantau semua laporan serta informasi dari masyarakat.</p>
         </div>
 
-        <div class="flex items-center gap-3">
+        <div class="flex flex-wrap items-center gap-3">
             <span class="inline-flex items-center justify-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2.5 text-sm font-semibold text-blue-700">
                 <span class="material-symbols-outlined text-[18px]">database</span>
                 Data MySQL aktif

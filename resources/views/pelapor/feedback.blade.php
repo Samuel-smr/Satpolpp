@@ -16,8 +16,8 @@
 
         <div class="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 shadow-sm text-center">
             {{-- QR Code --}}
-            <div class="inline-block bg-slate-50 border border-slate-200 rounded-xl p-4 mb-6">
-                <img src="{{ $qrUrl }}" alt="QR Code Survey Kepuasan" class="w-56 h-56 rounded-lg" width="224" height="224">
+            <div class="mb-6 inline-flex max-w-full rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <img src="{{ $qrUrl }}" alt="QR Code Survey Kepuasan" class="aspect-square h-auto w-full max-w-56 rounded-lg" width="224" height="224">
             </div>
             <p class="text-sm text-slate-500 mb-2">Scan QR di atas untuk membuka survey</p>
 
