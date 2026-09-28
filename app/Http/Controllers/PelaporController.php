@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Notifications\NewReportNotification;
 use App\ReportStatus;
 use App\ReportType;
+use App\Services\OtpService;
 use App\Services\WhatsAppService;
 use App\UserRole;
 use App\UserStatus;
@@ -36,6 +37,51 @@ class PelaporController extends Controller
     public function lapor(): View
     {
         return view('pelapor.lapor');
+    }
+
+    public function sendOtp(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'telepon' => ['required', 'string', 'regex:/^\+?[0-9][0-9\s-]{8,18}$/'],
+        ]);
+
+        $otp = app(OtpService::class);
+        $code = $otp->issue($validated['telepon']);
+
+        if ($code === false) {
+            return response()->json([
+                'message' => 'Mohon tunggu 60 detik sebelum meminta kode OTP kembali.',
+            ], 429);
+        }
+
+        $sent = $otp->send($validated['telepon'], $code);
+
+        if ($sent === false && ! config('app.debug')) {
+            $otp->forget($validated['telepon']);
+
+            return response()->json([
+                'message' => 'Gagal mengirim kode OTP. Coba lagi beberapa saat.',
+            ], 503);
+        }
+
+        return response()->json([
+            'message' => 'Kode OTP berhasil dikirim ke nomor WhatsApp Anda.',
+            ...(config('app.debug') ? ['debug_code' => $code] : []),
+        ]);
+    }
+
+    public function verifyOtp(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'telepon' => ['required', 'string', 'regex:/^\+?[0-9][0-9\s-]{8,18}$/'],
+            'kode' => ['required', 'string', 'regex:/^\d{6}$/'],
+        ]);
+
+        $verified = app(OtpService::class)->verify($validated['telepon'], $validated['kode']);
+
+        return $verified
+            ? response()->json(['message' => 'Nomor berhasil diverifikasi.'])
+            : response()->json(['message' => 'Kode OTP salah atau sudah kedaluwarsa.'], 422);
     }
 
     public function store(StoreGuestReportRequest $request): RedirectResponse

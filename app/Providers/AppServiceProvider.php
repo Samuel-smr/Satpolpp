@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Activity;
 use App\Models\Report;
 use App\Models\User;
+use App\Services\WhatsAppService;
 use App\UserRole;
 use App\UserStatus;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -34,6 +35,25 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('guest-reports', fn (Request $request): Limit => Limit::perMinute(5)->by($request->ip()));
         RateLimiter::for('guest-feedback', fn (Request $request): Limit => Limit::perMinute(10)->by($request->ip()));
         RateLimiter::for('login-ip', fn (Request $request): Limit => Limit::perMinute(20)->by($request->ip()));
+        RateLimiter::for('otp-request', function (Request $request): array {
+            $phone = (string) $request->input('telepon', '');
+            $limits = [
+                Limit::perMinute(8)->by('ip:'.$request->ip()),
+                Limit::perHour(15)->by('ip-hour:'.$request->ip()),
+            ];
+
+            if ($phone !== '') {
+                $limits[] = Limit::perHour(8)->by('phone:'.app(WhatsAppService::class)->normalizePhone($phone));
+            }
+
+            foreach ($limits as $limit) {
+                $limit->response(fn (Request $request, array $headers): JsonResponse => response()->json([
+                    'message' => 'Terlalu banyak permintaan kode OTP. Coba lagi nanti.',
+                ], 429, $headers));
+            }
+
+            return $limits;
+        });
         RateLimiter::for('ai-assistant', function (Request $request): array {
             $limits = [
                 Limit::perMinute(10)->by('minute:'.$request->ip()),
