@@ -24,6 +24,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [PelaporController::class, 'index'])->name('pelapor.index');
 Route::get('/lapor', [PelaporController::class, 'lapor'])->name('pelapor.lapor');
 Route::post('/lapor', [PelaporController::class, 'store'])->middleware('throttle:guest-reports')->name('pelapor.store');
+Route::post('/lapor/otp', [PelaporController::class, 'sendOtp'])->middleware('throttle:otp-request')->name('pelapor.otp.send');
+Route::post('/lapor/otp/verify', [PelaporController::class, 'verifyOtp'])->middleware('throttle:otp-request')->name('pelapor.otp.verify');
 Route::post('/lapor/asisten-ai', AiAssistantController::class)
     ->middleware('throttle:ai-assistant')
     ->block(30, 0)

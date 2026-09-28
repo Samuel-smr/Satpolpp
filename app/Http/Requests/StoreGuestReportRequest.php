@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Services\OtpService;
+use Closure;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreGuestReportRequest extends FormRequest
@@ -22,7 +24,11 @@ class StoreGuestReportRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'telepon' => ['required', 'string', 'regex:/^\+?[0-9][0-9\s-]{8,18}$/'],
+            'telepon' => ['required', 'string', 'regex:/^\+?[0-9][0-9\s-]{8,18}$/', function (string $attribute, mixed $value, Closure $fail): void {
+                if (! app(OtpService::class)->isVerified(is_string($value) ? $value : '')) {
+                    $fail('Nomor WhatsApp harus diverifikasi dengan kode OTP terlebih dahulu.');
+                }
+            }],
             'deskripsi' => ['required', 'string', 'max:5000'],
             'lokasi' => ['required', 'string', 'max:1000'],
             'bukti' => ['nullable', 'array', 'max:3'],
@@ -37,6 +43,7 @@ class StoreGuestReportRequest extends FormRequest
         return [
             'telepon.required' => 'Nomor WhatsApp atau telepon wajib diisi.',
             'telepon.regex' => 'Format nomor WhatsApp atau telepon tidak valid.',
+            'telepon.otp' => 'Nomor WhatsApp harus diverifikasi dengan kode OTP terlebih dahulu.',
             'deskripsi.required' => 'Deskripsi laporan wajib diisi.',
             'deskripsi.max' => 'Deskripsi laporan maksimal 5000 karakter.',
             'lokasi.required' => 'Lokasi kejadian wajib diisi.',

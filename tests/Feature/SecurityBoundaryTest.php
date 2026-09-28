@@ -113,6 +113,7 @@ class SecurityBoundaryTest extends TestCase
 
     public function test_guest_cannot_assign_report_ownership_status_or_legacy_nik(): void
     {
+        $this->verifyPhoneOtp('081234567890');
         $this->post(route('pelapor.store'), [
             ...$this->reportPayload(),
             'status' => 'completed',
@@ -152,6 +153,7 @@ class SecurityBoundaryTest extends TestCase
         Storage::fake('local');
         $fixture = UploadedFile::fake()->createWithContent($name, $content);
         $upload = new UploadedFile($fixture->getPathname(), $name, 'image/jpeg', null, true);
+        $this->verifyPhoneOtp('081234567890');
         $this->postJson(route('pelapor.store'), [
             ...$this->reportPayload(),
             'bukti' => [$upload],
@@ -320,6 +322,7 @@ class SecurityBoundaryTest extends TestCase
             return $length === 6 ? (++$attempt === 1 ? 'REUSED' : 'UNIQUE') : str_repeat('a', $length);
         });
         try {
+            $this->verifyPhoneOtp('081234567890');
             $this->post(route('pelapor.store'), $this->reportPayload())->assertRedirect();
         } finally {
             Str::createRandomStringsNormally();

@@ -488,7 +488,7 @@
 @push('scripts')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
     <script>
-        @if ($report->status === \App\ReportStatus::InProgress && ! ($reportReadOnly ?? false))
+        @if ($report->status === \App\ReportStatus::InProgress)
         document.querySelectorAll('a[href="#form-penyelesaian"]').forEach(function (link) {
             link.addEventListener('click', function (event) {
                 event.preventDefault();
