@@ -3,8 +3,6 @@
 namespace App\Services;
 
 use App\Models\Report;
-use Illuminate\Http\Client\ConnectionException;
-use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use RuntimeException;
@@ -14,39 +12,7 @@ class WhatsAppService
 {
     public function send(string $phone, string $message): void
     {
-        if ((string) config('services.whatsapp.driver') === 'fonnte') {
-            $this->sendViaFonnte($phone, $message);
-
-            return;
-        }
-
         $this->sendViaLocalBot($phone, $message);
-    }
-
-    private function sendViaFonnte(string $phone, string $message): void
-    {
-        $token = config('services.fonnte.token');
-
-        if (! is_string($token) || $token === '') {
-            throw new RuntimeException('Fonnte token is not configured.');
-        }
-
-        $response = Http::withHeaders(['Authorization' => $token])
-            ->acceptJson()
-            ->connectTimeout(5)
-            ->timeout(15)
-            ->retry([250], 0, fn (?Throwable $exception): bool => $exception instanceof ConnectionException
-                || ($exception instanceof RequestException
-                    && ($exception->response->status() === 429 || $exception->response->serverError())))
-            ->post('https://api.fonnte.com/send', [
-                'target' => $this->normalizePhone($phone),
-                'message' => $message,
-            ])
-            ->throw();
-
-        if (! $response->successful() || $response->json('status') !== true) {
-            throw new RuntimeException('Fonnte rejected the message: '.($response->json('reason') ?? 'unknown error'));
-        }
     }
 
     private function sendViaLocalBot(string $phone, string $message): void

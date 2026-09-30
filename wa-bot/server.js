@@ -42,21 +42,23 @@ const client = new Client({
     },
 });
 
+let ready = false;
+
 app.get('/health', (_req, res) => {
-    res.json({ status: client.info ? 'ready' : 'connecting' });
+    res.json({ status: client.info && ready ? 'ready' : 'connecting' });
 });
 
 app.post('/send', async (req, res) => {
     const { target, message } = req.body || {};
 
-    if (!client.info) {
-        return res.status(503).json({ status: false, reason: 'BOT_BELUM_SIAP' });
+    if (!client.info || !ready) {
+        return res.status(503).json({ status: false, reason: 'BOT_BELUM_SIAP', ready });
     }
     if (!target || !message) {
         return res.status(400).json({ status: false, reason: 'TARGET_ATAU_PESAN_KOSONG' });
     }
 
-try {
+    try {
         const number = normalizePhone(target);
         const chatId = `${number}@c.us`;
 
@@ -79,14 +81,30 @@ try {
     }
 });
 
+client.on('loading_screen', (percent, message) => {
+    console.log(`WhatsApp memuat: ${percent}% ${message || ''}`);
+});
+
+client.on('authenticated', () => {
+    console.log('WhatsApp terautentikasi (scan berhasil).');
+});
+
 client.on('qr', (qr) => {
     console.log('=== Scan QR berikut dengan WhatsApp Anda ===');
     qrcode.generate(qr, { small: true });
 });
 
 client.on('ready', () => {
+    ready = true;
     console.log('Bot WhatsApp siap. Notifikasi akan dikirim otomatis.');
     console.log(`Server lokal: http://localhost:${PORT}`);
+});
+
+client.on('disconnected', (reason) => {
+    console.log('WhatsApp terputus:', reason);
+    if (reason === 'LOGGED_OUT' || reason === 'LOGOUT') {
+        console.log('Sesi di-logout. Hapus folder session dan scan QR baru.');
+    }
 });
 
 client.on('auth_failure', (message) => {
@@ -95,6 +113,14 @@ client.on('auth_failure', (message) => {
 });
 
 client.initialize();
+
+process.on('unhandledRejection', (reason) => {
+    console.error('Ada unhandled rejection:', reason);
+});
+
+process.on('uncaughtException', (error) => {
+    console.error('Ada uncaught exception:', error.message);
+});
 
 app.listen(PORT, () => {
     console.log(`WA Bot HTTP API berjalan di port ${PORT}`);

@@ -433,11 +433,6 @@
                 otpVerifyArea.classList.remove('hidden');
                 otpKode.focus();
 
-                if (result.debug_code) {
-                    otpKode.value = result.debug_code;
-                    setOtpStatus(otpSendStatus, result.message, true);
-                }
-
                 coolingDown = true;
                 startOtpResendCountdown(60);
             } catch (error) {
