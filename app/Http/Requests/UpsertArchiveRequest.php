@@ -30,7 +30,7 @@ class UpsertArchiveRequest extends FormRequest
     public function rules(): array
     {
         $archive = $this->route('archive');
-        $remainingFileSlots = $archive instanceof Archive ? max(0, 3 - $archive->files()->count()) : 3;
+        $remainingFileSlots = $archive instanceof Archive ? max(0, 5 - $archive->files()->count()) : 5;
 
         return [
             'archive_context_id' => ['nullable', 'integer'],
@@ -74,7 +74,7 @@ class UpsertArchiveRequest extends FormRequest
             'confidentiality.enum' => 'Sifat dokumen tidak valid.',
             'files.required' => 'Minimal satu file arsip wajib diunggah.',
             'files.min' => 'Minimal satu file arsip wajib diunggah.',
-            'files.max' => 'Jumlah file dalam satu arsip maksimal tiga file.',
+            'files.max' => 'Jumlah file dalam satu arsip maksimal lima file.',
             'files.*.mimes' => 'File harus berformat PDF, JPG, JPEG, PNG, DOC, DOCX, XLS, XLSX, atau ZIP.',
             'files.*.extensions' => 'Ekstensi file harus PDF, JPG, JPEG, PNG, DOC, DOCX, XLS, XLSX, atau ZIP.',
             'files.*.max' => 'Ukuran setiap file arsip maksimal 20 MB.',

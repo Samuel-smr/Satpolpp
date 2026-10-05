@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Services\EprofilService;
 use Illuminate\Contracts\Validation\ValidationRule;
 
 class UpdateInternalActivityRequest extends StoreInternalActivityRequest
@@ -9,10 +10,10 @@ class UpdateInternalActivityRequest extends StoreInternalActivityRequest
     /**
      * @return array<string, ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
+    public function rules(EprofilService $eprofil): array
     {
         return [
-            ...parent::rules(),
+            ...parent::rules($eprofil),
             'current_updated_at' => ['required', 'date_format:Y-m-d H:i:s'],
         ];
     }

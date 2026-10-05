@@ -119,7 +119,7 @@
             <!-- Stat Cards -->
             <div class="grid grid-cols-2 gap-4">
                 <div class="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm flex flex-col">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Petugas Aktif</span>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Pegawai e-Profil</span>
                     <span class="text-2xl font-headline font-bold text-slate-800">{{ $mapStatistics['active_officers'] }}</span>
                 </div>
                 <div class="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm flex flex-col">
@@ -372,7 +372,7 @@
                             maintainAspectRatio: false,
                             plugins: { legend: { display: false } },
                             scales: {
-                                y: { beginAtZero: true, grid: { display: false } },
+                                y: { beginAtZero: true, ticks: { precision: 0, stepSize: 1 }, grid: { display: false } },
                                 x: { grid: { display: false } }
                             }
                         }
@@ -452,7 +452,7 @@
                             maintainAspectRatio: false,
                             plugins: { legend: { display: false } },
                             scales: {
-                                x: { beginAtZero: true, ticks: { precision: 0 }, grid: { display: false } },
+                                x: { beginAtZero: true, ticks: { precision: 0, stepSize: 1 }, grid: { display: false } },
                                 y: { grid: { display: false } }
                             }
                         }

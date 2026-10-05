@@ -148,7 +148,7 @@
                                     <span class="line-clamp-2" title="{{ $activity->location_address }}">{{ $activity->location_address }}</span>
                                 </td>
                                 <td class="px-6 py-4 text-center">
-                                    <span class="whitespace-nowrap rounded-full border border-blue-100 bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-600">{{ $activity->officers_count }} orang</span>
+                                    <span class="whitespace-nowrap rounded-full border border-blue-100 bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-600">{{ $activity->personnel_count }} orang</span>
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center justify-center">

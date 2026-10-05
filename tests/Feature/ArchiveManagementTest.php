@@ -92,7 +92,7 @@ class ArchiveManagementTest extends TestCase
         ]);
     }
 
-    public function test_admin_can_upload_three_archives_at_once(): void
+    public function test_admin_can_upload_five_files_in_one_archive(): void
     {
         Storage::fake('local');
         $admin = User::factory()->create();
@@ -105,15 +105,17 @@ class ArchiveManagementTest extends TestCase
                 UploadedFile::fake()->create('dokumen.pdf', 100, 'application/pdf'),
                 UploadedFile::fake()->image('foto-satu.jpg'),
                 UploadedFile::fake()->image('foto-dua.png'),
+                UploadedFile::fake()->create('lampiran-satu.pdf', 100, 'application/pdf'),
+                UploadedFile::fake()->create('lampiran-dua.pdf', 100, 'application/pdf'),
             ],
         ]);
 
         $response->assertRedirectToRoute('admin.arsip');
         $response->assertSessionHas('status', 'Arsip berhasil diunggah.');
         $this->assertDatabaseCount('archives', 1);
-        $this->assertDatabaseCount('archive_files', 3);
+        $this->assertDatabaseCount('archive_files', 5);
         $this->assertDatabaseCount('audit_logs', 1);
-        $this->assertCount(3, Storage::disk('local')->allFiles('archives/files'));
+        $this->assertCount(5, Storage::disk('local')->allFiles('archives/files'));
     }
 
     public function test_archive_folder_can_contain_pdf_image_and_spreadsheet_files(): void
@@ -140,7 +142,7 @@ class ArchiveManagementTest extends TestCase
         );
     }
 
-    public function test_archive_upload_rejects_more_than_three_files(): void
+    public function test_archive_upload_rejects_more_than_five_files(): void
     {
         Storage::fake('local');
         $admin = User::factory()->create();
@@ -154,10 +156,12 @@ class ArchiveManagementTest extends TestCase
                 UploadedFile::fake()->image('dua.jpg'),
                 UploadedFile::fake()->image('tiga.jpg'),
                 UploadedFile::fake()->image('empat.jpg'),
+                UploadedFile::fake()->image('lima.jpg'),
+                UploadedFile::fake()->image('enam.jpg'),
             ],
         ]);
 
-        $response->assertInvalid(['files']);
+        $response->assertInvalid(['files' => 'Jumlah file dalam satu arsip maksimal lima file.']);
         $this->assertDatabaseCount('archives', 0);
         $this->assertSame([], Storage::disk('local')->allFiles('archives/files'));
     }
@@ -245,7 +249,7 @@ class ArchiveManagementTest extends TestCase
         Storage::disk('local')->assertExists('archives/files/old.pdf');
     }
 
-    public function test_editing_an_archive_can_add_a_file_without_removing_existing_file(): void
+    public function test_editing_an_archive_can_add_files_up_to_five_without_removing_existing_file(): void
     {
         Storage::fake('local');
         $admin = User::factory()->create();
@@ -258,14 +262,48 @@ class ArchiveManagementTest extends TestCase
             'title' => $archive->title,
             'operational_category' => $this->activityTemplate->name,
             'confidentiality' => $archive->confidentiality->value,
-            'files' => [UploadedFile::fake()->image('new-image.jpg')],
+            'files' => [
+                UploadedFile::fake()->image('new-image.jpg'),
+                UploadedFile::fake()->create('lampiran-satu.pdf', 100, 'application/pdf'),
+                UploadedFile::fake()->create('lampiran-dua.pdf', 100, 'application/pdf'),
+                UploadedFile::fake()->create('lampiran-tiga.pdf', 100, 'application/pdf'),
+            ],
         ]);
 
         $response->assertRedirectToRoute('admin.arsip');
-        $this->assertCount(2, $archive->fresh()->files);
+        $this->assertCount(5, $archive->fresh()->files);
+        $this->assertCount(5, Storage::disk('local')->allFiles('archives/files'));
         $newFile = $archive->fresh()->files()->where('original_name', 'new-image.jpg')->sole();
         Storage::disk('local')->assertExists($newFile->file_path);
         Storage::disk('local')->assertExists('archives/files/old.pdf');
+    }
+
+    public function test_editing_an_archive_rejects_a_total_of_more_than_five_files(): void
+    {
+        Storage::fake('local');
+        $admin = User::factory()->create();
+        Storage::disk('local')->put('archives/files/old.pdf', 'old document');
+        $archive = Archive::factory()->create();
+        $archive->files()->first()->update(['file_path' => 'archives/files/old.pdf', 'original_name' => 'old.pdf']);
+
+        $response = $this->actingAs($admin)->put(route('admin.arsip.update', $archive), [
+            'archive_context_id' => $archive->id,
+            'title' => $archive->title,
+            'operational_category' => $this->activityTemplate->name,
+            'confidentiality' => $archive->confidentiality->value,
+            'files' => [
+                UploadedFile::fake()->image('satu.jpg'),
+                UploadedFile::fake()->image('dua.jpg'),
+                UploadedFile::fake()->image('tiga.jpg'),
+                UploadedFile::fake()->image('empat.jpg'),
+                UploadedFile::fake()->image('lima.jpg'),
+            ],
+        ]);
+
+        $response->assertInvalid(['files' => 'Jumlah file dalam satu arsip maksimal lima file.']);
+        $this->assertCount(1, $archive->fresh()->files);
+        $this->assertDatabaseCount('audit_logs', 0);
+        $this->assertSame(['archives/files/old.pdf'], Storage::disk('local')->allFiles('archives/files'));
     }
 
     public function test_archive_file_can_be_viewed_and_downloaded_securely(): void

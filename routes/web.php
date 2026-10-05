@@ -103,10 +103,6 @@ Route::prefix('super-admin')->name('super_admin.')->middleware(['auth', 'can:acc
     Route::patch('/user/{user}/status', [SuperAdminController::class, 'toggleUserStatus'])->name('user.status');
     Route::delete('/user/{user}', [SuperAdminController::class, 'destroyUser'])->name('user.destroy');
     Route::get('/petugas', [OfficerController::class, 'index'])->name('petugas');
-    Route::post('/petugas', [OfficerController::class, 'store'])->name('petugas.store');
-    Route::put('/petugas/{officer}', [OfficerController::class, 'update'])->name('petugas.update');
-    Route::patch('/petugas/{officer}/status', [OfficerController::class, 'toggleStatus'])->name('petugas.status');
-    Route::delete('/petugas/{officer}', [OfficerController::class, 'destroy'])->name('petugas.destroy');
 
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');

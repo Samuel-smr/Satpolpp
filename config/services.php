@@ -2,6 +2,11 @@
 
 return [
 
+    'eprofil' => [
+        'url' => env('api_eprofil'),
+        'token' => env('token_eprofil'),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Third Party Services

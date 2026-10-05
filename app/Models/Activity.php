@@ -3,15 +3,18 @@
 namespace App\Models;
 
 use App\ActivityType;
+use App\Services\EprofilService;
+use App\Support\Employee;
 use Database\Factories\ActivityFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Collection;
 
 #[Fillable([
     'report_id',
@@ -61,12 +64,16 @@ class Activity extends Model
         return $this->belongsTo(User::class, 'evaluated_by_user_id');
     }
 
-    /** @return BelongsToMany<Officer, $this> */
-    public function officers(): BelongsToMany
+    /** @return HasMany<ActivityPersonnel, $this> */
+    public function personnel(): HasMany
     {
-        return $this->belongsToMany(Officer::class)
-            ->withPivot(['assignment_role', 'notes'])
-            ->withTimestamps();
+        return $this->hasMany(ActivityPersonnel::class);
+    }
+
+    /** @return Attribute<Collection<int, Employee>, never> */
+    protected function officers(): Attribute
+    {
+        return Attribute::get(fn (): Collection => app(EprofilService::class)->resolvePersonnel($this->personnel));
     }
 
     /** @return MorphMany<Attachment, $this> */

@@ -4,15 +4,16 @@ namespace App\Http\Controllers;
 
 use App\ActivityType;
 use App\Models\Activity;
-use App\Models\Officer;
 use App\Models\Report;
+use App\Services\EprofilService;
+use App\Support\Employee;
 use App\UserRole;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class GlobalSearchController extends Controller
 {
-    public function __invoke(Request $request): JsonResponse
+    public function __invoke(Request $request, EprofilService $eprofil): JsonResponse
     {
         $validated = $request->validate(['q' => ['required', 'string', 'min:2', 'max:100']]);
         $term = $validated['q'];
@@ -53,12 +54,12 @@ class GlobalSearchController extends Controller
                 return ['type' => 'Kegiatan', 'title' => $activity->name, 'description' => $activity->location_address, 'url' => $url];
             });
 
-        $officers = Officer::query()
-            ->where(fn ($query) => $query->where('name', 'like', "%{$term}%")
-                ->orWhere('employee_number', 'like', "%{$term}%")
-                ->orWhere('position', 'like', "%{$term}%"))
-            ->orderBy('name')->limit(5)->get(['id', 'name', 'employee_number', 'position'])
-            ->map(fn (Officer $officer): array => [
+        $officers = $eprofil->officers()
+            ->filter(fn (Employee $officer): bool => str_contains(
+                mb_strtolower($officer->name.' '.$officer->employee_number.' '.$officer->position), mb_strtolower($term),
+            ))
+            ->take(5)
+            ->map(fn (Employee $officer): array => [
                 'type' => 'Petugas',
                 'title' => $officer->name,
                 'description' => collect([$officer->employee_number, $officer->position])->filter()->join(' · '),

@@ -3,391 +3,46 @@
 @section('title', 'Manajemen Petugas')
 
 @section('content')
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div>
-            <h1 class="font-headline text-3xl font-bold text-slate-900 tracking-tight">Manajemen Data Petugas</h1>
-            <p class="text-sm text-slate-500 mt-1">Direktori seluruh personil Satpol PP, regu lapangan, dan nomor NIP.</p>
-        </div>
-
-        <button type="button" onclick="bukaTambah()"
-            class="inline-flex items-center justify-center gap-2 bg-super-active text-white px-5 py-2.5 rounded-xl font-medium hover:bg-brand-600 transition-colors shadow-sm">
-            <span class="material-symbols-outlined text-[20px]">person_add</span>
-            Tambah Petugas
-        </button>
+    <div class="mb-8">
+        <h1 class="font-headline text-3xl font-bold tracking-tight text-slate-900">Daftar Pegawai</h1>
+        <p class="mt-1 text-sm text-slate-500">Nama, NIP, dan jabatan pegawai mengikuti data e-Profil.</p>
     </div>
 
-    {{-- Ringkasan --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-xl bg-super-active/10 text-super-active flex items-center justify-center">
-                    <span class="material-symbols-outlined text-[24px]">badge</span>
-                </div>
-                <div>
-                    <p class="text-xs text-slate-500 font-medium">Total Petugas</p>
-                    <p class="font-headline text-2xl font-bold text-slate-900">{{ $statistics['total'] }}</p>
-                </div>
-            </div>
-        </div>
-        <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-[24px]">task_alt</span>
-                </div>
-                <div>
-                    <p class="text-xs text-slate-500 font-medium">Aktif</p>
-                    <p class="font-headline text-2xl font-bold text-slate-900">{{ $statistics['active'] }}</p>
-                </div>
-            </div>
-        </div>
-        <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-[24px]">beach_access</span>
-                </div>
-                <div>
-                    <p class="text-xs text-slate-500 font-medium">Cuti</p>
-                    <p class="font-headline text-2xl font-bold text-slate-900">{{ $statistics['leave'] }}</p>
-                </div>
-            </div>
-        </div>
-        <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-xl bg-red-50 text-red-600 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-[24px]">group_off</span>
-                </div>
-                <div>
-                    <p class="text-xs text-slate-500 font-medium">Nonaktif</p>
-                    <p class="font-headline text-2xl font-bold text-slate-900">{{ $statistics['inactive'] }}</p>
-                </div>
-            </div>
-        </div>
+    @if ($officerDirectoryWarning)
+        <p role="alert" class="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">{{ $officerDirectoryWarning }}</p>
+    @endif
+
+    <div class="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <p class="text-sm text-slate-500">Total Pegawai</p>
+        <p class="mt-1 font-headline text-3xl font-bold text-slate-900">{{ $officers->count() }}</p>
     </div>
 
-    {{-- Tabel --}}
-    <div class="bg-white border border-slate-200/80 rounded-2xl shadow-sm overflow-hidden">
-        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-            <span class="text-sm font-semibold text-slate-700">Daftar Personil</span>
-            <span class="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-full font-medium">Database</span>
+    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div class="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+            <span class="text-sm font-semibold text-slate-700">Daftar Pegawai</span>
+            <span class="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">e-Profil</span>
         </div>
-
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
-                    <tr class="border-b border-slate-100 text-left text-xs text-slate-400 uppercase tracking-wider">
+                    <tr class="border-b border-slate-100 text-left text-xs uppercase tracking-wider text-slate-400">
                         <th class="px-6 py-3 font-semibold">NIP</th>
                         <th class="px-6 py-3 font-semibold">Nama</th>
                         <th class="px-6 py-3 font-semibold">Jabatan</th>
-                        <th class="px-6 py-3 font-semibold">Nama Satuan Kerja</th>
-                        <th class="px-6 py-3 font-semibold">Unit Kerja</th>
-                        <th class="px-6 py-3 font-semibold text-right">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($officers as $officer)
                         <tr class="border-b border-slate-50 hover:bg-slate-50/50">
                             <td class="px-6 py-3.5 font-mono text-xs text-slate-500">{{ $officer->employee_number }}</td>
-                            <td class="px-6 py-3.5"><div class="flex items-center gap-3"><div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-super-active/10 text-xs font-bold text-slate-700">{{ collect(explode(' ', $officer->name))->take(2)->map(fn ($word) => mb_substr($word, 0, 1))->join('') }}</div><span class="font-medium text-slate-800">{{ $officer->name }}</span></div></td>
+                            <td class="px-6 py-3.5 font-medium text-slate-800">{{ $officer->name }}</td>
                             <td class="min-w-80 px-6 py-3.5 text-slate-500">{{ $officer->position }}</td>
-                            <td class="min-w-56 px-6 py-3.5 text-slate-500">{{ $officer->work_unit_name }}</td>
-                            <td class="min-w-56 px-6 py-3.5 text-slate-500">{{ $officer->unit_name }}</td>
-                            <td class="px-6 py-3.5 text-right whitespace-nowrap">
-                                <button type="button" onclick="bukaEdit(@js(['id' => $officer->id, 'name' => $officer->name, 'employee_number' => $officer->employee_number, 'position' => $officer->position, 'work_unit_name' => $officer->work_unit_name, 'unit_name' => $officer->unit_name]))" class="p-1.5 text-slate-400 hover:text-super-active hover:bg-super-active/10 rounded-lg" title="Edit"><span class="material-symbols-outlined text-[20px]">edit</span></button>
-                                <button type="button" onclick="hapusPetugas({{ $officer->id }}, @js($officer->name))" class="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg" title="Hapus"><span class="material-symbols-outlined text-[20px]">delete</span></button>
-                            </td>
                         </tr>
                     @empty
-                        <tr><td colspan="6" class="px-6 py-12 text-center text-slate-400">Belum ada data petugas.</td></tr>
+                        <tr><td colspan="3" class="px-6 py-12 text-center text-slate-400">Belum ada data pegawai dari e-Profil.</td></tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
-
     </div>
-
-    {{-- Modal tambah/ubah petugas --}}
-    <div id="modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-black/40" onclick="tutupModal()"></div>
-        <div class="relative w-full max-w-lg bg-white rounded-2xl shadow-xl overflow-hidden max-h-[90vh] flex flex-col">
-            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-                <h2 class="font-headline font-bold text-slate-800" id="modal-judul">Tambah Petugas</h2>
-                <button type="button" onclick="tutupModal()" class="text-slate-400 hover:text-slate-600">
-                    <span class="material-symbols-outlined">close</span>
-                </button>
-            </div>
-
-            <form id="petugas-form" method="POST" class="p-6 space-y-4 overflow-y-auto" onsubmit="simpanPetugas(event)">
-                @csrf
-                <input type="hidden" name="edit_index" value="">
-                <input type="hidden" name="_method" value="POST">
-                <div>
-                    <label class="block text-sm font-medium mb-1">Nama Lengkap <span class="text-red-500">*</span></label>
-                    <input type="text" name="name" required placeholder="Contoh: Joko Widodo Samudra"
-                        class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none">
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium mb-1">NIP <span class="text-red-500">*</span></label>
-                    <input type="text" name="employee_number" required maxlength="50" placeholder="Masukkan NIP petugas"
-                        class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none">
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium mb-1">Jabatan <span class="text-red-500">*</span></label>
-                    <select name="position" required class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none bg-white">
-                        <option value="">Pilih Jabatan</option>
-                        @foreach ($positions as $position)<option value="{{ $position }}">{{ $position }}</option>@endforeach
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium mb-1">Nama Satuan Kerja <span class="text-red-500">*</span></label>
-                    <select name="work_unit_name" required class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none bg-white">
-                        <option value="">Pilih Nama Satuan Kerja</option>
-                        @foreach ($workUnits as $workUnit)<option value="{{ $workUnit }}">{{ $workUnit }}</option>@endforeach
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium mb-1">Unit Kerja <span class="text-red-500">*</span></label>
-                    <select name="unit_name" required class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none bg-white">
-                        <option value="">Pilih Unit Kerja</option>
-                        @foreach ($units as $unit)<option value="{{ $unit }}">{{ $unit }}</option>@endforeach
-                    </select>
-                </div>
-
-                <div class="flex justify-end gap-3 pt-2">
-                    <button type="button" onclick="tutupModal()" class="border border-slate-300 text-slate-600 px-5 py-2 rounded-xl font-medium hover:bg-slate-50 transition-colors">Batal</button>
-                    <button type="submit" class="bg-super-active text-white px-6 py-2 rounded-xl font-medium hover:bg-brand-600 transition-colors">Simpan</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-
-
 @endsection
-
-@push('scripts')
-{{-- Kode prototipe daftar lokal dinonaktifkan; CRUD menggunakan endpoint Laravel pada skrip setelah blok ini.
-    function getPetugas() {
-        return [];
-    }
-
-    function saveAll() {}
-
-    function statusClass(s) {
-        if (s === 'aktif') return 'bg-emerald-50 text-emerald-700 border-emerald-200';
-        if (s === 'cuti') return 'bg-amber-50 text-amber-700 border-amber-200';
-        return 'bg-red-50 text-red-700 border-red-200';
-    }
-
-    function renderList() {
-        const data = getPetugas();
-        document.getElementById('stat-total').textContent = data.length;
-        document.getElementById('stat-aktif').textContent = data.filter(p => p.status === 'aktif').length;
-        document.getElementById('stat-cuti').textContent = data.filter(p => p.status === 'cuti').length;
-        document.getElementById('stat-nonaktif').textContent = data.filter(p => p.status === 'nonaktif').length;
-
-        const tbody = document.getElementById('petugas-list');
-        const kosong = document.getElementById('kosong');
-
-        if (data.length === 0) {
-            tbody.innerHTML = '';
-            kosong.classList.remove('hidden');
-            return;
-        }
-        kosong.classList.add('hidden');
-
-        tbody.innerHTML = data.map((p, i) => `
-            <tr class="border-b border-slate-50 hover:bg-slate-50/50">
-                <td class="px-6 py-3.5">
-                    <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-full bg-super-active/10 text-slate-700 flex items-center justify-center font-bold text-xs flex-shrink-0">
-                            ${p.nama.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()}
-                        </div>
-                        <span class="font-medium text-slate-800">${p.nama}</span>
-                    </div>
-                </td>
-                <td class="px-6 py-3.5 text-slate-500 font-mono text-xs">${p.nip}</td>
-                <td class="px-6 py-3.5 text-slate-500">${p.pangkat || '-'}</td>
-                <td class="px-6 py-3.5 text-slate-500">${p.regu || '-'}</td>
-                <td class="px-6 py-3.5 text-slate-500">${p.zona || '-'}</td>
-                <td class="px-6 py-3.5">
-                    <span class="text-xs font-semibold px-2.5 py-1 rounded-full border capitalize ${statusClass(p.status)}">${p.status}</span>
-                </td>
-                <td class="px-6 py-3.5 text-right whitespace-nowrap">
-                    <button type="button" onclick="toggleStatus(${i})" class="p-1.5 text-slate-400 hover:text-super-active hover:bg-super-active/10 rounded-lg transition-colors" title="Ubah status">
-                        <span class="material-symbols-outlined text-[20px]">swap_vert</span>
-                    </button>
-                    <button type="button" onclick="bukaEdit(${i})" class="p-1.5 text-slate-400 hover:text-super-active hover:bg-super-active/10 rounded-lg transition-colors" title="Edit">
-                        <span class="material-symbols-outlined text-[20px]">edit</span>
-                    </button>
-                    <button type="button" onclick="hapusPetugas(${i})" class="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Hapus">
-                        <span class="material-symbols-outlined text-[20px]">delete</span>
-                    </button>
-                </td>
-            </tr>
-        `).join('');
-    }
-
-    function bukaTambah() {
-        document.getElementById('modal-judul').textContent = 'Tambah Petugas';
-        document.getElementById('petugas-form').reset();
-        document.querySelector('[name=edit_index]').value = '';
-        document.getElementById('modal').classList.remove('hidden');
-    }
-
-    function bukaEdit(i) {
-        const p = getPetugas()[i];
-        const f = document.getElementById('petugas-form');
-        f.reset();
-        document.getElementById('modal-judul').textContent = 'Ubah Petugas';
-        document.querySelector('[name=edit_index]').value = i;
-        f.nama.value = p.nama;
-        f.nip.value = p.nip;
-        f.pangkat.value = p.pangkat || '';
-        f.regu.value = p.regu || '';
-        f.zona.value = p.zona || '';
-        f.status.value = p.status;
-        document.getElementById('modal').classList.remove('hidden');
-    }
-
-    function tutupModal() { document.getElementById('modal').classList.add('hidden'); }
-
-    function simpanPetugas(e) {
-        e.preventDefault();
-        const f = document.getElementById('petugas-form');
-        const data = {
-            nama: f.nama.value.trim(),
-            nip: f.nip.value.trim(),
-            pangkat: f.pangkat.value.trim(),
-            regu: f.regu.value.trim(),
-            zona: f.zona.value.trim(),
-            status: f.status.value,
-        };
-
-        const all = getPetugas();
-        const idx = document.querySelector('[name=edit_index]').value;
-        if (idx !== '') {
-            all[idx] = data;
-            tampilToast('Edit berhasil! Data petugas telah diperbarui.');
-        } else {
-            all.unshift(data);
-            tampilToast('Berhasil menambah data petugas.');
-        }
-        saveAll(all);
-        renderList();
-        tutupModal();
-    }
-
-    function toggleStatus(i) {
-        const all = getPetugas();
-        const order = { 'aktif': 'cuti', 'cuti': 'nonaktif', 'nonaktif': 'aktif' };
-        all[i].status = order[all[i].status] || 'aktif';
-        saveAll(all);
-        renderList();
-        tampilToast('Edit berhasil! Status petugas diubah menjadi ' + all[i].status + '.');
-    }
-
-    function hapusPetugas(i) {
-        const all = getPetugas();
-        const nama = all[i] ? `petugas "${all[i].nama}"` : 'petugas ini';
-        window.konfirmasiHapus({
-            title: 'Hapus Petugas',
-            message: `Apakah Anda yakin ingin menghapus data ${nama}? Data yang dihapus tidak dapat dipulihkan.`,
-            onConfirm: () => {
-                all.splice(i, 1);
-                saveAll(all);
-                renderList();
-                tampilToast('Data petugas berhasil dihapus.');
-            }
-        });
-    }
-
-
-
-    // Daftar petugas dirender oleh Blade dari database.
---}}
-<script>
-    window.tutupModal = function () {
-        document.getElementById('modal')?.classList.add('hidden');
-    };
-
-    function bukaTambah() {
-        const form = document.getElementById('petugas-form');
-        form.reset();
-        form.elements.edit_index.value = '';
-        form.elements._method.value = 'POST';
-        document.getElementById('modal-judul').textContent = 'Tambah Petugas';
-        document.getElementById('modal').classList.remove('hidden');
-    }
-
-    function bukaEdit(officer) {
-        const form = document.getElementById('petugas-form');
-        form.reset();
-        form.elements.edit_index.value = officer.id;
-        form.elements._method.value = 'PUT';
-        ['name', 'employee_number', 'position', 'work_unit_name', 'unit_name'].forEach((field) => {
-            form.elements[field].value = officer[field] || '';
-        });
-        document.getElementById('modal-judul').textContent = 'Ubah Petugas';
-        document.getElementById('modal').classList.remove('hidden');
-    }
-
-    function simpanPetugas(event) {
-        event.preventDefault();
-        const form = event.currentTarget;
-        const id = form.elements.edit_index.value;
-        form.action = id === ''
-            ? @json(route('super_admin.petugas.store'))
-            : @json(route('super_admin.petugas.update', ['officer' => '__OFFICER__'])).replace('__OFFICER__', id);
-        const submitButton = form.querySelector('button[type="submit"]');
-        submitButton.disabled = true;
-        submitButton.classList.add('cursor-wait', 'opacity-70');
-        submitButton.textContent = 'Memproses...';
-        form.submit();
-    }
-
-    function toggleStatus(id) {
-        window.konfirmasiHapus({
-            title: 'Konfirmasi Perubahan Status',
-            message: 'Ubah status petugas ini? Perubahan status dapat memengaruhi penugasan kegiatan.',
-            confirmText: 'Ya, Ubah Status',
-            onConfirm: () => {
-                fetch(@json(route('super_admin.petugas.status', ['officer' => '__OFFICER__'])).replace('__OFFICER__', id), {
-                    method: 'PATCH',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        'Accept': 'application/json',
-                    },
-                }).then(async response => {
-                    const result = await response.json();
-                    if (!response.ok) throw new Error(result.message || 'Status petugas gagal diubah.');
-                    window.tampilkanToastLaluMuatUlang(`Status petugas berhasil diubah menjadi ${result.label}.`);
-                }).catch(error => window.tampilToast(error.message, 'error'));
-            },
-        });
-    }
-
-    function hapusPetugas(id, nama) {
-        window.konfirmasiHapus({
-            title: 'Hapus Petugas',
-            message: `Apakah Anda yakin ingin menghapus petugas "${nama}"? Data tetap tersimpan sebagai soft delete.`,
-            onConfirm: () => {
-                fetch(@json(route('super_admin.petugas.destroy', ['officer' => '__OFFICER__'])).replace('__OFFICER__', id), {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        'Accept': 'application/json',
-                    },
-                }).then(async response => {
-                    const result = await response.json();
-                    if (!response.ok) throw new Error(result.message || 'Petugas gagal dihapus.');
-                    window.tampilkanToastLaluMuatUlang(result.message || 'Petugas berhasil dihapus.');
-                }).catch(error => window.tampilToast(error.message, 'error'));
-            },
-        });
-    }
-</script>
-@endpush

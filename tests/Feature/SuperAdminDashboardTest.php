@@ -3,10 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\Activity;
-use App\Models\Officer;
 use App\Models\Report;
 use App\Models\User;
-use App\OfficerStatus;
 use App\ReportStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -19,7 +17,7 @@ class SuperAdminDashboardTest extends TestCase
     {
         $superAdmin = User::factory()->superAdmin()->create();
         Report::factory()->create(['status' => ReportStatus::Submitted]);
-        Officer::factory()->create(['status' => OfficerStatus::Active]);
+        $this->employee([]);
         Activity::factory()->create(['activity_date' => now()->toDateString()]);
 
         $response = $this->actingAs($superAdmin)->get(route('super_admin.dashboard'));
