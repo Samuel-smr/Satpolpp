@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\Activity;
-use App\Models\Officer;
 use App\Models\Report;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -18,7 +17,7 @@ class GlobalSearchTest extends TestCase
         $admin = User::factory()->create();
         $report = Report::factory()->create(['code' => 'SPJ-CARI-001', 'description' => 'Penertiban khusus pencarian']);
         Activity::factory()->create(['name' => 'Patroli khusus pencarian']);
-        Officer::factory()->create(['name' => 'Petugas Khusus Pencarian']);
+        $this->employee(['name' => 'Petugas Khusus Pencarian']);
 
         $this->actingAs($admin)
             ->getJson(route('global-search', ['q' => 'khusus pencarian']))

@@ -8,7 +8,6 @@ use App\FindingUnit;
 use App\Models\Activity;
 use App\Models\ActivityTemplate;
 use App\Models\AuditLog;
-use App\Models\Officer;
 use App\Models\Report;
 use App\Models\User;
 use App\ReportStatus;
@@ -32,7 +31,7 @@ class CompleteReportTest extends TestCase
             'description' => 'Laporan warga tetap tersimpan.',
         ]);
         $template = ActivityTemplate::factory()->create();
-        $officers = Officer::factory()->count(2)->create();
+        $officers = $this->employees(2);
         $expectedLatitude = '-7.8123456';
         $expectedLongitude = '110.1234567';
 
@@ -44,7 +43,7 @@ class CompleteReportTest extends TestCase
             ->assertSee('id="completion-current-location-button"', false)
             ->assertDontSee('name="operational_category"', false);
 
-        $payload = $this->validPayload($report, $officers->pluck('id')->all(), [
+        $payload = $this->validPayload($report, $officers->pluck('employee_number')->all(), [
             UploadedFile::fake()->image('bukti-satu.jpg'),
             UploadedFile::fake()->image('bukti-dua.png'),
         ], $template->id);
@@ -82,7 +81,7 @@ class CompleteReportTest extends TestCase
         $this->assertSame(FindingUnit::Piece, $activity->findings[1]->unit);
         $this->assertDatabaseCount('reports', 1);
         $this->assertDatabaseCount('activities', 1);
-        $this->assertDatabaseCount('activity_officer', 2);
+        $this->assertDatabaseCount('activity_personnel', 2);
         $this->assertDatabaseCount('attachments', 2);
         $this->assertDatabaseHas('report_status_histories', [
             'report_id' => $report->id,
@@ -135,13 +134,13 @@ class CompleteReportTest extends TestCase
         Storage::fake('local');
         $admin = User::factory()->create();
         $report = Report::factory()->create(['status' => ReportStatus::Verifying]);
-        $officer = Officer::factory()->create();
+        $officer = $this->employee();
 
         $response = $this->from(route('admin.pengaduan.detail', $report))
             ->actingAs($admin)
             ->post(route('admin.pengaduan.complete.store', $report), $this->validPayload(
                 $report,
-                [$officer->id],
+                [$officer->employee_number],
                 [UploadedFile::fake()->image('bukti.jpg')],
                 currentStatus: ReportStatus::Verifying,
             ));
@@ -161,11 +160,11 @@ class CompleteReportTest extends TestCase
         Storage::fake('local');
         $admin = User::factory()->create();
         $report = Report::factory()->create(['status' => ReportStatus::InProgress]);
-        $officer = Officer::factory()->create();
+        $officer = $this->employee();
 
         $firstResponse = $this->actingAs($admin)->post(
             route('admin.pengaduan.complete.store', $report),
-            $this->validPayload($report, [$officer->id], [UploadedFile::fake()->image('pertama.jpg')]),
+            $this->validPayload($report, [$officer->employee_number], [UploadedFile::fake()->image('pertama.jpg')]),
         );
         $firstResponse->assertRedirectToRoute('admin.pengaduan.detail', $report);
 
@@ -173,7 +172,7 @@ class CompleteReportTest extends TestCase
             ->actingAs($admin)
             ->post(route('admin.pengaduan.complete.store', $report), $this->validPayload(
                 $report,
-                [$officer->id],
+                [$officer->employee_number],
                 [UploadedFile::fake()->image('kedua.jpg')],
             ));
 
@@ -191,18 +190,18 @@ class CompleteReportTest extends TestCase
         Storage::fake('local');
         $admin = User::factory()->create();
         $report = Report::factory()->create(['status' => ReportStatus::InProgress]);
-        $inactiveOfficer = Officer::factory()->inactive()->create();
+        $inactiveOfficer = $this->employee([], available: false);
 
         $response = $this->from(route('admin.pengaduan.detail', $report))
             ->actingAs($admin)
             ->post(route('admin.pengaduan.complete.store', $report), $this->validPayload(
                 $report,
-                [$inactiveOfficer->id],
+                [$inactiveOfficer->employee_number],
                 [],
             ));
 
         $response->assertRedirect(route('admin.pengaduan.detail', $report));
-        $response->assertSessionHasErrors(['officer_ids.0', 'evidence']);
+        $response->assertSessionHasErrors(['employee_nips.0', 'evidence']);
         $this->assertSame(ReportStatus::InProgress, $report->fresh()->status);
         $this->assertDatabaseCount('activities', 0);
         $this->assertDatabaseCount('attachments', 0);
@@ -225,13 +224,13 @@ class CompleteReportTest extends TestCase
     }
 
     /**
-     * @param  list<int>  $officerIds
+     * @param  list<string>  $employeeNips
      * @param  list<UploadedFile>  $evidence
      * @return array<string, mixed>
      */
     private function validPayload(
         Report $report,
-        array $officerIds,
+        array $employeeNips,
         array $evidence,
         ?int $templateId = null,
         ReportStatus $currentStatus = ReportStatus::InProgress,
@@ -247,7 +246,7 @@ class CompleteReportTest extends TestCase
             'location_address' => $report->location_address,
             'latitude' => $report->latitude,
             'longitude' => $report->longitude,
-            'officer_ids' => $officerIds,
+            'employee_nips' => $employeeNips,
             'evidence' => $evidence,
         ];
     }

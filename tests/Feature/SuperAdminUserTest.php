@@ -26,6 +26,33 @@ class SuperAdminUserTest extends TestCase
             ->assertDontSee('Budi Hartono');
     }
 
+    public function test_super_admin_user_form_can_submit_the_expected_fields(): void
+    {
+        $superAdmin = User::factory()->superAdmin()->create();
+
+        $response = $this->actingAs($superAdmin)->get(route('super_admin.user'));
+
+        $response->assertSee('id="user-form" method="POST"', false)
+            ->assertSee('name="_token"', false)
+            ->assertSee('name="name"', false);
+    }
+
+    public function test_invalid_user_form_reopens_with_errors_and_previous_values(): void
+    {
+        $superAdmin = User::factory()->superAdmin()->create();
+
+        $this->actingAs($superAdmin)->from(route('super_admin.user'))->followingRedirects()->post(route('super_admin.user.store'), [
+            'name' => 'Admin Dicoba',
+            'username' => 'nama tidak valid',
+            'email' => 'admin@example.test',
+            'password' => 'password-baru',
+        ])
+            ->assertSee('Periksa kembali data user:')
+            ->assertSee('value="Admin Dicoba"', false)
+            ->assertSee('value="nama tidak valid"', false)
+            ->assertSee('id="modal" class="fixed inset-0', false);
+    }
+
     public function test_super_admin_can_create_account_and_cannot_delete_current_account(): void
     {
         $superAdmin = User::factory()->superAdmin()->create();

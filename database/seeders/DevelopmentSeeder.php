@@ -45,7 +45,7 @@ class DevelopmentSeeder extends Seeder
             $this->seedReportHistories($adminId, $reportOneId, $reportTwoId, $now);
             $this->seedReportAttachments($reportOneId, $reportTwoId, $now);
             $this->seedActivityTemplates($now);
-            $this->seedOfficersAndActivities($adminId, $superAdminId, $reportOneId, $now);
+            $this->seedActivitiesAndPersonnel($adminId, $superAdminId, $reportOneId, $now);
             $this->seedArchives($adminId, $superAdminId, $now);
             $this->seedNotificationsAndAuditLogs($adminId, $superAdminId, $reportOneId, $reportTwoId, $now);
         });
@@ -173,19 +173,8 @@ class DevelopmentSeeder extends Seeder
         );
     }
 
-    private function seedOfficersAndActivities(int $adminId, int $superAdminId, int $reportOneId, CarbonInterface $now): void
+    private function seedActivitiesAndPersonnel(int $adminId, int $superAdminId, int $reportOneId, CarbonInterface $now): void
     {
-        DB::table('officers')->updateOrInsert(
-            ['employee_number' => 'PP-001'],
-            ['user_id' => $adminId, 'name' => 'Ahmad Fauzi', 'position' => 'Kepala Seksi Pengendalian dan Operasional, Bidang Ketentraman dan Ketertiban Umum', 'work_unit_name' => 'Seksi Pengendalian dan Operasional', 'unit_name' => 'Bidang Ketentraman dan Ketertiban Umum', 'status' => 'active', 'created_at' => $now, 'updated_at' => $now, 'deleted_at' => null],
-        );
-        DB::table('officers')->updateOrInsert(
-            ['employee_number' => 'PP-002'],
-            ['user_id' => null, 'name' => 'Siti Aminah', 'position' => 'Operator Layanan Operasional pada Seksi Perlindungan Masyarakat, Bidang Ketentraman dan Ketertiban Umum', 'work_unit_name' => 'Seksi Perlindungan Masyarakat', 'unit_name' => 'Bidang Ketentraman dan Ketertiban Umum', 'status' => 'active', 'created_at' => $now, 'updated_at' => $now, 'deleted_at' => null],
-        );
-
-        $officerOneId = (int) DB::table('officers')->where('employee_number', 'PP-001')->value('id');
-        $officerTwoId = (int) DB::table('officers')->where('employee_number', 'PP-002')->value('id');
         $patrolTemplateId = (int) DB::table('activity_templates')->where('sort_order', 1)->value('id');
         $securityTemplateId = (int) DB::table('activity_templates')->where('sort_order', 2)->value('id');
 
@@ -200,12 +189,12 @@ class DevelopmentSeeder extends Seeder
 
         $externalActivityId = (int) DB::table('activities')->where('report_id', $reportOneId)->value('id');
         $internalActivityId = (int) DB::table('activities')->where('name', 'Patroli Rutin Kawasan Pengasih')->value('id');
-        DB::table('activity_officer')->updateOrInsert(
-            ['activity_id' => $externalActivityId, 'officer_id' => $officerOneId],
+        DB::table('activity_personnel')->updateOrInsert(
+            ['activity_id' => $externalActivityId, 'employee_nip' => '197202121991011001'],
             ['assignment_role' => 'Koordinator Lapangan', 'notes' => 'Memimpin penanganan laporan.', 'created_at' => $now, 'updated_at' => $now],
         );
-        DB::table('activity_officer')->updateOrInsert(
-            ['activity_id' => $internalActivityId, 'officer_id' => $officerTwoId],
+        DB::table('activity_personnel')->updateOrInsert(
+            ['activity_id' => $internalActivityId, 'employee_nip' => '196903181996031003'],
             ['assignment_role' => 'Anggota Patroli', 'notes' => 'Melaksanakan pemantauan wilayah.', 'created_at' => $now, 'updated_at' => $now],
         );
     }

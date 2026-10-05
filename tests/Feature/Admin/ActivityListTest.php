@@ -5,7 +5,6 @@ namespace Tests\Feature\Admin;
 use App\ActivityType;
 use App\Models\Activity;
 use App\Models\Attachment;
-use App\Models\Officer;
 use App\Models\Report;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -20,7 +19,7 @@ class ActivityListTest extends TestCase
     {
         $admin = User::factory()->create();
         $report = Report::factory()->create(['code' => 'SPJ-ACTIVITY-001']);
-        $officers = Officer::factory()->count(2)->create();
+        $officers = $this->employees(2);
         $externalActivity = Activity::factory()->for($report)->create([
             'name' => 'Penanganan Laporan Pasar',
             'type' => ActivityType::External,
@@ -29,7 +28,7 @@ class ActivityListTest extends TestCase
             'start_time' => '08:15:00',
             'location_address' => 'Pasar Wates',
         ]);
-        $externalActivity->officers()->attach($officers->pluck('id'));
+        $externalActivity->personnel()->createMany($officers->map(fn ($employee): array => ['employee_nip' => $employee->employee_number])->all());
         Activity::factory()->create([
             'name' => 'Patroli Internal Malam',
             'type' => ActivityType::Internal,

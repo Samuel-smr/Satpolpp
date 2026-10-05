@@ -6,7 +6,6 @@ use App\ActivityType;
 use App\Models\Activity;
 use App\Models\ActivityTemplate;
 use App\Models\Attachment;
-use App\Models\Officer;
 use App\Models\Report;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -19,14 +18,14 @@ class SuperAdminActivityTest extends TestCase
     public function test_super_admin_activity_page_uses_database_activities_and_officers(): void
     {
         $superAdmin = User::factory()->superAdmin()->create();
-        $officer = Officer::factory()->create(['name' => 'Petugas Kegiatan Database']);
+        $officer = $this->employee(['name' => 'Petugas Kegiatan Database']);
         $report = Report::factory()->create();
         $activity = Activity::factory()->create([
             'report_id' => $report->id,
             'type' => ActivityType::External,
             'name' => 'Kegiatan Eksternal Database',
         ]);
-        $activity->officers()->attach($officer, ['assignment_role' => 'Petugas Kegiatan']);
+        $activity->personnel()->create(['employee_nip' => $officer->employee_number, 'assignment_role' => 'Petugas Kegiatan']);
         $reportAttachment = Attachment::factory()->create([
             'attachable_type' => 'report',
             'attachable_id' => $report->id,
@@ -72,7 +71,7 @@ class SuperAdminActivityTest extends TestCase
     {
         $superAdmin = User::factory()->superAdmin()->create();
         $template = ActivityTemplate::factory()->create(['name' => 'Patroli Super Admin']);
-        $officer = Officer::factory()->create();
+        $officer = $this->employee();
 
         $createPage = $this->actingAs($superAdmin)->get(route('super_admin.kegiatan.create'));
 
@@ -90,7 +89,7 @@ class SuperAdminActivityTest extends TestCase
             'location_address' => 'Wates, Kulon Progo',
             'latitude' => -7.8578,
             'longitude' => 110.1589,
-            'officer_ids' => [$officer->id],
+            'employee_nips' => [$officer->employee_number],
         ]);
 
         $activity = Activity::query()->sole();
@@ -108,7 +107,7 @@ class SuperAdminActivityTest extends TestCase
             'location_address' => 'Pengasih, Kulon Progo',
             'latitude' => -7.8462,
             'longitude' => 110.173,
-            'officer_ids' => [$officer->id],
+            'employee_nips' => [$officer->employee_number],
         ])->assertRedirectToRoute('super_admin.kegiatan.show', $activity);
 
         $this->assertSame('Kegiatan Super Admin Diperbarui', $activity->fresh()->name);

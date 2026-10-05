@@ -44,8 +44,8 @@ class InitialDomainSchemaTest extends TestCase
         $this->assertFalse(Schema::hasTable('organizational_units'));
         $this->assertFalse(Schema::hasTable('operational_zones'));
         $this->assertFalse(Schema::hasTable('assets'));
-        $this->assertFalse(Schema::hasColumn('officers', 'organizational_unit_id'));
-        $this->assertFalse(Schema::hasColumn('officers', 'operational_zone_id'));
+        $this->assertFalse(Schema::hasTable('officers'));
+        $this->assertFalse(Schema::hasTable('activity_officer'));
     }
 
     public function test_manual_report_is_attributed_to_the_admin_without_a_guest_identity(): void

@@ -30,7 +30,7 @@
             </div>
         </div>
 
-        <!-- Card 2: Total Petugas Aktif -->
+        <!-- Card 2: Total Pegawai e-Profil -->
         <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
             <div class="flex items-center justify-between mb-4">
                 <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
@@ -42,7 +42,7 @@
             </div>
             <div>
                 <h3 class="font-headline text-3xl font-bold text-slate-900">{{ $systemStats['active_officers'] }}</h3>
-                <p class="text-xs font-medium text-slate-400 mt-1">Total Petugas Aktif</p>
+                <p class="text-xs font-medium text-slate-400 mt-1">Total Pegawai e-Profil</p>
             </div>
         </div>
 
@@ -76,6 +76,10 @@
         </div>
     </div>
 
+    <div class="mb-8">
+        @include('super_admin.peta')
+    </div>
+
     <!-- Log Aktivitas Sistem -->
     <div class="bg-white border border-slate-200/80 rounded-2xl shadow-sm overflow-hidden">
         <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
@@ -92,9 +96,6 @@
         <div class="divide-y divide-slate-50 max-h-[420px] overflow-y-auto" id="log-list"></div>
     </div>
 
-    <div class="mt-8">
-        @include('super_admin.peta')
-    </div>
 @endsection
 
 @push('scripts')
