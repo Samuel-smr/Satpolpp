@@ -66,6 +66,17 @@
                 <h3 class="font-headline font-bold text-slate-800 mb-5">Pelacakan Laporan</h3>
                 <ol class="relative ml-1" id="tracking-list"></ol>
 
+                {{-- Alasan penolakan (muncul saat laporan ditolak) --}}
+                <div id="tolak-section" class="hidden mt-8 border-t border-slate-200 pt-6">
+                    <h3 class="font-headline font-bold text-red-700 mb-1">Laporan Ditolak</h3>
+                    <p class="text-sm text-slate-500 mb-4">Laporan Anda tidak dapat diproses dengan alasan berikut:</p>
+                    <div class="bg-red-50 border border-red-200 rounded-xl p-4">
+                        <p class="text-sm text-red-700" id="tolak-alasan">--</p>
+                    </div>
+                    <p class="mt-4 text-sm text-slate-500">Jika Anda merasa penolakan ini tidak sesuai, silakan ajukan laporan baru melalui halaman pelaporan.</p>
+                    <a href="{{ route('pelapor.lapor') }}" class="mt-5 inline-block w-full bg-brand-600 text-white py-3 rounded-lg font-medium text-center hover:bg-brand-700 transition-colors">Buat Laporan Baru</a>
+                </div>
+
                 {{-- Bukti --}}
                 <div id="bukti-section" class="hidden mt-8 border-t border-slate-200 pt-6">
                     <h3 class="font-headline font-bold text-slate-800 mb-3">📸 Bukti Penanganan</h3>
@@ -118,7 +129,9 @@
         ['Ditindaklanjuti', 'Laporan sedang ditangani petugas.'],
         ['Penanganan selesai', 'Penanganan di lokasi selesai.'],
         ['Laporan selesai', 'Laporan telah selesai ditangani.'],
+        ['Laporan ditolak', 'Laporan Anda ditolak oleh petugas.'],
     ];
+    const REJECTED_INDEX = 6;
 
     const reportsFromDatabase = @json($reports);
 
@@ -128,6 +141,7 @@
 
     function labelStatus(idx) { return STATUSES[idx] ? STATUSES[idx][0] : 'Dikirim'; }
     function badgeClass(idx) {
+        if (idx === REJECTED_INDEX) return 'bg-red-100 text-red-700';
         if (idx >= 5) return 'bg-emerald-100 text-emerald-700';
         if (idx >= 3) return 'bg-amber-100 text-amber-700';
         if (idx >= 1) return 'bg-blue-100 text-blue-700';
@@ -195,16 +209,17 @@
         document.getElementById('d-deskripsi').textContent = r.deskripsi || '-';
 
         // Tracking list (presisi: garis & titik sejajar di x tengah)
-        const total = STATUSES.length;
+        const doneIdx = idx === REJECTED_INDEX ? 2 : Math.min(idx, STATUSES.length - 1);
         document.getElementById('tracking-list').innerHTML = STATUSES.map(([title, desc], i) => {
-            const done = i <= idx;
-            const isLast = i === total - 1;
+            const isRejected = idx === REJECTED_INDEX && i === REJECTED_INDEX;
+            const done = isRejected || i <= doneIdx;
+            const isLast = i === STATUSES.length - 1;
             return `
                 <li class="relative pl-8 ${isLast ? '' : 'pb-6'}">
                     ${isLast ? '' : '<span class="absolute left-0 top-6 bottom-0 w-0.5 bg-slate-200"></span>'}
-                    <span class="absolute left-0 top-1 w-4 h-4 -translate-x-1/2 rounded-full border-2 border-white ring-2 ${done ? 'bg-emerald-500 ring-emerald-500' : 'bg-slate-300 ring-slate-300'}"></span>
-                    <h4 class="font-semibold ${done ? 'text-slate-800' : 'text-slate-400'}">${title}</h4>
-                    <p class="text-sm ${done ? 'text-slate-500' : 'text-slate-400'}">${desc}</p>
+                    <span class="absolute left-0 top-1 w-4 h-4 -translate-x-1/2 rounded-full border-2 border-white ring-2 ${done ? (isRejected ? 'bg-red-500 ring-red-500' : 'bg-emerald-500 ring-emerald-500') : 'bg-slate-300 ring-slate-300'}"></span>
+                    <h4 class="font-semibold ${isRejected ? 'text-red-700' : (done ? 'text-slate-800' : 'text-slate-400')}">${title}</h4>
+                    <p class="text-sm ${isRejected ? 'text-red-600' : (done ? 'text-slate-500' : 'text-slate-400')}">${desc}</p>
                 </li>
             `;
         }).join('');
@@ -216,9 +231,16 @@
         // Penilaian kinerja hanya jika laporan selesai
         currentKode = r.kode;
         const section = document.getElementById('penilaian-section');
-        section.classList.toggle('hidden', !(idx >= 5));
+        section.classList.toggle('hidden', !(idx === 5));
 
-        if (idx >= 5) {
+        // Alasan penolakan
+        const tolakSection = document.getElementById('tolak-section');
+        tolakSection.classList.toggle('hidden', !(idx === REJECTED_INDEX));
+        if (idx === REJECTED_INDEX) {
+            document.getElementById('tolak-alasan').textContent = r.alasanTolak || 'Tidak ada keterangan lebih lanjut.';
+        }
+
+        if (idx === 5) {
             if (r.feedbackSubmitted) {
                 document.getElementById('rating-view').classList.add('hidden');
                 document.getElementById('rating-sukses').classList.remove('hidden');
@@ -235,7 +257,7 @@
         const buktiSection = document.getElementById('bukti-section');
         const buktiList = document.getElementById('bukti-list');
         const adaBukti = r.buktiSelesai && r.buktiSelesai.length > 0;
-        if (idx >= 5 && adaBukti) {
+        if (idx === 5 && adaBukti) {
             buktiSection.classList.remove('hidden');
             buktiList.innerHTML = r.buktiSelesai.map((f, i) => `
                 <figure class="relative aspect-video rounded-xl overflow-hidden border border-slate-200 bg-slate-100">

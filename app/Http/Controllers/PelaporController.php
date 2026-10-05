@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Notifications\NewReportNotification;
 use App\ReportStatus;
 use App\ReportType;
+use App\Services\WhatsAppService;
 use App\UserRole;
 use App\UserStatus;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -109,6 +110,8 @@ class PelaporController extends Controller
             ->where('status', UserStatus::Active)
             ->get();
         Notification::send($administrators, new NewReportNotification($report));
+
+        app(WhatsAppService::class)->sendReportCreated($report);
 
         return redirect()
             ->route('pelapor.lapor')
@@ -230,8 +233,12 @@ class PelaporController extends Controller
     {
         $statusIndex = match ($report->status) {
             ReportStatus::Completed => 5,
+            ReportStatus::Rejected => 6,
             default => array_search($report->status, ReportStatus::cases(), true),
         };
+
+        $rejectionReason = $report->statusHistories
+            ->firstWhere('status', ReportStatus::Rejected)?->note;
 
         return [
             'kode' => $report->code,
@@ -241,6 +248,7 @@ class PelaporController extends Controller
             'telepon' => $report->reporter_phone,
             'dibuat' => $report->created_at?->format('d/m/Y H.i'),
             'statusIdx' => $statusIndex === false ? 0 : $statusIndex,
+            'alasanTolak' => $rejectionReason,
             'feedbackSubmitted' => $report->feedback_submitted_at !== null,
             'feedbackRating' => $report->feedback_rating,
             'feedbackComment' => $report->feedback_comment,

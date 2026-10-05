@@ -52,6 +52,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:access-admin'])
     Route::get('/pengaduan/{report:code}', [AdminController::class, 'pengaduanDetail'])->name('pengaduan.detail');
     Route::delete('/pengaduan/{report:code}', [AdminReportController::class, 'destroy'])->name('pengaduan.destroy');
     Route::patch('/pengaduan/{report:code}/status', [ReportStatusController::class, 'update'])->name('pengaduan.status.update');
+    Route::patch('/pengaduan/{report:code}/reject', [ReportStatusController::class, 'reject'])->name('pengaduan.reject');
     Route::post('/pengaduan/{report:code}/complete', [CompleteReportController::class, 'store'])->name('pengaduan.complete.store');
     Route::get('/pengaduan/{report:code}/attachments/{attachment}', [ReportAttachmentController::class, 'show'])->name('pengaduan.attachments.show');
     Route::get('/kegiatan', [AdminController::class, 'kegiatan'])->name('kegiatan');

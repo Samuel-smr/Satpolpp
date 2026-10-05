@@ -44,4 +44,13 @@ return [
         'base_url' => env('AI_BASE_URL', 'https://generativelanguage.googleapis.com/v1beta'),
     ],
 
+    'fonnte' => [
+        'token' => env('FONNTE_TOKEN'),
+    ],
+
+    'whatsapp' => [
+        'driver' => env('WHATSAPP_DRIVER', 'local'),
+        'bot_url' => env('WHATSAPP_BOT_URL', 'http://localhost:3456'),
+    ],
+
 ];
