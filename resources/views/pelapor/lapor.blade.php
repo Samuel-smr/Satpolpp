@@ -54,8 +54,30 @@
                     <div>
                         <label class="block text-sm font-medium mb-1">Nomor WhatsApp / Telepon <span
                                 class="text-red-500">*</span></label>
-                        <input type="tel" name="telepon" required inputmode="tel" maxlength="20" pattern="\+?[0-9][0-9\s-]{8,18}" title="Masukkan 9–19 digit; boleh diawali + serta menggunakan spasi atau tanda hubung." placeholder="Contoh: 081234567890"
+                        <input type="tel" id="telepon" name="telepon" required inputmode="tel" maxlength="20" pattern="\+?[0-9][0-9\s-]{8,18}" title="Masukkan 9–19 digit; boleh diawali + serta menggunakan spasi atau tanda hubung." placeholder="Contoh: 081234567890"
                             class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none">
+
+                        <div id="otp-box" class="mt-3 space-y-3">
+                            <div class="flex flex-col sm:flex-row gap-2">
+                                <button type="button" id="otp-send"
+                                    class="flex-1 border border-brand-200 bg-brand-50 text-brand-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                                    Kirim Kode OTP
+                                </button>
+                            </div>
+                            <p id="otp-send-status" class="hidden text-xs"></p>
+                            <div id="otp-verify-area" class="hidden">
+                                <input type="text" id="otp-kode" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="Masukkan 6 digit kode OTP"
+                                    class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none">
+                                <div class="mt-2 flex flex-col sm:flex-row gap-2">
+                                    <button type="button" id="otp-verify"
+                                        class="flex-1 bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                                        Verifikasi Kode
+                                    </button>
+                                </div>
+                                <p id="otp-verify-status" class="hidden text-xs mt-2"></p>
+                            </div>
+                        </div>
+                        <input type="hidden" id="otp-verified" value="0">
                     </div>
 
                     <div>
@@ -74,18 +96,28 @@
                     </div>
                     <div class="mb-4">
                         <label class="block text-sm font-medium mb-1">Foto / Video Bukti</label>
-                        <label
-                            class="flex flex-col items-center justify-center w-full border-2 border-dashed border-slate-300 rounded-xl p-6 cursor-pointer hover:border-brand-500 bg-slate-50 transition-colors text-center">
-                            <input type="file" name="bukti[]" accept="image/jpeg,image/png,image/webp" multiple data-handle class="sr-only">
-                            <div class="text-3xl mb-2">📎</div>
-                            <p class="text-sm font-medium text-slate-600">Klik untuk memilih Foto / Video</p>
-                            <p class="text-xs text-slate-400 mt-1">Maks 3 foto, masing-masing maks 5 MB (JPG, PNG, atau WEBP)</p>
-                        </label>
+                        <input type="file" name="bukti[]" id="file-picker" accept="image/jpeg,image/png,image/webp" multiple data-handle class="sr-only">
+                        <input type="file" name="bukti[]" id="camera-picker" accept="image/jpeg,image/png,image/webp" capture="environment" data-handle class="sr-only">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <button type="button" id="camera-trigger"
+                                class="flex flex-col items-center justify-center w-full border-2 border-dashed border-slate-300 rounded-xl p-6 cursor-pointer hover:border-brand-500 bg-slate-50 transition-colors text-center">
+                                <div class="text-3xl mb-2">📷</div>
+                                <p class="text-sm font-medium text-slate-600">Ambil Foto (Kamera)</p>
+                                <p class="text-xs text-slate-400 mt-1">Buka kamera perangkat</p>
+                            </button>
+                            <button type="button" id="file-trigger"
+                                class="flex flex-col items-center justify-center w-full border-2 border-dashed border-slate-300 rounded-xl p-6 cursor-pointer hover:border-brand-500 bg-slate-50 transition-colors text-center">
+                                <div class="text-3xl mb-2">📎</div>
+                                <p class="text-sm font-medium text-slate-600">Pilih dari File</p>
+                                <p class="text-xs text-slate-400 mt-1">Galeri / dokumen (JPG, PNG, WEBP)</p>
+                            </button>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-1">Maks 3 foto, masing-masing maks 5 MB (JPG, PNG, atau WEBP)</p>
                         <div id="file-list" class="mt-3 grid grid-cols-2 md:grid-cols-3 gap-3"></div>
-                    <p class="text-xs text-slate-500 mt-2 flex items-center gap-1">
-                        <span class="text-red-500">*</span> Catatan: Proses pengerjaan laporan membutuhkan waktu maksimal 3
-                        hari kerja.
-                    </p>
+                        <p class="text-xs text-slate-500 mt-2 flex items-center gap-1">
+                            <span class="text-red-500">*</span> Catatan: Proses pengerjaan laporan membutuhkan waktu maksimal 3
+                            hari kerja.
+                        </p>
                     </div>
                 </div>
 
@@ -265,6 +297,12 @@
                 return;
             }
 
+            if (otpVerified.value !== '1') {
+                otpKode.focus();
+                setOtpStatus(otpSendStatus, 'Verifikasi nomor WhatsApp dengan kode OTP terlebih dahulu.');
+                return;
+            }
+
             goStep(2);
         }
 
@@ -294,7 +332,7 @@
         window.addEventListener('load', updateLines);
 
         // File upload preview (simple)
-        document.querySelector('input[data-handle]').addEventListener('change', function (e) {
+        const handleFileChange = function (e) {
             const list = document.getElementById('file-list');
             const MAX_SIZE = 5 * 1024 * 1024;
             const oversized = Array.from(e.target.files).filter((file) => file.size > MAX_SIZE);
@@ -313,6 +351,164 @@
                 div.textContent = file.name;
                 list.appendChild(div);
             });
+        };
+
+        document.querySelectorAll('input[data-handle]').forEach((input) => {
+            input.addEventListener('change', handleFileChange);
+        });
+
+        const cameraTrigger = document.getElementById('camera-trigger');
+        const cameraPicker = document.getElementById('camera-picker');
+        const fileTrigger = document.getElementById('file-trigger');
+        const filePicker = document.getElementById('file-picker');
+
+        cameraTrigger?.addEventListener('click', () => cameraPicker?.click());
+        fileTrigger?.addEventListener('click', () => filePicker?.click());
+
+        // ===== Verifikasi OTP nomor telepon =====
+        const otpSendButton = document.getElementById('otp-send');
+        const otpSendStatus = document.getElementById('otp-send-status');
+        const otpVerifyArea = document.getElementById('otp-verify-area');
+        const otpKode = document.getElementById('otp-kode');
+        const otpVerifyButton = document.getElementById('otp-verify');
+        const otpVerifyStatus = document.getElementById('otp-verify-status');
+        const otpVerified = document.getElementById('otp-verified');
+        const teleponInput = document.getElementById('telepon');
+
+        function setOtpStatus(el, message, ok = false) {
+            el.textContent = message;
+            el.classList.remove('hidden');
+            el.classList.toggle('text-emerald-600', ok);
+            el.classList.toggle('text-red-600', !ok);
+        }
+
+        function startOtpResendCountdown(seconds) {
+            otpSendButton.disabled = true;
+            otpSendButton.textContent = `Kirim ulang (${seconds}s)`;
+            otpSendButton.dataset.cooldown = '1';
+            const timer = setInterval(() => {
+                seconds -= 1;
+                if (seconds <= 0) {
+                    clearInterval(timer);
+                    otpSendButton.disabled = false;
+                    otpSendButton.textContent = 'Kirim Ulang Kode OTP';
+                    otpSendButton.dataset.cooldown = '';
+                } else {
+                    otpSendButton.textContent = `Kirim ulang (${seconds}s)`;
+                }
+            }, 1000);
+        }
+
+        async function sendOtp() {
+            const phone = teleponInput.value.trim();
+            otpSendStatus.classList.add('hidden');
+            otpVerifyStatus?.classList.add('hidden');
+
+            if (!teleponInput.checkValidity()) {
+                teleponInput.reportValidity();
+                teleponInput.focus();
+                return;
+            }
+
+            otpSendButton.disabled = true;
+            let coolingDown = false;
+            try {
+                const response = await fetch(@json(route('pelapor.otp.send')), {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    },
+                    body: JSON.stringify({ telepon: phone }),
+                });
+                const result = await response.json();
+
+                if (!response.ok) {
+                    setOtpStatus(otpSendStatus, result.message || 'Gagal mengirim kode OTP.');
+                    return;
+                }
+
+                setOtpStatus(otpSendStatus, result.message, true);
+                otpVerifyArea.classList.remove('hidden');
+                otpKode.focus();
+
+                if (result.debug_code) {
+                    otpKode.value = result.debug_code;
+                    setOtpStatus(otpSendStatus, result.message, true);
+                }
+
+                coolingDown = true;
+                startOtpResendCountdown(60);
+            } catch (error) {
+                setOtpStatus(otpSendStatus, 'Gagal mengirim kode OTP. Periksa koneksi internet.');
+            } finally {
+                if (!coolingDown) {
+                    otpSendButton.disabled = false;
+                }
+            }
+        }
+
+        async function verifyOtp() {
+            const phone = teleponInput.value.trim();
+            const code = otpKode.value.trim();
+            otpVerifyStatus.classList.add('hidden');
+
+            if (!/^\d{6}$/.test(code)) {
+                setOtpStatus(otpVerifyStatus, 'Masukkan 6 digit kode OTP.');
+                otpKode.focus();
+                return;
+            }
+
+            otpVerifyButton.disabled = true;
+            try {
+                const response = await fetch(@json(route('pelapor.otp.verify')), {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    },
+                    body: JSON.stringify({ telepon: phone, kode: code }),
+                });
+                const result = await response.json();
+
+                if (!response.ok) {
+                    setOtpStatus(otpVerifyStatus, result.message || 'Kode OTP salah atau kedaluwarsa.');
+                    otpKode.value = '';
+                    otpKode.focus();
+                    return;
+                }
+
+                otpVerified.value = '1';
+                otpVerified.dataset.phone = phone;
+                teleponInput.readOnly = true;
+                teleponInput.classList.add('bg-slate-100');
+                otpSendButton.disabled = true;
+                otpVerifyButton.disabled = true;
+                otpKode.readOnly = true;
+                setOtpStatus(otpVerifyStatus, 'Nomor berhasil diverifikasi. Anda dapat melanjutkan.', true);
+            } catch (error) {
+                setOtpStatus(otpVerifyStatus, 'Gagal memverifikasi kode. Periksa koneksi internet.');
+            } finally {
+                otpVerifyButton.disabled = false;
+            }
+        }
+
+        otpSendButton?.addEventListener('click', sendOtp);
+        otpVerifyButton?.addEventListener('click', verifyOtp);
+        teleponInput?.addEventListener('input', () => {
+            if (otpVerified?.value === '1' && teleponInput.value.trim() !== otpVerified.dataset.phone) {
+                otpVerified.value = '0';
+                otpVerified.dataset.phone = '';
+                teleponInput.readOnly = false;
+                teleponInput.classList.remove('bg-slate-100');
+                otpVerifyArea.classList.add('hidden');
+                otpSendStatus.classList.add('hidden');
+                otpVerifyStatus.classList.add('hidden');
+                otpSendButton.disabled = false;
+                otpSendButton.textContent = 'Kirim Kode OTP';
+            }
         });
 
         const aiPanel = document.getElementById('ai-assistant-panel');

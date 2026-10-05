@@ -27,6 +27,8 @@ class GuestReportTest extends TestCase
             ->assertSee('invalidField.reportValidity()', false)
             ->assertSee('name="telepon"', false)
             ->assertSee('inputmode="tel"', false)
+            ->assertSee('id="otp-send"', false)
+            ->assertSee('id="otp-verified"', false)
             ->assertSee('id="ai-assistant-panel"', false)
             ->assertSee('id="ai-assistant-form"', false)
             ->assertDontSee('name="nik"', false)
@@ -41,6 +43,7 @@ class GuestReportTest extends TestCase
         $blockedAdmin = User::factory()->blocked()->create();
         $superAdmin = User::factory()->superAdmin()->create();
 
+        $this->verifyPhoneOtp('081234567890');
         $response = $this->post(route('pelapor.store'), [
             'telepon' => '081234567890',
             'deskripsi' => 'Ada aktivitas yang mengganggu ketertiban umum.',
@@ -101,6 +104,7 @@ class GuestReportTest extends TestCase
     {
         Storage::fake('local');
 
+        $this->verifyPhoneOtp('081234567890');
         $response = $this->from(route('pelapor.lapor'))->post(route('pelapor.store'), [
             'telepon' => '081234567890',
             'nik' => '123',

@@ -488,6 +488,25 @@
 @push('scripts')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
     <script>
+        @if ($report->status === \App\ReportStatus::InProgress)
+        document.querySelectorAll('a[href="#form-penyelesaian"]').forEach(function (link) {
+            link.addEventListener('click', function (event) {
+                event.preventDefault();
+                const target = document.getElementById('form-penyelesaian');
+                const main = document.querySelector('main');
+
+                if (target && main) {
+                    main.scrollTo({
+                        top: main.scrollTop + target.getBoundingClientRect().top - main.getBoundingClientRect().top,
+                        behavior: 'smooth',
+                    });
+                } else {
+                    target?.scrollIntoView({ block: 'start' });
+                }
+            });
+        });
+        @endif
+
         const activityTemplate = document.getElementById('activity_template_id');
 
         activityTemplate?.addEventListener('change', function () {
