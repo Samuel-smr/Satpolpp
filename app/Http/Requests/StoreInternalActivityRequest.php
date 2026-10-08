@@ -4,8 +4,9 @@ namespace App\Http\Requests;
 
 use App\FindingType;
 use App\FindingUnit;
+use App\Models\Activity;
 use App\Models\User;
-use App\OfficerStatus;
+use App\Services\EprofilService;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Http\FormRequest;
@@ -29,8 +30,14 @@ class StoreInternalActivityRequest extends FormRequest
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
+    public function rules(EprofilService $eprofil): array
     {
+        $employeeNips = $eprofil->officers()->pluck('employee_number');
+        $activity = $this->route('activity');
+        if ($activity instanceof Activity) {
+            $employeeNips = $employeeNips->merge($activity->personnel()->pluck('employee_nip'));
+        }
+
         return [
             'activity_template_id' => [
                 'nullable',
@@ -59,16 +66,13 @@ class StoreInternalActivityRequest extends FormRequest
             'location_address' => ['required', 'string', 'max:2000'],
             'latitude' => ['required', 'numeric', 'between:-90,90'],
             'longitude' => ['required', 'numeric', 'between:-180,180'],
-            'officer_ids' => ['required', 'array', 'min:1'],
-            'officer_ids.*' => [
+            'employee_nips' => ['required', 'array', 'min:1'],
+            'employee_nips.*' => [
                 'required',
-                'integer',
-                'distinct',
-                Rule::exists('officers', 'id')->where(
-                    fn (Builder $query): Builder => $query
-                        ->where('status', OfficerStatus::Active->value)
-                        ->whereNull('deleted_at'),
-                ),
+                'string',
+                'max:50',
+                'distinct:strict',
+                Rule::in($employeeNips->all()),
             ],
             'documentation' => ['nullable', 'array', 'max:3'],
             'documentation.*' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'extensions:jpg,jpeg,png,webp', 'max:5120'],
@@ -98,9 +102,9 @@ class StoreInternalActivityRequest extends FormRequest
             'latitude.between' => 'Latitude harus berada antara -90 dan 90.',
             'longitude.required' => 'Longitude wajib diisi.',
             'longitude.between' => 'Longitude harus berada antara -180 dan 180.',
-            'officer_ids.required' => 'Pilih minimal satu petugas.',
-            'officer_ids.min' => 'Pilih minimal satu petugas.',
-            'officer_ids.*.exists' => 'Petugas yang dipilih tidak aktif atau tidak tersedia.',
+            'employee_nips.required' => 'Pilih minimal satu petugas.',
+            'employee_nips.min' => 'Pilih minimal satu petugas.',
+            'employee_nips.*.in' => 'Pegawai yang dipilih tidak tersedia di e-Profil.',
             'documentation.max' => 'Foto dokumentasi maksimal tiga file.',
             'documentation.*.image' => 'Setiap dokumentasi harus berupa gambar.',
             'documentation.*.mimes' => 'Foto dokumentasi hanya boleh berformat JPG, JPEG, PNG, atau WEBP.',

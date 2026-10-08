@@ -73,7 +73,7 @@
         
         <!-- Left: Control Panel + Map -->
         <div class="flex-1 flex flex-col gap-4 min-w-0">
-            <!-- Kartu Kontrol: Search & Checklist Kategori (terpisah dari peta) -->
+            <!-- Kartu Kontrol: Filter Kategori (terpisah dari peta) -->
             <div class="bg-white border border-slate-200/80 rounded-2xl shadow-sm">
                 <div class="p-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50">
                     <div class="flex items-center gap-2">
@@ -106,19 +106,6 @@
                         </label>
                     </div>
                 </div>
-
-                <!-- Search Lokasi -->
-                <div class="p-3 bg-white flex flex-col sm:flex-row gap-2 sm:items-center">
-                    <div class="flex-1 relative">
-                        <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-[18px]">search</span>
-                        <input type="text" x-model="searchQuery" @keyup.enter="searchLocation()" placeholder="Cari lokasi / alamat... mis. Pasar Wates, Kulon Progo"
-                            class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-super-active/20 focus:border-super-active outline-none transition-all text-sm">
-                    </div>
-                    <button type="button" @click="searchLocation()" class="inline-flex items-center justify-center gap-2 bg-super-active hover:bg-super-hover text-white px-5 py-2 rounded-xl text-sm font-semibold shadow-sm transition-colors">
-                        <span class="material-symbols-outlined text-[18px]">search</span>
-                        Cari Lokasi
-                    </button>
-                </div>
             </div>
 
             <!-- Kartu Peta (terpisah) -->
@@ -132,7 +119,7 @@
             <!-- Stat Cards -->
             <div class="grid grid-cols-2 gap-4">
                 <div class="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm flex flex-col">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Petugas Aktif</span>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Pegawai e-Profil</span>
                     <span class="text-2xl font-headline font-bold text-slate-800">{{ $mapStatistics['active_officers'] }}</span>
                 </div>
                 <div class="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm flex flex-col">
@@ -194,8 +181,7 @@
                 markers: [],
                 hotspots: [],
                 selectedItem: null,
-                searchQuery: '',
-                
+
                 filters: {
                     laporan: true,
                     kegiatan_eksternal: true,
@@ -326,26 +312,6 @@
                     });
                 },
 
-                // ===== Pencarian Lokasi (Geocoding via Nominatim OSM) =====
-                async searchLocation() {
-                    const q = (this.searchQuery || '').trim();
-                    if (!q) return;
-                    const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q);
-                    try {
-                        const res = await fetch(url, { headers: { 'Accept-Language': 'id' } });
-                        const data = await res.json();
-                        if (!data || data.length === 0) {
-                            alert('Lokasi tidak ditemukan. Coba alamat yang lebih spesifik.');
-                            return;
-                        }
-                        const lat = parseFloat(data[0].lat);
-                        const lng = parseFloat(data[0].lon);
-                        this.map.setView([lat, lng], 15, { animate: true });
-                    } catch (e) {
-                        alert('Gagal mencari lokasi. Periksa koneksi internet.');
-                    }
-                },
-
                 // Formatting Helpers
                 escapeHtml(value) {
                     const element = document.createElement('div');
@@ -406,7 +372,7 @@
                             maintainAspectRatio: false,
                             plugins: { legend: { display: false } },
                             scales: {
-                                y: { beginAtZero: true, grid: { display: false } },
+                                y: { beginAtZero: true, ticks: { precision: 0, stepSize: 1 }, grid: { display: false } },
                                 x: { grid: { display: false } }
                             }
                         }
@@ -486,7 +452,7 @@
                             maintainAspectRatio: false,
                             plugins: { legend: { display: false } },
                             scales: {
-                                x: { beginAtZero: true, ticks: { precision: 0 }, grid: { display: false } },
+                                x: { beginAtZero: true, ticks: { precision: 0, stepSize: 1 }, grid: { display: false } },
                                 y: { grid: { display: false } }
                             }
                         }

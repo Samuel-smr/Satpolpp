@@ -9,7 +9,6 @@ use App\Models\ActivityTemplate;
 use App\Models\Archive;
 use App\Models\ArchiveFile;
 use App\Models\Attachment;
-use App\Models\Officer;
 use App\Models\Report;
 use App\Models\User;
 use App\ReportStatus;
@@ -37,7 +36,6 @@ class SecurityBoundaryTest extends TestCase
             'archive' => Archive::factory()->create()->id,
             'archiveFile' => ArchiveFile::factory()->create()->id,
             'attachment' => Attachment::factory()->create()->id,
-            'officer' => Officer::factory()->create()->id,
             'user' => User::factory()->create()->id,
             'notification' => (string) Str::uuid(),
         ];
@@ -113,6 +111,7 @@ class SecurityBoundaryTest extends TestCase
 
     public function test_guest_cannot_assign_report_ownership_status_or_legacy_nik(): void
     {
+        $this->verifyPhoneOtp('081234567890');
         $this->post(route('pelapor.store'), [
             ...$this->reportPayload(),
             'status' => 'completed',
@@ -152,6 +151,7 @@ class SecurityBoundaryTest extends TestCase
         Storage::fake('local');
         $fixture = UploadedFile::fake()->createWithContent($name, $content);
         $upload = new UploadedFile($fixture->getPathname(), $name, 'image/jpeg', null, true);
+        $this->verifyPhoneOtp('081234567890');
         $this->postJson(route('pelapor.store'), [
             ...$this->reportPayload(),
             'bukti' => [$upload],
@@ -296,7 +296,7 @@ class SecurityBoundaryTest extends TestCase
             {
                 protected function passedValidation(): void
                 {
-                    ArchiveFile::factory()->count(2)->for($this->route('archive'))->create();
+                    ArchiveFile::factory()->count(4)->for($this->route('archive'))->create();
                 }
             };
         });
@@ -307,7 +307,7 @@ class SecurityBoundaryTest extends TestCase
             'files' => [UploadedFile::fake()->create('new.pdf', 1, 'application/pdf')],
         ])->assertUnprocessable()->assertJsonValidationErrors('files');
         $this->assertSame($archive->title, $archive->fresh()->title);
-        $this->assertSame(3, $archive->files()->count());
+        $this->assertSame(5, $archive->files()->count());
         $this->assertSame([], Storage::disk('local')->allFiles());
         $this->assertDatabaseCount('audit_logs', 0);
     }
@@ -320,6 +320,7 @@ class SecurityBoundaryTest extends TestCase
             return $length === 6 ? (++$attempt === 1 ? 'REUSED' : 'UNIQUE') : str_repeat('a', $length);
         });
         try {
+            $this->verifyPhoneOtp('081234567890');
             $this->post(route('pelapor.store'), $this->reportPayload())->assertRedirect();
         } finally {
             Str::createRandomStringsNormally();

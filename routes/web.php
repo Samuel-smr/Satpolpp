@@ -24,6 +24,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [PelaporController::class, 'index'])->name('pelapor.index');
 Route::get('/lapor', [PelaporController::class, 'lapor'])->name('pelapor.lapor');
 Route::post('/lapor', [PelaporController::class, 'store'])->middleware('throttle:guest-reports')->name('pelapor.store');
+Route::post('/lapor/otp', [PelaporController::class, 'sendOtp'])->middleware('throttle:otp-request')->name('pelapor.otp.send');
+Route::post('/lapor/otp/verify', [PelaporController::class, 'verifyOtp'])->middleware('throttle:otp-request')->name('pelapor.otp.verify');
 Route::post('/lapor/asisten-ai', AiAssistantController::class)
     ->middleware('throttle:ai-assistant')
     ->block(30, 0)
@@ -101,10 +103,6 @@ Route::prefix('super-admin')->name('super_admin.')->middleware(['auth', 'can:acc
     Route::patch('/user/{user}/status', [SuperAdminController::class, 'toggleUserStatus'])->name('user.status');
     Route::delete('/user/{user}', [SuperAdminController::class, 'destroyUser'])->name('user.destroy');
     Route::get('/petugas', [OfficerController::class, 'index'])->name('petugas');
-    Route::post('/petugas', [OfficerController::class, 'store'])->name('petugas.store');
-    Route::put('/petugas/{officer}', [OfficerController::class, 'update'])->name('petugas.update');
-    Route::patch('/petugas/{officer}/status', [OfficerController::class, 'toggleStatus'])->name('petugas.status');
-    Route::delete('/petugas/{officer}', [OfficerController::class, 'destroy'])->name('petugas.destroy');
 
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');

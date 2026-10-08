@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\ActivityType;
 use App\Models\Activity;
 use App\Models\Attachment;
-use App\Models\Officer;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
@@ -19,7 +18,7 @@ class SuperAdminActivityExportTest extends TestCase
     {
         Storage::fake('local');
         $superAdmin = User::factory()->superAdmin()->create();
-        $officer = Officer::factory()->create(['name' => 'Personel Ekspor']);
+        $officer = $this->employee(['name' => 'Personel Ekspor']);
         $activity = Activity::factory()->create([
             'name' => 'Patroli September',
             'activity_date' => '2026-09-05',
@@ -27,7 +26,7 @@ class SuperAdminActivityExportTest extends TestCase
             'handling_result' => 'Situasi aman dan tertib.',
             'evaluation_notes' => 'Kegiatan berjalan baik.',
         ]);
-        $activity->officers()->attach($officer);
+        $activity->personnel()->create(['employee_nip' => $officer->employee_number, 'assignment_role' => 'Petugas Kegiatan']);
         Storage::disk('local')->put('activities/documentation/patroli.jpg', 'image-content');
         $attachment = $activity->attachments()->create([
             'file_path' => 'activities/documentation/patroli.jpg',

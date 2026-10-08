@@ -6,12 +6,12 @@ use App\Http\Requests\StoreAdminUserRequest;
 use App\Http\Requests\UpdateAdminUserRequest;
 use App\Models\Activity;
 use App\Models\AuditLog;
-use App\Models\Officer;
 use App\Models\Report;
 use App\Models\User;
-use App\OfficerStatus;
 use App\ReportCategory;
 use App\ReportStatus;
+use App\Services\EprofilService;
+use App\Support\Employee;
 use App\UserRole;
 use App\UserStatus;
 use Illuminate\Http\JsonResponse;
@@ -29,7 +29,7 @@ class SuperAdminController extends Controller
         return view('super_admin.dashboard', [
             'systemStats' => [
                 'users' => User::query()->count(),
-                'active_officers' => Officer::query()->where('status', OfficerStatus::Active)->count(),
+                'active_officers' => app(EprofilService::class)->officers()->count(),
                 'monthly_reports' => Report::query()->whereBetween('created_at', [$monthStart, $monthEnd])->count(),
                 'monthly_activities' => Activity::query()->whereBetween('activity_date', [$monthStart->toDateString(), $monthEnd->toDateString()])->count(),
             ],
@@ -46,7 +46,7 @@ class SuperAdminController extends Controller
                 'template:id,name',
                 'createdByUser:id,name',
                 'evaluatedByUser:id,name',
-                'officers:id,name,position,work_unit_name',
+                'personnel',
                 'attachments:id,attachable_type,attachable_id,original_name,mime_type,file_type,audience',
             ])
             ->orderByDesc('activity_date')
@@ -68,7 +68,7 @@ class SuperAdminController extends Controller
                 'lokasi' => $activity->location_address,
                 'lat' => $activity->latitude,
                 'lng' => $activity->longitude,
-                'peserta' => $activity->officers->pluck('id')->all(),
+                'peserta' => $activity->personnel->pluck('employee_nip')->all(),
                 'jenis' => $activity->type->label(),
                 'dariLaporan' => $activity->report_id !== null,
                 'kodeLaporan' => $activity->report?->code,
@@ -90,11 +90,9 @@ class SuperAdminController extends Controller
                     ->values()
                     ->all(),
             ]);
-        $officers = Officer::query()
-            ->orderBy('name')
-            ->get(['id', 'name', 'position', 'work_unit_name'])
-            ->map(fn (Officer $officer): array => [
-                'id' => $officer->id,
+        $officers = app(EprofilService::class)->officers()
+            ->map(fn (Employee $officer): array => [
+                'id' => $officer->employee_number,
                 'nama' => $officer->name,
                 'jabatan' => $officer->position ?? '-',
                 'seksi' => $officer->work_unit_name ?? '-',
@@ -159,11 +157,6 @@ class SuperAdminController extends Controller
         $user->delete();
 
         return response()->json(['message' => 'Akun berhasil dihapus.']);
-    }
-
-    public function petugas()
-    {
-        return view('super_admin.petugas');
     }
 
     public function monitoring(): View
@@ -242,7 +235,7 @@ class SuperAdminController extends Controller
         return [
             'mapPoints' => $reportPoints->concat($activityPoints)->values(),
             'mapStatistics' => [
-                'active_officers' => Officer::query()->where('status', OfficerStatus::Active)->count(),
+                'active_officers' => app(EprofilService::class)->officers()->count(),
                 'open_reports' => Report::query()->where('status', '!=', ReportStatus::Completed)->count(),
             ],
             'categoryChart' => collect(ReportCategory::cases())->map(fn (ReportCategory $category): array => ['label' => $category->label(), 'total' => (int) ($categoryCounts[$category->value] ?? 0)]),

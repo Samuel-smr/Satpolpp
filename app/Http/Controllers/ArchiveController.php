@@ -132,8 +132,8 @@ class ArchiveController extends Controller
 
             DB::transaction(function () use ($request, $archive, $storedFiles): void {
                 $archive = Archive::query()->whereKey($archive->id)->lockForUpdate()->firstOrFail();
-                if ($archive->files()->count() + count($storedFiles) > 3) {
-                    throw ValidationException::withMessages(['files' => 'Jumlah file dalam satu arsip maksimal tiga file.']);
+                if ($archive->files()->count() + count($storedFiles) > 5) {
+                    throw ValidationException::withMessages(['files' => 'Jumlah file dalam satu arsip maksimal lima file.']);
                 }
                 $archive->update($request->safe()->only(['title', 'operational_category', 'description', 'confidentiality']));
                 foreach ($storedFiles as $storedFile) {

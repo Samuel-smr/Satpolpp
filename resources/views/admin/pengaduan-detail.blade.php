@@ -193,7 +193,7 @@
                 </section>
             @elseif ($report->status === \App\ReportStatus::InProgress && ! ($reportReadOnly ?? false))
                 @php
-                    $selectedOfficerIds = array_map('strval', old('officer_ids', []));
+                    $selectedEmployeeNips = array_map('strval', old('employee_nips', []));
                 @endphp
                 <section id="form-penyelesaian" class="overflow-hidden rounded-2xl border border-emerald-200 bg-emerald-50/60 shadow-sm">
                     <div class="px-6 pt-6">
@@ -270,6 +270,9 @@
 
                         <fieldset>
                             <legend class="mb-3 text-sm font-semibold text-slate-700">Petugas yang menangani</legend>
+                            @if ($officerDirectoryWarning)
+                                <p role="alert" class="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">{{ $officerDirectoryWarning }}</p>
+                            @endif
                             <div class="grid gap-4 lg:grid-cols-2">
                                 <div class="rounded-xl border border-slate-200 bg-slate-50/70 p-3">
                                     <label for="completion-officer-search" class="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500">Daftar petugas aktif</label>
@@ -280,7 +283,7 @@
                                     <div id="completion-officer-list" class="max-h-64 space-y-2 overflow-y-auto pr-1">
                                         @forelse ($activeOfficers as $officer)
                                             <label data-completion-officer-item data-search-text="{{ strtolower($officer->name.' '.$officer->employee_number.' '.$officer->position) }}" class="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 bg-white p-3 transition-colors hover:border-sidebar-active/40 hover:bg-blue-50/40">
-                                                <input type="checkbox" name="officer_ids[]" value="{{ $officer->id }}" @checked(in_array((string) $officer->id, $selectedOfficerIds, true)) data-completion-officer-checkbox data-name="{{ $officer->name }}" data-employee-number="{{ $officer->employee_number }}" data-position="{{ $officer->position }}" class="mt-1 rounded border-slate-300 text-sidebar-active focus:ring-sidebar-active">
+                                                <input type="checkbox" name="employee_nips[]" value="{{ $officer->employee_number }}" @checked(in_array((string) $officer->employee_number, $selectedEmployeeNips, true)) data-completion-officer-checkbox data-name="{{ $officer->name }}" data-employee-number="{{ $officer->employee_number }}" data-position="{{ $officer->position }}" class="mt-1 rounded border-slate-300 text-sidebar-active focus:ring-sidebar-active">
                                                 <span class="min-w-0">
                                                     <span class="block truncate text-sm font-semibold text-slate-700">{{ $officer->name }}</span>
                                                     <span class="block truncate text-xs text-slate-400">{{ $officer->employee_number }}{{ $officer->position ? ' · '.$officer->position : '' }}</span>
@@ -488,6 +491,25 @@
 @push('scripts')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
     <script>
+        @if ($report->status === \App\ReportStatus::InProgress)
+        document.querySelectorAll('a[href="#form-penyelesaian"]').forEach(function (link) {
+            link.addEventListener('click', function (event) {
+                event.preventDefault();
+                const target = document.getElementById('form-penyelesaian');
+                const main = document.querySelector('main');
+
+                if (target && main) {
+                    main.scrollTo({
+                        top: main.scrollTop + target.getBoundingClientRect().top - main.getBoundingClientRect().top,
+                        behavior: 'smooth',
+                    });
+                } else {
+                    target?.scrollIntoView({ block: 'start' });
+                }
+            });
+        });
+        @endif
+
         const activityTemplate = document.getElementById('activity_template_id');
 
         activityTemplate?.addEventListener('change', function () {

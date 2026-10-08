@@ -96,7 +96,7 @@
     </div>
 
     {{-- Modal tambah/ubah user --}}
-    <div id="modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div id="modal" @class(['fixed inset-0 z-50 flex items-center justify-center p-4', 'hidden' => !$errors->any()])>
         <div class="absolute inset-0 bg-black/40" onclick="tutupModal()"></div>
         <div class="relative w-full max-w-lg bg-white rounded-2xl shadow-xl overflow-hidden max-h-[90vh] flex flex-col">
             <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
@@ -106,24 +106,35 @@
                 </button>
             </div>
 
-            <form id="user-form" class="p-6 space-y-4 overflow-y-auto" onsubmit="simpanUser(event)">
-                <input type="hidden" name="edit_index" value="">
-                <input type="hidden" name="_method" value="POST">
+            <form id="user-form" method="POST" class="p-6 space-y-4 overflow-y-auto" onsubmit="simpanUser(event)">
+                @csrf
+                <input type="hidden" name="edit_index" value="{{ old('edit_index') }}">
+                <input type="hidden" name="_method" value="{{ old('_method', 'POST') }}">
+                @if ($errors->any())
+                    <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                        <p class="font-semibold">Periksa kembali data user:</p>
+                        <ul class="mt-2 list-disc pl-5">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
                 <div>
                     <label class="block text-sm font-medium mb-1">Nama Lengkap <span class="text-red-500">*</span></label>
-                    <input type="text" name="nama" required placeholder="Contoh: Andi Saputra"
+                    <input type="text" name="name" value="{{ old('name') }}" required placeholder="Contoh: Andi Saputra"
                         class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none">
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium mb-1">Username <span class="text-red-500">*</span></label>
-                        <input type="text" name="username" required placeholder="Contoh: andi.saputra"
+                        <input type="text" name="username" value="{{ old('username') }}" required placeholder="Contoh: andi.saputra"
                             class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none">
                     </div>
                     <div>
                         <label class="block text-sm font-medium mb-1">Email</label>
-                        <input type="email" name="email" placeholder="andi@example.com"
+                        <input type="email" name="email" value="{{ old('email') }}" placeholder="andi@example.com"
                             class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:border-super-active focus:ring-1 focus:ring-super-active outline-none">
                     </div>
                     <div>
@@ -252,7 +263,7 @@
         document.getElementById('modal-judul').textContent = 'Ubah User';
         document.querySelector('[name=edit_index]').value = gi;
         document.querySelector('[name=_method]').value = 'PUT';
-        f.nama.value = u.nama;
+        f.elements.namedItem('name').value = u.nama;
         f.username.value = u.username;
         f.email.value = u.email || '';
         f.phone.value = u.phone || '';
@@ -318,5 +329,13 @@
 
 
     setTab('semua');
+
+    @if ($errors->any())
+        if (document.querySelector('[name=edit_index]').value !== '') {
+            document.getElementById('modal-judul').textContent = 'Ubah User';
+            document.querySelector('[name=password]').required = false;
+            document.getElementById('pw-hint').classList.remove('hidden');
+        }
+    @endif
 </script>
 @endpush

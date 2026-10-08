@@ -4,10 +4,8 @@ namespace Tests\Feature;
 
 use App\ActivityType;
 use App\Models\Activity;
-use App\Models\Officer;
 use App\Models\Report;
 use App\Models\User;
-use App\OfficerStatus;
 use App\ReportStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -30,8 +28,8 @@ class DashboardTest extends TestCase
             'completed_at' => now()->subDay(),
         ]);
         Report::factory()->create(['status' => ReportStatus::InProgress]);
-        Officer::factory()->count(2)->create(['status' => OfficerStatus::Active]);
-        Officer::factory()->inactive()->create();
+        $this->employees(2, []);
+        $this->employee([], available: false);
         Activity::factory()->create([
             'type' => ActivityType::Internal,
             'activity_date' => now()->toDateString(),

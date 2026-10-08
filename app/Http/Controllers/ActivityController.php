@@ -8,9 +8,8 @@ use App\Http\Requests\UpdateInternalActivityRequest;
 use App\Models\Activity;
 use App\Models\ActivityTemplate;
 use App\Models\AuditLog;
-use App\Models\Officer;
 use App\Models\User;
-use App\OfficerStatus;
+use App\Services\EprofilService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -24,20 +23,18 @@ use Throwable;
 
 class ActivityController extends Controller
 {
-    public function create(): View
+    public function create(EprofilService $eprofil): View
     {
         $activityTemplates = ActivityTemplate::query()
             ->where('is_active', true)
             ->orderBy('sort_order')
             ->get(['id', 'name', 'default_description']);
-        $activeOfficers = Officer::query()
-            ->where('status', OfficerStatus::Active)
-            ->orderBy('name')
-            ->get(['id', 'name', 'employee_number', 'position']);
+        $activeOfficers = $eprofil->officers();
 
         return view('admin.kegiatan-create', [
             'activityTemplates' => $activityTemplates,
             'activeOfficers' => $activeOfficers,
+            'officerDirectoryWarning' => $eprofil->warning(),
             ...$this->viewContext(),
         ]);
     }
@@ -54,22 +51,6 @@ class ActivityController extends Controller
             $storedDocumentation = $this->storeDocumentation($request);
 
             $activity = DB::transaction(function () use ($request, $user, $validated, $storedDocumentation): Activity {
-                $officerIds = collect($validated['officer_ids'])
-                    ->map(fn (mixed $id): int => (int) $id)
-                    ->unique()
-                    ->values();
-                $activeOfficerIds = Officer::query()
-                    ->whereKey($officerIds)
-                    ->where('status', OfficerStatus::Active)
-                    ->lockForUpdate()
-                    ->pluck('id');
-
-                if ($activeOfficerIds->sort()->values()->all() !== $officerIds->sort()->values()->all()) {
-                    throw ValidationException::withMessages([
-                        'officer_ids' => 'Salah satu petugas sudah tidak aktif. Muat ulang formulir dan pilih kembali petugas.',
-                    ]);
-                }
-
                 $activityTemplate = null;
 
                 if (isset($validated['activity_template_id'])) {
@@ -105,10 +86,10 @@ class ActivityController extends Controller
 
                 $activity->findings()->createMany($validated['findings'] ?? []);
 
-                $officerAssignments = $officerIds->mapWithKeys(
-                    fn (int $officerId): array => [$officerId => ['assignment_role' => 'Petugas Kegiatan']],
-                )->all();
-                $activity->officers()->attach($officerAssignments);
+                $activity->personnel()->createMany(array_map(
+                    fn (string $nip): array => ['employee_nip' => $nip, 'assignment_role' => 'Petugas Kegiatan'],
+                    $validated['employee_nips'],
+                ));
 
                 foreach ($storedDocumentation as $documentation) {
                     $activity->attachments()->create([
@@ -155,7 +136,7 @@ class ActivityController extends Controller
         $activity->load([
             'template:id,name',
             'createdByUser:id,name',
-            'officers:id,name,employee_number,position,work_unit_name,unit_name',
+            'personnel',
             'attachments' => fn ($query) => $query->oldest('created_at'),
             'findings' => fn ($query) => $query->oldest('id'),
         ]);
@@ -163,11 +144,11 @@ class ActivityController extends Controller
         return view('admin.kegiatan-detail', ['activity' => $activity, ...$this->viewContext()]);
     }
 
-    public function edit(Activity $activity): View
+    public function edit(Activity $activity, EprofilService $eprofil): View
     {
         $this->ensureInternalActivity($activity);
         $activity->load([
-            'officers:id,name,employee_number,position',
+            'personnel',
             'attachments' => fn ($query) => $query->oldest('created_at'),
             'findings' => fn ($query) => $query->oldest('id'),
         ]);
@@ -176,15 +157,13 @@ class ActivityController extends Controller
             ->where('is_active', true)
             ->orderBy('sort_order')
             ->get(['id', 'name', 'default_description']);
-        $activeOfficers = Officer::query()
-            ->where('status', OfficerStatus::Active)
-            ->orderBy('name')
-            ->get(['id', 'name', 'employee_number', 'position']);
+        $activeOfficers = $eprofil->officers();
 
         return view('admin.kegiatan-create', [
             'activity' => $activity,
             'activityTemplates' => $activityTemplates,
-            'activeOfficers' => $activeOfficers,
+            'activeOfficers' => $activeOfficers->concat($activity->officers)->unique('employee_number')->sortBy('name')->values(),
+            'officerDirectoryWarning' => $eprofil->warning(),
             ...$this->viewContext(),
         ]);
     }
@@ -220,22 +199,6 @@ class ActivityController extends Controller
                 if ($existingDocumentationCount + count($storedDocumentation) > 3) {
                     throw ValidationException::withMessages([
                         'documentation' => 'Jumlah dokumentasi lama dan baru maksimal tiga foto.',
-                    ]);
-                }
-
-                $officerIds = collect($validated['officer_ids'])
-                    ->map(fn (mixed $id): int => (int) $id)
-                    ->unique()
-                    ->values();
-                $activeOfficerIds = Officer::query()
-                    ->whereKey($officerIds)
-                    ->where('status', OfficerStatus::Active)
-                    ->lockForUpdate()
-                    ->pluck('id');
-
-                if ($activeOfficerIds->sort()->values()->all() !== $officerIds->sort()->values()->all()) {
-                    throw ValidationException::withMessages([
-                        'officer_ids' => 'Salah satu petugas sudah tidak aktif. Muat ulang formulir dan pilih kembali petugas.',
                     ]);
                 }
 
@@ -276,10 +239,13 @@ class ActivityController extends Controller
                 $lockedActivity->findings()->delete();
                 $lockedActivity->findings()->createMany($validated['findings'] ?? []);
 
-                $officerAssignments = $officerIds->mapWithKeys(
-                    fn (int $officerId): array => [$officerId => ['assignment_role' => 'Petugas Kegiatan']],
-                )->all();
-                $lockedActivity->officers()->sync($officerAssignments);
+                $lockedActivity->personnel()->whereNotIn('employee_nip', $validated['employee_nips'])->delete();
+                foreach ($validated['employee_nips'] as $nip) {
+                    $lockedActivity->personnel()->updateOrCreate(
+                        ['employee_nip' => $nip],
+                        ['assignment_role' => 'Petugas Kegiatan'],
+                    );
+                }
 
                 foreach ($storedDocumentation as $documentation) {
                     $lockedActivity->attachments()->create([
