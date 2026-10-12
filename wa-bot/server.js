@@ -7,9 +7,24 @@ import wa from 'whatsapp-web.js';
 const { Client, LocalAuth } = wa;
 
 const PORT = process.env.PORT || 3456;
+const BOT_TOKEN = process.env.WA_BOT_TOKEN || '';
 const app = express();
 
 app.use(express.json());
+
+function checkToken(req, res, next) {
+    if (!BOT_TOKEN) {
+        return next();
+    }
+
+    const [scheme, token] = String(req.headers.authorization || '').split(' ');
+
+    if (scheme === 'Bearer' && token === BOT_TOKEN) {
+        return next();
+    }
+
+    return res.status(401).json({ status: false, reason: 'UNAUTHORIZED' });
+}
 
 function findChrome() {
     const candidates = [
@@ -48,7 +63,7 @@ app.get('/health', (_req, res) => {
     res.json({ status: client.info && ready ? 'ready' : 'connecting' });
 });
 
-app.post('/send', async (req, res) => {
+app.post('/send', checkToken, async (req, res) => {
     const { target, message } = req.body || {};
 
     if (!client.info || !ready) {
@@ -124,4 +139,8 @@ process.on('uncaughtException', (error) => {
 
 app.listen(PORT, () => {
     console.log(`WA Bot HTTP API berjalan di port ${PORT}`);
+
+    if (!BOT_TOKEN) {
+        console.warn('PERINGATAN: WA_BOT_TOKEN belum diset. Endpoint /send terbuka tanpa autentikasi.');
+    }
 });

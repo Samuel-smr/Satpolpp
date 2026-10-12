@@ -52,6 +52,7 @@ return [
     'whatsapp' => [
         'driver' => env('WHATSAPP_DRIVER', 'local'),
         'bot_url' => env('WHATSAPP_BOT_URL', 'http://localhost:3456'),
+        'bot_token' => env('WHATSAPP_BOT_TOKEN'),
     ],
 
 ];

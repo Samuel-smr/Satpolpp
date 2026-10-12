@@ -29,6 +29,10 @@ class WhatsAppService
         $response = Http::acceptJson()
             ->connectTimeout(5)
             ->timeout(15)
+            ->when(
+                (string) config('services.whatsapp.bot_token') !== '',
+                fn ($request) => $request->withToken((string) config('services.whatsapp.bot_token'))
+            )
             ->post("{$baseUrl}/send", [
                 'target' => $this->normalizePhone($phone),
                 'message' => $message,
