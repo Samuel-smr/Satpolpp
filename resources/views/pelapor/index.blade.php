@@ -17,6 +17,9 @@
                     <span class="w-2.5 h-2.5 rounded-full bg-accent-400 animate-pulse"></span>
                     Layanan resmi Satuan Polisi Pamong Praja
                 </span>
+                <span class="ml-2 inline-flex items-center gap-1 rounded-full bg-yellow-300 px-3 py-1 text-xs font-bold uppercase tracking-widest text-slate-900">
+                    Uji Deploy
+                </span>
 
                 <h1 class="mt-6 font-headline text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
                     Laporkan Gangguan Ketertiban <span class="text-accent-400">Dengan Cepat.</span>
