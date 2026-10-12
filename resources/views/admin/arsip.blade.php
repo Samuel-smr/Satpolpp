@@ -207,8 +207,8 @@
                     </label>
                     <label class="flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 p-6 text-center transition-colors hover:bg-slate-100">
                         <span class="material-symbols-outlined mb-2 text-4xl text-slate-400">cloud_upload</span>
-                        <p id="archive-file-name" class="text-sm font-medium text-slate-700">Pilih maksimal 3 file arsip</p>
-                        <p class="mt-1 text-xs text-slate-500">PDF, JPG, PNG, DOC, DOCX, XLS, XLSX, atau ZIP. Maksimal 3 file, masing-masing 20 MB.</p>
+                        <p id="archive-file-name" class="text-sm font-medium text-slate-700">Pilih maksimal 5 file arsip</p>
+                        <p class="mt-1 text-xs text-slate-500">PDF, JPG, PNG, DOC, DOCX, XLS, XLSX, atau ZIP. Maksimal 5 file, masing-masing 20 MB.</p>
                         <input id="archive-file" type="file" name="files[]" required multiple
                             accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.zip" class="sr-only"
                             onchange="tampilkanNamaFile(this)">
@@ -258,10 +258,10 @@
             document.getElementById('archive-submit-label').textContent = 'Simpan & Unggah';
             document.getElementById('archive-file').required = true;
             document.getElementById('archive-file').multiple = true;
-            document.getElementById('archive-file').dataset.maximumFiles = '3';
+            document.getElementById('archive-file').dataset.maximumFiles = '5';
             document.getElementById('archive-file-required').classList.remove('hidden');
             document.getElementById('archive-current-file').classList.add('hidden');
-            document.getElementById('archive-file-name').textContent = 'Pilih maksimal 3 file arsip';
+            document.getElementById('archive-file-name').textContent = 'Pilih maksimal 5 file arsip';
             modalArsip.classList.remove('hidden');
         }
 
@@ -280,10 +280,10 @@
             document.getElementById('archive-submit-label').textContent = 'Perbarui Arsip';
             document.getElementById('archive-file').required = false;
             document.getElementById('archive-file').multiple = true;
-            document.getElementById('archive-file').dataset.maximumFiles = String(3 - archive.file_count);
+            document.getElementById('archive-file').dataset.maximumFiles = String(5 - archive.file_count);
             document.getElementById('archive-file-required').classList.add('hidden');
             const currentFile = document.getElementById('archive-current-file');
-            currentFile.textContent = `File saat ini: ${archive.file_names.join(', ')}. Anda dapat menambahkan sampai ${3 - archive.file_count} file lagi.`;
+            currentFile.textContent = `File saat ini: ${archive.file_names.join(', ')}. Anda dapat menambahkan sampai ${5 - archive.file_count} file lagi.`;
             currentFile.classList.remove('hidden');
             document.getElementById('archive-file-name').textContent = 'Pilih file pengganti (opsional)';
             modalArsip.classList.remove('hidden');
@@ -296,10 +296,10 @@
         function tampilkanNamaFile(input) {
             bersihkanPreviewArsip();
 
-            const maximumFiles = Number.parseInt(input.dataset.maximumFiles || '3', 10);
+            const maximumFiles = Number.parseInt(input.dataset.maximumFiles || '5', 10);
             if (input.files.length > maximumFiles) {
                 input.value = '';
-                document.getElementById('archive-file-name').textContent = 'Maksimal 3 file arsip';
+                document.getElementById('archive-file-name').textContent = 'Maksimal 5 file arsip';
                 window.tampilToast?.(`Anda hanya dapat menambahkan ${maximumFiles} file lagi.`, 'warning');
 
                 return;
@@ -308,7 +308,7 @@
             const fileNames = Array.from(input.files).map((file) => file.name);
             document.getElementById('archive-file-name').textContent = fileNames.length > 0
                 ? `${fileNames.length} file dipilih: ${fileNames.join(', ')}`
-                : (input.multiple ? 'Pilih maksimal 3 file arsip' : 'Pilih file pengganti (opsional)');
+                : (input.multiple ? 'Pilih maksimal 5 file arsip' : 'Pilih file pengganti (opsional)');
 
             Array.from(input.files).forEach((file, index) => {
                 const card = document.createElement('div');

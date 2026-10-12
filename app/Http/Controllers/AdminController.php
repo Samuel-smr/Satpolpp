@@ -5,10 +5,9 @@ namespace App\Http\Controllers;
 use App\ActivityType;
 use App\Models\Activity;
 use App\Models\ActivityTemplate;
-use App\Models\Officer;
 use App\Models\Report;
-use App\OfficerStatus;
 use App\ReportStatus;
+use App\Services\EprofilService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
@@ -75,7 +74,7 @@ class AdminController extends Controller
                 ->whereIn('status', [ReportStatus::Submitted, ReportStatus::Received, ReportStatus::Verifying])
                 ->whereBetween('created_at', [$periodStart, $periodEnd])
                 ->count(),
-            'active_officers' => Officer::query()->where('status', OfficerStatus::Active)->count(),
+            'active_officers' => app(EprofilService::class)->officers()->count(),
             'activities_this_week' => Activity::query()
                 ->whereBetween('activity_date', [$periodStart->toDateString(), $periodEnd->toDateString()])
                 ->count(),
@@ -163,7 +162,7 @@ class AdminController extends Controller
         return view('admin.pengaduan', compact('reports', 'statistics', 'filters'));
     }
 
-    public function pengaduanDetail(Request $request, Report $report): View
+    public function pengaduanDetail(Request $request, Report $report, EprofilService $eprofil): View
     {
         $report->load([
             'statusHistories' => fn ($query) => $query
@@ -172,23 +171,22 @@ class AdminController extends Controller
             'attachments' => fn ($query) => $query->oldest('created_at'),
             'activity' => fn ($query) => $query->with([
                 'attachments' => fn ($attachmentQuery) => $attachmentQuery->oldest('created_at'),
-                'officers:id,name,employee_number,position',
+                'personnel',
                 'findings' => fn ($findingQuery) => $findingQuery->oldest('id'),
             ]),
         ]);
 
         $activityTemplates = collect();
         $activeOfficers = collect();
+        $officerDirectoryWarning = null;
 
         if ($report->status === ReportStatus::InProgress) {
             $activityTemplates = ActivityTemplate::query()
                 ->where('is_active', true)
                 ->orderBy('sort_order')
                 ->get(['id', 'name', 'default_description']);
-            $activeOfficers = Officer::query()
-                ->where('status', OfficerStatus::Active)
-                ->orderBy('name')
-                ->get(['id', 'name', 'employee_number', 'position']);
+            $activeOfficers = $eprofil->officers();
+            $officerDirectoryWarning = $eprofil->warning();
         }
 
         $reportReadOnly = $request->routeIs('super_admin.*');
@@ -205,6 +203,7 @@ class AdminController extends Controller
             'report',
             'activityTemplates',
             'activeOfficers',
+            'officerDirectoryWarning',
             'reportReadOnly',
             'reportLayout',
             'reportBackRoute',
@@ -259,7 +258,7 @@ class AdminController extends Controller
             ->select(['id', 'report_id', 'name', 'type', 'category', 'activity_date', 'start_time', 'location_address'])
             ->with('report:id,code')
             ->with('findings:id,activity_id,type,quantity,unit')
-            ->withCount('officers')
+            ->withCount('personnel')
             ->orderByDesc('activity_date')
             ->orderByDesc('start_time')
             ->orderByDesc('id')
@@ -273,7 +272,7 @@ class AdminController extends Controller
                 'template:id,name',
                 'createdByUser:id,name',
                 'evaluatedByUser:id,name',
-                'officers:id,name,position',
+                'personnel',
                 'attachments:id,attachable_type,attachable_id,original_name,mime_type,file_type,audience',
                 'findings:id,activity_id,type,quantity,unit',
             ])

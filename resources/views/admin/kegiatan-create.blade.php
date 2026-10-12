@@ -10,8 +10,8 @@
     @php
         $editingActivity = $activity ?? null;
         $isEditing = $editingActivity !== null;
-        $defaultOfficerIds = $isEditing ? $editingActivity->officers->pluck('id')->all() : [];
-        $selectedOfficerIds = array_map('strval', old('officer_ids', $defaultOfficerIds));
+        $defaultEmployeeNips = $isEditing ? $editingActivity->personnel->pluck('employee_nip')->all() : [];
+        $selectedEmployeeNips = array_map('strval', old('employee_nips', $defaultEmployeeNips));
         $existingDocumentationCount = $isEditing ? $editingActivity->attachments->count() : 0;
         $activityRoutePrefix = $activityRoutePrefix ?? 'admin.kegiatan';
         $closeRoute = route($activityRoutePrefix);
@@ -133,6 +133,9 @@
 
             <section class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
                 <h2 class="mb-5 font-headline text-lg font-bold text-slate-800">Petugas dan Dokumentasi</h2>
+                @if ($officerDirectoryWarning)
+                    <p role="alert" class="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">{{ $officerDirectoryWarning }}</p>
+                @endif
                 <fieldset>
                     <legend class="mb-3 text-sm font-semibold text-slate-700">Petugas yang mengikuti</legend>
                     <div class="grid gap-4 lg:grid-cols-2">
@@ -145,7 +148,7 @@
                             <div id="officer-list" class="max-h-64 space-y-2 overflow-y-auto pr-1">
                                 @forelse ($activeOfficers as $officer)
                                     <label data-officer-item data-search-text="{{ strtolower($officer->name.' '.$officer->employee_number.' '.$officer->position) }}" class="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 bg-white p-3 transition-colors hover:border-sidebar-active/40 hover:bg-blue-50/40">
-                                        <input type="checkbox" name="officer_ids[]" value="{{ $officer->id }}" @checked(in_array((string) $officer->id, $selectedOfficerIds, true)) data-officer-checkbox data-name="{{ $officer->name }}" data-employee-number="{{ $officer->employee_number }}" data-position="{{ $officer->position }}" class="mt-1 rounded border-slate-300 text-sidebar-active focus:ring-sidebar-active">
+                                        <input type="checkbox" name="employee_nips[]" value="{{ $officer->employee_number }}" @checked(in_array((string) $officer->employee_number, $selectedEmployeeNips, true)) data-officer-checkbox data-name="{{ $officer->name }}" data-employee-number="{{ $officer->employee_number }}" data-position="{{ $officer->position }}" class="mt-1 rounded border-slate-300 text-sidebar-active focus:ring-sidebar-active">
                                         <span class="min-w-0">
                                             <span class="block truncate text-sm font-semibold text-slate-700">{{ $officer->name }}</span>
                                             <span class="block truncate text-xs text-slate-400">{{ $officer->employee_number }}{{ $officer->position ? ' · '.$officer->position : '' }}</span>

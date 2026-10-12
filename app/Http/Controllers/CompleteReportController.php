@@ -7,11 +7,10 @@ use App\FindingType;
 use App\FindingUnit;
 use App\Models\Activity;
 use App\Models\AuditLog;
-use App\Models\Officer;
 use App\Models\Report;
 use App\Models\User;
-use App\OfficerStatus;
 use App\ReportStatus;
+use App\Services\EprofilService;
 use App\Services\WhatsAppService;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -26,9 +25,9 @@ use Throwable;
 
 class CompleteReportController extends Controller
 {
-    public function store(Request $request, Report $report): RedirectResponse
+    public function store(Request $request, Report $report, EprofilService $eprofil): RedirectResponse
     {
-        $validated = $this->validateCompletion($request);
+        $validated = $this->validateCompletion($request, $eprofil);
         $storedEvidence = [];
 
         /** @var User $user */
@@ -61,19 +60,6 @@ class CompleteReportController extends Controller
                     ]);
                 }
 
-                $officerIds = collect($validated['officer_ids'])->map(fn (mixed $id): int => (int) $id)->unique()->values();
-                $activeOfficerIds = Officer::query()
-                    ->whereKey($officerIds)
-                    ->where('status', OfficerStatus::Active)
-                    ->lockForUpdate()
-                    ->pluck('id');
-
-                if ($activeOfficerIds->sort()->values()->all() !== $officerIds->sort()->values()->all()) {
-                    throw ValidationException::withMessages([
-                        'officer_ids' => 'Salah satu petugas sudah tidak aktif. Muat ulang halaman dan pilih kembali petugas.',
-                    ]);
-                }
-
                 $activity = Activity::create([
                     'report_id' => $lockedReport->id,
                     'activity_template_id' => $validated['activity_template_id'] ?? null,
@@ -93,10 +79,10 @@ class CompleteReportController extends Controller
 
                 $activity->findings()->createMany($validated['findings'] ?? []);
 
-                $officerAssignments = $officerIds->mapWithKeys(
-                    fn (int $officerId): array => [$officerId => ['assignment_role' => 'Petugas Penanganan']],
-                )->all();
-                $activity->officers()->attach($officerAssignments);
+                $activity->personnel()->createMany(array_map(
+                    fn (string $nip): array => ['employee_nip' => $nip, 'assignment_role' => 'Petugas Penanganan'],
+                    $validated['employee_nips'],
+                ));
 
                 foreach ($storedEvidence as $evidence) {
                     $activity->attachments()->create([
@@ -168,12 +154,14 @@ class CompleteReportController extends Controller
      *   location_address: string,
      *   latitude: numeric-string|float|int,
      *   longitude: numeric-string|float|int,
-     *   officer_ids: list<int|string>,
+     *   employee_nips: list<string>,
      *   evidence: list<UploadedFile>
      * }
      */
-    private function validateCompletion(Request $request): array
+    private function validateCompletion(Request $request, EprofilService $eprofil): array
     {
+        $employeeNips = $eprofil->officers()->pluck('employee_number')->all();
+
         return $request->validate([
             'current_status' => ['required', 'string', Rule::enum(ReportStatus::class)],
             'activity_template_id' => [
@@ -193,16 +181,13 @@ class CompleteReportController extends Controller
             'location_address' => ['required', 'string', 'max:2000'],
             'latitude' => ['required', 'numeric', 'between:-90,90'],
             'longitude' => ['required', 'numeric', 'between:-180,180'],
-            'officer_ids' => ['required', 'array', 'min:1'],
-            'officer_ids.*' => [
+            'employee_nips' => ['required', 'array', 'min:1'],
+            'employee_nips.*' => [
                 'required',
-                'integer',
-                'distinct',
-                Rule::exists('officers', 'id')->where(
-                    fn (Builder $query): Builder => $query
-                        ->where('status', OfficerStatus::Active->value)
-                        ->whereNull('deleted_at'),
-                ),
+                'string',
+                'max:50',
+                'distinct:strict',
+                Rule::in($employeeNips),
             ],
             'evidence' => ['required', 'array', 'min:1', 'max:3'],
             'evidence.*' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'extensions:jpg,jpeg,png,webp', 'max:5120'],
@@ -217,9 +202,9 @@ class CompleteReportController extends Controller
             'findings.*.quantity.min' => 'Jumlah temuan minimal satu.',
             'findings.*.unit.required' => 'Satuan pada setiap temuan wajib dipilih.',
             'findings.*.unit.enum' => 'Satuan temuan tidak valid.',
-            'officer_ids.required' => 'Pilih minimal satu petugas.',
-            'officer_ids.min' => 'Pilih minimal satu petugas.',
-            'officer_ids.*.exists' => 'Petugas yang dipilih tidak aktif atau tidak tersedia.',
+            'employee_nips.required' => 'Pilih minimal satu petugas.',
+            'employee_nips.min' => 'Pilih minimal satu petugas.',
+            'employee_nips.*.in' => 'Pegawai yang dipilih tidak tersedia di e-Profil.',
             'evidence.required' => 'Unggah minimal satu foto bukti penanganan.',
             'evidence.min' => 'Unggah minimal satu foto bukti penanganan.',
             'evidence.max' => 'Foto bukti penanganan maksimal tiga file.',

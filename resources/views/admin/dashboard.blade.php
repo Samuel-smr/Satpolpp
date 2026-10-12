@@ -83,11 +83,11 @@
             </div>
         </div>
 
-        <!-- Card 3: Petugas Aktif -->
+        <!-- Card 3: Pegawai e-Profil -->
         <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
             <div class="flex items-start justify-between">
                 <div>
-                    <p class="text-xs font-semibold text-slate-600 max-w-[140px] leading-snug">Petugas Aktif</p>
+                    <p class="text-xs font-semibold text-slate-600 max-w-[140px] leading-snug">Pegawai e-Profil</p>
                     <h2 class="font-headline text-3xl font-bold text-slate-900 mt-3">{{ $dashboardStats['active_officers'] }}</h2>
                 </div>
                 <div class="w-10 h-10 rounded-xl bg-blue-100/70 text-brand-600 flex items-center justify-center flex-shrink-0">

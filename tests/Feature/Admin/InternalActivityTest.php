@@ -9,7 +9,6 @@ use App\Models\Activity;
 use App\Models\ActivityTemplate;
 use App\Models\Attachment;
 use App\Models\AuditLog;
-use App\Models\Officer;
 use App\Models\Report;
 use App\Models\User;
 use App\OperationalCategory;
@@ -30,8 +29,8 @@ class InternalActivityTest extends TestCase
             'operational_category' => OperationalCategory::EventSecurity,
         ]);
         ActivityTemplate::factory()->inactive()->create(['name' => 'Template Nonaktif']);
-        $activeOfficer = Officer::factory()->create(['name' => 'Petugas Aktif']);
-        Officer::factory()->inactive()->create(['name' => 'Petugas Nonaktif']);
+        $activeOfficer = $this->employee(['name' => 'Petugas Aktif']);
+        $this->employee(['name' => 'Petugas Nonaktif'], available: false);
 
         $response = $this->actingAs($admin)->get(route('admin.kegiatan.create'));
 
@@ -60,10 +59,10 @@ class InternalActivityTest extends TestCase
         $template = ActivityTemplate::factory()->create([
             'operational_category' => OperationalCategory::EventSecurity,
         ]);
-        $officers = Officer::factory()->count(2)->create();
+        $officers = $this->employees(2);
 
         $response = $this->actingAs($admin)->post(route('admin.kegiatan.store'), [
-            ...$this->validPayload($officers->pluck('id')->all(), $template->id),
+            ...$this->validPayload($officers->pluck('employee_number')->all(), $template->id),
             'category' => $template->name,
             'activity_date' => '2026-09-15',
             'findings' => [
@@ -95,7 +94,7 @@ class InternalActivityTest extends TestCase
         $this->assertSame(FindingType::Item, $activity->findings[1]->type);
         $this->assertSame(12, $activity->findings[1]->quantity);
         $this->assertSame(FindingUnit::Bottle, $activity->findings[1]->unit);
-        $this->assertDatabaseCount('activity_officer', 2);
+        $this->assertDatabaseCount('activity_personnel', 2);
         $this->assertDatabaseCount('attachments', 2);
 
         foreach ($activity->attachments as $attachment) {
@@ -128,11 +127,11 @@ class InternalActivityTest extends TestCase
     {
         Storage::fake('local');
         $admin = User::factory()->create();
-        $officer = Officer::factory()->create();
+        $officer = $this->employee();
 
         $response = $this->actingAs($admin)->post(
             route('admin.kegiatan.store'),
-            $this->validPayload([$officer->id]),
+            $this->validPayload([$officer->employee_number]),
         );
 
         $activity = Activity::query()->sole();
@@ -148,13 +147,13 @@ class InternalActivityTest extends TestCase
     {
         Storage::fake('local');
         $admin = User::factory()->create();
-        $inactiveOfficer = Officer::factory()->inactive()->create();
+        $inactiveOfficer = $this->employee([], available: false);
         $inactiveTemplate = ActivityTemplate::factory()->inactive()->create();
 
         $response = $this->from(route('admin.kegiatan.create'))
             ->actingAs($admin)
             ->post(route('admin.kegiatan.store'), [
-                ...$this->validPayload([$inactiveOfficer->id], $inactiveTemplate->id),
+                ...$this->validPayload([$inactiveOfficer->employee_number], $inactiveTemplate->id),
                 'documentation' => [
                     UploadedFile::fake()->image('satu.jpg'),
                     UploadedFile::fake()->image('dua.jpg'),
@@ -166,11 +165,11 @@ class InternalActivityTest extends TestCase
         $response->assertRedirect(route('admin.kegiatan.create'));
         $response->assertSessionHasErrors([
             'activity_template_id' => 'Template kegiatan tidak aktif atau tidak tersedia.',
-            'officer_ids.0' => 'Petugas yang dipilih tidak aktif atau tidak tersedia.',
+            'employee_nips.0' => 'Pegawai yang dipilih tidak tersedia di e-Profil.',
             'documentation' => 'Foto dokumentasi maksimal tiga file.',
         ]);
         $this->assertDatabaseCount('activities', 0);
-        $this->assertDatabaseCount('activity_officer', 0);
+        $this->assertDatabaseCount('activity_personnel', 0);
         $this->assertDatabaseCount('attachments', 0);
         $this->assertDatabaseCount('audit_logs', 0);
         $this->assertSame([], Storage::disk('local')->allFiles('activities/documentation'));
@@ -179,7 +178,7 @@ class InternalActivityTest extends TestCase
     public function test_internal_activity_detail_uses_database_data_and_escapes_user_content(): void
     {
         $admin = User::factory()->create(['name' => 'Admin Pembuat']);
-        $officer = Officer::factory()->create(['name' => 'Petugas Lapangan']);
+        $officer = $this->employee(['name' => 'Petugas Lapangan']);
         $unsafeName = '<script>alert("detail")</script>';
         $activity = Activity::factory()->for($admin, 'createdByUser')->create([
             'name' => $unsafeName,
@@ -187,7 +186,7 @@ class InternalActivityTest extends TestCase
             'description' => '<img src=x onerror=alert(1)>',
             'handling_result' => 'Kegiatan berjalan lancar.',
         ]);
-        $activity->officers()->attach($officer, ['assignment_role' => 'Petugas Kegiatan']);
+        $activity->personnel()->create(['employee_nip' => $officer->employee_number, 'assignment_role' => 'Petugas Kegiatan']);
 
         $response = $this->actingAs($admin)->get(route('admin.kegiatan.show', $activity));
 
@@ -203,13 +202,13 @@ class InternalActivityTest extends TestCase
     public function test_edit_form_is_prefilled_with_current_activity_and_officers(): void
     {
         $admin = User::factory()->create();
-        $selectedOfficer = Officer::factory()->create(['name' => 'Petugas Terpilih']);
+        $selectedOfficer = $this->employee(['name' => 'Petugas Terpilih']);
         $activity = Activity::factory()->for($admin, 'createdByUser')->create([
             'name' => 'Nama Kegiatan Lama',
             'type' => ActivityType::Internal,
             'handling_result' => 'Hasil sementara.',
         ]);
-        $activity->officers()->attach($selectedOfficer, ['assignment_role' => 'Petugas Kegiatan']);
+        $activity->personnel()->create(['employee_nip' => $selectedOfficer->employee_number, 'assignment_role' => 'Petugas Kegiatan']);
         $activity->attachments()->create([
             'uploaded_by_user_id' => $admin->id,
             'file_path' => 'activities/documentation/lama.jpg',
@@ -239,15 +238,15 @@ class InternalActivityTest extends TestCase
         $admin = User::factory()->create();
         $otherUser = User::factory()->create();
         $report = Report::factory()->create();
-        $oldOfficer = Officer::factory()->create();
-        $newOfficer = Officer::factory()->create();
+        $oldOfficer = $this->employee();
+        $newOfficer = $this->employee();
         $activity = Activity::factory()->for($admin, 'createdByUser')->create([
             'name' => 'Nama Lama',
             'type' => ActivityType::Internal,
             'category' => 'Kategori Lama',
             'activity_date' => '2026-09-10',
         ]);
-        $activity->officers()->attach($oldOfficer, ['assignment_role' => 'Petugas Kegiatan']);
+        $activity->personnel()->create(['employee_nip' => $oldOfficer->employee_number, 'assignment_role' => 'Petugas Kegiatan']);
         Storage::disk('local')->put('activities/documentation/lama.jpg', 'old-file');
         $activity->attachments()->create([
             'uploaded_by_user_id' => $admin->id,
@@ -262,7 +261,7 @@ class InternalActivityTest extends TestCase
         $this->travelTo('2026-09-09 10:01:00');
 
         $response = $this->actingAs($admin)->put(route('admin.kegiatan.update', $activity), [
-            ...$this->validPayload([$newOfficer->id]),
+            ...$this->validPayload([$newOfficer->employee_number]),
             'current_updated_at' => $currentUpdatedAt,
             'name' => 'Nama Kegiatan Baru',
             'activity_date' => '2026-09-20',
@@ -284,13 +283,13 @@ class InternalActivityTest extends TestCase
         $this->assertSame('Kategori Manual', $freshActivity->category);
         $this->assertSame('2026-09-20', $freshActivity->activity_date->toDateString());
         $this->assertSame('Kegiatan selesai dengan tertib.', $freshActivity->handling_result);
-        $this->assertDatabaseMissing('activity_officer', [
+        $this->assertDatabaseMissing('activity_personnel', [
             'activity_id' => $activity->id,
-            'officer_id' => $oldOfficer->id,
+            'employee_nip' => $oldOfficer->employee_number,
         ]);
-        $this->assertDatabaseHas('activity_officer', [
+        $this->assertDatabaseHas('activity_personnel', [
             'activity_id' => $activity->id,
-            'officer_id' => $newOfficer->id,
+            'employee_nip' => $newOfficer->employee_number,
             'assignment_role' => 'Petugas Kegiatan',
         ]);
         $this->assertDatabaseCount('attachments', 2);
@@ -308,7 +307,7 @@ class InternalActivityTest extends TestCase
         Storage::fake('local');
         $this->travelTo('2026-09-09 10:00:00');
         $admin = User::factory()->create();
-        $officer = Officer::factory()->create();
+        $officer = $this->employee();
         $activity = Activity::factory()->create([
             'name' => 'Nama Terkini',
             'type' => ActivityType::Internal,
@@ -320,7 +319,7 @@ class InternalActivityTest extends TestCase
         $response = $this->from(route('admin.kegiatan.edit', $activity))
             ->actingAs($admin)
             ->put(route('admin.kegiatan.update', $activity), [
-                ...$this->validPayload([$officer->id]),
+                ...$this->validPayload([$officer->employee_number]),
                 'current_updated_at' => $currentUpdatedAt,
                 'name' => 'Perubahan dari formulir lama',
                 'documentation' => [UploadedFile::fake()->image('stale.jpg')],
@@ -339,7 +338,7 @@ class InternalActivityTest extends TestCase
     {
         Storage::fake('local');
         $admin = User::factory()->create();
-        $officer = Officer::factory()->create();
+        $officer = $this->employee();
         $activity = Activity::factory()->create(['type' => ActivityType::Internal]);
 
         foreach (range(1, 3) as $number) {
@@ -354,7 +353,7 @@ class InternalActivityTest extends TestCase
         $response = $this->from(route('admin.kegiatan.edit', $activity))
             ->actingAs($admin)
             ->put(route('admin.kegiatan.update', $activity), [
-                ...$this->validPayload([$officer->id]),
+                ...$this->validPayload([$officer->employee_number]),
                 'current_updated_at' => $activity->updated_at->format('Y-m-d H:i:s'),
                 'documentation' => [UploadedFile::fake()->image('keempat.jpg')],
             ]);
@@ -386,7 +385,7 @@ class InternalActivityTest extends TestCase
             ->assertNotFound();
         $this->actingAs($admin)
             ->put(route('admin.kegiatan.update', $externalActivity), [
-                ...$this->validPayload([Officer::factory()->create()->id]),
+                ...$this->validPayload([$this->employee()->employee_number]),
                 'current_updated_at' => $externalActivity->updated_at->format('Y-m-d H:i:s'),
             ])
             ->assertNotFound();
@@ -448,10 +447,10 @@ class InternalActivityTest extends TestCase
     }
 
     /**
-     * @param  list<int>  $officerIds
+     * @param  list<string>  $employeeNips
      * @return array<string, mixed>
      */
-    private function validPayload(array $officerIds, ?int $templateId = null): array
+    private function validPayload(array $employeeNips, ?int $templateId = null): array
     {
         $category = ActivityTemplate::query()->find($templateId)?->name
             ?? ActivityTemplate::factory()->create(['name' => 'Kategori Manual'])->name;
@@ -467,7 +466,7 @@ class InternalActivityTest extends TestCase
             'location_address' => 'Kecamatan Wates, Kulon Progo',
             'latitude' => -7.8578000,
             'longitude' => 110.1589000,
-            'officer_ids' => $officerIds,
+            'employee_nips' => $employeeNips,
         ];
     }
 }
