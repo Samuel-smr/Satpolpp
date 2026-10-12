@@ -45,7 +45,7 @@ return [
         'hourly_limit' => env('AI_HOURLY_LIMIT', 60),
         'daily_limit' => env('AI_DAILY_LIMIT', 1000),
         'key' => env('AI_API_KEY'),
-        'model' => env('AI_MODEL', 'gemini-3.1-flash-lite'),
+        'model' => env('AI_MODEL', 'gemini-3.5-flash'),
         'base_url' => env('AI_BASE_URL', 'https://generativelanguage.googleapis.com/v1beta'),
     ],
 

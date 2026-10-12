@@ -15,6 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Hosting berjalan di belakang CDN/proxy (TLS termination),
+        // jadi semua proxy dipercaya agar deteksi HTTPS/asset/cookie benar.
+        $middleware->trustProxies(at: '*');
         $middleware->web(append: [SecurityHeaders::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
