@@ -503,6 +503,9 @@
                 otpVerifyStatus.classList.add('hidden');
                 otpSendButton.disabled = false;
                 otpSendButton.textContent = 'Kirim Kode OTP';
+                otpKode.value = '';
+                otpKode.readOnly = false;
+                otpVerifyButton.disabled = false;
             }
         });
 
