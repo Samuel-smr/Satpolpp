@@ -102,15 +102,16 @@
         </div>
 
         <div class="max-w-5xl mx-auto px-4">
-            <div class="relative grid grid-cols-1 sm:grid-cols-3 gap-10">
+            <div class="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
                 {{-- Garis penghubung --}}
-                <div class="hidden lg:block absolute top-6 left-[12%] right-[12%] h-px bg-slate-200"></div>
+                <div class="hidden lg:block absolute top-6 left-[10%] right-[10%] h-px bg-slate-200"></div>
 
                 @php
                     $steps = [
-                        ['1', '📍', 'Isi Detail & Lokasi', 'Sertakan foto bila ada'],
-                        ['2', '📤', 'Kirim', 'Laporan Anda terkirim'],
-                        ['3', '📊', 'Pantau Status', 'Cek perkembangan & isi survei kepuasan'],
+                        ['1', '💬', 'Verifikasi WhatsApp', 'Masukkan nomor HP lalu ketik kode OTP 6 digit'],
+                        ['2', '📝', 'Isi Detail & Lokasi', 'Deskripsi kejadian, lokasi, dan foto bukti'],
+                        ['3', '📤', 'Kirim Laporan', 'Centang pernyataan lalu simpan kode laporan'],
+                        ['4', '📊', 'Pantau Status', 'Cek perkembangan dan isi survei kepuasan'],
                     ];
                 @endphp
 
