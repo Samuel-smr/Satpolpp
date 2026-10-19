@@ -61,6 +61,7 @@ class AuthController extends Controller
         ], $request->boolean('remember'))) {
             RateLimiter::clear($throttleKey);
             $request->session()->regenerate();
+            $request->session()->forget('data_year');
 
             /** @var User $user */
             $user = $request->user();

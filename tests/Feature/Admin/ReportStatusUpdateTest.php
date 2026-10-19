@@ -20,7 +20,7 @@ class ReportStatusUpdateTest extends TestCase
         ReportStatus $expectedStatus,
     ): void {
         $admin = User::factory()->create();
-        $report = Report::factory()->create(['status' => $currentStatus]);
+        $report = Report::factory()->assignedTo($admin)->create(['status' => $currentStatus]);
 
         $response = $this->actingAs($admin)->patch(route('admin.pengaduan.status.update', $report), [
             'current_status' => $currentStatus->value,
@@ -62,7 +62,7 @@ class ReportStatusUpdateTest extends TestCase
     public function test_status_endpoint_cannot_complete_or_reopen_a_report(ReportStatus $currentStatus): void
     {
         $admin = User::factory()->create();
-        $report = Report::factory()->create(['status' => $currentStatus]);
+        $report = Report::factory()->assignedTo($admin)->create(['status' => $currentStatus]);
 
         $response = $this->from(route('admin.pengaduan.detail', $report))
             ->actingAs($admin)
@@ -91,7 +91,7 @@ class ReportStatusUpdateTest extends TestCase
     public function test_status_note_longer_than_one_thousand_characters_is_rejected_without_writes(): void
     {
         $admin = User::factory()->create();
-        $report = Report::factory()->create(['status' => ReportStatus::Submitted]);
+        $report = Report::factory()->assignedTo($admin)->create(['status' => ReportStatus::Submitted]);
 
         $response = $this->from(route('admin.pengaduan.detail', $report))
             ->actingAs($admin)
@@ -125,7 +125,7 @@ class ReportStatusUpdateTest extends TestCase
     public function test_stale_status_request_is_rejected_without_advancing_again(): void
     {
         $admin = User::factory()->create();
-        $report = Report::factory()->create(['status' => ReportStatus::Received]);
+        $report = Report::factory()->assignedTo($admin)->create(['status' => ReportStatus::Received]);
 
         $response = $this->from(route('admin.pengaduan.detail', $report))
             ->actingAs($admin)

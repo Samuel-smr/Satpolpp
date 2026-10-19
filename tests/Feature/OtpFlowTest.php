@@ -25,7 +25,7 @@ class OtpFlowTest extends TestCase
         $response = $this->postJson(route('pelapor.otp.send'), ['telepon' => '082233445566']);
 
         $response->assertOk()
-            ->assertJsonPath('message', 'Kode OTP berhasil dikirim ke nomor WhatsApp Anda.')
+            ->assertJsonPath('message', 'Kode Verifikasi berhasil dikirim ke nomor WhatsApp Anda.')
             ->assertJsonStructure(['message', 'debug_code']);
 
         $stored = Cache::get('sipraja_otp:code:'.hash('sha256', '6282233445566'));
@@ -56,7 +56,7 @@ class OtpFlowTest extends TestCase
 
         $this->postJson(route('pelapor.otp.send'), ['telepon' => '082233445577'])
             ->assertStatus(429)
-            ->assertJsonPath('message', 'Mohon tunggu 60 detik sebelum meminta kode OTP kembali.');
+            ->assertJsonPath('message', 'Mohon tunggu 60 detik sebelum meminta kode verifikasi kembali.');
     }
 
     public function test_verifying_otp_marks_phone_as_verified(): void
@@ -77,7 +77,7 @@ class OtpFlowTest extends TestCase
         for ($attempt = 0; $attempt < 5; $attempt++) {
             $this->postJson(route('pelapor.otp.verify'), ['telepon' => '085511223355', 'kode' => '000000'])
                 ->assertStatus(422)
-                ->assertJsonPath('message', 'Kode OTP salah atau sudah kedaluwarsa.');
+                ->assertJsonPath('message', 'Kode Verifikasi salah atau sudah kedaluwarsa.');
         }
 
         $this->postJson(route('pelapor.otp.verify'), ['telepon' => '085511223355', 'kode' => '123456'])

@@ -12,7 +12,6 @@ use App\UserRole;
 use App\UserStatus;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -94,7 +93,6 @@ class DevelopmentSeeder extends Seeder
                 'source_platform' => ReportSourcePlatform::Website->value,
                 'reporter_name' => 'Budi Santoso',
                 'reporter_phone' => '081234567890',
-                'reporter_nik' => Crypt::encryptString('3401010101010001'),
                 'description' => 'Pedagang kaki lima menutup akses trotoar dan mengganggu pengguna jalan.',
                 'location_address' => 'Pasar Wates, Kabupaten Kulon Progo',
                 'latitude' => -7.8578000,
@@ -120,7 +118,6 @@ class DevelopmentSeeder extends Seeder
                 'source_platform' => ReportSourcePlatform::WhatsApp->value,
                 'reporter_name' => 'Siti Rahma',
                 'reporter_phone' => '081298765432',
-                'reporter_nik' => Crypt::encryptString('3401010202020002'),
                 'description' => 'Tumpukan sampah mengganggu ketertiban dan kebersihan area umum.',
                 'location_address' => 'Alun-alun Wates, Kabupaten Kulon Progo',
                 'latitude' => -7.8591000,

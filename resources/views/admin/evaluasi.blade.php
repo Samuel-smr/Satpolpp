@@ -107,6 +107,7 @@
                                     <p class="mt-0.5 text-xs">{{ $evaluation->evaluatedByUser?->name ?? '-' }}</p>
                                 </td>
                                 <td class="px-6 py-3.5 text-right">
+                                    @can('evaluate-activity', $evaluation)
                                     <div class="flex items-center justify-end gap-1">
                                         <button type="button"
                                             onclick="bukaEditEvaluasi(@js([
@@ -130,6 +131,9 @@
                                             </button>
                                         </form>
                                     </div>
+                                    @else
+                                        <span class="text-xs text-slate-400">Lihat saja</span>
+                                    @endcan
                                 </td>
                             </tr>
                         @endforeach

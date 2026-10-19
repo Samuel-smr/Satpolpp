@@ -108,7 +108,7 @@
 
                 @php
                     $steps = [
-                        ['1', '💬', 'Verifikasi WhatsApp', 'Masukkan nomor HP lalu ketik kode OTP 6 digit'],
+                        ['1', '💬', 'Verifikasi WhatsApp', 'Masukkan nomor HP lalu ketik kode verifikasi 6 digit'],
                         ['2', '📝', 'Isi Detail & Lokasi', 'Deskripsi kejadian, lokasi, dan foto bukti'],
                         ['3', '📤', 'Kirim Laporan', 'Centang pernyataan lalu simpan kode laporan'],
                         ['4', '📊', 'Pantau Status', 'Cek perkembangan dan isi survei kepuasan'],

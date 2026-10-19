@@ -6,7 +6,6 @@ use App\Services\WhatsAppService;
 use App\Support\Employee;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
 abstract class TestCase extends BaseTestCase
@@ -52,13 +51,11 @@ abstract class TestCase extends BaseTestCase
         return collect(range(1, $count))->map(fn (): Employee => $this->employee($attributes));
     }
 
-    /** Menandai nomor telepon sebagai sudah diverifikasi OTP di cache. */
+    /** Menandai nomor telepon sebagai sudah diverifikasi OTP dalam sesi pengujian. */
     protected function verifyPhoneOtp(string $phone): void
     {
-        Cache::put(
-            'sipraja_otp:verified:'.hash('sha256', app(WhatsAppService::class)->normalizePhone($phone)),
-            true,
-            now()->addMinutes(15),
-        );
+        $this->withSession([
+            'sipraja_otp.verified.'.hash('sha256', app(WhatsAppService::class)->normalizePhone($phone)) => now()->addMinutes(15)->timestamp,
+        ]);
     }
 }

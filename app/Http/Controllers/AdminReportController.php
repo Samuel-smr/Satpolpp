@@ -9,11 +9,13 @@ use App\Models\User;
 use App\Notifications\NewReportNotification;
 use App\ReportStatus;
 use App\ReportType;
+use App\Support\DataYear;
 use App\UserRole;
 use App\UserStatus;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -30,6 +32,7 @@ class AdminReportController extends Controller
 
     public function store(StoreAdminReportRequest $request): RedirectResponse
     {
+        app(DataYear::class)->ensureCurrentYear();
         $validated = $request->validated();
         $storedEvidence = [];
 
@@ -60,7 +63,6 @@ class AdminReportController extends Controller
                     'source_platform' => $validated['source_platform'] ?? null,
                     'reporter_name' => $validated['reporter_name'] ?? null,
                     'reporter_phone' => $validated['reporter_phone'],
-                    'reporter_nik' => $validated['reporter_nik'] ?? null,
                     'description' => $validated['description'],
                     'location_address' => $validated['location_address'],
                     'latitude' => $validated['latitude'],
@@ -94,7 +96,7 @@ class AdminReportController extends Controller
         }
 
         $administrators = User::query()
-            ->where('role', UserRole::Admin)
+            ->whereIn('role', [UserRole::Admin, UserRole::SuperAdmin])
             ->where('status', UserStatus::Active)
             ->get();
         Notification::send($administrators, new NewReportNotification($report));
@@ -104,11 +106,15 @@ class AdminReportController extends Controller
 
     public function destroy(Request $request, Report $report): RedirectResponse
     {
+        Gate::authorize('manage-report', $report);
+
         DB::transaction(function () use ($request, $report): void {
             $lockedReport = Report::query()
                 ->whereKey($report->getKey())
                 ->lockForUpdate()
                 ->firstOrFail();
+
+            Gate::authorize('manage-report', $lockedReport);
 
             $lockedReport->delete();
 

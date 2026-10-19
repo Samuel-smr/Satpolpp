@@ -50,23 +50,24 @@ class PelaporController extends Controller
 
         if ($code === false) {
             return response()->json([
-                'message' => 'Mohon tunggu 60 detik sebelum meminta kode OTP kembali.',
+                'message' => 'Mohon tunggu 60 detik sebelum meminta kode verifikasi kembali.',
             ], 429);
         }
 
         $sent = $otp->send($validated['telepon'], $code);
+        $allowDebugCode = config('app.debug') && app()->environment('local', 'testing');
 
-        if ($sent === false && ! config('app.debug')) {
+        if ($sent === false && ! $allowDebugCode) {
             $otp->forget($validated['telepon']);
 
             return response()->json([
-                'message' => 'Gagal mengirim kode OTP. Coba lagi beberapa saat.',
+                'message' => 'Gagal mengirim kode verifikasi. Coba lagi beberapa saat.',
             ], 503);
         }
 
         return response()->json([
-            'message' => 'Kode OTP berhasil dikirim ke nomor WhatsApp Anda.',
-            ...(config('app.debug') ? ['debug_code' => $code] : []),
+            'message' => 'Kode Verifikasi berhasil dikirim ke nomor WhatsApp Anda.',
+            ...($allowDebugCode ? ['debug_code' => $code] : []),
         ]);
     }
 
@@ -81,7 +82,7 @@ class PelaporController extends Controller
 
         return $verified
             ? response()->json(['message' => 'Nomor berhasil diverifikasi.'])
-            : response()->json(['message' => 'Kode OTP salah atau sudah kedaluwarsa.'], 422);
+            : response()->json(['message' => 'Kode Verifikasi salah atau sudah kedaluwarsa.'], 422);
     }
 
     public function store(StoreGuestReportRequest $request): RedirectResponse
@@ -117,7 +118,6 @@ class PelaporController extends Controller
                     'source_platform' => 'website',
                     'reporter_name' => null,
                     'reporter_phone' => $validated['telepon'],
-                    'reporter_nik' => null,
                     'description' => $validated['deskripsi'],
                     'location_address' => $validated['lokasi'],
                     'latitude' => null,
@@ -152,7 +152,7 @@ class PelaporController extends Controller
         }
 
         $administrators = User::query()
-            ->where('role', UserRole::Admin)
+            ->whereIn('role', [UserRole::Admin, UserRole::SuperAdmin])
             ->where('status', UserStatus::Active)
             ->get();
         Notification::send($administrators, new NewReportNotification($report));

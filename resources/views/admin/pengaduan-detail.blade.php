@@ -19,7 +19,7 @@
 
     <a href="{{ route($reportBackRoute ?? 'admin.pengaduan') }}" class="inline-flex items-center gap-2 text-sidebar-active font-medium hover:underline mb-6">
         <span class="material-symbols-outlined text-[18px]">arrow_back</span>
-        <span>{{ ($reportReadOnly ?? false) ? 'Kembali ke daftar kegiatan' : 'Kembali ke daftar pengaduan' }}</span>
+        <span>Kembali ke daftar pengaduan</span>
     </a>
 
     @if (session('status'))
@@ -37,6 +37,32 @@
             </ul>
         </div>
     @endif
+
+    <section class="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 class="font-headline font-bold text-slate-800">Penanggung Jawab</h2>
+        <p class="mt-2 text-sm text-slate-600">{{ $report->assignedAdmin ? $report->assignedAdmin->name.' ('.$report->assignedAdmin->username.')' : 'Belum ditugaskan' }}</p>
+        @if ($isSuperAdmin)
+            <form method="POST" action="{{ route('super_admin.pengaduan.assignment.update', $report) }}" class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
+                @csrf
+                @method('PATCH')
+                <div class="flex-1">
+                    <label for="assigned-admin" class="mb-1 block text-sm font-medium text-slate-700">Admin penanggung jawab</label>
+                    <select id="assigned-admin" name="assigned_admin_id" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm">
+                        <option value="">Belum ditugaskan</option>
+                        @foreach ($assignableAdmins as $admin)
+                            <option value="{{ $admin->id }}" @selected((string) old('assigned_admin_id', $report->assigned_admin_id) === (string) $admin->id)>{{ $admin->name }} ({{ $admin->username }})</option>
+                        @endforeach
+                    </select>
+                    @if ($report->assignedAdmin?->status === \App\UserStatus::Blocked)
+                        <p class="mt-2 text-xs text-amber-700">Admin sebelumnya diblokir. Pilih admin aktif untuk melanjutkan penanganan.</p>
+                    @endif
+                </div>
+                <button type="submit" class="rounded-xl bg-sidebar-active px-4 py-2.5 text-sm font-semibold text-white hover:bg-sidebar-hover">Simpan Penugasan</button>
+            </form>
+        @elseif ($reportReadOnly)
+            <p class="mt-2 text-sm text-amber-700">Anda dapat melihat laporan ini. Perubahan hanya dapat dilakukan oleh admin penanggung jawab.</p>
+        @endif
+    </section>
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div class="space-y-6 lg:col-span-2">
@@ -67,10 +93,6 @@
                     <div>
                         <dt class="text-slate-400">Nomor telepon</dt>
                         <dd class="font-medium text-slate-800">{{ $report->reporter_phone }}</dd>
-                    </div>
-                    <div>
-                        <dt class="text-slate-400">NIK</dt>
-                        <dd class="font-medium text-slate-800">{{ $report->maskedReporterNik() ?? 'Tidak dicantumkan' }}</dd>
                     </div>
                     <div>
                         <dt class="text-slate-400">Latitude</dt>
@@ -232,7 +254,7 @@
                             </div>
                             <div>
                                 <label for="activity_date" class="mb-1.5 block text-sm font-semibold text-slate-700">Tanggal pelaksanaan</label>
-                                <input id="activity_date" name="activity_date" type="date" max="{{ now()->toDateString() }}" required value="{{ old('activity_date', now()->toDateString()) }}" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:border-sidebar-active focus:outline-none focus:ring-1 focus:ring-sidebar-active">
+                                <input id="activity_date" name="activity_date" type="date" min="{{ app(\App\Support\DataYear::class)->start()->toDateString() }}" max="{{ app(\App\Support\DataYear::class)->referenceDate()->toDateString() }}" required value="{{ old('activity_date', app(\App\Support\DataYear::class)->referenceDate()->toDateString()) }}" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:border-sidebar-active focus:outline-none focus:ring-1 focus:ring-sidebar-active">
                             </div>
                             <div>
                                 <label for="start_time" class="mb-1.5 block text-sm font-semibold text-slate-700">Waktu mulai (opsional)</label>
@@ -412,8 +434,8 @@
             <div class="sticky top-24 rounded-2xl border bg-slate-800 p-6 text-white shadow-sm">
                 <h2 class="font-headline font-bold mb-2">Tindak Lanjut</h2>
                 @if ($reportReadOnly ?? false)
-                    <p class="text-sm text-slate-300">Detail laporan ini ditampilkan dalam mode baca-saja untuk Super Admin.</p>
-                    <a href="{{ route('super_admin.kegiatan', ['type' => 'external']) }}" class="mt-5 block w-full rounded-xl bg-white/10 py-2.5 text-center font-medium text-white hover:bg-white/20">Kembali ke Kegiatan</a>
+                    <p class="text-sm text-slate-300">Laporan ini ditampilkan dalam mode baca-saja. Hanya admin penanggung jawab yang dapat memproses laporan ini.</p>
+
                 @elseif ($report->status->nextProcessingStatus() !== null)
                     <p class="text-sm text-slate-300">
                         Lanjutkan ke status <strong class="text-white">{{ $report->status->nextProcessingStatus()->label() }}</strong>.

@@ -124,18 +124,11 @@ for (const role of ['admin', 'super_admin']) {
         sandbox.document.querySelector = () => null;
         sandbox.document.createElement = () => ({ remove() { removed++; } });
         sandbox.document.head = { appendChild(script) { scripts.push(script); } };
-        const source = read('resources/views/' + role + '/kegiatan.blade.php');
-        if (role === 'admin') {
-            const start = source.indexOf('            const loadScript =');
-            const end = source.indexOf('            const dateLabel =', start);
-            assert.ok(start >= 0 && end > start);
-            vm.runInContext(source.slice(start, end).replace('const loadScript =', 'globalThis.loadScript ='), sandbox);
-        } else {
-            const start = source.indexOf('                loadScript(src');
-            const end = source.indexOf('                getPdfReport', start);
-            assert.ok(start >= 0 && end > start);
-            vm.runInContext('globalThis.loadScript = ({' + source.slice(start, end) + '}).loadScript;', sandbox);
-        }
+        const source = read('resources/views/admin/kegiatan.blade.php');
+        const start = source.indexOf('            const loadScript =');
+        const end = source.indexOf('            const dateLabel =', start);
+        assert.ok(start >= 0 && end > start);
+        vm.runInContext(source.slice(start, end).replace('const loadScript =', 'globalThis.loadScript ='), sandbox);
         const failed = sandbox.loadScript('https://example.test/library.js', 'sha384-test');
         assert.equal(scripts[0].integrity, 'sha384-test');
         assert.equal(scripts[0].crossOrigin, 'anonymous');

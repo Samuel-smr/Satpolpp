@@ -9,6 +9,7 @@ use App\ReportSource;
 use App\ReportSourcePlatform;
 use App\ReportStatus;
 use App\ReportType;
+use Illuminate\Encryption\Encrypter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -18,16 +19,13 @@ class InitialDomainSchemaTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_guest_report_is_owned_by_the_browser_identity_and_encrypts_the_nik(): void
+    public function test_guest_report_is_owned_by_the_browser_identity(): void
     {
         $guestAccess = GuestAccess::factory()->create();
-        $plainNik = '3401010101010001';
 
         $report = Report::factory()
             ->for($guestAccess)
-            ->create(['reporter_nik' => $plainNik]);
-
-        $storedNik = DB::table('reports')->where('id', $report->id)->value('reporter_nik');
+            ->create();
 
         $this->assertTrue($report->guestAccess->is($guestAccess));
         $this->assertNull($report->createdByUser);
@@ -35,8 +33,6 @@ class InitialDomainSchemaTest extends TestCase
         $this->assertSame(ReportSource::Online, $report->source);
         $this->assertSame(ReportSourcePlatform::Website, $report->source_platform);
         $this->assertSame(ReportStatus::Submitted, $report->status);
-        $this->assertSame($plainNik, $report->reporter_nik);
-        $this->assertNotSame($plainNik, $storedNik);
     }
 
     public function test_obsolete_domain_tables_and_officer_foreign_keys_are_removed(): void
@@ -58,5 +54,27 @@ class InitialDomainSchemaTest extends TestCase
         $this->assertNull($report->guestAccess);
         $this->assertSame(ReportSource::Offline, $report->source);
         $this->assertNull($report->source_platform);
+    }
+
+    public function test_legacy_encrypted_nik_does_not_block_assignment_and_can_be_removed_without_losing_the_report(): void
+    {
+        $migration = require database_path('migrations/2026_10_19_125442_remove_reporter_nik_from_reports_table.php');
+        $migration->down();
+        $report = Report::factory()->create(['description' => 'Laporan lama tetap dipertahankan.']);
+        $legacyEncrypter = new Encrypter(str_repeat('x', 32), 'AES-256-CBC');
+        DB::table('reports')->where('id', $report->id)->update(['reporter_nik' => $legacyEncrypter->encryptString('3401010101010001')]);
+        $superAdmin = User::factory()->superAdmin()->create();
+        $admin = User::factory()->create();
+
+        $this->actingAs($superAdmin)->get(route('super_admin.pengaduan.detail', $report))
+            ->assertOk()->assertSeeText($report->description)->assertDontSeeText('NIK');
+        $this->patch(route('super_admin.pengaduan.assignment.update', $report), ['assigned_admin_id' => $admin->id])
+            ->assertRedirectToRoute('super_admin.pengaduan.detail', $report);
+
+        $migration->up();
+
+        $this->get(route('super_admin.pengaduan.detail', $report))->assertOk()->assertSeeText($admin->name);
+        $this->assertDatabaseHas('reports', ['id' => $report->id, 'code' => $report->code, 'description' => $report->description, 'assigned_admin_id' => $admin->id]);
+        $this->assertArrayNotHasKey('reporter_nik', $report->fresh()->getAttributes());
     }
 }

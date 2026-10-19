@@ -8,6 +8,7 @@ use App\Models\ActivityTemplate;
 use App\Models\Archive;
 use App\Models\ArchiveFile;
 use App\Models\AuditLog;
+use App\Support\DataYear;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -33,7 +34,7 @@ class ArchiveController extends Controller
             'category' => ['nullable', 'string', 'max:255'],
         ]);
 
-        $archives = Archive::query()
+        $archives = Archive::query()->forDataYear()
             ->with(['createdByUser:id,name', 'files' => fn ($query) => $query->oldest('id')])
             ->when($filters['search'] ?? null, function ($query, string $search): void {
                 $query->where(function ($searchQuery) use ($search): void {
@@ -47,15 +48,15 @@ class ArchiveController extends Controller
             ->paginate(12)
             ->withQueryString();
 
-        $summary = Archive::query()
+        $summary = Archive::query()->forDataYear()
             ->selectRaw('COUNT(*) as total')
             ->selectRaw('SUM(CASE WHEN confidentiality = ? THEN 1 ELSE 0 END) as confidential', [ArchiveConfidentiality::Confidential->value])
             ->first();
-        $mediaCount = Archive::query()->whereHas('files', fn ($query) => $query->whereIn('file_extension', self::MEDIA_EXTENSIONS))->count();
+        $mediaCount = Archive::query()->forDataYear()->whereHas('files', fn ($query) => $query->whereIn('file_extension', self::MEDIA_EXTENSIONS))->count();
 
         $editingArchiveId = (int) $request->old('archive_context_id', 0);
         $editingArchive = $editingArchiveId > 0
-            ? Archive::query()->with('files')->find($editingArchiveId)
+            ? Archive::query()->forDataYear()->with('files')->find($editingArchiveId)
             : null;
 
         return view('admin.arsip', [
@@ -79,6 +80,7 @@ class ArchiveController extends Controller
 
     public function store(UpsertArchiveRequest $request): RedirectResponse
     {
+        app(DataYear::class)->ensureCurrentYear();
         /** @var list<UploadedFile> $files */
         $files = $request->file('files', []);
         $storedFiles = [];
@@ -131,7 +133,7 @@ class ArchiveController extends Controller
             }
 
             DB::transaction(function () use ($request, $archive, $storedFiles): void {
-                $archive = Archive::query()->whereKey($archive->id)->lockForUpdate()->firstOrFail();
+                $archive = Archive::query()->forDataYear()->whereKey($archive->id)->lockForUpdate()->firstOrFail();
                 if ($archive->files()->count() + count($storedFiles) > 5) {
                     throw ValidationException::withMessages(['files' => 'Jumlah file dalam satu arsip maksimal lima file.']);
                 }

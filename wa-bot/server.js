@@ -69,7 +69,10 @@ app.post('/send', checkToken, async (req, res) => {
     if (!client.info || !ready) {
         return res.status(503).json({ status: false, reason: 'BOT_BELUM_SIAP', ready });
     }
-    if (!target || !message) {
+    if (
+        typeof target !== 'string' || !/^\+?[0-9][0-9\s-]{8,18}$/.test(target)
+        || typeof message !== 'string' || message.trim() === '' || message.length > 5000
+    ) {
         return res.status(400).json({ status: false, reason: 'TARGET_ATAU_PESAN_KOSONG' });
     }
 
@@ -92,7 +95,7 @@ app.post('/send', checkToken, async (req, res) => {
         return res.json({ status: true, messageId: sent?.id?.id ?? null, number });
     } catch (error) {
         console.error('Send error:', error);
-        return res.status(422).json({ status: false, reason: error.message || 'GAGAL_KIRIM', stack: error.stack });
+        return res.status(422).json({ status: false, reason: 'GAGAL_KIRIM' });
     }
 });
 
@@ -137,7 +140,7 @@ process.on('uncaughtException', (error) => {
     console.error('Ada uncaught exception:', error.message);
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '127.0.0.1', () => {
     console.log(`WA Bot HTTP API berjalan di port ${PORT}`);
 
     if (!BOT_TOKEN) {

@@ -12,11 +12,13 @@ use App\Models\User;
 use App\ReportStatus;
 use App\Services\EprofilService;
 use App\Services\WhatsAppService;
+use App\Support\DataYear;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -27,6 +29,8 @@ class CompleteReportController extends Controller
 {
     public function store(Request $request, Report $report, EprofilService $eprofil): RedirectResponse
     {
+        Gate::authorize('manage-report', $report);
+
         $validated = $this->validateCompletion($request, $eprofil);
         $storedEvidence = [];
 
@@ -41,6 +45,8 @@ class CompleteReportController extends Controller
                     ->whereKey($report->getKey())
                     ->lockForUpdate()
                     ->firstOrFail();
+
+                Gate::authorize('manage-report', $lockedReport);
 
                 if ($lockedReport->status !== ReportStatus::from($validated['current_status'])) {
                     throw ValidationException::withMessages([
@@ -170,13 +176,13 @@ class CompleteReportController extends Controller
                 Rule::exists('activity_templates', 'id')->where(fn (Builder $query): Builder => $query->where('is_active', true)),
             ],
             'name' => ['required', 'string', 'max:255'],
-            'activity_date' => ['required', 'date', 'before_or_equal:today'],
+            'activity_date' => ['required', 'date', 'before_or_equal:today', ...app(DataYear::class)->dateRules()],
             'start_time' => ['nullable', 'date_format:H:i'],
             'description' => ['nullable', 'string', 'max:5000'],
             'handling_result' => ['required', 'string', 'max:5000'],
             'findings' => ['nullable', 'array', 'max:50'],
             'findings.*.type' => ['required', Rule::enum(FindingType::class)],
-            'findings.*.quantity' => ['required', 'integer', 'min:1'],
+            'findings.*.quantity' => ['required', 'integer', 'min:1', 'max:4294967295'],
             'findings.*.unit' => ['required', Rule::enum(FindingUnit::class)],
             'location_address' => ['required', 'string', 'max:2000'],
             'latitude' => ['required', 'numeric', 'between:-90,90'],
@@ -200,6 +206,7 @@ class CompleteReportController extends Controller
             'findings.*.quantity.required' => 'Jumlah pada setiap temuan wajib diisi.',
             'findings.*.quantity.integer' => 'Jumlah temuan harus berupa angka bulat.',
             'findings.*.quantity.min' => 'Jumlah temuan minimal satu.',
+            'findings.*.quantity.max' => 'Jumlah temuan maksimal 4.294.967.295.',
             'findings.*.unit.required' => 'Satuan pada setiap temuan wajib dipilih.',
             'findings.*.unit.enum' => 'Satuan temuan tidak valid.',
             'employee_nips.required' => 'Pilih minimal satu petugas.',

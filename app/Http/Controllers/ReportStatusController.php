@@ -10,6 +10,7 @@ use App\Services\WhatsAppService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
@@ -17,6 +18,8 @@ class ReportStatusController extends Controller
 {
     public function update(Request $request, Report $report): RedirectResponse
     {
+        Gate::authorize('manage-report', $report);
+
         $validated = $request->validate([
             'current_status' => ['required', 'string', Rule::enum(ReportStatus::class)],
             'note' => ['nullable', 'string', 'max:1000'],
@@ -34,6 +37,8 @@ class ReportStatusController extends Controller
                 ->whereKey($report->getKey())
                 ->lockForUpdate()
                 ->firstOrFail();
+
+            Gate::authorize('manage-report', $lockedReport);
 
             $previousStatus = $lockedReport->status;
 
@@ -85,6 +90,8 @@ class ReportStatusController extends Controller
 
     public function reject(Request $request, Report $report): RedirectResponse
     {
+        Gate::authorize('manage-report', $report);
+
         $validated = $request->validate([
             'current_status' => ['required', 'string', Rule::enum(ReportStatus::class)],
             'alasan_tolak' => ['required', 'string', 'max:1000'],
@@ -103,6 +110,8 @@ class ReportStatusController extends Controller
                 ->whereKey($report->getKey())
                 ->lockForUpdate()
                 ->firstOrFail();
+
+            Gate::authorize('manage-report', $lockedReport);
 
             $previousStatus = $lockedReport->status;
 

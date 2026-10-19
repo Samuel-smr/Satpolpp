@@ -144,6 +144,10 @@
             </div>
         </div>
         <div class="w-full max-w-md mx-auto">
+            <a href="{{ route('pelapor.index') }}" class="mb-8 inline-flex items-center gap-2 rounded-lg py-2 text-sm font-semibold text-primary transition-colors hover:text-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
+                <span class="material-symbols-outlined text-[20px]" aria-hidden="true">arrow_back</span>
+                Kembali ke Beranda
+            </a>
             <div class="mb-10 text-center md:text-left">
                 <h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-2">Masuk ke Portal</h2>
                 <p class="font-body-md text-body-md text-on-surface-variant">Silakan masukkan kredensial Anda untuk melanjutkan.</p>

@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateActivityEvaluationRequest;
 use App\Models\Activity;
 use App\Models\ActivityTemplate;
 use App\Models\AuditLog;
+use App\Models\Report;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -32,7 +33,7 @@ class ActivityEvaluationController extends Controller
         ]);
         $search = addcslashes($filters['search'] ?? '', '%_\\');
 
-        $evaluations = Activity::query()
+        $evaluations = Activity::query()->forDataYear()
             ->whereNotNull('evaluated_at')
             ->when($search !== '', fn ($query) => $query->where(function ($nestedQuery) use ($search): void {
                 $nestedQuery->where('name', 'like', "%{$search}%")
@@ -47,13 +48,14 @@ class ActivityEvaluationController extends Controller
             })
             ->when($filters['date_start'] ?? null, fn ($query, string $date) => $query->whereDate('evaluated_at', '>=', $date))
             ->when($filters['date_end'] ?? null, fn ($query, string $date) => $query->whereDate('evaluated_at', '<=', $date))
-            ->with(['report:id,code', 'evaluatedByUser:id,name'])
+            ->with(['report:id,code,assigned_admin_id', 'evaluatedByUser:id,name'])
             ->latest('evaluated_at')
             ->paginate(15)
             ->withQueryString();
 
-        $availableActivities = Activity::query()
+        $availableActivities = Activity::query()->forDataYear()
             ->whereNull('evaluated_at')
+            ->where(fn ($query) => $query->whereNull('report_id')->orWhereHas('report', fn ($reports) => $reports->where('assigned_admin_id', $request->user()->id)))
             ->where(function ($query): void {
                 $query->where('type', ActivityType::Internal)
                     ->orWhere(function ($externalQuery): void {
@@ -61,12 +63,12 @@ class ActivityEvaluationController extends Controller
                             ->whereNotNull('report_id');
                     });
             })
-            ->with('report:id,code')
+            ->with('report:id,code,assigned_admin_id')
             ->orderByDesc('activity_date')
             ->orderByDesc('id')
             ->get();
 
-        $summary = Activity::query()
+        $summary = Activity::query()->forDataYear()
             ->whereNotNull('evaluated_at')
             ->toBase()
             ->selectRaw('COUNT(*) as total')
@@ -77,7 +79,7 @@ class ActivityEvaluationController extends Controller
 
         $editingEvaluationId = (int) $request->old('evaluation_context_id', 0);
         $editingEvaluation = $editingEvaluationId > 0
-            ? Activity::query()->whereNotNull('evaluated_at')->find($editingEvaluationId)
+            ? Activity::query()->forDataYear()->whereNotNull('evaluated_at')->find($editingEvaluationId)
             : null;
 
         $availableCategories = ActivityTemplate::query()
@@ -107,7 +109,8 @@ class ActivityEvaluationController extends Controller
         $user = $request->user();
 
         DB::transaction(function () use ($validated, $user, $request): void {
-            $activity = Activity::query()->lockForUpdate()->findOrFail($validated['activity_id']);
+            $activity = Activity::query()->forDataYear()->lockForUpdate()->findOrFail($validated['activity_id']);
+            $this->authorizeEvaluation($activity);
 
             if ($activity->evaluated_at !== null) {
                 abort(422, 'Kegiatan ini sudah memiliki evaluasi.');
@@ -141,11 +144,14 @@ class ActivityEvaluationController extends Controller
 
     public function update(UpdateActivityEvaluationRequest $request, Activity $activity): RedirectResponse
     {
+        Gate::authorize('evaluate-activity', $activity);
         $validated = $request->safe()->only(['evaluation_notes', 'evaluation_obstacles']);
         $user = $request->user();
 
         DB::transaction(function () use ($activity, $validated, $user, $request): void {
-            $lockedActivity = Activity::query()->lockForUpdate()->findOrFail($activity->id);
+            $lockedActivity = Activity::query()->forDataYear()->lockForUpdate()->findOrFail($activity->id);
+
+            $this->authorizeEvaluation($lockedActivity);
 
             if ($lockedActivity->evaluated_at === null) {
                 throw new NotFoundHttpException;
@@ -179,9 +185,12 @@ class ActivityEvaluationController extends Controller
     public function destroy(Request $request, Activity $activity): RedirectResponse
     {
         Gate::authorize('access-admin');
+        Gate::authorize('evaluate-activity', $activity);
 
         DB::transaction(function () use ($activity, $request): void {
-            $lockedActivity = Activity::query()->lockForUpdate()->findOrFail($activity->id);
+            $lockedActivity = Activity::query()->forDataYear()->lockForUpdate()->findOrFail($activity->id);
+
+            $this->authorizeEvaluation($lockedActivity);
 
             if ($lockedActivity->evaluated_at === null) {
                 throw new NotFoundHttpException;
@@ -211,6 +220,15 @@ class ActivityEvaluationController extends Controller
         });
 
         return redirect()->route('admin.evaluasi')->with('status', 'Evaluasi kegiatan berhasil dihapus.');
+    }
+
+    private function authorizeEvaluation(Activity $activity): void
+    {
+        if ($activity->report_id !== null) {
+            $activity->setRelation('report', Report::query()->lockForUpdate()->find($activity->report_id));
+        }
+
+        Gate::authorize('evaluate-activity', $activity);
     }
 
     /** @param array<string, mixed>|null $oldValues */

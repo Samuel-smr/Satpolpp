@@ -6,6 +6,7 @@ use App\Models\Activity;
 use App\Models\Report;
 use App\Models\User;
 use App\Services\WhatsAppService;
+use App\Support\DataYear;
 use App\UserRole;
 use App\UserStatus;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -36,7 +37,8 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('guest-feedback', fn (Request $request): Limit => Limit::perMinute(10)->by($request->ip()));
         RateLimiter::for('login-ip', fn (Request $request): Limit => Limit::perMinute(20)->by($request->ip()));
         RateLimiter::for('otp-request', function (Request $request): array {
-            $phone = (string) $request->input('telepon', '');
+            $phoneInput = $request->input('telepon');
+            $phone = is_string($phoneInput) ? $phoneInput : '';
             $limits = [
                 Limit::perMinute(8)->by('ip:'.$request->ip()),
                 Limit::perHour(15)->by('ip-hour:'.$request->ip()),
@@ -48,7 +50,7 @@ class AppServiceProvider extends ServiceProvider
 
             foreach ($limits as $limit) {
                 $limit->response(fn (Request $request, array $headers): JsonResponse => response()->json([
-                    'message' => 'Terlalu banyak permintaan kode OTP. Coba lagi nanti.',
+                    'message' => 'Terlalu banyak permintaan kode verifikasi. Coba lagi nanti.',
                 ], 429, $headers));
             }
 
@@ -84,13 +86,23 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('access-internal', fn (User $user): bool => $user->can('access-admin')
             || $user->can('access-super-admin'));
 
+        Gate::define('manage-report', fn (User $user, Report $report): bool => $user->can('access-admin')
+            && $report->assigned_admin_id !== null
+            && (int) $report->assigned_admin_id === $user->id);
+
+        Gate::define('evaluate-activity', fn (User $user, Activity $activity): bool => $user->can('access-admin')
+            && ($activity->report_id === null || ($activity->report !== null && $user->can('manage-report', $activity->report))));
+
         View::composer(['layouts.admin', 'layouts.super_admin'], function ($view): void {
             $user = request()->user();
-            $databaseNotifications = $user?->notifications()->latest()->limit(10)->get() ?? collect();
+            $databaseNotifications = $user?->notifications()->where('created_at', '>=', app(DataYear::class)->start())->where('created_at', '<', app(DataYear::class)->end())->latest()->limit(10)->get() ?? collect();
 
             $view->with([
+                'activeDataYear' => app(DataYear::class)->selected(),
+                'availableDataYears' => app(DataYear::class)->available(),
+                'mustSelectDataYear' => ! session()->has('data_year'),
                 'layoutNotifications' => $databaseNotifications,
-                'layoutUnreadNotificationCount' => $user?->unreadNotifications()->count() ?? 0,
+                'layoutUnreadNotificationCount' => $user?->unreadNotifications()->where('created_at', '>=', app(DataYear::class)->start())->where('created_at', '<', app(DataYear::class)->end())->count() ?? 0,
             ]);
         });
     }

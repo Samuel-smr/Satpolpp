@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\ActivityType;
 use App\Http\Requests\StoreAdminUserRequest;
 use App\Http\Requests\UpdateAdminUserRequest;
 use App\Models\Activity;
@@ -11,94 +12,28 @@ use App\Models\User;
 use App\ReportCategory;
 use App\ReportStatus;
 use App\Services\EprofilService;
-use App\Support\Employee;
+use App\Support\DataYear;
 use App\UserRole;
 use App\UserStatus;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 
 class SuperAdminController extends Controller
 {
     public function dashboard(): View
     {
-        $monthStart = Carbon::now()->startOfMonth();
-        $monthEnd = Carbon::now()->endOfMonth();
 
         return view('super_admin.dashboard', [
             'systemStats' => [
                 'users' => User::query()->count(),
                 'active_officers' => app(EprofilService::class)->officers()->count(),
-                'monthly_reports' => Report::query()->whereBetween('created_at', [$monthStart, $monthEnd])->count(),
-                'monthly_activities' => Activity::query()->whereBetween('activity_date', [$monthStart->toDateString(), $monthEnd->toDateString()])->count(),
+                'yearly_reports' => Report::query()->forDataYear()->count(),
+                'yearly_activities' => Activity::query()->forDataYear()->count(),
             ],
             'logs' => $this->systemLogs(12),
             ...$this->mapDashboardData(),
         ]);
-    }
-
-    public function kegiatan(): View
-    {
-        $activities = Activity::query()
-            ->with([
-                'report:id,code',
-                'template:id,name',
-                'createdByUser:id,name',
-                'evaluatedByUser:id,name',
-                'personnel',
-                'attachments:id,attachable_type,attachable_id,original_name,mime_type,file_type,audience',
-            ])
-            ->orderByDesc('activity_date')
-            ->orderByDesc('start_time')
-            ->get()
-            ->map(fn (Activity $activity): array => [
-                'id' => $activity->id,
-                'nama' => $activity->name,
-                'tanggal' => $activity->activity_date->toDateString(),
-                'waktu' => $activity->start_time?->format('H:i'),
-                'idLaporan' => $activity->report_id,
-                'idTemplate' => $activity->activity_template_id,
-                'namaTemplate' => $activity->template?->name,
-                'dibuatOleh' => $activity->createdByUser?->name,
-                'dievaluasiOleh' => $activity->evaluatedByUser?->name,
-                'deskripsi' => $activity->description,
-                'hasil' => $activity->handling_result,
-                'kategori' => $activity->category,
-                'lokasi' => $activity->location_address,
-                'lat' => $activity->latitude,
-                'lng' => $activity->longitude,
-                'peserta' => $activity->personnel->pluck('employee_nip')->all(),
-                'jenis' => $activity->type->label(),
-                'dariLaporan' => $activity->report_id !== null,
-                'kodeLaporan' => $activity->report?->code,
-                'tindakan' => $activity->handling_result,
-                'catatanEvaluasi' => $activity->evaluation_notes,
-                'kendalaEvaluasi' => $activity->evaluation_obstacles,
-                'dievaluasiPada' => $activity->evaluated_at?->format('Y-m-d H:i:s'),
-                'dibuatPada' => $activity->created_at?->format('Y-m-d H:i:s'),
-                'diperbaruiPada' => $activity->updated_at?->format('Y-m-d H:i:s'),
-                'dihapusPada' => $activity->deleted_at?->format('Y-m-d H:i:s'),
-                'dokumentasi' => $activity->attachments
-                    ->filter(fn ($attachment): bool => $attachment->file_type === 'image'
-                        && $attachment->audience === 'internal'
-                        && in_array($attachment->mime_type, ['image/jpeg', 'image/png', 'image/webp'], true))
-                    ->map(fn ($attachment): array => [
-                        'nama' => $attachment->original_name,
-                        'url' => route('super_admin.kegiatan.attachments.show', [$activity, $attachment]),
-                    ])
-                    ->values()
-                    ->all(),
-            ]);
-        $officers = app(EprofilService::class)->officers()
-            ->map(fn (Employee $officer): array => [
-                'id' => $officer->employee_number,
-                'nama' => $officer->name,
-                'jabatan' => $officer->position ?? '-',
-                'seksi' => $officer->work_unit_name ?? '-',
-            ]);
-
-        return view('super_admin.kegiatan', compact('activities', 'officers'));
     }
 
     public function user(): View
@@ -161,12 +96,12 @@ class SuperAdminController extends Controller
 
     public function monitoring(): View
     {
-        $activityByDate = AuditLog::query()
-            ->where('created_at', '>=', now()->subDays(6)->startOfDay())
+        $activityByDate = AuditLog::query()->forDataYear()
+            ->where('created_at', '>=', app(DataYear::class)->referenceDate()->subDays(6)->startOfDay())
             ->get(['actor_user_id', 'created_at'])
             ->groupBy(fn (AuditLog $log): string => $log->created_at->toDateString());
         $chart = collect(range(6, 0))->map(function (int $daysAgo) use ($activityByDate): array {
-            $date = now()->subDays($daysAgo);
+            $date = app(DataYear::class)->referenceDate()->subDays($daysAgo);
             $dailyLogs = $activityByDate->get($date->toDateString(), collect());
 
             return [
@@ -177,9 +112,9 @@ class SuperAdminController extends Controller
         });
 
         $monitoringStats = [
-            'today' => AuditLog::query()->whereDate('created_at', today())->count(),
-            'actors' => AuditLog::query()->whereDate('created_at', today())->whereNotNull('actor_user_id')->distinct()->count('actor_user_id'),
-            'modules' => AuditLog::query()->distinct()->count('module'),
+            'today' => AuditLog::query()->forDataYear()->whereDate('created_at', app(DataYear::class)->referenceDate())->count(),
+            'actors' => AuditLog::query()->forDataYear()->whereDate('created_at', app(DataYear::class)->referenceDate())->whereNotNull('actor_user_id')->distinct()->count('actor_user_id'),
+            'modules' => AuditLog::query()->forDataYear()->distinct()->count('module'),
         ];
 
         return view('super_admin.monitoring', compact('chart', 'monitoringStats'));
@@ -188,7 +123,7 @@ class SuperAdminController extends Controller
     /** @return array<string, mixed> */
     private function mapDashboardData(): array
     {
-        $reportPoints = Report::query()
+        $reportPoints = Report::query()->forDataYear()
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
             ->latest()
@@ -204,14 +139,17 @@ class SuperAdminController extends Controller
                 'status' => $report->status->label(),
                 'date' => $report->created_at->format('d/m/Y H:i'),
             ]);
-        $activityPoints = Activity::query()
+        $activityPoints = Activity::query()->forDataYear()
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
             ->orderByDesc('activity_date')
             ->get(['id', 'name', 'type', 'description', 'location_address', 'latitude', 'longitude', 'activity_date', 'start_time'])
             ->map(fn (Activity $activity): array => [
                 'id' => 'K-'.$activity->id,
-                'type' => 'kegiatan_'.$activity->type->value,
+                'type' => match ($activity->type) {
+                    ActivityType::External => 'kegiatan_eksternal',
+                    ActivityType::Internal => 'kegiatan_internal',
+                },
                 'title' => $activity->name,
                 'desc' => $activity->description,
                 'location' => $activity->location_address,
@@ -220,14 +158,14 @@ class SuperAdminController extends Controller
                 'status' => $activity->activity_date->isFuture() ? 'Dijadwalkan' : 'Selesai',
                 'date' => trim($activity->activity_date->format('d/m/Y').' '.($activity->start_time?->format('H:i') ?? '')),
             ]);
-        $categoryCounts = Report::query()->selectRaw('category, COUNT(*) as total')->whereNotNull('category')->groupBy('category')->pluck('total', 'category');
-        $statusCounts = Report::query()->selectRaw('status, COUNT(*) as total')->groupBy('status')->pluck('total', 'status');
-        $dailyReports = Report::query()
-            ->where('created_at', '>=', now()->subDays(6)->startOfDay())
+        $categoryCounts = Report::query()->forDataYear()->selectRaw('category, COUNT(*) as total')->whereNotNull('category')->groupBy('category')->pluck('total', 'category');
+        $statusCounts = Report::query()->forDataYear()->selectRaw('status, COUNT(*) as total')->groupBy('status')->pluck('total', 'status');
+        $dailyReports = Report::query()->forDataYear()
+            ->where('created_at', '>=', app(DataYear::class)->referenceDate()->subDays(6)->startOfDay())
             ->get(['created_at'])
             ->countBy(fn (Report $report): string => $report->created_at->toDateString());
         $reportTrend = collect(range(6, 0))->map(function (int $daysAgo) use ($dailyReports): array {
-            $date = now()->subDays($daysAgo);
+            $date = app(DataYear::class)->referenceDate()->subDays($daysAgo);
 
             return ['label' => $date->translatedFormat('D'), 'total' => (int) ($dailyReports[$date->toDateString()] ?? 0)];
         });
@@ -236,7 +174,7 @@ class SuperAdminController extends Controller
             'mapPoints' => $reportPoints->concat($activityPoints)->values(),
             'mapStatistics' => [
                 'active_officers' => app(EprofilService::class)->officers()->count(),
-                'open_reports' => Report::query()->where('status', '!=', ReportStatus::Completed)->count(),
+                'open_reports' => Report::query()->forDataYear()->where('status', '!=', ReportStatus::Completed)->count(),
             ],
             'categoryChart' => collect(ReportCategory::cases())->map(fn (ReportCategory $category): array => ['label' => $category->label(), 'total' => (int) ($categoryCounts[$category->value] ?? 0)]),
             'statusChart' => collect(ReportStatus::cases())->map(fn (ReportStatus $status): array => ['label' => $status->label(), 'total' => (int) ($statusCounts[$status->value] ?? 0)]),
@@ -264,7 +202,7 @@ class SuperAdminController extends Controller
      */
     private function systemLogs(int $limit): array
     {
-        return AuditLog::query()
+        return AuditLog::query()->forDataYear()
             ->with('actorUser:id,name')
             ->latest('created_at')
             ->limit($limit)

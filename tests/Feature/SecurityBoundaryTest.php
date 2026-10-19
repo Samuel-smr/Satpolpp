@@ -124,7 +124,7 @@ class SecurityBoundaryTest extends TestCase
         $report = Report::query()->sole();
         $this->assertSame(ReportStatus::Submitted, $report->status);
         $this->assertNull($report->created_by_user_id);
-        $this->assertNull($report->reporter_nik);
+        $this->assertArrayNotHasKey('reporter_nik', $report->getAttributes());
         $this->assertNull($report->latitude);
         $this->assertNotSame(999, $report->guest_access_id);
     }

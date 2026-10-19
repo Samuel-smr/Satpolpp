@@ -33,7 +33,13 @@ class StoreActivityEvaluationRequest extends FormRequest
                     return;
                 }
 
-                $activity = Activity::query()->find($this->integer('activity_id'));
+                $activity = Activity::query()->forDataYear()->find($this->integer('activity_id'));
+
+                if ($activity === null) {
+                    $validator->errors()->add('activity_id', 'Kegiatan tidak tersedia pada tahun yang dipilih.');
+
+                    return;
+                }
 
                 if ($activity?->evaluated_at !== null) {
                     $validator->errors()->add('activity_id', 'Kegiatan ini sudah memiliki evaluasi.');

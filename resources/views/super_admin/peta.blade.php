@@ -106,6 +106,7 @@
                         </label>
                     </div>
                 </div>
+                <p class="px-4 py-3 text-xs text-slate-500">Penanda pada lokasi yang sama ditampilkan berdampingan. Klik setiap penanda untuk melihat laporan atau kegiatan yang berbeda.</p>
             </div>
 
             <!-- Kartu Peta (terpisah) -->
@@ -227,6 +228,31 @@
                     // Titik peta sudah disediakan controller dari database.
                 },
 
+                visibleMarkers() {
+                    const markers = this.mapData
+                        .filter(item => this.filters[item.type])
+                        .map(item => ({ item, offsetX: 0, offsetY: 0 }));
+                    const locations = new Map();
+
+                    markers.forEach(marker => {
+                        const key = `${Number(marker.item.lat).toFixed(7)},${Number(marker.item.lng).toFixed(7)}`;
+                        if (!locations.has(key)) locations.set(key, []);
+                        locations.get(key).push(marker);
+                    });
+
+                    locations.forEach(group => {
+                        if (group.length < 2) return;
+                        const radius = Math.max(28, 44 / (2 * Math.sin(Math.PI / group.length)));
+                        group.forEach((marker, index) => {
+                            const angle = Math.PI + (2 * Math.PI * index / group.length);
+                            marker.offsetX = Math.round(radius * Math.cos(angle));
+                            marker.offsetY = Math.round(radius * Math.sin(angle));
+                        });
+                    });
+
+                    return markers;
+                },
+
                 renderMap() {
                     // Clear existing markers and hotspots
                     this.markers.forEach(m => this.map.removeLayer(m));
@@ -250,9 +276,7 @@
                     }
 
                     // Render Markers
-                    this.mapData.forEach(item => {
-                        if (!this.filters[item.type]) return; // Skip if filtered out
-
+                    this.visibleMarkers().forEach(({ item, offsetX, offsetY }) => {
                         let iconHtml = '';
                         if (item.type === 'laporan') iconHtml = 'campaign';
                         if (item.type === 'kegiatan_eksternal') iconHtml = 'shield';
@@ -267,8 +291,8 @@
                             className: 'custom-div-icon marker-' + item.type,
                             html: `<div class="marker-pin"></div><span class="material-symbols-outlined marker-icon">${iconHtml}</span>`,
                             iconSize: [30, 42],
-                            iconAnchor: [15, 42],
-                            popupAnchor: [0, -35]
+                            iconAnchor: [15 - offsetX, 42 - offsetY],
+                            popupAnchor: [offsetX, offsetY - 35]
                         });
 
                         let popupHtml = `
@@ -297,7 +321,7 @@
                             </div>
                         `;
 
-                        let marker = L.marker([item.lat, item.lng], { icon: customIcon })
+                        let marker = L.marker([item.lat, item.lng], { icon: customIcon, title: `${typeFormatted}: ${item.title}` })
                             .bindPopup(popupHtml, {
                                 closeButton: true,
                                 offset: L.point(0, -5)
@@ -320,9 +344,9 @@
                 },
 
                 formatType(type) {
-                    if (type === 'laporan') return 'Laporan Warga';
-                    if (type === 'kegiatan_eksternal') return 'Keg. Eksternal';
-                    if (type === 'kegiatan_internal') return 'Keg. Internal';
+                    if (type === 'laporan') return 'Laporan/Aduan';
+                    if (type === 'kegiatan_eksternal') return 'Kegiatan Eksternal';
+                    if (type === 'kegiatan_internal') return 'Kegiatan Internal';
                     return type;
                 },
 

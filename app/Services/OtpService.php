@@ -87,14 +87,20 @@ class OtpService
 
         Cache::forget(self::CACHE_PREFIX.'code:'.$key);
         Cache::forget(self::CACHE_PREFIX.'attempts:'.$key);
-        Cache::put(self::CACHE_PREFIX.'verified:'.$key, true, now()->addSeconds(self::VERIFIED_TTL));
+        request()->session()->put('sipraja_otp.verified.'.$key, now()->addSeconds(self::VERIFIED_TTL)->timestamp);
 
         return true;
     }
 
     public function isVerified(string $phone): bool
     {
-        return Cache::get(self::CACHE_PREFIX.'verified:'.$this->key($this->normalize($phone))) === true;
+        if (! request()->hasSession()) {
+            return false;
+        }
+
+        $expiresAt = request()->session()->get('sipraja_otp.verified.'.$this->key($this->normalize($phone)));
+
+        return is_int($expiresAt) && $expiresAt > now()->timestamp;
     }
 
     /** Menghapus kode/percobaan agar gagal kirim tidak meninggalkan kode aktif. */

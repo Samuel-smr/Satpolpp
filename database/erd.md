@@ -38,7 +38,6 @@ erDiagram
         varchar source_platform
         varchar reporter_name
         varchar reporter_phone
-        text reporter_nik
         text description
         text location_address
         decimal latitude "10,7"

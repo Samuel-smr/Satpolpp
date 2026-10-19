@@ -19,8 +19,8 @@ class ProfileController extends Controller
         return view($this->profileView($user->role), [
             'profileUser' => $user,
             'profileStats' => [
-                'reports_created' => Report::query()->whereBelongsTo($user, 'createdByUser')->count(),
-                'activities_logged' => AuditLog::query()->whereBelongsTo($user, 'actorUser')->count(),
+                'reports_created' => Report::query()->forDataYear()->whereBelongsTo($user, 'createdByUser')->count(),
+                'activities_logged' => AuditLog::query()->forDataYear()->whereBelongsTo($user, 'actorUser')->count(),
             ],
         ]);
     }

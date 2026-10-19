@@ -6,8 +6,12 @@ use App\ActivityType;
 use App\Models\Activity;
 use App\Models\ActivityTemplate;
 use App\Models\Report;
+use App\Models\User;
 use App\ReportStatus;
 use App\Services\EprofilService;
+use App\Support\DataYear;
+use App\UserRole;
+use App\UserStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
@@ -17,9 +21,9 @@ class AdminController extends Controller
 {
     public function dashboard(Request $request): View
     {
-        $today = Carbon::today();
+        $today = app(DataYear::class)->referenceDate();
         $filters = $request->validate([
-            'period' => ['nullable', Rule::in(['1', '3', '7', 'custom'])],
+            'period' => ['nullable', Rule::in(['1', '3', '7', 'custom', 'year'])],
             'date_start' => ['nullable', 'date_format:Y-m-d', 'required_if:period,custom'],
             'date_end' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:date_start', 'required_if:period,custom'],
         ], [
@@ -29,24 +33,35 @@ class AdminController extends Controller
             'date_end.after_or_equal' => 'Tanggal akhir tidak boleh sebelum tanggal mulai.',
         ]);
 
-        $period = $filters['period'] ?? '1';
+        $dataYear = app(DataYear::class);
+        $period = $filters['period'] ?? ($dataYear->selected() === now()->year ? '1' : 'year');
         $periodStart = $period === 'custom'
             ? Carbon::createFromFormat('Y-m-d', $filters['date_start'])->startOfDay()
             : $today->copy()->subDays((int) $period - 1)->startOfDay();
         $periodEnd = $period === 'custom'
             ? Carbon::createFromFormat('Y-m-d', $filters['date_end'])->endOfDay()
             : $today->copy()->endOfDay();
+
+        if ($period === 'year') {
+            $periodStart = $dataYear->start();
+            $periodEnd = $dataYear->end()->subSecond();
+        }
+
         $periodDayCount = $periodStart->diffInDays($periodEnd) + 1;
         $periodLabel = $period === '1'
             ? 'Pengaduan Hari Ini'
             : ($period === 'custom' ? 'Pengaduan Periode Ini' : "Pengaduan {$period} Hari Terakhir");
 
-        $incomingByDate = Report::query()
+        if ($period === 'year') {
+            $periodLabel = 'Pengaduan Tahun '.$dataYear->selected();
+        }
+
+        $incomingByDate = Report::query()->forDataYear()
             ->selectRaw('DATE(created_at) as report_date, COUNT(*) as total')
             ->whereBetween('created_at', [$periodStart, $periodEnd])
             ->groupByRaw('DATE(created_at)')
             ->pluck('total', 'report_date');
-        $completedByDate = Report::query()
+        $completedByDate = Report::query()->forDataYear()
             ->selectRaw('DATE(completed_at) as report_date, COUNT(*) as total')
             ->where('status', ReportStatus::Completed)
             ->whereBetween('completed_at', [$periodStart, $periodEnd])
@@ -67,20 +82,20 @@ class AdminController extends Controller
         }
 
         $dashboardStats = [
-            'urgent_today' => Report::query()
+            'urgent_today' => Report::query()->forDataYear()
                 ->whereBetween('created_at', [$periodStart, $periodEnd])
                 ->count(),
-            'pending' => Report::query()
+            'pending' => Report::query()->forDataYear()
                 ->whereIn('status', [ReportStatus::Submitted, ReportStatus::Received, ReportStatus::Verifying])
                 ->whereBetween('created_at', [$periodStart, $periodEnd])
                 ->count(),
             'active_officers' => app(EprofilService::class)->officers()->count(),
-            'activities_this_week' => Activity::query()
+            'activities_this_week' => Activity::query()->forDataYear()
                 ->whereBetween('activity_date', [$periodStart->toDateString(), $periodEnd->toDateString()])
                 ->count(),
         ];
 
-        $latestReports = Report::query()
+        $latestReports = Report::query()->forDataYear()
             ->select(['id', 'code', 'type', 'category', 'status', 'location_address', 'created_at'])
             ->whereBetween('created_at', [$periodStart, $periodEnd])
             ->latest()
@@ -114,7 +129,7 @@ class AdminController extends Controller
             'month.date_format' => 'Format bulan pengaduan tidak valid.',
         ]);
         $search = addcslashes($filters['search'] ?? '', '%_\\');
-        $reportQuery = Report::query();
+        $reportQuery = Report::query()->forDataYear();
 
         $reportQuery
             ->when($search !== '', fn ($query) => $query->where(function ($nestedQuery) use ($search): void {
@@ -143,12 +158,14 @@ class AdminController extends Controller
                 'location_address',
                 'status',
                 'created_at',
+                'assigned_admin_id',
             ])
+            ->with('assignedAdmin:id,name,username')
             ->latest()
             ->paginate(15)
             ->withQueryString();
 
-        $reportCounts = Report::query()
+        $reportCounts = Report::query()->forDataYear()
             ->toBase()
             ->selectRaw('COUNT(*) as total')
             ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as completed', [ReportStatus::Completed->value])
@@ -159,12 +176,16 @@ class AdminController extends Controller
             'completed' => (int) $reportCounts->completed,
         ];
 
-        return view('admin.pengaduan', compact('reports', 'statistics', 'filters'));
+        $reportRoutePrefix = $request->routeIs('super_admin.*') ? 'super_admin.pengaduan' : 'admin.pengaduan';
+        $reportLayout = $request->routeIs('super_admin.*') ? 'layouts.super_admin' : 'layouts.admin';
+
+        return view('admin.pengaduan', compact('reports', 'statistics', 'filters', 'reportRoutePrefix', 'reportLayout'));
     }
 
     public function pengaduanDetail(Request $request, Report $report, EprofilService $eprofil): View
     {
         $report->load([
+            'assignedAdmin:id,name,username,status',
             'statusHistories' => fn ($query) => $query
                 ->with('changedByUser:id,name')
                 ->oldest('created_at'),
@@ -180,7 +201,7 @@ class AdminController extends Controller
         $activeOfficers = collect();
         $officerDirectoryWarning = null;
 
-        if ($report->status === ReportStatus::InProgress) {
+        if ($report->status === ReportStatus::InProgress && $request->user()->can('manage-report', $report)) {
             $activityTemplates = ActivityTemplate::query()
                 ->where('is_active', true)
                 ->orderBy('sort_order')
@@ -189,18 +210,22 @@ class AdminController extends Controller
             $officerDirectoryWarning = $eprofil->warning();
         }
 
-        $reportReadOnly = $request->routeIs('super_admin.*');
-        $reportLayout = $reportReadOnly ? 'layouts.super_admin' : 'layouts.admin';
-        $reportBackRoute = $reportReadOnly ? 'super_admin.kegiatan' : 'admin.pengaduan';
-        $activityAttachmentRoute = $reportReadOnly
+        $isSuperAdmin = $request->routeIs('super_admin.*');
+        $reportReadOnly = ! $request->user()->can('manage-report', $report);
+        $reportLayout = $isSuperAdmin ? 'layouts.super_admin' : 'layouts.admin';
+        $reportBackRoute = $isSuperAdmin ? 'super_admin.pengaduan' : 'admin.pengaduan';
+        $assignableAdmins = $isSuperAdmin ? User::query()->where('role', UserRole::Admin)->where('status', UserStatus::Active)->orderBy('name')->get(['id', 'name', 'username']) : collect();
+        $activityAttachmentRoute = $isSuperAdmin
             ? 'super_admin.kegiatan.export-attachments.show'
             : 'admin.kegiatan.export-attachments.show';
-        $reportAttachmentRoute = $reportReadOnly
+        $reportAttachmentRoute = $isSuperAdmin
             ? 'super_admin.pengaduan.attachments.show'
             : 'admin.pengaduan.attachments.show';
 
         return view('admin.pengaduan-detail', compact(
             'report',
+            'isSuperAdmin',
+            'assignableAdmins',
             'activityTemplates',
             'activeOfficers',
             'officerDirectoryWarning',
@@ -235,7 +260,7 @@ class AdminController extends Controller
         ]);
         $search = addcslashes($filters['search'] ?? '', '%_\\');
 
-        $activityQuery = Activity::query()
+        $activityQuery = Activity::query()->forDataYear()
             ->when($search !== '', fn ($query) => $query->where(function ($nestedQuery) use ($search): void {
                 $nestedQuery->where('name', 'like', "%{$search}%")
                     ->orWhere('location_address', 'like', "%{$search}%")
@@ -303,7 +328,7 @@ class AdminController extends Controller
                 'lokasi' => $activity->location_address,
                 'lintang' => $activity->latitude,
                 'bujur' => $activity->longitude,
-                'personel' => $activity->officers->map(fn ($officer): string => trim($officer->name.($officer->position ? " ({$officer->position})" : '')))->all(),
+                'personel' => $activity->officers->map(fn ($officer): string => $officer->name)->all(),
                 'catatan_evaluasi' => $activity->evaluation_notes,
                 'kendala_evaluasi' => $activity->evaluation_obstacles,
                 'waktu_evaluasi' => $activity->evaluated_at?->format('Y-m-d H:i:s'),
@@ -345,13 +370,13 @@ class AdminController extends Controller
 
     public function feedback(): View
     {
-        $feedbacks = Report::query()
+        $feedbacks = Report::query()->forDataYear()
             ->whereNotNull('feedback_submitted_at')
             ->select(['id', 'code', 'type', 'category', 'feedback_rating', 'feedback_comment', 'feedback_submitted_at'])
             ->latest('feedback_submitted_at')
             ->paginate(10)
             ->withQueryString();
-        $summary = Report::query()
+        $summary = Report::query()->forDataYear()
             ->whereNotNull('feedback_submitted_at')
             ->toBase()
             ->selectRaw('COUNT(*) as total')

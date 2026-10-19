@@ -17,8 +17,8 @@ class ActivityEvaluationTest extends TestCase
     public function test_page_lists_latest_unevaluated_external_activities_from_reports(): void
     {
         $admin = User::factory()->create();
-        $olderReport = Report::factory()->create(['code' => 'LAP-OLDER']);
-        $latestReport = Report::factory()->create(['code' => 'LAP-LATEST']);
+        $olderReport = Report::factory()->assignedTo($admin)->create(['code' => 'LAP-OLDER']);
+        $latestReport = Report::factory()->assignedTo($admin)->create(['code' => 'LAP-LATEST']);
         $olderActivity = Activity::factory()->create([
             'report_id' => $olderReport->id,
             'type' => ActivityType::External,
@@ -91,7 +91,7 @@ class ActivityEvaluationTest extends TestCase
     {
         $this->travelTo('2026-09-09 14:30:00');
         $admin = User::factory()->create();
-        $report = Report::factory()->create();
+        $report = Report::factory()->assignedTo($admin)->create();
         $activity = Activity::factory()->create([
             'report_id' => $report->id,
             'type' => ActivityType::External,
@@ -189,7 +189,7 @@ class ActivityEvaluationTest extends TestCase
     public function test_admin_can_remove_an_evaluation_without_deleting_its_activity_or_report(): void
     {
         $admin = User::factory()->create();
-        $report = Report::factory()->create();
+        $report = Report::factory()->assignedTo($admin)->create();
         $activity = Activity::factory()->create([
             'report_id' => $report->id,
             'type' => ActivityType::External,

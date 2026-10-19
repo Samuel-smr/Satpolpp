@@ -58,7 +58,7 @@ class GuestReportTest extends TestCase
         $response->assertCookie('sipraja_guest_token');
         $this->assertSame(ReportStatus::Submitted, $report->status);
         $this->assertSame(ReportType::Report, $report->type);
-        $this->assertNull($report->reporter_nik);
+        $this->assertArrayNotHasKey('reporter_nik', $report->getAttributes());
         $this->assertNull($report->category);
         $this->assertDatabaseCount('guest_accesses', 1);
         $this->assertDatabaseCount('report_status_histories', 1);
@@ -73,7 +73,7 @@ class GuestReportTest extends TestCase
             'type' => NewReportNotification::class,
             'notifiable_id' => $blockedAdmin->id,
         ]);
-        $this->assertDatabaseMissing('notifications', [
+        $this->assertDatabaseHas('notifications', [
             'type' => NewReportNotification::class,
             'notifiable_id' => $superAdmin->id,
         ]);

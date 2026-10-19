@@ -26,6 +26,7 @@
             <div>
                 <label for="period" class="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500">Periode statistik</label>
                 <select id="period" name="period" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-700 outline-none transition focus:border-sidebar-active focus:bg-white focus:ring-2 focus:ring-sidebar-active/20">
+                    <option value="year" @selected($dashboardFilters['period'] === 'year')>Seluruh tahun {{ session('data_year', now()->year) }}</option>
                     <option value="1" @selected($dashboardFilters['period'] === '1')>1 hari terakhir</option>
                     <option value="3" @selected($dashboardFilters['period'] === '3')>3 hari terakhir</option>
                     <option value="7" @selected($dashboardFilters['period'] === '7')>7 hari terakhir</option>

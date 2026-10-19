@@ -26,7 +26,7 @@ class StoreGuestReportRequest extends FormRequest
         return [
             'telepon' => ['required', 'string', 'regex:/^\+?[0-9][0-9\s-]{8,18}$/', function (string $attribute, mixed $value, Closure $fail): void {
                 if (! app(OtpService::class)->isVerified(is_string($value) ? $value : '')) {
-                    $fail('Nomor WhatsApp harus diverifikasi dengan kode OTP terlebih dahulu.');
+                    $fail('Nomor WhatsApp harus diverifikasi dengan kode verifikasi terlebih dahulu.');
                 }
             }],
             'deskripsi' => ['required', 'string', 'max:5000'],
@@ -43,7 +43,7 @@ class StoreGuestReportRequest extends FormRequest
         return [
             'telepon.required' => 'Nomor WhatsApp atau telepon wajib diisi.',
             'telepon.regex' => 'Format nomor WhatsApp atau telepon tidak valid.',
-            'telepon.otp' => 'Nomor WhatsApp harus diverifikasi dengan kode OTP terlebih dahulu.',
+            'telepon.otp' => 'Nomor WhatsApp harus diverifikasi dengan kode verifikasi terlebih dahulu.',
             'deskripsi.required' => 'Deskripsi laporan wajib diisi.',
             'deskripsi.max' => 'Deskripsi laporan maksimal 5000 karakter.',
             'lokasi.required' => 'Lokasi kejadian wajib diisi.',

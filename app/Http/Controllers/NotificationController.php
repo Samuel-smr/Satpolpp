@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\DataYear;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -11,7 +12,7 @@ class NotificationController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $notifications = $request->user()->notifications()->latest()->limit(10)->get()
+        $notifications = $request->user()->notifications()->where('created_at', '>=', app(DataYear::class)->start())->where('created_at', '<', app(DataYear::class)->end())->latest()->limit(10)->get()
             ->map(fn (DatabaseNotification $notification): array => [
                 'id' => $notification->id,
                 'title' => data_get($notification->data, 'title', 'Notifikasi'),
@@ -21,7 +22,7 @@ class NotificationController extends Controller
             ]);
 
         return response()->json([
-            'unread_count' => $request->user()->unreadNotifications()->count(),
+            'unread_count' => $request->user()->unreadNotifications()->where('created_at', '>=', app(DataYear::class)->start())->where('created_at', '<', app(DataYear::class)->end())->count(),
             'notifications' => $notifications,
         ]);
     }
@@ -30,7 +31,7 @@ class NotificationController extends Controller
     {
         /** @var DatabaseNotification $databaseNotification */
         $databaseNotification = $request->user()
-            ->notifications()
+            ->notifications()->where('created_at', '>=', app(DataYear::class)->start())->where('created_at', '<', app(DataYear::class)->end())
             ->whereKey($notification)
             ->firstOrFail();
 
@@ -49,7 +50,7 @@ class NotificationController extends Controller
 
     public function readAll(Request $request): RedirectResponse
     {
-        $request->user()->unreadNotifications()->update(['read_at' => now()]);
+        $request->user()->unreadNotifications()->where('created_at', '>=', app(DataYear::class)->start())->where('created_at', '<', app(DataYear::class)->end())->update(['read_at' => now()]);
 
         return back()->with('status', 'Semua notifikasi telah ditandai dibaca.');
     }

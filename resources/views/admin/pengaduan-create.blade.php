@@ -49,9 +49,6 @@
                     <label class="block text-sm font-semibold text-slate-700">Nomor HP/telepon
                         <input type="tel" name="reporter_phone" value="{{ old('reporter_phone') }}" required inputmode="tel" maxlength="20" pattern="\+?[0-9][0-9\s-]{8,18}" title="Masukkan 9–19 digit; boleh diawali + serta menggunakan spasi atau tanda hubung." class="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 focus:border-sidebar-active focus:bg-white focus:outline-none focus:ring-1 focus:ring-sidebar-active">
                     </label>
-                    <label id="nik-field" class="block text-sm font-semibold text-slate-700">NIK pelapor (wajib untuk offline)
-                        <input name="reporter_nik" value="{{ old('reporter_nik') }}" inputmode="numeric" minlength="16" maxlength="16" pattern="[0-9]{16}" title="NIK harus terdiri dari tepat 16 angka." class="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 focus:border-sidebar-active focus:bg-white focus:outline-none focus:ring-1 focus:ring-sidebar-active">
-                    </label>
                     <label class="block text-sm font-semibold text-slate-700">Deskripsi laporan
                         <textarea name="description" required rows="5" class="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 focus:border-sidebar-active focus:bg-white focus:outline-none focus:ring-1 focus:ring-sidebar-active">{{ old('description') }}</textarea>
                     </label>
@@ -92,13 +89,10 @@
     <script>
         const source = document.getElementById('source');
         const platformField = document.getElementById('platform-field');
-        const nikField = document.getElementById('nik-field');
         function updateSourceFields() {
             const online = source.value === 'online';
             platformField.classList.toggle('hidden', !online);
-            nikField.classList.toggle('hidden', online);
             platformField.querySelector('select').required = online;
-            nikField.querySelector('input').required = !online;
         }
         source.addEventListener('change', updateSourceFields);
         updateSourceFields();

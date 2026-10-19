@@ -9,15 +9,18 @@ use App\Http\Controllers\AiAssistantController;
 use App\Http\Controllers\ArchiveController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CompleteReportController;
+use App\Http\Controllers\DataYearController;
 use App\Http\Controllers\GlobalSearchController;
 use App\Http\Controllers\InternalActivityAttachmentController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OfficerController;
 use App\Http\Controllers\PelaporController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReportAssignmentController;
 use App\Http\Controllers\ReportAttachmentController;
 use App\Http\Controllers\ReportStatusController;
 use App\Http\Controllers\SuperAdminController;
+use App\Http\Middleware\EnsureSelectedDataYear;
 use Illuminate\Support\Facades\Route;
 
 // Landing / Role Pelapor (masyarakat)
@@ -38,7 +41,8 @@ Route::get('/feedback', [PelaporController::class, 'feedback'])->name('pelapor.f
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login-ip')->name('login.store');
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
-Route::middleware(['auth', 'can:access-internal'])->group(function () {
+Route::middleware(['auth', 'can:access-internal', EnsureSelectedDataYear::class])->group(function () {
+    Route::put('/data-year', [DataYearController::class, 'update'])->name('data-year.update');
     Route::get('/global-search', GlobalSearchController::class)->middleware('throttle:60,1')->name('global-search');
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
@@ -46,7 +50,7 @@ Route::middleware(['auth', 'can:access-internal'])->group(function () {
 });
 
 // Admin Routes (Tampilan Sementara / Prototyping)
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:access-admin'])->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:access-admin', EnsureSelectedDataYear::class])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/pengaduan', [AdminController::class, 'pengaduan'])->name('pengaduan');
     Route::get('/pengaduan/create', [AdminReportController::class, 'create'])->name('pengaduan.create');
@@ -83,7 +87,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:access-admin'])
 });
 
 // Super Admin Routes (Tampilan Sementara / Prototyping)
-Route::prefix('super-admin')->name('super_admin.')->middleware(['auth', 'can:access-super-admin'])->group(function () {
+Route::prefix('super-admin')->name('super_admin.')->middleware(['auth', 'can:access-super-admin', EnsureSelectedDataYear::class])->group(function () {
+    Route::get('/pengaduan', [AdminController::class, 'pengaduan'])->name('pengaduan');
+    Route::patch('/pengaduan/{report:code}/assignment', [ReportAssignmentController::class, 'update'])->name('pengaduan.assignment.update');
     Route::get('/dashboard', [SuperAdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/kegiatan', [AdminController::class, 'kegiatan'])->name('kegiatan');
     Route::get('/kegiatan/{activity}/export-attachments/{attachment}', [AdminActivityExportAttachmentController::class, 'show'])->name('kegiatan.export-attachments.show');

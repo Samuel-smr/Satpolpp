@@ -3,8 +3,11 @@
 namespace App\Models;
 
 use App\ArchiveConfidentiality;
+use App\Support\DataYear;
 use Database\Factories\ArchiveFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,6 +25,12 @@ class Archive extends Model
 {
     /** @use HasFactory<ArchiveFactory> */
     use HasFactory, SoftDeletes;
+
+    #[Scope]
+    protected function forDataYear(Builder $query): Builder
+    {
+        return app(DataYear::class)->constrain($query, 'created_at');
+    }
 
     /** @return BelongsTo<User, $this> */
     public function createdByUser(): BelongsTo

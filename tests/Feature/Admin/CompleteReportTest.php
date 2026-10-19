@@ -26,7 +26,7 @@ class CompleteReportTest extends TestCase
         $this->travelTo(now()->setDate(2026, 9, 9)->setTime(10, 30));
 
         $admin = User::factory()->create();
-        $report = Report::factory()->create([
+        $report = Report::factory()->assignedTo($admin)->create([
             'status' => ReportStatus::InProgress,
             'description' => 'Laporan warga tetap tersimpan.',
         ]);
@@ -133,7 +133,7 @@ class CompleteReportTest extends TestCase
     {
         Storage::fake('local');
         $admin = User::factory()->create();
-        $report = Report::factory()->create(['status' => ReportStatus::Verifying]);
+        $report = Report::factory()->assignedTo($admin)->create(['status' => ReportStatus::Verifying]);
         $officer = $this->employee();
 
         $response = $this->from(route('admin.pengaduan.detail', $report))
@@ -159,7 +159,7 @@ class CompleteReportTest extends TestCase
     {
         Storage::fake('local');
         $admin = User::factory()->create();
-        $report = Report::factory()->create(['status' => ReportStatus::InProgress]);
+        $report = Report::factory()->assignedTo($admin)->create(['status' => ReportStatus::InProgress]);
         $officer = $this->employee();
 
         $firstResponse = $this->actingAs($admin)->post(
@@ -189,7 +189,7 @@ class CompleteReportTest extends TestCase
     {
         Storage::fake('local');
         $admin = User::factory()->create();
-        $report = Report::factory()->create(['status' => ReportStatus::InProgress]);
+        $report = Report::factory()->assignedTo($admin)->create(['status' => ReportStatus::InProgress]);
         $inactiveOfficer = $this->employee([], available: false);
 
         $response = $this->from(route('admin.pengaduan.detail', $report))

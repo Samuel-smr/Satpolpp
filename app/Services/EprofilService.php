@@ -88,7 +88,7 @@ class EprofilService
         $validated = Validator::make($payload, [
             'data' => ['present', 'array'],
             'data.*.nama' => ['required', 'string', 'max:255'],
-            'data.*.nip' => ['required', 'string', 'max:50', 'regex:/^\d+$/', 'distinct'],
+            'data.*.nip' => ['required', 'string', 'max:50', 'regex:/\A[0-9]+\z/', 'distinct:strict'],
             'data.*.jabatan_nama' => ['required', 'string', 'max:255'],
         ])->validate();
 

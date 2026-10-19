@@ -19,7 +19,7 @@ class GlobalSearchController extends Controller
         $term = $validated['q'];
         $isAdmin = $request->user()->role === UserRole::Admin;
 
-        $reports = Report::query()
+        $reports = Report::query()->forDataYear()
             ->where(fn ($query) => $query->where('code', 'like', "%{$term}%")
                 ->orWhere('description', 'like', "%{$term}%")
                 ->orWhere('location_address', 'like', "%{$term}%"))
@@ -30,10 +30,10 @@ class GlobalSearchController extends Controller
                 'description' => str($report->description)->limit(70)->toString(),
                 'url' => $isAdmin
                     ? route('admin.pengaduan.detail', $report, absolute: false)
-                    : route('super_admin.dashboard', ['search' => $report->code], false).'#peta-persebaran',
+                    : route('super_admin.pengaduan.detail', $report, absolute: false),
             ]);
 
-        $activities = Activity::query()
+        $activities = Activity::query()->forDataYear()
             ->with('report:id,code')
             ->where(fn ($query) => $query->where('name', 'like', "%{$term}%")
                 ->orWhere('description', 'like', "%{$term}%")

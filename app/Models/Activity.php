@@ -4,9 +4,12 @@ namespace App\Models;
 
 use App\ActivityType;
 use App\Services\EprofilService;
+use App\Support\DataYear;
 use App\Support\Employee;
 use Database\Factories\ActivityFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -39,6 +42,12 @@ class Activity extends Model
 {
     /** @use HasFactory<ActivityFactory> */
     use HasFactory, SoftDeletes;
+
+    #[Scope]
+    protected function forDataYear(Builder $query): Builder
+    {
+        return app(DataYear::class)->constrain($query, 'activity_date');
+    }
 
     /** @return BelongsTo<Report, $this> */
     public function report(): BelongsTo

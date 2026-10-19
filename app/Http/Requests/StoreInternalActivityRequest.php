@@ -7,6 +7,7 @@ use App\FindingUnit;
 use App\Models\Activity;
 use App\Models\User;
 use App\Services\EprofilService;
+use App\Support\DataYear;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Http\FormRequest;
@@ -55,13 +56,13 @@ class StoreInternalActivityRequest extends FormRequest
                     fn (Builder $query): Builder => $query->where('is_active', true),
                 ),
             ],
-            'activity_date' => ['required', 'date'],
+            'activity_date' => ['required', 'date', ...app(DataYear::class)->dateRules()],
             'start_time' => ['nullable', 'date_format:H:i'],
             'description' => ['nullable', 'string', 'max:5000'],
             'handling_result' => ['nullable', 'string', 'max:5000'],
             'findings' => ['nullable', 'array', 'max:50'],
             'findings.*.type' => ['required', Rule::enum(FindingType::class)],
-            'findings.*.quantity' => ['required', 'integer', 'min:1'],
+            'findings.*.quantity' => ['required', 'integer', 'min:1', 'max:4294967295'],
             'findings.*.unit' => ['required', Rule::enum(FindingUnit::class)],
             'location_address' => ['required', 'string', 'max:2000'],
             'latitude' => ['required', 'numeric', 'between:-90,90'],
@@ -95,6 +96,7 @@ class StoreInternalActivityRequest extends FormRequest
             'findings.*.quantity.required' => 'Jumlah pada setiap temuan wajib diisi.',
             'findings.*.quantity.integer' => 'Jumlah temuan harus berupa angka bulat.',
             'findings.*.quantity.min' => 'Jumlah temuan minimal satu.',
+            'findings.*.quantity.max' => 'Jumlah temuan maksimal 4.294.967.295.',
             'findings.*.unit.required' => 'Satuan pada setiap temuan wajib dipilih.',
             'findings.*.unit.enum' => 'Satuan temuan tidak valid.',
             'location_address.required' => 'Lokasi kegiatan wajib diisi.',

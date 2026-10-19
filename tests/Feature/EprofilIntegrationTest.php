@@ -51,7 +51,7 @@ class EprofilIntegrationTest extends TestCase
         $user = $isSuperAdmin ? User::factory()->superAdmin()->create() : User::factory()->create();
         $parameters = match ($routeName) {
             'admin.kegiatan.edit', 'super_admin.kegiatan.edit' => [Activity::factory()->create()],
-            'admin.pengaduan.detail' => [Report::factory()->create(['status' => ReportStatus::InProgress])],
+            'admin.pengaduan.detail' => [Report::factory()->assignedTo($user)->create(['status' => ReportStatus::InProgress])],
             default => [],
         };
 
@@ -196,8 +196,9 @@ class EprofilIntegrationTest extends TestCase
     {
         Storage::fake('local');
         $this->fakeDirectory();
-        $report = Report::factory()->create(['status' => ReportStatus::InProgress]);
-        $this->actingAs(User::factory()->create())->get(route('admin.pengaduan.detail', $report))->assertOk();
+        $admin = User::factory()->create();
+        $report = Report::factory()->assignedTo($admin)->create(['status' => ReportStatus::InProgress]);
+        $this->actingAs($admin)->get(route('admin.pengaduan.detail', $report))->assertOk();
         $officer = app(EprofilService::class)->officers()->firstWhere('employee_number', '197202121991011001');
 
         $this->post(route('admin.pengaduan.complete.store', $report), [

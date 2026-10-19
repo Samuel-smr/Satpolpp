@@ -81,7 +81,7 @@
                     </div>
                     <div>
                         <label for="activity_date" class="mb-1.5 block text-sm font-semibold text-slate-700">Tanggal pelaksanaan</label>
-                        <input id="activity_date" name="activity_date" type="date" required value="{{ old('activity_date', $editingActivity?->activity_date?->toDateString() ?? now()->toDateString()) }}" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:border-sidebar-active focus:bg-white focus:outline-none focus:ring-1 focus:ring-sidebar-active">
+                        <input id="activity_date" name="activity_date" type="date" min="{{ app(\App\Support\DataYear::class)->start()->toDateString() }}" max="{{ app(\App\Support\DataYear::class)->end()->subDay()->toDateString() }}" required value="{{ old('activity_date', $editingActivity?->activity_date?->toDateString() ?? app(\App\Support\DataYear::class)->referenceDate()->toDateString()) }}" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:border-sidebar-active focus:bg-white focus:outline-none focus:ring-1 focus:ring-sidebar-active">
                     </div>
                     <div>
                         <label for="start_time" class="mb-1.5 block text-sm font-semibold text-slate-700">Waktu mulai (opsional)</label>

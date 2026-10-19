@@ -46,7 +46,7 @@
             </div>
         </div>
 
-        <!-- Card 3: Total Pengaduan Bulan Ini -->
+        <!-- Card 3: Total Pengaduan Tahun {{ session('data_year', now()->year) }} -->
         <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
             <div class="flex items-center justify-between mb-4">
                 <div class="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center">
@@ -57,8 +57,8 @@
                 </span>
             </div>
             <div>
-                <h3 class="font-headline text-3xl font-bold text-slate-900">{{ $systemStats['monthly_reports'] }}</h3>
-                <p class="text-xs font-medium text-slate-400 mt-1">Total Pengaduan Bulan Ini</p>
+                <h3 class="font-headline text-3xl font-bold text-slate-900">{{ $systemStats['yearly_reports'] }}</h3>
+                <p class="text-xs font-medium text-slate-400 mt-1">Total Pengaduan Tahun {{ session('data_year', now()->year) }}</p>
             </div>
         </div>
 
@@ -70,7 +70,7 @@
                 </div>
             </div>
             <div>
-                <h3 class="font-headline text-3xl font-bold text-slate-900">{{ $systemStats['monthly_activities'] }}</h3>
+                <h3 class="font-headline text-3xl font-bold text-slate-900">{{ $systemStats['yearly_activities'] }}</h3>
                 <p class="text-xs font-medium text-slate-400 mt-1">Total Kegiatan Berjalan</p>
             </div>
         </div>

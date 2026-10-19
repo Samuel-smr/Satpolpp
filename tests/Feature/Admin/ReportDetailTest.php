@@ -19,7 +19,6 @@ class ReportDetailTest extends TestCase
         $admin = User::factory()->create(['name' => 'Admin Pemeriksa']);
         $report = Report::factory()->create([
             'code' => 'SPJ-DETAIL-001',
-            'reporter_nik' => '3401010101010001',
             'description' => 'Deskripsi laporan dari database.',
         ]);
         ReportStatusHistory::factory()->for($report)->for($admin, 'changedByUser')->create([
@@ -38,8 +37,6 @@ class ReportDetailTest extends TestCase
         $response->assertSeeText('Lokasi sedang diverifikasi.');
         $response->assertSeeText('Admin Pemeriksa');
         $response->assertSeeText('bukti-laporan.jpg');
-        $response->assertSeeText('3401********0001');
-        $response->assertDontSeeText('3401010101010001');
     }
 
     public function test_report_detail_uses_the_public_code_and_returns_not_found_for_an_unknown_code(): void

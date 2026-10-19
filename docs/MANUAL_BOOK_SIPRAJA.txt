@@ -1,0 +1,1865 @@
+===============================================================================
+                         MANUAL BOOK / PANDUAN PENGGUNA
+                                    SIPRAJA
+                  SATUAN POLISI PAMONG PRAJA KULON PROGO
+===============================================================================
+
+Aktor: Warga/Pelapor, Admin, dan Super Admin
+Versi dokumen: 1.1
+Tanggal penyusunan: 8 Oktober 2026
+Format: Teks (.txt)
+
+Panduan ini disusun berdasarkan menu, formulir, hak akses, dan alur yang tersedia
+pada kode aplikasi saat penyusunan. Nama tombol ditulis sesuai tampilan aplikasi.
+Alamat website mengikuti alamat resmi yang diberikan pengelola SIPRAJA.
+
+PETUNJUK PEMASANGAN GAMBAR
+Penanda [gambar fitur] adalah tempat memasukkan gambar secara manual.
+Tersedia 40 gambar pilihan: 11 warga, 21 Admin, dan 8 Super Admin.
+Satu screenshot dapat menjelaskan beberapa langkah pada halaman/formulir yang
+sama. Tidak perlu menambahkan gambar untuk setiap klik atau setiap kolom.
+Kode W digunakan untuk warga, A untuk Admin, dan S untuk Super Admin.
+Nomor gambar berurutan per aktor, misalnya W-01, W-02, dan seterusnya.
+Tampilan kegiatan/profil yang sama pada Admin dan Super Admin cukup memakai
+gambar pada bagian Admin. Semua langkah penggunaan tetap dijelaskan lengkap.
+Gunakan data contoh dan samarkan nomor telepon, NIK, email, password, serta OTP.
+
+DAFTAR ISI
+BAB 1. Pendahuluan dan Petunjuk Umum
+  1.1 Tujuan dan ruang lingkup
+  1.2 Persiapan penggunaan
+  1.3 Pembagian hak akses
+  1.4 Istilah dan alur laporan
+  1.5 Cara membaca panduan
+BAB 2. Panduan Warga/Pelapor
+  2.1 Beranda dan navigasi
+  2.2 Persiapan laporan
+  2.3 Buat Laporan: tahap Detail dan OTP
+  2.4 Melampirkan foto bukti
+  2.5 Asisten AI
+  2.6 Buat Laporan: tahap Kirim
+  2.7 Cek Status Laporan
+  2.8 Membaca penolakan laporan
+  2.9 Penilaian layanan per laporan
+  2.10 Survey Kepuasan / SKM
+  2.11 Contoh alur penggunaan warga
+BAB 3. Panduan Admin
+  3.1 Masuk ke portal
+  3.2 Navigasi dan fitur bagian atas
+  3.3 Dashboard
+  3.4 Manajemen Pengaduan: daftar dan filter
+  3.5 Tambah Laporan online/offline
+  3.6 Detail laporan dan lampiran
+  3.7 Memajukan status laporan
+  3.8 Menolak laporan
+  3.9 Menyelesaikan laporan dan membuat kegiatan eksternal
+  3.10 Menghapus laporan
+  3.11 Acara & Kegiatan: daftar dan detail
+  3.12 Menambah kegiatan internal
+  3.13 Mengubah kegiatan dan dokumentasi
+  3.14 Menghapus kegiatan internal
+  3.15 Ekspor Excel dan PDF kegiatan
+  3.16 Evaluasi Kegiatan
+  3.17 Feedback Masyarakat
+  3.18 Arsip dan dokumen
+  3.19 Profil dan password
+  3.20 Notifikasi
+  3.21 Pencarian global
+  3.22 Kembali ke Portal dan Logout
+  3.23 Contoh alur kerja admin
+BAB 4. Panduan Super Admin
+  4.1 Masuk dan navigasi
+  4.2 Dashboard dan ringkasan sistem
+  4.3 Peta persebaran pada dashboard
+  4.4 Kegiatan: daftar dan detail laporan
+  4.5 Menambah kegiatan internal
+  4.6 Mengubah kegiatan dan dokumentasi
+  4.7 Menghapus kegiatan internal
+  4.8 Ekspor Excel dan PDF kegiatan
+  4.9 Manajemen User: melihat dan menambah akun
+  4.10 Manajemen User: mengubah akun dan password
+  4.11 Memblokir dan mengaktifkan akun
+  4.12 Menghapus akun
+  4.13 Manajemen Petugas / Daftar Pegawai e-Profil
+  4.14 Monitoring Sistem
+  4.15 Profil Super Admin
+  4.16 Notifikasi dan pencarian global
+  4.17 Kembali ke Portal dan Logout
+  4.18 Contoh alur kerja super admin
+BAB 5. Kendala Umum dan Penyelesaiannya
+  5.1 Website tidak terbuka atau tampilan belum lengkap
+  5.2 Otp whatsapp belum masuk
+  5.3 Otp salah, kedaluwarsa, atau verifikasi tidak berlaku
+  5.4 Laporan tidak muncul pada cek status
+  5.5 Foto atau file ditolak
+  5.6 Kamera tidak terbuka
+  5.7 Asisten ai tidak menjawab
+  5.8 Gagal login atau akun terblokir
+  5.9 Status laporan atau data kegiatan sudah berubah
+  5.10 Laporan belum bisa diselesaikan
+  5.11 Pegawai e-profil kosong atau tidak sesuai
+  5.12 Peta atau pencarian lokasi gagal
+  5.13 Data kosong setelah filter
+  5.14 Evaluasi tidak dapat ditambah
+  5.15 Penilaian warga tidak tersedia atau gagal
+  5.16 Ekspor gagal atau file tidak ditemukan
+  5.17 Session berakhir atau halaman menampilkan akses ditolak
+  5.18 Qr survey tidak muncul atau skm tidak terbuka
+BAB 6. Ringkasan Batas Input dan Unggah
+  6.1 Laporan warga
+  6.2 Laporan yang dicatat admin
+  6.3 Catatan status dan penolakan
+  6.4 Penyelesaian laporan / kegiatan eksternal
+  6.5 Kegiatan internal
+  6.6 Temuan
+  6.7 Evaluasi kegiatan
+  6.8 Arsip
+  6.9 Akun dan profil
+  6.10 Penilaian dan ai
+BAB 7. Checklist Penggunaan
+  7.1 Checklist warga sebelum mengirim laporan
+  7.2 Checklist admin sebelum menyelesaikan laporan
+  7.3 Checklist super admin untuk pengawasan
+
+
+===============================================================================
+BAB 1. PENDAHULUAN DAN PETUNJUK UMUM
+===============================================================================
+
+1.1 TUJUAN DAN RUANG LINGKUP
+
+SIPRAJA digunakan untuk menerima laporan masyarakat, membantu pencatatan dan
+penanganan oleh Satpol PP, serta mendukung pengawasan operasional. Panduan ini
+menjelaskan penggunaan aplikasi dari tiga sisi:
+a. Warga/Pelapor: membuat laporan, memantau status, dan memberi penilaian.
+b. Admin: menangani laporan dan mengelola pencatatan operasional.
+c. Super Admin: mengawasi sistem, mengelola akun, dan melihat data pegawai.
+
+Panduan berfokus pada tindakan pengguna melalui menu aplikasi. Persiapan server,
+instalasi, pengaturan integrasi, dan perbaikan program ditangani pengelola teknis.
+
+1.2 PERSIAPAN PENGGUNAAN
+
+Siapkan perangkat komputer atau ponsel, browser, dan koneksi internet. Untuk
+melapor sebagai warga, siapkan nomor WhatsApp aktif yang dapat menerima OTP.
+Untuk admin dan super admin, siapkan username/email dan password yang diberikan
+pengelola. File bukti dan dokumen sebaiknya disiapkan sebelum membuka formulir.
+
+Langkah membuka aplikasi:
+1. Buka browser pada perangkat.
+2. Masukkan alamat website SIPRAJA yang diberikan pengelola.
+3. Tunggu sampai halaman utama selesai dimuat.
+   Hasil: logo SIPRAJA dan pilihan layanan masyarakat terlihat.
+4. Pada ponsel, tekan ikon tiga garis untuk membuka pilihan navigasi.
+   Hasil: menu yang tersembunyi ditampilkan.
+
+1.3 PEMBAGIAN HAK AKSES
+
+WARGA/PELAPOR
+- Menggunakan halaman publik tanpa membuat akun atau login.
+- Membuat laporan dengan verifikasi nomor WhatsApp.
+- Mengakses laporan yang terkait dengan browser saat membuat laporan.
+- Mengirim satu penilaian untuk masing-masing laporan yang sudah selesai.
+- Membuka survey SKM melalui menu Survey Kepuasan.
+
+ADMIN
+- Login dengan akun aktif.
+- Melihat dan menangani laporan masyarakat.
+- Mencatat laporan online/offline yang diterima melalui kanal lain.
+- Memajukan status, menolak pada tahap verifikasi, dan menyelesaikan laporan.
+- Membuat, mengubah, dan menghapus kegiatan internal.
+- Mengelola evaluasi dan arsip, membaca feedback, serta mengekspor kegiatan.
+- Menggunakan profil, notifikasi, dan pencarian global sesuai aksesnya.
+
+SUPER ADMIN
+- Login dengan akun aktif.
+- Melihat dashboard, peta persebaran, dan monitoring audit.
+- Mengelola akun yang ditampilkan pada Manajemen User; akun baru menjadi Admin.
+- Melihat daftar pegawai yang bersumber dari e-Profil.
+- Mengelola kegiatan internal dan mengekspor daftar kegiatan.
+- Membuka detail laporan dalam mode baca-saja.
+- Menggunakan profil, notifikasi, dan pencarian global sesuai aksesnya.
+
+Peta persebaran tersedia di dashboard super admin. Akses ke arsip, evaluasi,
+feedback admin, dan tindakan perubahan status laporan mengikuti peran Admin.
+Ikuti menu yang tampil untuk akun yang sedang digunakan.
+
+1.4 ISTILAH DAN ALUR LAPORAN
+
+Laporan/Pengaduan : Kejadian yang disampaikan kepada Satpol PP.
+Kode laporan     : Identitas laporan, misalnya SPJ-ABC123 (contoh fiktif).
+OTP              : Kode verifikasi sekali pakai, terdiri dari enam angka.
+Kegiatan internal: Agenda operasional yang dicatat langsung oleh petugas aplikasi.
+Kegiatan eksternal: Pencatatan penanganan yang dibuat saat laporan diselesaikan.
+Template kegiatan: Pilihan isian awal kegiatan yang tersedia pada formulir.
+Temuan           : Catatan jumlah orang/barang dalam suatu kegiatan.
+Evaluasi         : Penilaian hasil dan kendala pelaksanaan kegiatan oleh admin.
+Feedback         : Rating dan komentar warga terhadap penanganan laporan.
+Arsip            : Kelompok dokumen dengan nama, kategori, dan sifat dokumen.
+Audit log        : Catatan aktivitas yang direkam sistem.
+e-Profil         : Sumber data pegawai yang ditampilkan dan dipilih di SIPRAJA.
+
+Alur utama laporan:
+Laporan dibuat -> Laporan diterima -> Sedang diverifikasi -> Ditindaklanjuti
+-> Laporan selesai -> Pelapor dapat memberikan penilaian.
+
+Alur penolakan:
+Laporan dibuat -> Laporan diterima -> Sedang diverifikasi -> Laporan ditolak.
+
+Status diproses berurutan. Pada halaman warga, pelacakan juga menampilkan label
+"Penanganan selesai". Admin menuntaskan penanganan melalui formulir penyelesaian
+yang sekaligus membuat kegiatan eksternal; label tersebut tidak membutuhkan
+tindakan perubahan status tersendiri oleh warga.
+
+1.5 CARA MEMBACA PANDUAN
+
+Setiap prosedur memuat tujuan, persiapan, langkah, dan hasil yang diharapkan.
+"Opsional" berarti boleh dikosongkan. Kolom bertanda bintang (*) atau ditandai
+wajib harus diisi. Klik/tekan berarti memilih tombol yang sama pada komputer
+atau ponsel. Jika formulir berada pada jendela popup, gulir bagian dalam jendela
+untuk melihat kolom dan tombol di bagian bawah.
+
+Tunggu pemberitahuan berhasil sebelum berpindah halaman. Jika muncul kesalahan,
+baca pesannya, perbaiki kolom terkait, dan pilih ulang file bila diperlukan.
+Menutup formulir atau menekan Batal tidak menyimpan perubahan yang belum dikirim.
+
+
+===============================================================================
+BAB 2. PANDUAN WARGA/PELAPOR
+===============================================================================
+
+2.1 BERANDA DAN NAVIGASI
+
+Tujuan: mengenali pilihan layanan tanpa login.
+
+Menu yang digunakan:
+- Logo SIPRAJA: kembali ke beranda.
+- Buat Laporan / kartu Lapor: membuka formulir pengaduan.
+- Cek Status / Cek Status Laporan: membuka laporan milik pelapor.
+- Survey Kepuasan: membuka halaman QR dan tautan survey SKM.
+- Masuk: membuka login untuk pengguna internal.
+
+Langkah:
+1. Buka halaman utama SIPRAJA.
+   [gambar fitur] W-01 - Beranda, navigasi, dan kartu layanan masyarakat.
+2. Baca bagian Cara Melapor untuk memahami urutan umum pengiriman.
+3. Pilih layanan yang diperlukan melalui menu atas atau kartu layanan.
+   Pada ponsel, buka ikon tiga garis terlebih dahulu bila menu belum terlihat.
+
+2.2 PERSIAPAN LAPORAN
+
+Sebelum mengisi, siapkan:
+a. Nomor WhatsApp aktif milik pelapor yang dapat menerima pesan verifikasi.
+b. Uraian kejadian: apa yang terjadi, kapan, keadaan di lokasi, dan dampaknya.
+c. Alamat kejadian dengan patokan yang membantu petugas menemukan lokasi.
+d. Foto bukti jika tersedia, maksimal tiga foto dengan ukuran 5 MB per foto.
+
+Formulir warga yang tersedia berisi nomor WhatsApp/telepon, deskripsi, lokasi,
+dan bukti foto. Nama dan NIK tidak diminta pada formulir publik ini. Lokasi
+diisi sebagai alamat/teks; warga tidak perlu memilih koordinat peta.
+
+Contoh deskripsi:
+"Pada 8 Oktober 2026 sekitar pukul 09.00 terdapat kendaraan yang menutup akses
+pejalan kaki di sekitar lokasi yang saya tuliskan. Pejalan kaki harus melewati
+badan jalan. Mohon petugas memeriksa dan menindaklanjuti sesuai kewenangan."
+
+Contoh lokasi:
+"Jalan [nama jalan], dekat [patokan], Kalurahan [nama kalurahan], Kapanewon
+[nama kapanewon], Kabupaten Kulon Progo."
+Bagian dalam tanda kurung siku pada contoh perlu diganti dengan data kejadian.
+
+2.3 BUAT LAPORAN: TAHAP DETAIL DAN OTP
+
+Tujuan: mengisi detail kejadian dan memastikan nomor WhatsApp telah diverifikasi.
+
+Langkah:
+1. Dari beranda pilih Lapor, atau tekan Buat Laporan pada menu navigasi.
+   Hasil: halaman Buat Pengaduan terbuka dengan tahap Detail dan Kirim.
+   [gambar fitur] W-02 - Formulir Detail: nomor WhatsApp, deskripsi, lokasi, dan bukti foto.
+2. Isi Nomor WhatsApp / Telepon, misalnya menggunakan format awal 08 atau +62.
+   Gunakan nomor sebenarnya yang dapat menerima pesan WhatsApp.
+3. Tekan Kirim Kode OTP.
+   Tunggu pesan keberhasilan pengiriman dan munculnya kolom kode.
+   [gambar fitur] W-03 - Verifikasi nomor WhatsApp: kolom OTP dan tombol verifikasi.
+4. Buka WhatsApp pada nomor tersebut dan baca kode verifikasi SIPRAJA.
+   Kode terdiri dari enam angka dan berlaku selama lima menit.
+5. Kembali ke SIPRAJA dan ketik kode di kolom Masukkan 6 digit kode OTP.
+   Pastikan seluruh angka sesuai pesan terbaru yang diterima.
+6. Tekan Verifikasi Kode.
+   Hasil: muncul pesan nomor berhasil diverifikasi dan boleh melanjutkan.
+   Nomor yang berhasil diverifikasi menjadi terkunci pada formulir tersebut.
+7. Isi Deskripsi Singkat dengan uraian kejadian yang jelas.
+   Isian wajib, maksimal 5.000 karakter. Jika perlu, gunakan Asisten AI sesuai
+   bagian 2.5 lalu periksa kembali hasilnya.
+8. Isi Lokasi Kejadian dengan alamat dan patokan.
+   Isian wajib, maksimal 1.000 karakter. Lokasi harus sesuai kejadian yang dilapor.
+9. Jika memiliki bukti, ikuti langkah pada bagian 2.4.
+10. Setelah nomor terverifikasi dan detail lengkap, tekan Selanjutnya.
+    Hasil: aplikasi membuka tahap Kirim. Kolom wajib yang belum lengkap akan
+    ditunjukkan untuk diperbaiki sebelum dapat melanjutkan.
+
+Ketentuan OTP:
+- Tunggu 60 detik sebelum meminta pengiriman ulang.
+- Gunakan kode terbaru jika sudah meminta ulang.
+- Setelah lima percobaan kode salah, minta kode baru setelah jeda pengiriman.
+- Verifikasi berhasil berlaku selama 15 menit pada sesi browser tersebut.
+  Jika pengisian terlalu lama dan verifikasi sudah tidak berlaku, lakukan ulang.
+- Jika nomor yang dimasukkan keliru, buka ulang formulir dan verifikasi nomor
+  yang benar sebelum mengirim. Catat dahulu deskripsi agar mudah diisi kembali.
+
+2.4 MELAMPIRKAN FOTO BUKTI
+
+Tujuan: menyertakan dokumentasi yang membantu petugas memahami kejadian.
+Foto bersifat opsional. Format yang diterima: JPG, JPEG, PNG, atau WEBP.
+Maksimal tiga foto untuk satu laporan, masing-masing maksimal 5 MB.
+Meskipun label bagian berbunyi "Foto / Video Bukti", unggahan yang diterima
+pada versi ini adalah foto dalam format tersebut.
+
+Pilihan A - mengambil foto:
+1. Pada tahap Detail, tekan Ambil Foto (Kamera).
+2. Jika perangkat membuka kamera atau meminta izin, izinkan untuk mengambil foto.
+   Respons mengikuti kemampuan browser dan perangkat; komputer dapat menampilkan
+   pemilih file sebagai pengganti kamera.
+3. Ambil foto yang memperlihatkan kejadian, lalu konfirmasikan penggunaan foto.
+4. Periksa nama file yang ditampilkan pada daftar bukti.
+   [gambar fitur] W-04 - Area bukti foto: pilihan kamera/file dan daftar foto yang dipilih.
+
+Pilihan B - memilih foto dari penyimpanan:
+1. Tekan Pilih dari File.
+2. Pilih foto dari galeri atau folder perangkat. Untuk beberapa foto, pilih
+   sekaligus dalam pemilih file bila perangkat mendukung.
+3. Konfirmasikan pilihan dan periksa nama file pada formulir.
+4. Jika salah memilih, buka pemilih file lagi dan tentukan pilihan yang benar.
+   Pilihan ulang pada satu pemilih file menggantikan pilihan sebelumnya.
+
+Periksa jumlah keseluruhan foto jika menggunakan kedua pilihan. Foto lebih dari
+5 MB perlu diperkecil dahulu. Jika aplikasi menolak format/jumlah/ukuran, perbaiki
+pilihan sebelum melanjutkan. Setelah kegagalan pengiriman, pilih ulang foto jika
+pemilih file sudah kosong.
+
+2.5 ASISTEN AI
+
+Tujuan: memperoleh panduan melapor atau bantuan menyusun deskripsi.
+Asisten tersedia pada halaman Buat Pengaduan. Mengirim pesan ke AI tidak
+mengirim laporan kepada Satpol PP. Laporan tetap harus dikirim melalui formulir.
+
+Langkah bertanya:
+1. Buka halaman Buat Pengaduan.
+2. Tekan Tanya Asisten AI di bagian bawah layar.
+   Hasil: panel Asisten SIPRAJA terbuka.
+3. Tekan Cara melapor untuk meminta petunjuk, atau ketik pertanyaan pada kolom
+   Tulis pertanyaan. Maksimal 600 karakter untuk satu pesan.
+4. Tekan ikon kirim atau Enter. Untuk baris baru, gunakan Shift+Enter.
+   Hasil: pesan tampil dan aplikasi menunjukkan Sedang menyiapkan jawaban.
+5. Baca jawaban dan ajukan pertanyaan lanjutan bila masih perlu penjelasan.
+6. Tekan ikon X pada panel untuk menutup asisten dan kembali ke formulir.
+
+Langkah menyusun deskripsi:
+1. Buka panel AI, kemudian pilih Bantu deskripsi atau tulis permintaan penyusunan.
+   Contoh: "Bantu susun deskripsi tentang akses pejalan kaki yang tertutup
+   kendaraan. Kejadian pagi ini, lokasi akan saya isi di formulir."
+2. Berikan rincian kejadian yang diperlukan melalui percakapan.
+   Hindari mengirim NIK, password, OTP, atau data sensitif yang tidak diperlukan.
+3. Baca draf jawaban dan pastikan sesuai fakta kejadian.
+   [gambar fitur] W-05 - Panel Asisten AI: percakapan, draf deskripsi, dan pilihan penggunaannya.
+4. Jika tombol Gunakan sebagai deskripsi muncul, tekan tombol tersebut.
+   Hasil: isi jawaban masuk ke kolom Deskripsi Singkat dan panel ditutup.
+5. Periksa dan edit isi kolom Deskripsi Singkat sebelum mengirim laporan.
+   Penggunaan draf mengganti isi deskripsi sebelumnya.
+6. Lengkapi nomor terverifikasi, lokasi, dan bukti, lalu lanjutkan pengiriman.
+
+Jika AI tidak tersedia atau respons terlalu lama, lanjutkan pengisian deskripsi
+sendiri. Asisten dapat memiliki batas permintaan; tunggu sesuai pesan jika batas
+tercapai. Jawaban AI perlu diperiksa karena dapat keliru.
+
+2.6 BUAT LAPORAN: TAHAP KIRIM
+
+Tujuan: menyatakan kebenaran data dan mengirim laporan.
+Persiapan: tahap Detail selesai, nomor terverifikasi, serta file sudah sesuai.
+
+Langkah:
+1. Pada tahap Kirim, baca pernyataan kebenaran data.
+   [gambar fitur] W-06 - Tahap Kirim: pernyataan kebenaran data dan tombol pengiriman.
+2. Jika perlu memperbaiki data, tekan Sebelumnya, ubah detail yang diperlukan,
+   kemudian tekan Selanjutnya untuk kembali ke tahap Kirim.
+3. Centang "Saya menyatakan data yang diisi adalah benar dan dapat
+   dipertanggungjawabkan" setelah memastikan isian sesuai fakta.
+4. Tekan Kirim Laporan dan tunggu proses selesai.
+5. Pastikan muncul pesan Laporan Terkirim! beserta kode laporan.
+   Hasil: laporan tersimpan dan siap diproses oleh admin.
+   [gambar fitur] W-07 - Laporan berhasil dikirim beserta kode laporan.
+6. Catat kode laporan atau simpan tangkapan layarnya.
+   Gunakan kode tersebut untuk mengenali laporan dan mencari dalam daftar status.
+7. Tekan tautan Cek Status Laporan pada hasil pengiriman atau menu Cek Status.
+
+Jika pesan kesalahan muncul, laporan belum dapat dianggap berhasil hanya karena
+tombol sudah ditekan. Baca kesalahan, isi ulang kolom yang kosong, verifikasi
+kembali bila diminta, dan pilih ulang file bila diperlukan.
+
+Catatan akses status:
+SIPRAJA menyimpan akses tamu melalui cookie browser setelah laporan terkirim.
+Gunakan browser dan perangkat yang sama untuk memantau. Kode laporan membantu
+pencarian, tetapi mengetik kode saja tidak memulihkan akses dari perangkat lain.
+Menghapus cookie, menggunakan mode incognito, mengganti browser, atau berakhirnya
+masa akses dapat membuat daftar laporan kosong.
+
+2.7 CEK STATUS LAPORAN
+
+Tujuan: membaca perkembangan laporan yang telah dikirim dari browser tersebut.
+
+Langkah:
+1. Buka menu Cek Status atau kartu Cek Status Laporan pada beranda.
+   Hasil: halaman menampilkan daftar laporan yang terkait dengan akses tamu.
+2. Jika ada beberapa laporan, ketik kode, lokasi, atau potongan deskripsi pada
+   kolom pencarian. Daftar berubah saat kata kunci diketik.
+3. Klik kartu laporan yang sesuai. Cocokkan kode agar tidak salah memilih.
+4. Baca kode, status, lokasi, waktu lapor, dan deskripsi pada detail.
+5. Periksa bagian Pelacakan Laporan untuk melihat tahap yang sudah dicapai.
+   [gambar fitur] W-08 - Detail laporan dan pelacakan status penanganan.
+6. Jika status Laporan ditolak, ikuti bagian 2.8. Jika status Laporan selesai,
+   bagian penilaian dapat digunakan sesuai bagian 2.9.
+7. Tekan Kembali ke daftar untuk membuka laporan lain.
+8. Untuk memperoleh data terbaru setelah petugas memproses laporan, muat ulang
+   halaman Cek Status lalu buka kembali detail laporan.
+
+Makna status:
+- Laporan dibuat: pengiriman tersimpan pada sistem.
+- Laporan diterima: petugas telah menerima laporan.
+- Sedang diverifikasi: petugas memeriksa kebenaran/kelengkapan laporan.
+- Ditindaklanjuti: petugas menangani kejadian di lapangan.
+- Laporan selesai: admin telah mencatat hasil penanganan dan penyelesaian.
+- Laporan ditolak: laporan tidak dilanjutkan, dengan alasan yang ditampilkan.
+
+Jika muncul Belum Ada Laporan, pastikan menggunakan browser tempat melapor.
+Jika muncul Laporan Tidak Ditemukan ketika mencari, hapus atau ubah kata kunci.
+Detail warga memuat ringkasan dan pelacakan; dokumentasi lengkap penanganan
+diperiksa petugas internal melalui detail laporan/kegiatan.
+
+2.8 MEMBACA PENOLAKAN LAPORAN
+
+Tujuan: memahami alasan laporan tidak dilanjutkan.
+
+Langkah:
+1. Buka Cek Status, lalu pilih laporan dengan status Laporan ditolak.
+2. Gulir ke bagian Laporan Ditolak dan baca alasan yang dicatat admin.
+   [gambar fitur] W-09 - Detail laporan ditolak beserta alasan penolakan.
+3. Periksa informasi yang perlu dilengkapi atau alasan di luar kewenangan.
+4. Jika perlu mengajukan kembali dengan informasi yang diperbaiki, tekan
+   Buat Laporan Baru dan isi formulir dari awal.
+5. Kirim laporan baru dengan uraian dan lokasi yang lebih jelas.
+   Hasil: pengajuan baru memperoleh kode laporan tersendiri.
+
+Laporan lama yang ditolak tidak dapat diubah atau dibuka kembali oleh warga
+melalui menu status. Simpan kode lama jika perlu menjelaskan riwayat kepada petugas.
+
+2.9 PENILAIAN LAYANAN PER LAPORAN
+
+Tujuan: memberi rating dan komentar terhadap penanganan laporan tertentu.
+Persiapan: laporan sudah berstatus Laporan selesai dan belum pernah dinilai.
+
+Langkah:
+1. Buka Cek Status menggunakan browser yang dipakai membuat laporan.
+2. Pilih laporan dengan status Laporan selesai.
+3. Gulir ke bagian "Bagaimana kepuasan Anda terhadap layanan kami?".
+   [gambar fitur] W-10 - Formulir penilaian: bintang, komentar, dan tombol Kirim Penilaian.
+4. Pilih bintang sesuai penilaian, dari satu sampai lima.
+   Menekan bintang kelima berarti rating 5; bintang pertama berarti rating 1.
+5. Isi Komentar / Saran jika ingin menambahkan masukan.
+   Komentar opsional, maksimal 2.000 karakter.
+6. Periksa pilihan, kemudian tekan Kirim Penilaian.
+7. Pastikan muncul Terima Kasih! sebagai tanda penilaian diterima.
+   Hasil: rating dan komentar dapat dibaca admin di Feedback Masyarakat.
+
+Satu laporan hanya menerima satu penilaian. Penilaian yang sudah dikirim tidak
+memiliki tombol edit/kirim ulang pada halaman warga. Laporan yang belum selesai
+atau ditolak tidak dapat dinilai melalui formulir ini.
+
+2.10 SURVEY KEPUASAN / SKM
+
+Tujuan: membuka survey kepuasan layanan pada layanan resmi SKM.
+Menu ini membuka survey eksternal. Rating per laporan di bagian 2.9 disimpan
+di SIPRAJA dan terlihat pada Feedback Masyarakat milik admin.
+
+Langkah melalui tombol:
+1. Klik Survey Kepuasan pada navigasi atau kartu layanan beranda.
+   Hasil: muncul QR, tautan survey, dan tombol Survey Sekarang.
+   [gambar fitur] W-11 - Survey Kepuasan: QR dan tombol Survey Sekarang.
+2. Tekan Survey Sekarang.
+   Hasil: halaman survey SKM dibuka pada tab baru.
+3. Ikuti pertanyaan dan petunjuk pada halaman SKM yang terbuka.
+   Isian dan urutannya mengikuti layanan tersebut saat digunakan.
+4. Kirim jawaban melalui tombol yang tersedia pada halaman survey.
+   Pastikan layanan SKM menunjukkan penyelesaian/penerimaan jawaban.
+5. Kembali ke tab SIPRAJA jika masih ingin menggunakan aplikasi.
+
+Langkah melalui QR:
+1. Buka Survey Kepuasan pada layar yang akan dipindai.
+2. Arahkan kamera/pemindai QR perangkat lain ke kode QR di halaman.
+3. Buka tautan hasil pemindaian, lalu ikuti petunjuk survey SKM.
+4. Jika QR tidak muncul atau sulit dipindai, gunakan tombol Survey Sekarang.
+
+2.11 CONTOH ALUR PENGGUNAAN WARGA
+
+1. Warga membuka SIPRAJA dan memilih Buat Laporan.
+2. Warga memasukkan nomor WhatsApp, meminta OTP, dan memverifikasi kode.
+3. Warga mengisi deskripsi dan lokasi; bila perlu memakai bantuan AI.
+4. Warga memilih foto bukti, maksimal tiga foto.
+5. Warga memilih Selanjutnya, mencentang pernyataan, lalu Kirim Laporan.
+6. Warga menyimpan kode dan memantau melalui Cek Status di browser yang sama.
+7. Warga membaca progres sampai Laporan selesai atau membaca alasan penolakan.
+8. Setelah laporan selesai, warga memberikan bintang dan komentar satu kali.
+9. Warga juga dapat membuka Survey Kepuasan untuk mengisi survey SKM.
+
+
+===============================================================================
+BAB 3. PANDUAN ADMIN
+===============================================================================
+
+3.1 MASUK KE PORTAL
+
+Tujuan: membuka halaman operasional dengan akun Admin.
+Persiapan: memiliki akun aktif beserta username/email dan password.
+
+Langkah:
+1. Dari beranda SIPRAJA, klik Masuk.
+   Hasil: halaman Masuk ke Portal ditampilkan.
+   [gambar fitur] A-01 - Halaman login beserta isian identitas, kata sandi, dan Ingat Saya.
+2. Isi kolom identitas dengan username akun atau email yang terdaftar.
+   Teks petunjuk menyebut ID petugas/email; gunakan username yang diberikan
+   pengelola. NIP pegawai e-Profil tidak otomatis menjadi identitas login.
+3. Isi Kata Sandi. Gunakan ikon mata jika perlu memeriksa pengetikan.
+4. Centang Ingat Saya hanya jika ingin mempertahankan login pada perangkat
+   pribadi yang digunakan untuk bekerja.
+5. Tekan Masuk pada formulir dan tunggu proses autentikasi.
+   Hasil: akun Admin aktif diarahkan ke dashboard admin.
+6. Jika identitas/password tidak cocok, perbaiki isian. Jika terlalu banyak
+   percobaan, tunggu sejumlah detik yang diberitahukan aplikasi.
+
+3.2 NAVIGASI DAN FITUR BAGIAN ATAS
+
+Menu samping admin:
+- Dashboard: ringkasan operasional dan statistik pengaduan.
+- Manajemen Pengaduan: daftar dan penanganan laporan.
+- Acara & Kegiatan: kegiatan internal dan penanganan laporan eksternal.
+- Evaluasi Kegiatan: hasil evaluasi dan kendala pelaksanaan.
+- Feedback Masyarakat: penilaian yang dikirim warga.
+- Arsip: pengelolaan dokumen.
+- Kembali ke Portal: membuka halaman publik.
+- Logout: mengakhiri sesi login.
+
+Fitur bagian atas: pencarian global, lonceng notifikasi, dan akses profil akun.
+
+Langkah:
+1. Pilih menu di sebelah kiri sesuai pekerjaan yang akan dilakukan.
+   Menu aktif ditandai dengan latar yang berbeda.
+   [gambar fitur] A-02 - Navigasi Admin: sidebar, pencarian, notifikasi, profil, dan Logout.
+2. Pada ponsel, tekan ikon Buka menu di bagian atas untuk membuka sidebar.
+   Setelah memilih menu, tutup sidebar menggunakan ikon X/area luar jika perlu.
+3. Gunakan kolom pencarian, lonceng, atau profil di bagian atas bila diperlukan.
+4. Jika tabel melebar pada ponsel, geser tabel secara horizontal untuk melihat
+   kolom Aksi. Jika form panjang, gulir jendela formulir sampai tombol simpan.
+
+3.3 DASHBOARD
+
+Tujuan: membaca jumlah pengaduan, kondisi penanganan, statistik, dan laporan baru.
+
+Isi dashboard:
+- Pengaduan Hari Ini/Periode Ini: jumlah pengaduan pada periode yang dipilih.
+- Belum Ditindaklanjuti: laporan pada tahap dibuat, diterima, atau verifikasi
+  yang masuk pada periode tersebut.
+- Pegawai e-Profil: jumlah pegawai yang tersedia dari sumber e-Profil.
+- Kegiatan Minggu Ini: kartu kegiatan; perhitungannya mengikuti periode filter.
+- Statistik Pengaduan: pengaduan masuk dan selesai berdasarkan tanggal.
+- Laporan Terbaru: beberapa laporan terbaru dalam periode terpilih.
+
+Langkah membaca dan memfilter:
+1. Pilih Dashboard.
+   [gambar fitur] A-03 - Dashboard Admin: ringkasan, filter periode, grafik, dan laporan terbaru.
+2. Baca rentang tanggal yang tercantum agar memahami periode data.
+3. Pilih Periode statistik: 1 hari terakhir, 3 hari terakhir, 7 hari terakhir,
+   atau Rentang tanggal.
+4. Jika memilih Rentang tanggal, isi Dari tanggal dan Sampai tanggal.
+   Tanggal akhir harus sama atau sesudah tanggal awal.
+5. Tekan Terapkan Filter.
+   Hasil: ringkasan, grafik, dan daftar laporan terbaru dimuat sesuai periode.
+6. Arahkan penunjuk ke grafik untuk membaca informasi angka yang ditampilkan.
+   Gunakan legenda grafik untuk mengenali pengaduan masuk dan selesai.
+7. Klik salah satu Laporan Terbaru untuk membuka detail.
+8. Tekan Lihat Semua untuk membuka Manajemen Pengaduan.
+
+3.4 MANAJEMEN PENGADUAN: DAFTAR DAN FILTER
+
+Tujuan: menemukan laporan yang harus diproses.
+
+Langkah:
+1. Klik Manajemen Pengaduan pada sidebar.
+   Hasil: daftar laporan, ringkasan, filter, dan tombol Tambah Laporan terlihat.
+   [gambar fitur] A-04 - Manajemen Pengaduan: tabel, pencarian, filter, dan tombol aksi.
+2. Isi Pencarian jika ingin mencari kode laporan, lokasi, atau nomor telepon.
+3. Pilih Status, misalnya Laporan dibuat, Sedang diverifikasi, atau Laporan
+   selesai. Pilih Semua status untuk tidak membatasi status.
+4. Isi Bulan jika memerlukan data laporan pada bulan tertentu.
+5. Isi Mulai dan Sampai jika memerlukan rentang tanggal.
+   Filter dapat dikombinasikan; perhatikan agar kriterianya tidak saling
+   mempersempit sampai tidak ada data yang sesuai.
+6. Tekan Terapkan untuk menjalankan pencarian dan filter.
+   Hasil: tabel menampilkan laporan yang cocok.
+7. Gunakan navigasi halaman di bawah tabel jika data lebih dari satu halaman.
+8. Tekan aksi lihat/detail pada laporan yang akan ditangani.
+9. Tekan Reset untuk kembali ke daftar tanpa filter.
+
+3.5 TAMBAH LAPORAN ONLINE/OFFLINE
+
+Tujuan: mencatat laporan yang diterima admin di luar pengisian langsung warga.
+Laporan Online dapat berasal dari kanal digital; Offline digunakan untuk laporan
+yang diterima secara langsung/non-digital sesuai pencatatan petugas.
+
+Langkah:
+1. Buka Manajemen Pengaduan lalu tekan Tambah Laporan.
+   Hasil: formulir Tambah Laporan ditampilkan.
+   [gambar fitur] A-05 - Formulir Tambah Laporan: sumber Online/Offline dan isian laporan.
+2. Pilih Sumber laporan: Online atau Offline.
+3. Jika Online, pilih Platform online. Pilihan yang tersedia adalah Website,
+   WhatsApp, Instagram, X, Facebook, TikTok, dan Lainnya.
+   Platform wajib dipilih untuk sumber Online.
+4. Isi Nama pelapor jika tersedia. Nama bersifat opsional, maksimal 255 karakter.
+5. Isi Nomor HP/telepon pelapor yang dapat dihubungi.
+   Form admin tidak memakai langkah OTP seperti formulir warga.
+6. Untuk sumber Offline, isi NIK pelapor dengan tepat 16 angka.
+   Kolom ini wajib untuk Offline dan tidak diminta pada form publik warga.
+7. Isi Deskripsi laporan, maksimal 5.000 karakter.
+   Catat kejadian sesuai keterangan yang diterima.
+8. Isi Alamat lokasi, maksimal 1.000 karakter.
+9. Tentukan titik kejadian pada peta. Gunakan pencarian lokasi atau klik peta;
+   gunakan Lokasi Saat Ini hanya jika perangkat memang berada di lokasi kejadian.
+   Periksa posisi penanda karena koordinat awal peta belum tentu lokasi laporan.
+   [gambar fitur] A-06 - Pemilihan lokasi laporan melalui peta dan koordinat.
+10. Periksa Latitude dan Longitude yang terisi dari pilihan peta.
+    Pada form ini koordinat ditampilkan sebagai kolom baca-saja.
+11. Jika tersedia, pilih Foto bukti, maksimal tiga foto JPG/JPEG/PNG/WEBP,
+    masing-masing 5 MB. Foto pada pembuatan laporan bersifat opsional.
+12. Periksa seluruh data, lalu tekan Simpan Laporan.
+13. Pastikan muncul pesan berhasil dan buka detail laporan yang tersimpan.
+    Hasil: kode laporan dibuat oleh sistem dan laporan dapat diproses.
+14. Jika batal mencatat, gunakan Batal atau X untuk kembali ke daftar.
+
+Catatan: laporan yang dicatat admin tidak otomatis menjadi laporan yang dapat
+diakses melalui cookie tamu warga di perangkat warga. Gunakan kode laporan dan
+kanal komunikasi petugas untuk membantu pelapor mengetahui pencatatannya.
+
+3.6 DETAIL LAPORAN DAN LAMPIRAN
+
+Tujuan: memahami laporan sebelum menentukan tindakan.
+
+Langkah:
+1. Dari daftar pengaduan, buka detail laporan yang sesuai.
+   [gambar fitur] A-07 - Detail pengaduan: informasi laporan, riwayat status, dan lampiran.
+2. Cocokkan kode, status, sumber laporan, identitas yang tersedia, nomor telepon,
+   waktu laporan, alamat, dan deskripsi.
+3. Baca riwayat status beserta catatan dan petugas pencatat jika tersedia.
+4. Pada Lampiran Laporan, klik foto/aksi lihat untuk membuka bukti di tab baru.
+   Hasil: petugas dapat memeriksa foto lebih jelas.
+5. Kembali ke tab detail dan periksa panel Tindak Lanjut.
+   Tombol yang tersedia menyesuaikan status laporan.
+6. Jika laporan sudah selesai, baca data kegiatan penanganan, hasil, temuan,
+   lokasi peta, petugas, dan bukti penanganan yang tersimpan.
+7. Jika warga sudah mengirim penilaian, baca bagian Feedback Pelapor.
+
+3.7 MEMAJUKAN STATUS LAPORAN
+
+Tujuan: mencatat progres penanganan secara berurutan.
+Perubahan status disimpan langsung ketika tombol tahap berikutnya ditekan.
+
+A. Menerima laporan
+1. Buka laporan yang berstatus Laporan dibuat.
+2. Pada panel Tindak Lanjut, isi Catatan status jika perlu, maksimal 1.000 karakter.
+   Contoh: "Laporan diterima dan akan diperiksa petugas."
+   [gambar fitur] A-08 - Panel Tindak Lanjut: catatan dan tombol perubahan status.
+3. Tekan Laporan diterima.
+4. Pastikan status berubah dan riwayat bertambah.
+
+B. Memulai verifikasi
+1. Buka laporan yang berstatus Laporan diterima.
+2. Isi catatan jika diperlukan, misalnya proses pengecekan lokasi/keterangan.
+3. Tekan Sedang diverifikasi.
+4. Pastikan status dan riwayat menunjukkan tahap verifikasi.
+
+C. Memulai tindak lanjut
+1. Buka laporan yang berstatus Sedang diverifikasi.
+2. Setelah pemeriksaan dan keputusan tindak lanjut, isi catatan jika perlu.
+3. Tekan Ditindaklanjuti.
+4. Pastikan status berubah dan formulir penyelesaian dapat diakses.
+
+Hasil: setiap perubahan tercatat dalam riwayat dan dapat dipantau warga melalui
+Cek Status. Status tidak dapat dilompati atau dimundurkan melalui menu ini.
+Jika muncul "Status laporan sudah berubah", muat ulang detail sebelum menentukan
+langkah berikutnya; admin lain mungkin sudah memproses laporan tersebut.
+
+3.8 MENOLAK LAPORAN
+
+Tujuan: mengakhiri laporan yang tidak dapat dilanjutkan setelah pemeriksaan.
+Persiapan: laporan berstatus Sedang diverifikasi. Alasan penolakan wajib diisi.
+
+Langkah:
+1. Buka detail laporan pada tahap Sedang diverifikasi.
+2. Di panel Tindak Lanjut, temukan Alasan penolakan.
+   [gambar fitur] A-09 - Formulir penolakan laporan beserta kolom alasan.
+3. Isi alasan yang jelas, maksimal 1.000 karakter.
+   Jelaskan kondisi yang ditemukan agar pelapor memahami keputusan.
+4. Periksa kode laporan dan isi alasan, lalu tekan Tolak Laporan.
+5. Jika dialog konfirmasi muncul, baca kembali keterangannya lalu pilih konfirmasi
+   untuk melanjutkan atau Batal untuk meninjau ulang.
+6. Pastikan muncul pesan berhasil dan status Laporan ditolak.
+   Hasil: alasan tercatat dan dapat dibaca pelapor melalui halaman status.
+
+Penolakan tersedia pada tahap verifikasi. Laporan yang sudah ditolak tidak
+memiliki tindakan melanjutkan proses atau penyelesaian pada menu ini.
+
+3.9 MENYELESAIKAN LAPORAN DAN MEMBUAT KEGIATAN EKSTERNAL
+
+Tujuan: menyimpan hasil penanganan lapangan dan menuntaskan laporan.
+Persiapan: status Ditindaklanjuti; penanganan sudah dilakukan; tersedia minimal
+satu petugas e-Profil dan satu foto bukti penanganan.
+
+Langkah:
+1. Buka detail laporan dengan status Ditindaklanjuti.
+2. Tekan Isi Form Penyelesaian pada panel Tindak Lanjut, atau gulir ke Selesaikan
+   Laporan yang tampil pada halaman.
+   [gambar fitur] A-10 - Formulir penyelesaian laporan dan pencatatan kegiatan eksternal.
+3. Pilih Template kegiatan jika diperlukan, atau biarkan Tanpa template.
+   Periksa isian nama/deskripsi yang mungkin terbantu oleh template.
+4. Isi atau perbaiki Nama kegiatan, misalnya "Penanganan SPJ-ABC123".
+   Nama wajib, maksimal 255 karakter.
+5. Pilih Tanggal pelaksanaan sesuai tanggal penanganan sebenarnya.
+   Tanggal tidak boleh melewati hari ini. Isi Waktu mulai jika tersedia.
+6. Periksa Lokasi kegiatan dan sesuaikan dengan lokasi penanganan.
+   Alamat wajib, maksimal 2.000 karakter.
+7. Tentukan titik pada peta menggunakan Cari Lokasi, Lokasi Saat Ini, atau klik
+   peta. Pastikan Latitude dan Longitude sesuai, bukan posisi awal peta.
+8. Isi Deskripsi kegiatan jika ingin menambahkan uraian tindakan, maksimal 5.000
+   karakter. Kolom ini opsional.
+9. Isi Hasil penanganan, maksimal 5.000 karakter.
+   Kolom wajib. Jelaskan tindakan, keadaan setelah penanganan, dan hasilnya.
+10. Jika ada temuan, tekan Tambah Temuan. Pilih Jenis temuan: Orang atau Barang;
+    isi Jumlah temuan sebagai bilangan bulat minimal satu; pilih satuan Buah,
+    Batang, Botol, atau Orang sesuai catatan yang dibuat.
+11. Ulangi Tambah Temuan untuk catatan tambahan, maksimal 50 baris. Hapus baris
+    yang tidak digunakan melalui ikon Hapus temuan agar tidak ada isian kosong.
+12. Cari petugas berdasarkan nama atau nomor pada Daftar petugas aktif.
+    Centang minimal satu petugas yang benar-benar menangani laporan.
+    [gambar fitur] A-11 - Pemilihan petugas dan ringkasan personel yang dipilih.
+13. Periksa panel Petugas terpilih dan jumlahnya. Batalkan centang atau gunakan
+    tombol X pada pilihan jika salah memilih.
+14. Pada Foto bukti penanganan, pilih minimal satu dan maksimal tiga foto.
+    Gunakan JPG/JPEG/PNG/WEBP, maksimal 5 MB per foto.
+15. Periksa data dan tekan Selesaikan dan Buat Kegiatan Eksternal.
+16. Tunggu pesan berhasil. Periksa status Laporan selesai dan data kegiatan
+    penanganan yang sekarang tampil pada detail.
+    Hasil: laporan selesai dan satu kegiatan eksternal terkait tercatat.
+17. Buka Acara & Kegiatan, filter Jenis kegiatan ke Eksternal, lalu cari kode
+    laporan untuk memastikan catatan penanganan dapat ditemukan.
+
+Satu laporan mempunyai paling banyak satu kegiatan eksternal penanganan.
+Gunakan proses penyelesaian ini untuk mencatatnya. Tombol Tambah Kegiatan pada
+menu kegiatan digunakan untuk kegiatan internal.
+Jika daftar petugas kosong atau ada peringatan e-Profil, periksa masalah sumber
+pegawai bersama pengelola; formulir tidak dapat diselesaikan tanpa pilihan petugas.
+
+3.10 MENGHAPUS LAPORAN
+
+Tujuan: menghapus laporan melalui tindakan yang tersedia untuk Admin.
+Pastikan kode dan isi laporan memang sesuai dengan data yang hendak dihapus.
+
+Langkah:
+1. Buka detail laporan yang akan dihapus.
+2. Periksa kode laporan, lokasi, status, dan isi sebelum bertindak.
+3. Tekan Hapus Laporan pada panel yang tersedia.
+4. Baca dialog konfirmasi. Pilih Batal untuk mempertahankan data, atau konfirmasi
+   hapus untuk meneruskan.
+5. Tunggu pemberitahuan berhasil dan periksa kembali daftar pengaduan.
+   Hasil: laporan tidak lagi tampil pada daftar aktif. Riwayat dan berkas laporan
+   tetap disimpan oleh sistem untuk audit.
+
+Tidak tersedia menu pemulihan laporan di antarmuka yang dibahas dalam panduan.
+Gunakan penolakan sesuai alurnya jika tujuan pekerjaan adalah mencatat alasan
+laporan tidak dapat ditindaklanjuti.
+
+3.11 ACARA & KEGIATAN: DAFTAR DAN DETAIL
+
+Tujuan: membaca kegiatan internal dan catatan penanganan laporan eksternal.
+
+Langkah menemukan kegiatan:
+1. Klik Acara & Kegiatan pada sidebar.
+   [gambar fitur] A-12 - Acara & Kegiatan: tabel, filter, ekspor, dan aksi pengelolaan.
+2. Isi Pencarian dengan nama kegiatan, kode laporan, atau lokasi.
+3. Pilih Bulan kegiatan, Mulai tanggal, dan Sampai tanggal sesuai kebutuhan.
+4. Pilih Jenis kegiatan: Semua jenis, Internal, atau Eksternal.
+5. Pilih Kategori bila ingin mempersempit daftar.
+6. Tekan tombol filter, lalu baca hasil pada tabel.
+   Hasil: daftar mengikuti kombinasi filter.
+7. Gunakan navigasi halaman di bawah tabel untuk data berikutnya.
+8. Gunakan ikon Reset filter untuk menghapus filter dan melihat daftar awal.
+
+Langkah membaca detail:
+1. Untuk kegiatan Internal, tekan Lihat detail kegiatan/ikon mata pada kolom Aksi.
+2. Baca Informasi Kegiatan, temuan, dokumentasi, lokasi peta, dan petugas.
+3. Klik foto/ikon Buka dokumentasi untuk melihat lampiran dalam tab baru.
+4. Tutup detail dengan X untuk kembali ke daftar.
+5. Untuk kegiatan Eksternal yang terhubung ke laporan, tekan Lihat laporan dan
+   kegiatan. Hasil: detail pengaduan dibuka beserta data penanganannya.
+
+Kegiatan internal menyediakan tindakan lihat, edit, dan hapus. Kegiatan eksternal
+dicatat dari penyelesaian laporan dan dibaca melalui detail laporan terkait.
+
+3.12 MENAMBAH KEGIATAN INTERNAL
+
+Tujuan: mencatat kegiatan operasional yang tidak berasal dari laporan masyarakat.
+Persiapan: mengetahui nama, kategori, tanggal, lokasi, dan petugas kegiatan.
+
+Langkah:
+1. Buka Acara & Kegiatan, lalu tekan Tambah Kegiatan.
+   Hasil: jendela Tambah Kegiatan Internal terbuka.
+   [gambar fitur] A-13 - Formulir Tambah Kegiatan Internal beserta isian utamanya.
+2. Pilih Template kegiatan jika diperlukan. Pilihan Tanpa template tersedia.
+   Template dapat membantu mengisi nama, kategori, dan deskripsi; tinjau hasilnya.
+3. Pilih Kategori kegiatan dari daftar yang tersedia. Kategori wajib dipilih
+   meskipun menggunakan Tanpa template.
+4. Isi Nama kegiatan, maksimal 255 karakter.
+   Contoh: "Patroli Ketertiban Wilayah Pengasih".
+5. Isi Tanggal pelaksanaan. Waktu mulai bersifat opsional.
+6. Isi Deskripsi atau tujuan jika tersedia, maksimal 5.000 karakter.
+7. Isi Hasil kegiatan jika kegiatan sudah dilaksanakan, maksimal 5.000 karakter.
+   Deskripsi dan hasil bersifat opsional.
+8. Jika ada temuan, tekan Tambah Temuan. Pilih Orang/Barang, isi jumlah bilangan
+   bulat minimal satu, dan pilih satuan Buah/Batang/Botol/Orang.
+   Maksimal 50 baris; gunakan ikon hapus untuk membuang baris yang tidak dipakai.
+9. Isi Alamat lengkap pada Lokasi Kegiatan, maksimal 2.000 karakter.
+10. Cari lokasi melalui Cari Lokasi dan pilih hasilnya, tekan Lokasi Saat Ini
+    jika perangkat berada di lokasi kegiatan, atau klik titik pada peta.
+11. Periksa Latitude dan Longitude yang terisi. Kolom ini juga dapat diisi
+    dengan koordinat yang diketahui. Gunakan titik untuk nilai desimal.
+12. Pada Petugas yang mengikuti, cari nama/nomor petugas, lalu centang minimal
+    satu petugas dari daftar yang tersedia.
+13. Periksa Petugas terpilih. Gunakan X atau batalkan centang untuk mengoreksi.
+14. Pilih Foto dokumentasi bila tersedia. Dokumentasi opsional, maksimal tiga
+    foto JPG/JPEG/PNG/WEBP, ukuran maksimal 5 MB setiap foto.
+15. Tekan Simpan Kegiatan Internal dan tunggu pesan berhasil.
+16. Periksa detail kegiatan yang dibuka setelah penyimpanan.
+    Hasil: kegiatan Internal tersimpan dan masuk ke daftar kegiatan.
+17. Jika ingin batal, gunakan Batal atau X sebelum menyimpan.
+
+Jika lokasi pencarian gagal, pilih titik peta secara manual dan isi alamat.
+Jika daftar kategori atau pegawai tidak tersedia, hubungi pengelola sebelum
+melanjutkan karena kategori dan minimal satu petugas wajib dipilih.
+
+3.13 MENGUBAH KEGIATAN DAN DOKUMENTASI
+
+Tujuan: memperbarui kegiatan internal yang sudah dicatat.
+
+Langkah mengubah data:
+1. Temukan kegiatan Internal pada Acara & Kegiatan.
+2. Tekan Edit kegiatan/ikon pensil, atau Edit pada detail kegiatan.
+   Hasil: jendela Edit Kegiatan Internal berisi data yang tersimpan.
+3. Perbaiki template/kategori, nama, tanggal, waktu, deskripsi, hasil, atau temuan
+   yang diperlukan. Periksa isian yang terpengaruh ketika mengganti template.
+   [gambar fitur] A-14 - Formulir Edit Kegiatan Internal dan dokumentasi tersimpan.
+4. Jika lokasi berubah, perbarui alamat serta titik peta dan koordinatnya.
+5. Perbarui petugas dengan mencentang tambahan atau membatalkan pilihan.
+   Pastikan tetap terdapat minimal satu petugas.
+6. Jika ingin menambahkan foto, gunakan kolom Foto dokumentasi. Jumlah foto
+   tersimpan ditambah foto baru tidak boleh melebihi tiga.
+7. Tekan Simpan Perubahan.
+8. Periksa pesan berhasil dan data terbaru pada detail kegiatan.
+
+Langkah membuka/menghapus dokumentasi:
+1. Buka detail atau form Edit Kegiatan Internal.
+2. Pada dokumentasi tersimpan, klik ikon mata untuk melihat foto di tab baru.
+3. Untuk menghapus foto, pilih ikon Hapus dokumentasi pada foto yang sesuai.
+4. Konfirmasikan penghapusan pada dialog jika data yang dipilih sudah benar.
+   Hasil: foto tersebut dihapus; slot unggah dapat digunakan kembali.
+5. Jika mengganti foto, pilih foto baru setelah slot tersedia lalu Simpan Perubahan.
+
+Penghapusan dokumentasi adalah tindakan tersendiri dan langsung memengaruhi foto
+tersimpan. Simpan perubahan isian lain terlebih dahulu sebelum menghapus foto
+agar isian yang belum dikirim tidak hilang ketika halaman dimuat kembali.
+Jika sistem menyatakan data kegiatan sudah berubah, buka ulang form edit dan
+terapkan perubahan pada versi terbaru.
+
+3.14 MENGHAPUS KEGIATAN INTERNAL
+
+Tujuan: menghapus kegiatan internal dari daftar aktif.
+
+Langkah:
+1. Temukan kegiatan Internal yang akan dihapus.
+2. Cocokkan nama, tanggal, dan lokasi kegiatan.
+3. Tekan Hapus kegiatan/ikon tempat sampah pada tabel atau detail.
+4. Baca dialog konfirmasi lalu pilih konfirmasi hapus atau Batal.
+5. Pastikan pesan berhasil dan kegiatan tidak lagi tampil pada daftar aktif.
+
+Menu pemulihan kegiatan tidak tersedia pada antarmuka ini. Periksa pencatatan
+yang diperlukan sebelum menghapus karena evaluasi terhubung dengan kegiatan.
+
+3.15 EKSPOR EXCEL DAN PDF KEGIATAN
+
+Tujuan: menyimpan rekap kegiatan sebagai berkas di perangkat.
+Data ekspor mengikuti filter yang diterapkan dan mencakup seluruh hasil yang
+cocok, termasuk data di halaman tabel lain.
+
+A. Ekspor Excel
+1. Buka Acara & Kegiatan.
+2. Tentukan pencarian, periode, jenis, dan kategori; tekan tombol filter.
+3. Periksa daftar dan pastikan ada kegiatan yang sesuai.
+4. Tekan Ekspor Excel.
+5. Tunggu sampai file .xlsx diunduh. Buka folder unduhan atau daftar unduhan
+   browser untuk menemukan file Laporan_Kegiatan_....xlsx.
+6. Buka file dengan aplikasi spreadsheet, lalu periksa nama, jenis, tanggal,
+   lokasi, petugas, hasil, temuan, dan data evaluasi yang tercantum.
+   Dokumentasi pada Excel dicatat sebagai nama file.
+
+B. Ekspor PDF
+1. Gunakan daftar yang sudah difilter sesuai kebutuhan.
+2. Tekan Ekspor PDF.
+3. Tunggu proses penyusunan dan unduhan .pdf. Dokumentasi gambar dapat membuat
+   proses lebih lama, terutama jika jumlah kegiatan banyak.
+4. Buka PDF dan periksa periode, tabel tanggal/waktu, personel, tindakan/hasil,
+   dokumentasi, serta ringkasan yang dihasilkan.
+   [gambar fitur] A-15 - Contoh hasil ekspor PDF rekap kegiatan.
+5. Periksa seluruh halaman sebelum mencetak atau membagikan berkas.
+
+Jika tidak ada kegiatan sesuai filter, ubah filter terlebih dahulu. Jika pustaka
+ekspor gagal dimuat, periksa koneksi internet, muat ulang halaman, dan coba lagi.
+Jika browser meminta izin unduhan, izinkan sesuai pengaturan browser.
+
+3.16 EVALUASI KEGIATAN
+
+Tujuan: mencatat hasil evaluasi dan kendala suatu kegiatan.
+Evaluasi dapat dibuat untuk kegiatan Internal dan Eksternal yang tersedia.
+Satu kegiatan mempunyai satu evaluasi aktif; evaluasi yang sudah ada diubah
+melalui Edit, bukan ditambahkan sebagai duplikat.
+
+A. Melihat dan mencari evaluasi
+1. Klik Evaluasi Kegiatan pada sidebar.
+   [gambar fitur] A-16 - Evaluasi Kegiatan: tabel, filter, dan aksi pengelolaan.
+   Baca kartu Total Evaluasi, Internal, Eksternal (Laporan), dan Ada Kendala.
+   Ringkasan menghitung evaluasi yang tersimpan; filter digunakan untuk
+   mempersempit tabel.
+2. Isi Pencarian untuk nama kegiatan, laporan, atau hasil evaluasi.
+3. Pilih Sumber: Internal/Eksternal, isi Bulan atau rentang Mulai dan Sampai.
+   Bulan/rentang tanggal pada daftar ini mengikuti waktu pencatatan evaluasi.
+4. Tekan Terapkan, kemudian baca tabel hasil.
+   Periksa kegiatan, sumber, tanggal, hasil evaluasi, kendala, dan pencatat.
+5. Gunakan navigasi halaman jika tersedia. Tekan Reset untuk menghapus filter.
+
+B. Menambah evaluasi
+1. Tekan Tambah Evaluasi.
+   Hasil: form Tambah Evaluasi terbuka.
+   [gambar fitur] A-17 - Formulir evaluasi: sumber, kegiatan, hasil evaluasi, dan kendala.
+2. Pilih Sumber: Internal (Kegiatan Satpol PP) atau Eksternal.
+   Pilihan ini membantu menentukan kegiatan yang dapat dipilih.
+3. Pilih Kategori jika ingin mempersempit daftar kegiatan.
+4. Pilih Nama Kegiatan yang akan dievaluasi. Hanya kegiatan yang tersedia untuk
+   penambahan evaluasi yang dapat dipilih.
+5. Isi Hasil Evaluasi, maksimal 3.000 karakter.
+   Contoh isi: pelaksanaan, kesesuaian tujuan, kondisi akhir, dan saran perbaikan.
+6. Isi Kendala jika ada, maksimal 3.000 karakter. Kolom ini opsional.
+7. Tekan Simpan pada form dan tunggu pemberitahuan berhasil.
+   Hasil: evaluasi muncul pada daftar dan terkait dengan kegiatan yang dipilih.
+8. Gunakan Batal atau X jika ingin menutup form tanpa menyimpan.
+
+C. Mengubah evaluasi
+1. Temukan evaluasi pada tabel, lalu tekan Edit/ikon pensil.
+2. Perbaiki Hasil Evaluasi dan/atau Kendala pada form Edit Evaluasi.
+3. Tekan Simpan Perubahan.
+4. Pastikan pesan berhasil dan periksa isian terbaru pada daftar.
+   Hasil: evaluasi kegiatan diperbarui.
+
+D. Menghapus evaluasi
+1. Temukan evaluasi yang sesuai dan periksa nama kegiatan.
+2. Tekan Hapus/ikon tempat sampah pada evaluasi tersebut.
+3. Baca dialog konfirmasi dan pilih konfirmasi hapus untuk melanjutkan.
+4. Pastikan pesan berhasil dan evaluasi tidak lagi tampil.
+   Hasil: catatan evaluasi dihapus dari kegiatan; kegiatan dasarnya tetap ada.
+
+3.17 FEEDBACK MASYARAKAT
+
+Tujuan: membaca rating dan saran warga yang dikirim setelah laporan selesai.
+
+Langkah:
+1. Klik Feedback Masyarakat.
+   [gambar fitur] A-18 - Feedback & Kepuasan Masyarakat: ringkasan, rating, dan komentar.
+2. Baca kartu Total Feedback, Rata-rata Rating, Sangat Puas (5 bintang), dan
+   Perlu Perbaikan (rating di bawah 3 bintang).
+3. Gulir Daftar Feedback Pelapor.
+4. Baca kode laporan, waktu pengiriman feedback, jumlah bintang, dan komentar.
+5. Gunakan navigasi halaman untuk membaca feedback berikutnya jika tersedia.
+6. Jika memerlukan konteks laporan, cari kode tersebut di Manajemen Pengaduan
+   atau pencarian global, lalu buka detailnya.
+
+Menu ini digunakan untuk membaca penilaian per laporan. Tidak tersedia tombol
+balas, ubah, hapus, atau filter khusus feedback pada halaman ini. Jawaban survey
+SKM eksternal mengikuti layanan SKM dan tidak otomatis muncul sebagai daftar ini.
+
+3.18 ARSIP DAN DOKUMEN
+
+Tujuan: menyimpan dan mengakses kelompok dokumen operasional.
+Satu arsip dapat memuat maksimal lima file, ukuran maksimal 20 MB setiap file.
+
+A. Melihat dan mencari arsip
+1. Klik Arsip.
+   Hasil: halaman Arsip & Dokumen tampil dengan ringkasan dan daftar arsip.
+   [gambar fitur] A-19 - Arsip & Dokumen: pencarian, kategori, daftar dokumen, dan aksi.
+   Baca ringkasan Total Arsip, Dokumen, Media, dan Rahasia. Angka tersebut
+   menghitung kelompok arsip, bukan jumlah file. Media berarti kelompok yang
+   memiliki gambar JPG/JPEG/PNG; Dokumen menghitung kelompok lainnya; Rahasia
+   menghitung kelompok dengan sifat Rahasia / Confidential.
+2. Isi pencarian berdasarkan nama arsip, nama file, atau deskripsi.
+3. Pilih Semua Kategori atau kategori yang diperlukan, lalu tekan Filter.
+4. Baca kartu arsip: nama, kategori, sifat dokumen, keterangan, dan file.
+5. Gunakan ikon Reset filter jika ingin kembali ke daftar awal.
+6. Gunakan navigasi halaman di bawah daftar jika terdapat lebih banyak arsip.
+
+B. Mengunggah arsip baru
+1. Tekan Unggah Arsip.
+   Hasil: form Unggah Arsip Baru terbuka.
+   [gambar fitur] A-20 - Formulir arsip: nama, kategori, sifat, keterangan, dan unggahan file.
+2. Isi Nama Arsip / Dokumen, maksimal 255 karakter.
+   Gunakan nama yang mudah ditemukan, misalnya judul dokumen dan periode.
+3. Pilih Kategori dari daftar kategori yang tersedia.
+4. Pilih Sifat Dokumen: Biasa / Publik atau Rahasia / Confidential.
+   Label sifat dokumen digunakan untuk klasifikasi; akses berkas arsip tetap
+   melalui halaman internal yang memerlukan login dan hak akses Admin.
+5. Isi Keterangan / Deskripsi Ringkas jika diperlukan, maksimal 5.000 karakter.
+6. Klik area Unggah File dan pilih minimal satu, maksimal lima file.
+   Format: PDF, JPG, JPEG, PNG, DOC, DOCX, XLS, XLSX, atau ZIP.
+   Masing-masing file maksimal 20 MB.
+7. Periksa nama dan jumlah file, lalu tekan Simpan & Unggah.
+8. Tunggu pesan berhasil dan periksa kartu arsip baru beserta file-file di dalamnya.
+
+C. Melihat dan mengunduh file
+1. Cari kartu arsip yang diperlukan.
+2. Pada file yang sesuai, tekan ikon Lihat file/ikon mata.
+   Hasil: berkas dibuka pada tab baru atau ditangani browser sesuai formatnya.
+   PDF/gambar dapat ditampilkan; format tertentu dapat memicu unduhan.
+3. Untuk menyimpan ke perangkat, tekan ikon Unduh file.
+4. Periksa daftar unduhan browser dan buka file dengan aplikasi yang sesuai.
+
+D. Mengubah arsip dan menambah file
+1. Pada kartu arsip, tekan Edit/ikon pensil.
+2. Perbarui nama, kategori, sifat dokumen, atau keterangan.
+3. Jika menambah file, pilih unggahan baru sesuai slot yang masih tersedia.
+   Contoh: arsip berisi tiga file dapat ditambah dua file lagi.
+   Isian unggah boleh dikosongkan jika hanya mengubah keterangan.
+4. Tekan Perbarui Arsip, lalu periksa pesan berhasil dan kartu terbaru.
+   Hasil: metadata diperbarui dan file baru ditambahkan ke kelompok arsip.
+
+E. Menghapus arsip
+1. Temukan kartu arsip yang sesuai dan periksa daftar file di dalamnya.
+2. Tekan Hapus arsip/ikon tempat sampah.
+3. Konfirmasikan penghapusan jika arsip yang dipilih sudah benar.
+4. Tunggu pesan berhasil dan pastikan kartu arsip tidak lagi tampil.
+   Hasil: kelompok arsip dikeluarkan dari daftar aktif dan file terkait tidak
+   lagi dapat dibuka melalui kartu arsip tersebut.
+
+Penghapusan pada menu ini berlaku untuk kelompok arsip. Tidak tersedia tombol
+hapus satu file arsip secara terpisah atau pemulihan arsip pada halaman ini.
+
+3.19 PROFIL DAN PASSWORD
+
+Tujuan: melihat identitas akun dan memperbarui data pribadi atau password.
+
+A. Melihat dan mengubah profil
+1. Klik bagian nama/avatar akun di kanan atas.
+   Hasil: halaman Profil Pengguna terbuka.
+2. Baca nama, username, email, peran, dan informasi akun yang tampil.
+3. Tekan Edit Profil.
+   [gambar fitur] A-21 - Formulir Edit Profil: identitas dan kolom penggantian password.
+4. Perbarui Nama Lengkap dan Username sesuai kebutuhan.
+   Nama maksimal 255 karakter; username maksimal 100 karakter dan harus unik.
+   Username menerima huruf, angka, titik, garis bawah, dan tanda hubung.
+5. Isi/perbarui Email jika diperlukan. Email harus valid dan belum digunakan
+   akun lain. Email bersifat opsional.
+6. Jika hanya mengubah identitas, biarkan kolom password kosong.
+7. Tekan Simpan Perubahan, tunggu pesan berhasil, dan periksa profil terbaru.
+
+B. Mengganti password
+1. Buka Profil Pengguna dan tekan Edit Profil.
+2. Pada bagian password, isi Password Saat Ini dengan password yang masih berlaku.
+3. Isi Password Baru, minimal delapan karakter dan maksimal 72 byte.
+   Untuk karakter huruf/angka biasa, 72 byte setara 72 karakter; karakter tertentu
+   dapat memakai lebih dari satu byte.
+4. Isi Konfirmasi Password Baru dengan nilai yang sama.
+5. Tekan Simpan Perubahan dan tunggu pesan berhasil.
+6. Gunakan password baru untuk login berikutnya.
+
+Jika lupa password lama, hubungi super admin/pengelola untuk memperbarui password
+akun. Penggantian melalui profil sendiri membutuhkan password saat ini.
+
+3.20 NOTIFIKASI
+
+Tujuan: melihat pemberitahuan akun, terutama laporan baru untuk admin aktif.
+
+Langkah:
+1. Tekan ikon lonceng di bagian atas.
+   Hasil: panel Notifikasi terbuka. Penanda merah menunjukkan notifikasi belum
+   dibaca jika ada.
+2. Baca judul, ringkasan, dan waktu notifikasi.
+3. Tekan notifikasi yang ingin dibuka.
+   Hasil: notifikasi ditandai dibaca dan diarahkan ke tujuan sesuai akses akun.
+4. Untuk menandai seluruh notifikasi, tekan Tandai semua dibaca.
+5. Tekan lonceng atau area luar panel untuk menutupnya.
+
+Daftar notifikasi diperbarui berkala selama halaman aktif. Jika tidak ada pesan,
+panel menampilkan Tidak ada notifikasi. Membaca notifikasi tidak mengubah status
+pengaduan; status diproses pada detail laporan.
+
+3.21 PENCARIAN GLOBAL
+
+Tujuan: menemukan data dari kolom pencarian bagian atas tanpa membuka daftar satu
+per satu. Hasil menyesuaikan hak akses akun.
+
+Langkah:
+1. Klik kolom "Cari laporan, kegiatan, atau petugas..." di bagian atas.
+2. Ketik minimal dua karakter, misalnya potongan kode laporan atau nama kegiatan.
+3. Tunggu daftar hasil muncul di bawah kolom.
+4. Baca jenis, judul, dan ringkasan untuk memilih data yang sesuai.
+5. Klik hasil untuk membuka halaman tujuan.
+6. Jika hasil kosong, perbaiki kata kunci. Klik di luar kolom untuk menutup hasil.
+
+Data yang dapat dibuka tetap mengikuti akses Admin meskipun teks petunjuk kolom
+menyebut beberapa jenis data. Gunakan pencarian dalam menu jika perlu filter
+status atau periode yang lebih rinci.
+
+3.22 KEMBALI KE PORTAL DAN LOGOUT
+
+Tujuan: berpindah ke halaman publik atau mengakhiri sesi kerja.
+
+Kembali ke Portal:
+1. Klik Kembali ke Portal di bagian bawah sidebar.
+2. Halaman publik SIPRAJA terbuka. Tindakan ini tidak mengakhiri sesi login.
+
+Logout:
+1. Selesaikan penyimpanan formulir yang sedang dikerjakan.
+2. Klik Logout di bagian bawah sidebar.
+3. Pastikan diarahkan ke beranda publik.
+   Hasil: sesi akun berakhir; halaman internal memerlukan login kembali.
+
+3.23 CONTOH ALUR KERJA ADMIN
+
+1. Login dan baca Dashboard untuk mengetahui laporan masuk.
+2. Buka Notifikasi atau Manajemen Pengaduan.
+3. Periksa detail laporan dan foto bukti.
+4. Catat Laporan diterima, lalu Sedang diverifikasi.
+5. Jika tidak dapat dilanjutkan, isi alasan dan Tolak Laporan pada tahap verifikasi.
+6. Jika dapat dilanjutkan, ubah ke Ditindaklanjuti dan lakukan penanganan.
+7. Isi hasil, lokasi, petugas, temuan, dan bukti pada formulir penyelesaian.
+8. Selesaikan laporan; periksa kegiatan eksternal yang terbentuk.
+9. Catat evaluasi, unggah dokumen pendukung ke Arsip, dan baca feedback warga.
+10. Ekspor kegiatan sesuai periode yang dibutuhkan.
+11. Logout setelah pekerjaan selesai.
+
+
+===============================================================================
+BAB 4. PANDUAN SUPER ADMIN
+===============================================================================
+
+4.1 MASUK DAN NAVIGASI
+
+Tujuan: mengakses menu pengawasan dan pengelolaan dengan akun Super Admin.
+
+Langkah login:
+1. Buka SIPRAJA dan tekan Masuk.
+2. Isi username atau email akun Super Admin yang aktif.
+3. Isi Kata Sandi. Gunakan ikon mata jika perlu memeriksa pengetikan.
+4. Pilih Ingat Saya jika diperlukan pada perangkat pribadi.
+5. Tekan Masuk dan tunggu dashboard Super Admin terbuka.
+
+Menu samping:
+- Dashboard: ringkasan sistem, peta persebaran, dan log aktivitas.
+- Kegiatan: pencatatan internal, pembacaan eksternal, serta ekspor.
+- Manajemen User: membuat dan mengelola akun yang ditampilkan.
+- Manajemen Petugas: menampilkan halaman Daftar Pegawai dari e-Profil.
+- Monitoring Sistem: ringkasan aktivitas yang terekam dalam audit.
+- Kembali ke Portal dan Logout.
+
+Langkah navigasi:
+1. Klik menu yang sesuai pada sidebar.
+   [gambar fitur] S-01 - Navigasi Super Admin beserta menu dan fitur bagian atas.
+2. Pada ponsel, tekan ikon Buka menu di bagian atas untuk menampilkan sidebar,
+   lalu pilih menu. Tutup dengan X/area luar jika perlu.
+3. Gunakan pencarian global, lonceng, dan nama/avatar di bagian atas untuk mencari
+   data, membaca notifikasi, dan membuka profil.
+
+4.2 DASHBOARD DAN RINGKASAN SISTEM
+
+Tujuan: memperoleh gambaran pengguna, pegawai, pengaduan, kegiatan, dan audit.
+
+Langkah:
+1. Pilih Dashboard.
+   [gambar fitur] S-02 - Dashboard Super Admin: ringkasan sistem dan log aktivitas.
+2. Baca Ringkasan Sistem:
+   a. Total User: jumlah akun pengguna yang dihitung sistem.
+   b. Total Pegawai e-Profil: jumlah pegawai dari sumber e-Profil.
+   c. Total Pengaduan Bulan Ini: pengaduan pada bulan berjalan.
+   d. Total Kegiatan Berjalan: ringkasan kegiatan yang ditampilkan sistem;
+      pada versi ini jumlahnya menggunakan kegiatan bulan berjalan.
+3. Gulir ke peta persebaran untuk melihat lokasi laporan dan kegiatan.
+   Gunakan prosedur pada bagian 4.3.
+4. Gulir ke Log Aktivitas Sistem untuk membaca aktivitas terbaru yang tercatat.
+   Periksa pelaku, uraian, modul/aksi, dan waktu yang ditampilkan.
+5. Gunakan tautan ke Monitoring Sistem untuk melihat ringkasan audit.
+6. Muat ulang dashboard bila ingin melihat data terbaru setelah perubahan.
+
+4.3 PETA PERSEBARAN PADA DASHBOARD
+
+Tujuan: melihat sebaran lokasi pengaduan serta kegiatan internal dan eksternal.
+Peta berada pada Dashboard di bagian Live Deployment Map.
+
+Langkah:
+1. Buka Dashboard dan gulir ke Live Deployment Map.
+   [gambar fitur] S-03 - Peta persebaran: filter, penanda, dan ringkasan data.
+2. Perhatikan penanda warna:
+   Merah = Laporan/Aduan; biru = Kegiatan Eksternal; hijau = Kegiatan Internal.
+3. Centang kategori yang ingin ditampilkan. Hilangkan centang untuk menyembunyikan
+   kategori tertentu. Contoh: tampilkan hanya Kegiatan Internal.
+   Hasil: penanda pada peta mengikuti pilihan filter.
+4. Geser peta untuk melihat area lain. Gunakan tombol + dan - untuk memperbesar
+   atau memperkecil. Pada komputer, Ctrl+gulir juga dapat digunakan.
+5. Klik penanda untuk membuka informasi ringkas lokasi/kegiatan/laporan.
+   Baca judul, tanggal, jenis, status, dan uraian yang tersedia.
+6. Tutup popup melalui X dan pilih penanda lain bila diperlukan.
+7. Baca kartu Pegawai e-Profil dan Laporan Terbuka di samping peta.
+8. Periksa grafik Kategori Persebaran, Distribusi Status, Laporan 7 Hari Terakhir,
+   dan Distribusi per Kecamatan.
+9. Muat ulang dashboard untuk mengambil data terbaru dari sistem.
+
+Catatan pembacaan:
+- Peta hanya dapat menampilkan data yang memiliki koordinat.
+- Laporan publik awalnya berisi alamat teks. Titiknya tersedia setelah admin
+  mencatat koordinat penanganan, atau pada laporan yang dicatat admin dengan peta.
+- Dua penanda dapat berdekatan jika laporan dan kegiatan penanganannya mempunyai
+  koordinat sama; ubah filter untuk membedakan jenis data.
+- Filter checkbox mengubah penanda peta; grafik merupakan ringkasan data yang
+  dimuat dan tidak semuanya dihitung ulang oleh pilihan checkbox tersebut.
+- Distribusi per Kecamatan pada versi ini memperkirakan area berdasarkan titik
+  pusat terdekat. Gunakan informasi alamat untuk memeriksa lokasi sebenarnya.
+- Label Live/Real-Time pada tampilan digunakan untuk ringkasan operasional;
+  pembaruan data dashboard dilakukan dengan memuat ulang halaman.
+
+4.4 KEGIATAN: DAFTAR DAN DETAIL LAPORAN
+
+Tujuan: melihat agenda internal dan hasil penanganan laporan eksternal.
+
+Langkah melihat daftar:
+1. Klik Kegiatan pada sidebar.
+   Hasil: halaman Acara & Kegiatan terbuka untuk peran Super Admin.
+2. Isi Pencarian dengan nama, kode laporan, atau lokasi kegiatan.
+3. Isi Bulan kegiatan atau rentang Mulai tanggal dan Sampai tanggal.
+4. Pilih Jenis kegiatan: Semua jenis, Internal, atau Eksternal.
+5. Pilih Kategori jika diperlukan, lalu tekan tombol filter.
+6. Periksa tabel. Gunakan navigasi halaman jika hasil lebih dari satu halaman.
+7. Gunakan Reset filter untuk kembali ke daftar awal.
+
+Langkah membaca kegiatan internal:
+1. Pada baris Internal, tekan Lihat detail kegiatan/ikon mata.
+2. Baca nama, tanggal, waktu, kategori, deskripsi, hasil, temuan, lokasi, petugas,
+   dan dokumentasi yang tersedia.
+3. Klik foto/ikon Buka dokumentasi untuk melihat gambar di tab baru.
+4. Tutup detail dengan X untuk kembali ke daftar.
+
+Langkah membaca kegiatan eksternal/laporan:
+1. Filter Jenis kegiatan ke Eksternal dan temukan kegiatan yang diperlukan.
+2. Tekan Lihat laporan dan kegiatan pada kegiatan yang terhubung ke laporan.
+3. Baca detail laporan, lampiran, riwayat status, hasil penanganan, temuan,
+   petugas, koordinat, dan dokumentasi.
+   [gambar fitur] S-04 - Detail laporan dalam mode baca-saja untuk Super Admin.
+4. Baca keterangan mode baca-saja pada panel Tindak Lanjut.
+   Super Admin tidak memajukan status, menolak, atau menyelesaikan laporan
+   melalui halaman ini. Penanganan dilakukan akun Admin.
+5. Tekan Kembali ke Kegiatan untuk membuka daftar lagi.
+
+4.5 MENAMBAH KEGIATAN INTERNAL
+
+Tujuan: mencatat agenda operasional langsung melalui akun Super Admin.
+Persiapan: tersedia kategori kegiatan, lokasi, dan minimal satu pegawai e-Profil.
+
+Langkah:
+1. Buka Kegiatan lalu tekan Tambah Kegiatan.
+2. Pada Tambah Kegiatan Internal, pilih Template kegiatan jika diperlukan.
+   Jika tidak, biarkan Tanpa template.
+3. Pilih Kategori kegiatan dari daftar aktif yang disediakan aplikasi.
+   Kategori wajib, termasuk ketika tidak menggunakan template.
+4. Isi Nama kegiatan, maksimal 255 karakter.
+5. Pilih Tanggal pelaksanaan; isi Waktu mulai jika tersedia.
+6. Isi Deskripsi atau tujuan dan Hasil kegiatan jika diperlukan, masing-masing
+   maksimal 5.000 karakter. Hasil boleh diisi saat pelaksanaan telah selesai.
+7. Jika ada temuan, pilih Tambah Temuan, tentukan jenis Orang/Barang, isi jumlah
+   bilangan bulat minimal satu, dan satuan Buah/Batang/Botol/Orang.
+   Maksimal 50 baris. Hapus baris yang tidak diperlukan melalui ikon hapus.
+8. Isi Alamat lengkap, maksimal 2.000 karakter.
+9. Gunakan Cari Lokasi dan pilih hasil pencarian, Lokasi Saat Ini jika sesuai,
+   atau klik titik peta kegiatan.
+10. Periksa Latitude/Longitude; isian dapat diperbaiki dengan koordinat yang
+    diketahui. Gunakan titik sebagai pemisah desimal.
+11. Cari nama/nomor pegawai pada Petugas yang mengikuti dan centang minimal satu.
+12. Periksa panel Petugas terpilih. Gunakan X atau batalkan centang jika salah.
+13. Unggah Foto dokumentasi bila tersedia, maksimal tiga foto JPG/JPEG/PNG/WEBP,
+    masing-masing 5 MB. Dokumentasi bersifat opsional.
+14. Tekan Simpan Kegiatan Internal dan tunggu pesan berhasil.
+15. Periksa detail kegiatan setelah tersimpan.
+    Hasil: kegiatan baru tercatat sebagai Internal.
+16. Untuk menutup tanpa menyimpan, gunakan Batal atau X.
+
+Kegiatan eksternal dibentuk ketika Admin menyelesaikan laporan. Form Tambah
+Kegiatan digunakan untuk pencatatan Internal.
+
+4.6 MENGUBAH KEGIATAN DAN DOKUMENTASI
+
+Tujuan: memperbarui data kegiatan internal melalui akun Super Admin.
+
+Langkah:
+1. Pada daftar Kegiatan, temukan baris Internal dan tekan Edit kegiatan.
+2. Perbaiki nama, kategori, template, tanggal/waktu, deskripsi, hasil, atau temuan
+   sesuai kebutuhan. Pastikan nama, kategori, dan tanggal tetap terisi.
+3. Jika tempat berubah, perbarui alamat, titik peta, dan koordinatnya.
+4. Tambahkan/batalkan pilihan pegawai. Pertahankan minimal satu petugas terpilih.
+5. Tambahkan foto melalui Foto dokumentasi jika masih tersedia slot.
+   Total foto lama ditambah baru maksimal tiga, ukuran setiap foto maksimal 5 MB.
+6. Tekan Simpan Perubahan dan periksa pemberitahuan serta detail terbaru.
+
+Langkah mengelola foto tersimpan:
+1. Buka detail atau form edit kegiatan internal.
+2. Tekan ikon mata untuk membuka dokumentasi.
+3. Jika foto akan dihapus, pilih Hapus dokumentasi pada foto yang benar.
+4. Konfirmasikan penghapusan pada dialog.
+   Hasil: foto dihapus dan slot tersedia kembali.
+5. Bila mengganti foto, unggah foto baru dan simpan perubahan kegiatan.
+
+Simpan isian kegiatan yang sedang diedit sebelum menghapus foto agar tidak
+kehilangan isian saat halaman dimuat kembali. Jika muncul pesan data sudah berubah,
+buka ulang form edit agar memakai data terbaru.
+
+4.7 MENGHAPUS KEGIATAN INTERNAL
+
+Langkah:
+1. Buka Kegiatan dan temukan kegiatan Internal yang hendak dihapus.
+2. Periksa nama, tanggal, dan lokasi untuk memastikan pilihan.
+3. Tekan Hapus kegiatan pada tabel atau detail.
+4. Baca dialog konfirmasi; pilih konfirmasi hapus atau Batal.
+5. Tunggu pesan berhasil dan periksa daftar.
+   Hasil: kegiatan tidak lagi tampil pada daftar aktif.
+
+Tindakan ini tersedia untuk kegiatan Internal. Tidak tersedia menu pemulihan
+kegiatan pada antarmuka yang dijelaskan di sini.
+
+4.8 EKSPOR EXCEL DAN PDF KEGIATAN
+
+Tujuan: menyimpan rekap kegiatan sesuai kebutuhan pengawasan.
+
+Langkah Ekspor Excel:
+1. Buka Kegiatan dan tetapkan pencarian, bulan/rentang tanggal, jenis, serta
+   kategori. Tekan tombol filter untuk menerapkan pilihan.
+2. Pastikan terdapat data yang sesuai, lalu tekan Ekspor Excel.
+3. Tunggu unduhan file .xlsx dan buka dari folder/daftar unduhan browser.
+4. Periksa data kegiatan, laporan terkait, petugas, hasil, temuan, dan evaluasi.
+   Ekspor mencakup seluruh hasil filter, termasuk halaman tabel lain.
+
+Langkah Ekspor PDF:
+1. Gunakan hasil filter yang sudah sesuai kebutuhan.
+2. Tekan Ekspor PDF dan tunggu proses selesai.
+3. Buka PDF yang diunduh dan periksa periode, tabel kegiatan, personel,
+   tindakan/hasil, dokumentasi, dan ringkasan.
+4. Periksa setiap halaman sebelum mencetak atau membagikan.
+
+Jika data kosong, ubah filter. Jika gagal memuat pustaka ekspor, periksa koneksi,
+muat ulang halaman, dan coba kembali. Proses PDF dengan banyak foto dapat lebih
+lama dibanding unduhan Excel.
+
+4.9 MANAJEMEN USER: MELIHAT DAN MENAMBAH AKUN
+
+Tujuan: memeriksa akun pengguna dan menyediakan akun Admin baru.
+
+Langkah melihat akun:
+1. Klik Manajemen User.
+   [gambar fitur] S-05 - Manajemen User: ringkasan, daftar akun, status, dan kolom Aksi.
+2. Baca kartu Total User, Admin Satpol PP, Terblokir, dan User Aktif.
+3. Baca tabel akun: nama/email yang tersedia, username, status, waktu dibuat,
+   dan kolom Aksi. Gunakan tab Semua yang tersedia untuk melihat daftar.
+
+Langkah menambah akun:
+1. Tekan Tambah User.
+   Hasil: jendela Tambah User terbuka.
+   [gambar fitur] S-06 - Formulir akun: nama, username, email, dan kata sandi.
+2. Isi Nama Lengkap, maksimal 255 karakter.
+3. Isi Username yang unik, maksimal 100 karakter. Gunakan huruf, angka, titik,
+   garis bawah, atau tanda hubung.
+4. Isi Email jika tersedia. Email opsional, harus valid dan unik.
+5. Isi Kata Sandi, minimal delapan karakter dan maksimal 72 byte.
+   Siapkan password yang akan digunakan pemilik akun untuk login.
+6. Periksa isian, kemudian tekan Simpan.
+7. Tunggu pesan berhasil dan periksa akun di daftar.
+   Hasil: akun baru dibuat dengan peran Admin dan status Aktif.
+8. Berikan identitas login kepada pemilik akun melalui prosedur internal organisasi.
+9. Gunakan Batal atau X jika ingin menutup form tanpa membuat akun.
+
+Form penambahan ini membuat akun Admin. Tidak tersedia pilihan role baru pada
+form Tambah User. Data pegawai e-Profil dan akun login dikelola sebagai dua hal
+berbeda; kemunculan pegawai pada Manajemen Petugas tidak otomatis membuat akun.
+
+4.10 MANAJEMEN USER: MENGUBAH AKUN DAN PASSWORD
+
+Tujuan: memperbarui identitas akun atau menetapkan password pengganti.
+
+Langkah:
+1. Buka Manajemen User dan temukan baris akun yang akan diubah.
+2. Tekan Edit/ikon pensil pada baris tersebut.
+   Hasil: form Ubah User menampilkan data akun terpilih.
+3. Perbaiki Nama Lengkap, Username, atau Email sesuai kebutuhan.
+   Pastikan username/email tidak digunakan akun lain.
+4. Jika password tidak akan diganti, biarkan kolom Kata Sandi kosong.
+   Password lama akan tetap digunakan.
+5. Jika mengganti password, isi Kata Sandi baru minimal delapan karakter,
+   maksimal 72 byte. Form pengelolaan akun tidak meminta password lama pemilik.
+6. Tekan Simpan dan tunggu pesan berhasil.
+7. Periksa data terbaru di daftar, kemudian informasikan perubahan kepada pemilik
+   akun melalui prosedur internal jika diperlukan.
+
+Mengubah username/email dapat mengubah identitas yang digunakan saat login.
+Status aktif/terblokir diubah menggunakan aksi status pada bagian 4.11.
+
+4.11 MEMBLOKIR DAN MENGAKTIFKAN AKUN
+
+Tujuan: mengatur akses login akun yang ditampilkan pada Manajemen User.
+
+A. Memblokir akun aktif
+1. Buka Manajemen User dan temukan akun berstatus Aktif.
+2. Tekan Ubah status/ikon blokir pada kolom Aksi.
+3. Baca Konfirmasi Perubahan Status dan cocokkan nama akun.
+4. Tekan Ya, Ubah Status jika memang ingin memblokir.
+5. Tunggu pemberitahuan berhasil dan muat ulang daftar jika belum diperbarui.
+   Hasil: status menjadi Terblokir dan akun tidak dapat dipakai login aktif.
+
+B. Mengaktifkan kembali akun
+1. Temukan akun berstatus Terblokir.
+2. Tekan Ubah status/ikon centang pada akun tersebut.
+3. Konfirmasikan dengan Ya, Ubah Status.
+4. Pastikan status menjadi Aktif.
+   Hasil: pemilik akun dapat login dengan identitas dan password yang berlaku.
+
+Akun yang sedang dipakai oleh super admin tidak dapat diblokir melalui tindakan
+ini. Pilih Batal pada dialog jika akun yang ditunjukkan tidak sesuai.
+
+4.12 MENGHAPUS AKUN
+
+Tujuan: menghapus akun yang tidak lagi diperlukan melalui Manajemen User.
+
+Langkah:
+1. Buka Manajemen User dan temukan akun yang hendak dihapus.
+2. Cocokkan nama dan username, serta pastikan akun yang dipilih benar.
+3. Tekan Hapus/ikon tempat sampah pada baris akun.
+4. Baca dialog konfirmasi, lalu pilih konfirmasi hapus untuk melanjutkan.
+5. Tunggu pesan berhasil dan periksa daftar yang diperbarui.
+   Hasil: akun tidak lagi tersedia pada daftar dan tidak dapat dipakai login.
+
+Akun yang sedang digunakan tidak dapat dihapus. Menu pemulihan akun tidak
+tersedia. Jika tujuan hanya menghentikan akses untuk sementara, gunakan perubahan
+status menjadi Terblokir sehingga akun dapat diaktifkan kembali.
+
+4.13 MANAJEMEN PETUGAS / DAFTAR PEGAWAI E-PROFIL
+
+Tujuan: melihat data pegawai yang menjadi sumber pilihan personel kegiatan.
+Menu sidebar bernama Manajemen Petugas; halaman yang dibuka berjudul Daftar
+Pegawai. Pada versi ini datanya mengikuti e-Profil.
+
+Langkah:
+1. Klik Manajemen Petugas pada sidebar.
+   [gambar fitur] S-07 - Manajemen Petugas: daftar pegawai, NIP, nama, dan jabatan.
+2. Baca kartu Total Pegawai untuk mengetahui jumlah data yang tersedia.
+3. Baca tabel NIP, Nama, dan Jabatan.
+   Gunakan NIP untuk memastikan pegawai dengan nama serupa.
+4. Pada ponsel, geser tabel horizontal untuk melihat seluruh kolom jabatan.
+5. Jika muncul peringatan sumber data, baca keterangannya sebelum memilih
+   pegawai pada kegiatan.
+6. Jika pegawai tidak ada atau datanya keliru, koordinasikan pembaruan sumber
+   e-Profil dengan pengelola yang berwenang, lalu muat ulang halaman SIPRAJA
+   setelah sumber/integrasinya diperbarui.
+
+Halaman ini menyediakan pembacaan daftar pegawai. Tidak terdapat form tambah,
+edit, hapus, atau perubahan status pegawai lokal pada tampilan saat penyusunan.
+Penugasan pegawai dilakukan saat membuat/mengubah kegiatan atau ketika Admin
+mengisi penyelesaian laporan.
+
+4.14 MONITORING SISTEM
+
+Tujuan: membaca ringkasan layanan yang tampil dan aktivitas yang terekam dalam audit.
+
+Langkah:
+1. Klik Monitoring Sistem pada sidebar.
+   Hasil: halaman Status & Monitoring Sistem terbuka.
+   [gambar fitur] S-08 - Monitoring Sistem: status layanan, grafik, ringkasan audit, dan Refresh.
+2. Baca kartu Status Layanan: Server Utama, Database, API / Backend, dan Storage.
+3. Baca grafik Aktivitas Sistem untuk audit log tujuh hari terakhir.
+   Arahkan penunjuk ke grafik untuk melihat angka yang ditampilkan.
+4. Baca grafik Pelaku Aktivitas untuk jumlah pengguna unik yang tercatat pada
+   audit setiap hari.
+5. Periksa Ringkasan Audit Hari Ini: Aktivitas tercatat, Pengguna tercatat, dan
+   Modul terpantau. Modul terpantau merupakan jumlah modul unik dalam audit
+   yang dihitung sistem.
+6. Tekan Refresh Status untuk memuat ulang halaman dan mengambil data terbaru.
+7. Cocokkan perubahan ringkasan dengan aktivitas operasional yang baru dilakukan.
+   Untuk uraian aktivitas terbaru, baca Log Aktivitas Sistem pada Dashboard.
+
+Catatan pembacaan: angka grafik berasal dari audit aktivitas yang direkam sistem,
+sehingga tidak mewakili semua kunjungan browser atau semua permintaan jaringan.
+Kartu Status Layanan pada versi ini menggunakan label tampilan tetap; halaman
+ini belum menjadi alat pemeriksaan kesehatan server/kapasitas storage secara
+otomatis. Jika ada gangguan, gunakan informasi kesalahan dan koordinasi pengelola
+teknis untuk memastikan kondisi layanan sebenarnya.
+
+4.15 PROFIL SUPER ADMIN
+
+Tujuan: memperbarui identitas dan password akun yang sedang digunakan.
+
+A. Mengubah identitas
+1. Klik nama/avatar di bagian kanan atas.
+   Hasil: halaman Profil Super Admin terbuka.
+2. Baca identitas akun lalu tekan Edit Profil.
+3. Perbarui Nama Lengkap dan Username. Nama maksimal 255 karakter; username
+   maksimal 100 karakter, unik, dan memakai huruf/angka/titik/garis bawah/
+   tanda hubung.
+4. Isi/perbarui Email jika diperlukan. Email harus valid dan unik.
+5. Jika tidak mengganti password, biarkan bagian password kosong.
+6. Tekan Simpan Perubahan dan pastikan profil terbaru tampil.
+
+B. Mengganti password sendiri
+1. Buka Edit Profil Super Admin.
+2. Isi Password Saat Ini dengan password yang masih berlaku.
+3. Isi Password Baru, minimal delapan karakter dan maksimal 72 byte.
+4. Isi Konfirmasi Password Baru dengan nilai yang sama.
+5. Tekan Simpan Perubahan dan tunggu pemberitahuan berhasil.
+6. Gunakan identitas dan password terbaru untuk login berikutnya.
+
+Ketiga kolom password pada profil diperlukan jika mengganti password sendiri.
+Jika lupa password yang sedang berlaku, ikuti proses pemulihan yang ditetapkan
+pengelola organisasi; menu login yang tersedia tidak menyediakan alur reset email.
+
+4.16 NOTIFIKASI DAN PENCARIAN GLOBAL
+
+A. Notifikasi
+1. Tekan lonceng pada bagian atas halaman.
+2. Baca notifikasi yang memang tersedia untuk akun tersebut.
+   Notifikasi laporan baru pada versi ini dikirim kepada Admin aktif; panel
+   Super Admin dapat kosong bila tidak memiliki notifikasi sendiri.
+3. Tekan item untuk menandainya dibaca dan membuka tujuan sesuai hak akses.
+4. Gunakan Tandai semua dibaca untuk menandai semua pesan akun tersebut.
+5. Tutup panel dengan lonceng atau klik di luar panel.
+
+B. Pencarian global
+1. Klik kolom pencarian pada bagian atas.
+2. Ketik minimal dua karakter dari kode laporan, nama kegiatan, atau identitas
+   pegawai yang ingin dicari.
+3. Tunggu hasil muncul; baca jenis, judul, dan ringkasannya.
+4. Klik hasil yang sesuai untuk membuka tujuan:
+   - Hasil Petugas membuka halaman Daftar Pegawai.
+   - Hasil Kegiatan membuka daftar kegiatan dengan kata kunci terkait. Pilih
+     aksi detail dari tabel untuk membaca kegiatannya.
+   - Hasil Laporan mengarah ke bagian peta pada Dashboard. Untuk membaca detail
+     penanganan laporan selesai, buka Kegiatan, pilih Eksternal, lalu pilih
+     Lihat laporan dan kegiatan sesuai bagian 4.4.
+5. Jika tidak ada hasil, gunakan kata kunci lain atau buka menu daftar terkait.
+6. Klik di luar kolom untuk menutup hasil pencarian.
+
+4.17 KEMBALI KE PORTAL DAN LOGOUT
+
+Langkah Kembali ke Portal:
+1. Klik Kembali ke Portal di bagian bawah sidebar.
+2. Halaman publik terbuka; sesi login masih berlaku sampai melakukan Logout.
+
+Langkah Logout:
+1. Simpan formulir yang masih dikerjakan.
+2. Tekan Logout di bagian bawah sidebar.
+3. Pastikan beranda publik terbuka.
+   Hasil: sesi berakhir dan halaman internal memerlukan login kembali.
+
+4.18 CONTOH ALUR KERJA SUPER ADMIN
+
+1. Login dan baca Ringkasan Sistem di Dashboard.
+2. Gunakan peta untuk melihat sebaran laporan dan kegiatan yang memiliki koordinat.
+3. Baca log aktivitas dan Monitoring Sistem untuk meninjau pencatatan operasional.
+4. Buka Kegiatan dan baca detail penanganan laporan dalam mode baca-saja.
+5. Buat/perbarui kegiatan Internal sesuai kebutuhan.
+6. Tambahkan akun Admin, perbarui identitas, atau atur status akses akun.
+7. Baca Daftar Pegawai dan koordinasikan koreksi e-Profil jika diperlukan.
+8. Ekspor rekap kegiatan sesuai periode pengawasan.
+9. Perbarui profil jika perlu, kemudian Logout.
+
+
+===============================================================================
+BAB 5. KENDALA UMUM DAN PENYELESAIANNYA
+===============================================================================
+
+5.1 WEBSITE TIDAK TERBUKA ATAU TAMPILAN BELUM LENGKAP
+1. Periksa koneksi internet.
+2. Pastikan alamat website sesuai yang diberikan pengelola.
+3. Muat ulang halaman dan tunggu sampai selesai.
+4. Jika tetap gagal, catat waktu dan pesan yang terlihat, lalu sampaikan kepada
+   pengelola teknis untuk pengecekan.
+
+5.2 OTP WHATSAPP BELUM MASUK
+1. Periksa nomor, termasuk kode negara/awalan yang digunakan.
+2. Pastikan WhatsApp nomor tersebut aktif dan terkoneksi.
+3. Tunggu pesan pengiriman; jangan meminta OTP berulang dalam waktu singkat.
+4. Setelah jeda 60 detik, gunakan Kirim Ulang Kode OTP bila diperlukan.
+5. Jika pengiriman gagal berulang, simpan pesan kesalahan dan hubungi pengelola.
+
+5.3 OTP SALAH, KEDALUWARSA, ATAU VERIFIKASI TIDAK BERLAKU
+1. Ketik tepat enam angka dari pesan terbaru.
+2. Jika kode sudah melewati lima menit atau terlalu banyak percobaan salah,
+   minta kode baru setelah jeda pengiriman.
+3. Jika saat mengirim laporan diminta verifikasi ulang, lakukan verifikasi lagi;
+   verifikasi berhasil mempunyai masa berlaku 15 menit pada sesi yang sama.
+4. Gunakan browser yang sama dari verifikasi hingga pengiriman laporan.
+
+5.4 LAPORAN TIDAK MUNCUL PADA CEK STATUS
+1. Pastikan pernah melihat Laporan Terkirim! beserta kode.
+2. Gunakan browser/perangkat tempat laporan dibuat.
+3. Hapus kata kunci pencarian agar seluruh laporan terkait terlihat.
+4. Periksa apakah browser menggunakan incognito atau cookie telah dihapus.
+5. Jika akses tamu hilang, hubungi petugas dengan kode laporan yang dicatat.
+   Memasukkan kode di perangkat baru saja tidak memulihkan akses status.
+
+5.5 FOTO ATAU FILE DITOLAK
+1. Baca kesalahan jumlah, ukuran, atau format.
+2. Sesuaikan dengan BAB 6. Foto bukti/dokumentasi berbeda ketentuannya dari arsip.
+3. Perkecil file yang terlalu besar atau pilih file dengan format yang didukung.
+4. Pilih ulang file pada formulir. Mengganti nama ekstensi saja tidak mengubah
+   format isi file dan dapat tetap ditolak.
+5. Jika server menolak unggahan sebelum muncul pesan aplikasi, coba file lebih
+   kecil dan koordinasikan batas unggah server dengan pengelola teknis.
+
+5.6 KAMERA TIDAK TERBUKA
+1. Periksa izin kamera browser/perangkat.
+2. Jika pemilih kamera tidak tersedia, gunakan Pilih dari File.
+3. Ambil foto dengan aplikasi kamera perangkat, lalu pilih hasilnya dari galeri.
+
+5.7 ASISTEN AI TIDAK MENJAWAB
+1. Periksa koneksi dan pesan kesalahan.
+2. Jika respons terlalu lama, tunggu lalu coba pesan singkat yang relevan.
+3. Jika batas permintaan tercapai, tunggu sesuai pesan aplikasi.
+4. Isi deskripsi sendiri untuk melanjutkan pelaporan.
+
+5.8 GAGAL LOGIN ATAU AKUN TERBLOKIR
+1. Periksa username/email dan password, termasuk huruf besar/kecil pada password.
+2. Gunakan username akun, bukan otomatis NIP pegawai.
+3. Jika percobaan dibatasi, tunggu sejumlah detik yang ditampilkan.
+4. Admin yang lupa password atau terblokir menghubungi super admin/pengelola.
+5. Jangan membagikan password atau OTP dalam laporan kendala.
+
+5.9 STATUS LAPORAN ATAU DATA KEGIATAN SUDAH BERUBAH
+1. Catat perubahan yang hendak dilakukan.
+2. Muat ulang detail/form untuk mengambil status/data terbaru.
+3. Baca riwayat atau isian terbaru agar tidak mengulang tindakan petugas lain.
+4. Tentukan tindakan berikutnya sesuai status yang sekarang tersedia.
+
+5.10 LAPORAN BELUM BISA DISELESAIKAN
+1. Pastikan status sudah Ditindaklanjuti.
+2. Isi nama, tanggal tidak melewati hari ini, hasil penanganan, alamat, koordinat,
+   minimal satu petugas, serta minimal satu foto.
+3. Jika membuat baris temuan, lengkapi jenis/jumlah/satuan atau hapus baris kosong.
+4. Pastikan laporan belum mempunyai kegiatan penanganan yang sudah tercatat.
+5. Jika petugas tidak tersedia, periksa sumber e-Profil bersama pengelola.
+
+5.11 PEGAWAI E-PROFIL KOSONG ATAU TIDAK SESUAI
+1. Super Admin membuka Manajemen Petugas untuk memeriksa daftar sumber.
+2. Baca peringatan integrasi bila muncul.
+3. Koordinasikan pembaruan sumber/integrasi dengan pengelola.
+4. Muat ulang halaman setelah perbaikan. Sumber dapat menggunakan cache, sehingga
+   pembaruan tampilan mengikuti penyegaran data yang dilakukan pengelola.
+
+5.12 PETA ATAU PENCARIAN LOKASI GAGAL
+1. Periksa koneksi internet karena peta dan pencarian lokasi memerlukan layanan
+   pemetaan yang digunakan aplikasi.
+2. Jika pencarian tidak menemukan alamat, gunakan patokan yang lebih umum.
+3. Pilih titik peta secara manual, lalu isi alamat kejadian dengan jelas.
+4. Jika Lokasi Saat Ini gagal, periksa izin lokasi browser atau pilih titik manual.
+5. Jika peta tidak tampil sama sekali, muat ulang dan koordinasikan dengan pengelola.
+
+5.13 DATA KOSONG SETELAH FILTER
+1. Periksa kata kunci, status, jenis, kategori, bulan, dan rentang tanggal.
+2. Pastikan tanggal akhir tidak sebelum tanggal awal.
+3. Perhatikan bahwa beberapa filter bekerja sekaligus; bulan dan tanggal yang
+   tidak saling beririsan dapat menghasilkan daftar kosong.
+4. Gunakan Reset/Reset filter untuk melihat daftar tanpa pembatasan.
+
+5.14 EVALUASI TIDAK DAPAT DITAMBAH
+1. Pilih Sumber terlebih dahulu supaya pilihan Nama Kegiatan tersedia.
+2. Periksa kategori yang mungkin menyembunyikan kegiatan yang dicari.
+3. Pastikan kegiatan masih ada dan belum mempunyai evaluasi.
+4. Jika sudah ada evaluasi, gunakan Edit pada daftar evaluasi.
+5. Kegiatan eksternal yang dievaluasi harus terhubung ke laporan.
+
+5.15 PENILAIAN WARGA TIDAK TERSEDIA ATAU GAGAL
+1. Pastikan laporan sudah Laporan selesai, bukan Ditindaklanjuti atau Ditolak.
+2. Gunakan browser yang memiliki akses laporan.
+3. Pilih bintang sebelum menekan Kirim Penilaian.
+4. Pastikan komentar tidak melebihi 2.000 karakter.
+5. Jika penilaian sudah pernah dikirim, formulir tidak menerima pengiriman kedua.
+
+5.16 EKSPOR GAGAL ATAU FILE TIDAK DITEMUKAN
+1. Pastikan ada kegiatan yang sesuai filter.
+2. Periksa koneksi dan tunggu proses, terutama PDF yang memuat dokumentasi.
+3. Periksa izin unduhan serta daftar unduhan browser.
+4. Jika muncul pesan pustaka ekspor gagal dimuat, muat ulang dan coba kembali.
+5. Periksa folder unduhan sesuai pengaturan browser/perangkat.
+
+5.17 SESSION BERAKHIR ATAU HALAMAN MENAMPILKAN AKSES DITOLAK
+1. Simpan salinan teks isian yang masih diperlukan.
+2. Kembali ke halaman login dan masuk menggunakan akun aktif yang sesuai.
+3. Buka menu dari navigasi akun tersebut.
+4. Jika diarahkan ke login/akses ditolak berulang, minta pengelola memeriksa akun
+   dan statusnya. Pilih ulang file setelah form dibuka kembali.
+
+5.18 QR SURVEY TIDAK MUNCUL ATAU SKM TIDAK TERBUKA
+1. Periksa koneksi internet.
+2. Gunakan Survey Sekarang jika QR tidak dapat dimuat/dipindai.
+3. Pastikan tab baru diizinkan browser bila perlu.
+4. Jika layanan SKM bermasalah, coba lagi kemudian; ketersediaan survey mengikuti
+   layanan eksternal tersebut.
+
+
+===============================================================================
+BAB 6. RINGKASAN BATAS INPUT DAN UNGGAH
+===============================================================================
+
+6.1 LAPORAN WARGA
+- Nomor WhatsApp/telepon: wajib dan harus diverifikasi melalui OTP.
+- OTP: enam angka; berlaku lima menit; jeda kirim ulang 60 detik.
+- Verifikasi berhasil: berlaku 15 menit pada sesi browser terkait.
+- Deskripsi: wajib, maksimal 5.000 karakter.
+- Lokasi: wajib, maksimal 1.000 karakter.
+- Bukti: opsional, maksimal tiga foto, 5 MB setiap foto.
+- Format bukti: JPG/JPEG/PNG/WEBP.
+- Pernyataan kebenaran data: wajib disetujui.
+- Nama/NIK/koordinat: tidak diisi pada form publik saat penyusunan.
+
+6.2 LAPORAN YANG DICATAT ADMIN
+- Sumber: wajib, Online atau Offline.
+- Platform: wajib untuk Online.
+- Nama pelapor: opsional, maksimal 255 karakter.
+- Nomor telepon: wajib; tidak menggunakan langkah OTP pada form admin.
+- NIK: wajib untuk Offline, tepat 16 angka.
+- Deskripsi: wajib, maksimal 5.000 karakter.
+- Alamat lokasi: wajib, maksimal 1.000 karakter.
+- Latitude dan Longitude: wajib, dipilih melalui peta.
+- Bukti: opsional, maksimal tiga foto, 5 MB setiap foto, JPG/JPEG/PNG/WEBP.
+
+6.3 CATATAN STATUS DAN PENOLAKAN
+- Catatan status: opsional, maksimal 1.000 karakter.
+- Alasan penolakan: wajib, maksimal 1.000 karakter.
+- Penolakan: hanya pada tahap Sedang diverifikasi.
+- Penyelesaian: hanya pada tahap Ditindaklanjuti.
+
+6.4 PENYELESAIAN LAPORAN / KEGIATAN EKSTERNAL
+- Template: opsional, dari pilihan aktif yang tersedia.
+- Nama kegiatan: wajib, maksimal 255 karakter.
+- Tanggal: wajib, tidak boleh sesudah hari ini.
+- Waktu mulai: opsional.
+- Deskripsi: opsional, maksimal 5.000 karakter.
+- Hasil penanganan: wajib, maksimal 5.000 karakter.
+- Alamat: wajib, maksimal 2.000 karakter.
+- Koordinat: wajib; Latitude -90 s.d. 90, Longitude -180 s.d. 180.
+- Petugas: wajib minimal satu, dipilih dari data pegawai yang tersedia.
+- Foto penanganan: wajib satu sampai tiga foto, 5 MB setiap foto.
+- Format foto: JPG/JPEG/PNG/WEBP.
+- Temuan: opsional, maksimal 50 baris.
+
+6.5 KEGIATAN INTERNAL
+- Template: opsional.
+- Kategori: wajib, dari daftar kategori aktif yang tersedia.
+- Nama: wajib, maksimal 255 karakter.
+- Tanggal pelaksanaan: wajib; waktu mulai opsional.
+- Deskripsi/tujuan dan hasil: opsional, maksimal 5.000 karakter masing-masing.
+- Alamat: wajib, maksimal 2.000 karakter.
+- Latitude/Longitude: wajib, dalam rentang koordinat yang valid.
+- Petugas: wajib minimal satu.
+- Dokumentasi: opsional, total maksimal tiga foto termasuk foto tersimpan.
+- Ukuran/format dokumentasi: 5 MB setiap foto, JPG/JPEG/PNG/WEBP.
+- Temuan: opsional, maksimal 50 baris.
+
+6.6 TEMUAN
+- Jenis: Orang atau Barang.
+- Jumlah: bilangan bulat minimal satu, maksimal 4.294.967.295.
+- Satuan: Buah, Batang, Botol, atau Orang.
+- Semua kolom pada baris yang ditambahkan harus diisi.
+
+6.7 EVALUASI KEGIATAN
+- Kegiatan: wajib dipilih dan belum mempunyai evaluasi saat penambahan.
+- Hasil Evaluasi: wajib, maksimal 3.000 karakter.
+- Kendala: opsional, maksimal 3.000 karakter.
+
+6.8 ARSIP
+- Nama: wajib, maksimal 255 karakter.
+- Kategori dan sifat dokumen: wajib.
+- Deskripsi: opsional, maksimal 5.000 karakter.
+- File baru: minimal satu ketika membuat arsip; total maksimal lima file.
+- Edit arsip: file baru opsional dan hanya sesuai slot yang tersisa.
+- Ukuran: maksimal 20 MB setiap file.
+- Format: PDF/JPG/JPEG/PNG/DOC/DOCX/XLS/XLSX/ZIP.
+
+6.9 AKUN DAN PROFIL
+- Nama lengkap: wajib, maksimal 255 karakter.
+- Username: wajib, unik, maksimal 100 karakter.
+- Karakter username: huruf, angka, titik, garis bawah, tanda hubung.
+- Email: opsional, valid, unik, maksimal 255 karakter.
+- Password baru: minimal delapan karakter, maksimal 72 byte.
+- Profil sendiri: password saat ini dan konfirmasi wajib jika mengganti password.
+- Ubah User oleh Super Admin: password baru opsional; kosong berarti tetap.
+- Akun baru melalui Tambah User: peran Admin, status Aktif.
+
+6.10 PENILAIAN DAN AI
+- Rating warga: satu sampai lima bintang, wajib sebelum mengirim penilaian.
+- Komentar penilaian: opsional, maksimal 2.000 karakter.
+- Penilaian: satu kali per laporan yang berstatus selesai.
+- Pesan Asisten AI: maksimal 600 karakter per pesan.
+- Pencarian global: minimal dua karakter sebelum hasil diminta.
+
+
+===============================================================================
+BAB 7. CHECKLIST PENGGUNAAN
+===============================================================================
+
+7.1 CHECKLIST WARGA SEBELUM MENGIRIM LAPORAN
+[ ] Nomor WhatsApp benar dan berhasil diverifikasi.
+[ ] Deskripsi menjelaskan kejadian berdasarkan fakta.
+[ ] Alamat dan patokan lokasi jelas.
+[ ] Foto sesuai format, maksimal tiga, masing-masing tidak lebih dari 5 MB.
+[ ] Draf AI sudah dibaca dan diperbaiki bila digunakan.
+[ ] Pernyataan kebenaran data dicentang.
+[ ] Setelah pengiriman, Laporan Terkirim! dan kode laporan sudah terlihat.
+[ ] Kode dicatat dan browser yang sama dipakai untuk memantau.
+
+7.2 CHECKLIST ADMIN SEBELUM MENYELESAIKAN LAPORAN
+[ ] Kode laporan dan lokasi sesuai kejadian yang ditangani.
+[ ] Status sudah Ditindaklanjuti.
+[ ] Nama dan tanggal pelaksanaan benar; tanggal tidak melebihi hari ini.
+[ ] Alamat serta titik koordinat lokasi penanganan benar.
+[ ] Hasil penanganan sudah diisi.
+[ ] Minimal satu petugas yang menangani sudah dipilih.
+[ ] Temuan lengkap jika ada; baris kosong sudah dibuang.
+[ ] Minimal satu foto bukti penanganan sudah dipilih.
+[ ] Setelah menyimpan, status selesai dan kegiatan eksternal sudah terlihat.
+[ ] Evaluasi/arsip/rekap dicatat sesuai kebutuhan pekerjaan.
+
+7.3 CHECKLIST SUPER ADMIN UNTUK PENGAWASAN
+[ ] Ringkasan dashboard dan periode data dipahami.
+[ ] Peta dibaca bersama ketersediaan koordinat dan jenis penandanya.
+[ ] Detail kegiatan eksternal/laporan diperiksa melalui mode baca-saja.
+[ ] Akun baru mempunyai identitas unik dan pemilik yang jelas.
+[ ] Status akun diperiksa setelah perubahan.
+[ ] Data pegawai e-Profil diperiksa bila ada kekurangan/kesalahan.
+[ ] Monitoring dibaca sebagai ringkasan audit yang memang direkam sistem.
+[ ] Hasil ekspor diperiksa sebelum dibagikan.
+[ ] Perubahan formulir sudah disimpan dan sesi diakhiri dengan Logout.
+
+===============================================================================
+                             AKHIR MANUAL BOOK
+===============================================================================

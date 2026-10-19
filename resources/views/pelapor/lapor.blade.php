@@ -61,12 +61,12 @@
                             <div class="flex flex-col sm:flex-row gap-2">
                                 <button type="button" id="otp-send"
                                     class="flex-1 border border-brand-200 bg-brand-50 text-brand-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-                                    Kirim Kode OTP
+                                    Kirim Kode Verifikasi
                                 </button>
                             </div>
                             <p id="otp-send-status" class="hidden text-xs"></p>
                             <div id="otp-verify-area" class="hidden">
-                                <input type="text" id="otp-kode" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="Masukkan 6 digit kode OTP"
+                                <input type="text" id="otp-kode" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="Masukkan 6 digit kode verifikasi"
                                     class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none">
                                 <div class="mt-2 flex flex-col sm:flex-row gap-2">
                                     <button type="button" id="otp-verify"
@@ -299,7 +299,7 @@
 
             if (otpVerified.value !== '1') {
                 otpKode.focus();
-                setOtpStatus(otpSendStatus, 'Verifikasi nomor WhatsApp dengan kode OTP terlebih dahulu.');
+                setOtpStatus(otpSendStatus, 'Verifikasi nomor WhatsApp dengan kode verifikasi terlebih dahulu.');
                 return;
             }
 
@@ -391,7 +391,7 @@
                 if (seconds <= 0) {
                     clearInterval(timer);
                     otpSendButton.disabled = false;
-                    otpSendButton.textContent = 'Kirim Ulang Kode OTP';
+                    otpSendButton.textContent = 'Kirim Ulang Kode Verifikasi';
                     otpSendButton.dataset.cooldown = '';
                 } else {
                     otpSendButton.textContent = `Kirim ulang (${seconds}s)`;
@@ -425,7 +425,7 @@
                 const result = await response.json();
 
                 if (!response.ok) {
-                    setOtpStatus(otpSendStatus, result.message || 'Gagal mengirim kode OTP.');
+                    setOtpStatus(otpSendStatus, result.message || 'Gagal mengirim kode verifikasi.');
                     return;
                 }
 
@@ -436,7 +436,7 @@
                 coolingDown = true;
                 startOtpResendCountdown(60);
             } catch (error) {
-                setOtpStatus(otpSendStatus, 'Gagal mengirim kode OTP. Periksa koneksi internet.');
+                setOtpStatus(otpSendStatus, 'Gagal mengirim kode verifikasi. Periksa koneksi internet.');
             } finally {
                 if (!coolingDown) {
                     otpSendButton.disabled = false;
@@ -450,7 +450,7 @@
             otpVerifyStatus.classList.add('hidden');
 
             if (!/^\d{6}$/.test(code)) {
-                setOtpStatus(otpVerifyStatus, 'Masukkan 6 digit kode OTP.');
+                setOtpStatus(otpVerifyStatus, 'Masukkan 6 digit kode verifikasi.');
                 otpKode.focus();
                 return;
             }
@@ -469,7 +469,7 @@
                 const result = await response.json();
 
                 if (!response.ok) {
-                    setOtpStatus(otpVerifyStatus, result.message || 'Kode OTP salah atau kedaluwarsa.');
+                    setOtpStatus(otpVerifyStatus, result.message || 'Kode Verifikasi salah atau kedaluwarsa.');
                     otpKode.value = '';
                     otpKode.focus();
                     return;
@@ -502,7 +502,7 @@
                 otpSendStatus.classList.add('hidden');
                 otpVerifyStatus.classList.add('hidden');
                 otpSendButton.disabled = false;
-                otpSendButton.textContent = 'Kirim Kode OTP';
+                otpSendButton.textContent = 'Kirim Kode Verifikasi';
                 otpKode.value = '';
                 otpKode.readOnly = false;
                 otpVerifyButton.disabled = false;

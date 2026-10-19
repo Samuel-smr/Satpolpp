@@ -8,11 +8,27 @@ use App\Models\Attachment;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\TestWith;
 use Tests\TestCase;
 
 class SuperAdminActivityExportTest extends TestCase
 {
     use RefreshDatabase;
+
+    #[TestWith(['admin'])]
+    #[TestWith(['super_admin'])]
+    public function test_document_exports_use_officer_names_without_positions_for_each_role(string $role): void
+    {
+        $user = $role === 'admin' ? User::factory()->create() : User::factory()->superAdmin()->create();
+        $officer = $this->employee(['name' => 'AGUNG SUKMAWANTORO', 'position' => 'Polisi Pamong Praja Mahir pada Seksi Perlindungan Masyarakat']);
+        $activity = Activity::factory()->create();
+        $activity->personnel()->create(['employee_nip' => $officer->employee_number]);
+
+        $response = $this->actingAs($user)->get(route($role.'.kegiatan'));
+
+        $response->assertOk()->assertSee('Ekspor PDF')->assertSee('Ekspor Word')->assertSee('js/activity-word-export.js', false);
+        $response->assertViewHas('exportActivities', fn ($activities): bool => $activities->sole()['personel'] === ['AGUNG SUKMAWANTORO']);
+    }
 
     public function test_export_source_contains_complete_activity_data_and_documentation_url(): void
     {

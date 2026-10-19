@@ -52,7 +52,7 @@ class CrudPopupConsistencyTest extends TestCase
     public function test_report_delete_uses_application_confirmation_modal_instead_of_browser_confirm(): void
     {
         $admin = User::factory()->create();
-        $report = Report::factory()->create();
+        $report = Report::factory()->assignedTo($admin)->create();
 
         $response = $this->actingAs($admin)->get(route('admin.pengaduan.detail', $report));
 

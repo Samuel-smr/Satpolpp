@@ -74,6 +74,10 @@
                 <span>Dashboard</span>
             </a>
 
+            <a href="{{ route('super_admin.pengaduan') }}" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium {{ request()->routeIs('super_admin.pengaduan*') ? 'bg-super-active text-white' : 'text-slate-300 hover:bg-super-hover hover:text-white' }}">
+                <span class="material-symbols-outlined text-[20px]">inbox</span><span>Aduan</span>
+            </a>
+
             <a href="{{ route('super_admin.kegiatan') }}"
                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all {{ request()->routeIs('super_admin.kegiatan') ? 'bg-super-active text-white shadow-md font-semibold' : 'text-slate-300 hover:bg-super-hover hover:text-white' }}">
                 <span class="material-symbols-outlined text-[20px]">event</span>
@@ -128,6 +132,7 @@
 
             <!-- Header Action Icons -->
             <div class="relative ml-auto flex items-center gap-2">
+                <x-data-year-picker :active-data-year="$activeDataYear" :available-data-years="$availableDataYears" :must-select-data-year="$mustSelectDataYear" />
                 <!-- Notifikasi -->
                 <div class="relative">
                     <button onclick="toggleNotif(event)" data-notification-button data-notifications-url="{{ route('notifications.index') }}" class="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors relative" title="Notifikasi">

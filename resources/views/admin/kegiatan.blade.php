@@ -18,6 +18,10 @@
                     <span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
                     Ekspor PDF
                 </button>
+                <button id="export-word" type="button" class="flex items-center gap-2 rounded-xl bg-blue-700 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-800 disabled:cursor-wait disabled:opacity-70">
+                    <span class="material-symbols-outlined text-[18px]">description</span>
+                    Ekspor Word
+                </button>
                 <a href="{{ route(($activityRoutePrefix ?? 'admin.kegiatan').'.create') }}" class="flex items-center gap-2 rounded-xl bg-sidebar-active px-4 py-2.5 text-sm font-semibold text-white shadow-md transition-colors hover:bg-sidebar-hover">
                     <span class="material-symbols-outlined text-[18px]">add</span>
                     Tambah Kegiatan
@@ -205,12 +209,14 @@
 @endsection
 
 @push('scripts')
+    <script src="{{ asset('js/activity-word-export.js') }}"></script>
     <script>
         (() => {
             const activities = {{ Illuminate\Support\Js::from($exportActivities) }};
             const filters = {{ Illuminate\Support\Js::from($filters) }};
             const excelButton = document.getElementById('export-excel');
             const pdfButton = document.getElementById('export-pdf');
+            const wordButton = document.getElementById('export-word');
 
             const loadScript = (source, integrity = null) => new Promise((resolve, reject) => {
                 if (document.querySelector(`script[src="${source}"]`)) return resolve();
@@ -348,6 +354,42 @@
                     window.tampilToast(error.message, 'error');
                 } finally {
                     excelButton.disabled = false;
+                }
+            });
+
+            wordButton.addEventListener('click', async () => {
+                if (!ensureData()) return;
+                wordButton.disabled = true;
+                try {
+                    if (!window.SiprajaWordExport) throw new Error('Ekspor Word belum tersedia. Muat ulang halaman dan coba lagi.');
+                    const [logos, photos] = await Promise.all([
+                        Promise.all([
+                            logoData('{{ asset("images/logo-kulonprogo.png") }}'),
+                            logoData('{{ asset("images/logo-satpolpp.png") }}'),
+                            logoData('{{ asset("images/logo-linmas.png") }}'),
+                        ]),
+                        Promise.all(activities.map(activity => Promise.all(activity.dokumentasi.map(item => imageData(item.url))))),
+                    ]);
+                    const [start, end] = period();
+                    const documentWord = window.SiprajaWordExport.createDocument({
+                        activities,
+                        periodLabel: `${dateLabel(start)}-${dateLabel(end)}`,
+                        exportDate: new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }),
+                        logos: logos.filter(Boolean),
+                        photos: photos.map(items => items.filter(Boolean)),
+                    });
+                    const url = URL.createObjectURL(documentWord);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `Laporan_Kegiatan_${suffix()}.docx`;
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    setTimeout(() => URL.revokeObjectURL(url), 1000);
+                } catch (error) {
+                    window.tampilToast(error.message, 'error');
+                } finally {
+                    wordButton.disabled = false;
                 }
             });
 

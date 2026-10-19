@@ -34,7 +34,6 @@ class ReportFactory extends Factory
             'source_platform' => ReportSourcePlatform::Website,
             'reporter_name' => null,
             'reporter_phone' => fake()->numerify('08##########'),
-            'reporter_nik' => null,
             'description' => fake()->sentence(),
             'location_address' => fake()->address(),
             'latitude' => fake()->latitude(-7.95, -7.60),
@@ -59,5 +58,10 @@ class ReportFactory extends Factory
             'source_platform' => $source === ReportSource::Online ? $platform : null,
             'reporter_name' => fake()->name(),
         ]);
+    }
+
+    public function assignedTo(User $admin): static
+    {
+        return $this->state(fn (array $attributes): array => ['assigned_admin_id' => $admin->id]);
     }
 }

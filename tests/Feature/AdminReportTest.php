@@ -19,14 +19,13 @@ class AdminReportTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_create_form_guides_numeric_nik_and_phone_input(): void
+    public function test_create_form_guides_phone_input_without_requesting_nik(): void
     {
         $admin = User::factory()->create();
 
         $this->actingAs($admin)->get(route('admin.pengaduan.create'))
             ->assertOk()
-            ->assertSee('name="reporter_nik"', false)
-            ->assertSee('pattern="[0-9]{16}"', false)
+            ->assertDontSee('name="reporter_nik"', false)
             ->assertSee('name="reporter_phone"', false)
             ->assertSee('type="tel"', false)
             ->assertSee('id="report-location-search"', false)
@@ -38,7 +37,7 @@ class AdminReportTest extends TestCase
     {
         Storage::fake('local');
         $admin = User::factory()->create();
-        $report = Report::factory()->create([
+        $report = Report::factory()->assignedTo($admin)->create([
             'code' => 'SPJ-HAPUS1',
             'status' => ReportStatus::Completed,
         ]);
@@ -92,7 +91,7 @@ class AdminReportTest extends TestCase
         $this->assertNotSoftDeleted('reports', ['id' => $report->id]);
     }
 
-    public function test_admin_can_create_offline_report_with_nik(): void
+    public function test_admin_can_create_offline_report_without_nik(): void
     {
         $admin = User::factory()->create();
         $otherActiveAdmin = User::factory()->create();
@@ -102,7 +101,6 @@ class AdminReportTest extends TestCase
             'source' => ReportSource::Offline->value,
             'reporter_name' => 'Pelapor Offline',
             'reporter_phone' => '081234567890',
-            'reporter_nik' => '1234567890123456',
             'description' => 'Laporan offline dari loket.',
             'location_address' => 'Lokasi laporan',
             'latitude' => '-7.7956',
@@ -132,7 +130,7 @@ class AdminReportTest extends TestCase
         ]);
     }
 
-    public function test_online_report_requires_platform_and_does_not_require_nik(): void
+    public function test_online_report_requires_platform(): void
     {
         $admin = User::factory()->create();
         $data = [
@@ -153,7 +151,6 @@ class AdminReportTest extends TestCase
         $this->assertDatabaseHas('reports', [
             'source' => ReportSource::Online->value,
             'source_platform' => ReportSourcePlatform::WhatsApp->value,
-            'reporter_nik' => null,
         ]);
     }
 }

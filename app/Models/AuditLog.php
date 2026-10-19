@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use App\Support\DataYear;
 use Database\Factories\AuditLogFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,6 +25,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 ])]
 class AuditLog extends Model
 {
+    #[Scope]
+    protected function forDataYear(Builder $query): Builder
+    {
+        return app(DataYear::class)->constrain($query, 'created_at');
+    }
+
     /** @use HasFactory<AuditLogFactory> */
     use HasFactory;
 

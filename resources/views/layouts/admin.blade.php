@@ -141,6 +141,7 @@
 
             <!-- Right Actions / Profile -->
             <div class="relative ml-auto flex items-center gap-2">
+                <x-data-year-picker :active-data-year="$activeDataYear" :available-data-years="$availableDataYears" :must-select-data-year="$mustSelectDataYear" />
                 <!-- Notifikasi -->
                 <div class="relative">
                     <button onclick="toggleNotif(event)" data-notification-button data-notifications-url="{{ route('notifications.index') }}"
@@ -186,9 +187,8 @@
                 <!-- Topbar Profile Icon -->
                 <a href="{{ route('admin.profile') }}">
                     <div class="flex items-center gap-3 pl-2 border-l border-slate-200">
-                        <div class="w-9 h-9 rounded-full bg-slate-700 overflow-hidden ring-2 ring-slate-100">
-                            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=150"
-                                alt="Avatar Admin" class="w-full h-full object-cover">
+                        <div class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-50 text-sidebar-active ring-2 ring-slate-100">
+                            <span class="material-symbols-outlined text-[20px]" aria-hidden="true">person</span>
                         </div>
                         <div class="hidden md:block text-left">
                             <div class="text-xs font-bold text-slate-800 leading-tight">{{ auth()->user()->name }}</div>

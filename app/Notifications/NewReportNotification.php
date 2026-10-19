@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Report;
+use App\UserRole;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 
@@ -33,7 +34,7 @@ class NewReportNotification extends Notification
             'title' => 'Laporan baru',
             'message' => "Laporan {$this->report->code} baru diterima dari masyarakat.",
             'report_id' => $this->report->id,
-            'url' => route('admin.pengaduan.detail', $this->report, absolute: false),
+            'url' => route($notifiable->role === UserRole::SuperAdmin ? 'super_admin.pengaduan.detail' : 'admin.pengaduan.detail', $this->report, absolute: false),
         ];
     }
 }

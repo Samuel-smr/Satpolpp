@@ -28,7 +28,7 @@ class ActivityFactory extends Factory
             'name' => fake()->sentence(4),
             'type' => ActivityType::Internal,
             'category' => fake()->sentence(4),
-            'activity_date' => fake()->date(),
+            'activity_date' => now()->toDateString(),
             'start_time' => '08:00:00',
             'description' => fake()->sentence(),
             'handling_result' => fake()->sentence(),

@@ -7,9 +7,11 @@ use App\ReportSource;
 use App\ReportSourcePlatform;
 use App\ReportStatus;
 use App\ReportType;
+use App\Support\DataYear;
 use Database\Factories\ReportFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,19 +19,18 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Str;
 
 #[Fillable([
     'code',
     'guest_access_id',
     'created_by_user_id',
+    'assigned_admin_id',
     'type',
     'category',
     'source',
     'source_platform',
     'reporter_name',
     'reporter_phone',
-    'reporter_nik',
     'description',
     'location_address',
     'latitude',
@@ -40,11 +41,22 @@ use Illuminate\Support\Str;
     'feedback_comment',
     'feedback_submitted_at',
 ])]
-#[Hidden(['reporter_nik'])]
 class Report extends Model
 {
     /** @use HasFactory<ReportFactory> */
     use HasFactory, SoftDeletes;
+
+    #[Scope]
+    protected function forDataYear(Builder $query): Builder
+    {
+        return app(DataYear::class)->constrain($query, 'created_at');
+    }
+
+    /** @return BelongsTo<User, $this> */
+    public function assignedAdmin(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assigned_admin_id');
+    }
 
     /**
      * @return BelongsTo<GuestAccess, $this>
@@ -84,15 +96,6 @@ class Report extends Model
         return $this->hasOne(Activity::class);
     }
 
-    public function maskedReporterNik(): ?string
-    {
-        if ($this->reporter_nik === null) {
-            return null;
-        }
-
-        return Str::mask($this->reporter_nik, '*', 4, 8);
-    }
-
     /**
      * @return array<string, string>
      */
@@ -103,7 +106,6 @@ class Report extends Model
             'category' => ReportCategory::class,
             'source' => ReportSource::class,
             'source_platform' => ReportSourcePlatform::class,
-            'reporter_nik' => 'encrypted',
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',
             'status' => ReportStatus::class,
