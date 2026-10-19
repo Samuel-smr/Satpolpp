@@ -308,15 +308,49 @@
                     return null;
                 }
             };
-            const photoThumb = 18;
             const photoGap = 3;
             const photoPad = 3;
-            const photoPerRow = (cellWidth) => Math.max(1, Math.floor((cellWidth - 6 + photoGap) / (photoThumb + photoGap)));
-            const photoRows = (count, cellWidth) => Math.ceil(Math.max(count, 0) / photoPerRow(cellWidth));
-            const photoCellHeight = (count, cellWidth) => {
-                if (!count) return 0;
-                const rows = photoRows(count, cellWidth);
-                return (photoPad * 2) + (rows * photoThumb) + ((rows - 1) * photoGap);
+            const photoMinBox = 16;
+            const photoMaxBlock = 82;
+            const dokumentasiColumnWidth = 80;
+            const photoLayout = (photos, cellWidth) => {
+                const usable = Math.max(photoMinBox, cellWidth - photoPad * 2);
+                const count = photos.length;
+                let best = null;
+                let fallback = null;
+                for (let perRow = 1; perRow <= Math.max(1, count); perRow++) {
+                    const boxWidth = (usable - (perRow - 1) * photoGap) / perRow;
+                    if (boxWidth < 1) continue;
+                    const rowCount = Math.ceil(count / perRow);
+                    const totalHeight = rowCount * boxWidth + Math.max(0, rowCount - 1) * photoGap + photoPad * 2;
+                    if (!fallback || totalHeight < fallback.totalHeight) fallback = { perRow, boxWidth, totalHeight };
+                    if (totalHeight <= photoMaxBlock && (!best || boxWidth > best.boxWidth)) {
+                        best = { perRow, boxWidth, totalHeight };
+                    }
+                }
+                const { perRow, boxWidth } = best || fallback;
+                const boxHeight = boxWidth;
+                const rows = [];
+                photos.forEach((photo, index) => {
+                    const rowIndex = Math.floor(index / perRow);
+                    if (!rows[rowIndex]) rows[rowIndex] = [];
+                    const ratio = photo.width && photo.height ? photo.width / photo.height : 1;
+                    let width = boxWidth;
+                    let height = width / ratio;
+                    if (height > boxHeight) {
+                        height = boxHeight;
+                        width = boxHeight * ratio;
+                    }
+                    rows[rowIndex].push({ photo, width, height });
+                });
+                const heights = rows.map(() => boxHeight);
+                return {
+                    rows,
+                    heights,
+                    boxWidth,
+                    totalHeight: heights.reduce((sum, height) => sum + height, 0)
+                        + Math.max(0, rows.length - 1) * photoGap + photoPad * 2,
+                };
             };
 
             excelButton.addEventListener('click', async () => {
@@ -435,20 +469,20 @@
                         return [index + 1, `${activity.tanggal}\n${activity.waktu ? activity.waktu + ' WIB' : '-'}`,
                             activity.personel.join(', ') || '-',
                             `Kegiatan: ${activity.nama}\nLokasi: ${activity.lokasi}\nTindakan: ${activity.deskripsi || '-'}\nHasil: ${activity.hasil || '-'}\nTemuan: ${activity.temuan.map(item => `${item.jenis}: ${item.jumlah} ${item.satuan}`).join(', ') || '-'}`,
-                            images[index].length ? '\n' : '-'];
+                            images[index].length ? '' : '-'];
                     }));
                     documentPdf.autoTable({
                         head: [['No', 'Tanggal/Waktu', 'Personel', 'Tindakan dan Hasil', 'Dokumentasi']], body,
                         startY: 50, theme: 'grid', rowPageBreak: 'avoid', margin: { left: 14, right: 14 },
                         headStyles: { fillColor: [43, 79, 124], halign: 'center', fontStyle: 'bold' },
                         bodyStyles: { fontSize: 8, cellPadding: 3 },
-                        columnStyles: { 0: { cellWidth: 12, halign: 'center' }, 1: { cellWidth: 30, halign: 'center' }, 2: { cellWidth: 48 }, 3: { cellWidth: 116 }, 4: { cellWidth: 62, halign: 'center' } },
+                        columnStyles: { 0: { cellWidth: 12, halign: 'center' }, 1: { cellWidth: 30, halign: 'center' }, 2: { cellWidth: 48 }, 3: { cellWidth: 98 }, 4: { cellWidth: dokumentasiColumnWidth, halign: 'center' } },
                         didParseCell: data => {
                             if (data.section !== 'body' || data.column.index !== 4) return;
 
-                            const count = images[data.row.index]?.length || 0;
-                            if (count > 0) {
-                                data.cell.styles.minCellHeight = photoCellHeight(count, data.cell.width);
+                            const layout = photoLayout(images[data.row.index] || [], dokumentasiColumnWidth);
+                            if (layout.rows.length) {
+                                data.cell.styles.minCellHeight = layout.totalHeight;
                             }
                         },
                         didDrawCell: data => {
@@ -457,15 +491,19 @@
                             const photos = images[data.row.index] || [];
                             if (!photos.length) return;
 
-                            const totalHeight = photoCellHeight(photos.length, data.cell.width);
-                            const startX = data.cell.x + ((data.cell.width - (Math.min(photos.length, photoPerRow(data.cell.width)) * photoThumb + (Math.min(photos.length, photoPerRow(data.cell.width)) - 1) * photoGap)) / 2);
-                            const startY = data.cell.y + ((data.cell.height - totalHeight) / 2);
-                            photos.forEach((photo, index) => {
-                                const col = index % photoPerRow(data.cell.width);
-                                const row = Math.floor(index / photoPerRow(data.cell.width));
-                                const x = startX + col * (photoThumb + photoGap);
-                                const y = startY + photoPad + row * (photoThumb + photoGap);
-                                documentPdf.addImage(photo.data, 'JPEG', x, y, photoThumb, photoThumb);
+                            const layout = photoLayout(photos, data.cell.width || dokumentasiColumnWidth);
+                            const offsetY = data.cell.y + Math.max(0, (data.cell.height - layout.totalHeight) / 2);
+                            let rowY = offsetY + photoPad;
+                            layout.rows.forEach((row, rowIndex) => {
+                                const rowHeight = layout.heights[rowIndex];
+                                const rowWidth = row.length * layout.boxWidth + Math.max(0, row.length - 1) * photoGap;
+                                const offsetX = data.cell.x + Math.max(photoPad, (data.cell.width - rowWidth) / 2);
+                                row.forEach((item, colIndex) => {
+                                    const x = offsetX + colIndex * (layout.boxWidth + photoGap) + ((layout.boxWidth - item.width) / 2);
+                                    const y = rowY + ((rowHeight - item.height) / 2);
+                                    documentPdf.addImage(item.photo.data, 'JPEG', x, y, item.width, item.height);
+                                });
+                                rowY += rowHeight + photoGap;
                             });
                         },
                     });

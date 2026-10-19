@@ -55,4 +55,8 @@ return [
         'bot_token' => env('WHATSAPP_BOT_TOKEN'),
     ],
 
+    'skm' => [
+        'survey_url' => env('SKM_SURVEY_URL', 'https://skm.go.id/share/instansi/f1319c33-2d84-4f64-bcdb-e73685895e37/1'),
+    ],
+
 ];

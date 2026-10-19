@@ -3,7 +3,7 @@
 @section('title', 'Survey Kepuasan')
 
 @php
-    $surveyUrl = 'https://skm.go.id/share/instansi/f1319c33-2d84-4f64-bcdb-e73685895e37/1';
+    $surveyUrl = config('services.skm.survey_url');
     $qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . urlencode($surveyUrl);
 @endphp
 

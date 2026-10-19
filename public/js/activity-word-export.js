@@ -83,6 +83,25 @@
         return new Blob([...parts, ...directory, end], { type: mimeType });
     };
 
+    const photoGap = 3;
+    const photoPad = 3;
+    const photoMaxBlock = 82;
+    const dokumentasiWidth = 80;
+    const photoLayout = count => {
+        const usable = dokumentasiWidth - photoPad * 2;
+        let best = null;
+        let fallback = null;
+        for (let perRow = 1; perRow <= Math.max(1, count); perRow++) {
+            const box = (usable - (perRow - 1) * photoGap) / perRow;
+            if (box < 1) continue;
+            const rows = Math.ceil(count / perRow);
+            const total = rows * box + Math.max(0, rows - 1) * photoGap + photoPad * 2;
+            if (!fallback || total < fallback.total) fallback = { perRow, box };
+            if (total <= photoMaxBlock && (!best || box > best.box)) best = { perRow, box };
+        }
+        return best || fallback;
+    };
+
     const createDocument = ({ activities, periodLabel, exportDate, logos = [], photos = [] }) => {
         if (!activities.length) throw new Error('Tidak ada kegiatan yang sesuai dengan filter untuk diekspor.');
         const files = [];
@@ -109,17 +128,21 @@
             ['LAPORAN KEGIATAN', 'SATUAN POLISI PAMONG PRAJA', 'KABUPATEN KULON PROGO'].map(line => paragraph(line, { bold: true, size: 26, after: 30 })).join('') + paragraph(periodLabel, { bold: true, size: 18 }), 10094,
         )}</w:tr>`], false);
 
-        const widths = [680, 1700, 2720, 6570, 3524];
+        const widths = [680, 1700, 2720, 5557, 4537];
         const headers = ['No', 'Tanggal/Waktu', 'Personel', 'Tindakan dan Hasil', 'Dokumentasi'];
         const rows = [`<w:tr><w:trPr><w:tblHeader/></w:trPr>${headers.map((text, index) => cell(paragraph(text, { bold: true, align: 'center', color: 'FFFFFF' }), widths[index], true)).join('')}</w:tr>`];
 
         activities.forEach((activity, index) => {
             const findings = (activity.temuan || []).map(item => `${item.jenis}: ${item.jumlah} ${item.satuan}`).join(', ') || '-';
             const details = [`Kegiatan: ${activity.nama}`, `Lokasi: ${activity.lokasi}`, `Tindakan: ${activity.deskripsi || '-'}`, `Hasil: ${activity.hasil || '-'}`, `Temuan: ${findings}`].map(text => paragraph(text, { size: 16 })).join('');
-            const photoRuns = (photos[index] || []).map(photo => picture(photo, 23, 22)).filter(Boolean);
+            const list = photos[index] || [];
+            const layout = list.length ? photoLayout(list.length) : null;
+            const photoRuns = layout ? list.map(photo => picture(photo, layout.box, layout.box)).filter(Boolean) : [];
             const photoParagraphs = [];
-            for (let photoIndex = 0; photoIndex < photoRuns.length; photoIndex += 2) {
-                photoParagraphs.push(`<w:p><w:pPr><w:spacing w:after="80"/><w:jc w:val="center"/></w:pPr>${photoRuns.slice(photoIndex, photoIndex + 2).join('<w:r><w:t xml:space="preserve">  </w:t></w:r>')}</w:p>`);
+            if (layout) {
+                for (let photoIndex = 0; photoIndex < photoRuns.length; photoIndex += layout.perRow) {
+                    photoParagraphs.push(`<w:p><w:pPr><w:spacing w:after="60"/><w:jc w:val="center"/></w:pPr>${photoRuns.slice(photoIndex, photoIndex + layout.perRow).join('<w:r><w:t xml:space="preserve">  </w:t></w:r>')}</w:p>`);
+                }
             }
             rows.push(`<w:tr>${[
                 paragraph(index + 1, { align: 'center', size: 16 }),

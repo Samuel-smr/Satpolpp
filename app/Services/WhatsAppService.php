@@ -72,6 +72,25 @@ class WhatsAppService
         $this->attempt($report, $message);
     }
 
+    public function sendReportCompleted(Report $report, ?string $note = null): void
+    {
+        if ($report->reporter_phone === null || trim($report->reporter_phone) === '') {
+            return;
+        }
+
+        $surveyUrl = (string) config('services.skm.survey_url');
+
+        $message = "Laporan Anda Telah Selesai Ditangani\n\n"
+            ."Kode Laporan: {$report->code}\n"
+            ."Status: Laporan selesai\n"
+            .($note !== null && $note !== '' ? "\nHasil penanganan:\n{$note}\n" : '')
+            ."\nBantu kami meningkatkan pelayanan dengan menilai kinerja Satpol PP melalui tautan berikut:\n"
+            ."{$surveyUrl}\n\n"
+            .'Terima kasih telah menggunakan SIPRAJA.';
+
+        $this->attempt($report, $message);
+    }
+
     public function sendNewReportToAdmins(Report $report): void
     {
         $admins = User::query()

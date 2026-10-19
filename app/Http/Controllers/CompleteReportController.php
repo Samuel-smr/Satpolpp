@@ -136,11 +136,7 @@ class CompleteReportController extends Controller
             throw $exception;
         }
 
-        app(WhatsAppService::class)->sendReportStatusUpdate(
-            $report,
-            ReportStatus::Completed->label(),
-            $validated['handling_result'],
-        );
+        app(WhatsAppService::class)->sendReportCompleted($report, $validated['handling_result']);
 
         return redirect()
             ->route('admin.pengaduan.detail', $report)
