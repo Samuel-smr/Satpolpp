@@ -75,10 +75,11 @@
                             <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
-                    <div class="sm:col-span-2">
-                        <label for="activity_name" class="mb-1.5 block text-sm font-semibold text-slate-700">Nama kegiatan</label>
-                        <input id="activity_name" name="name" type="text" maxlength="255" required value="{{ old('name', $editingActivity?->name) }}" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:border-sidebar-active focus:bg-white focus:outline-none focus:ring-1 focus:ring-sidebar-active">
-                    </div>
+                        <div class="sm:col-span-2">
+                            <label for="activity_name" class="mb-1.5 block text-sm font-semibold text-slate-700">Nama kegiatan</label>
+                            <input id="activity_name" name="name" type="text" maxlength="255" required value="{{ old('name', $editingActivity?->name) }}" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:border-sidebar-active focus:bg-white focus:outline-none focus:ring-1 focus:ring-sidebar-active">
+                            <p class="mt-1.5 text-xs text-slate-500">Nama kegiatan bisa diedit apabila diperlukan.</p>
+                        </div>
                     <div>
                         <label for="activity_date" class="mb-1.5 block text-sm font-semibold text-slate-700">Tanggal pelaksanaan</label>
                         <input id="activity_date" name="activity_date" type="date" min="{{ app(\App\Support\DataYear::class)->start()->toDateString() }}" max="{{ app(\App\Support\DataYear::class)->end()->subDay()->toDateString() }}" required value="{{ old('activity_date', $editingActivity?->activity_date?->toDateString() ?? app(\App\Support\DataYear::class)->referenceDate()->toDateString()) }}" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:border-sidebar-active focus:bg-white focus:outline-none focus:ring-1 focus:ring-sidebar-active">

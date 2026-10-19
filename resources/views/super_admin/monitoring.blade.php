@@ -179,7 +179,7 @@
                     pointRadius: 3,
                 }]
             },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } } }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0, stepSize: 5 }, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } } }
         });
 
         new Chart(document.getElementById('chart-users'), {
@@ -193,7 +193,7 @@
                     borderRadius: 6,
                 }]
             },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } } }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0, stepSize: 5 }, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } } }
         });
     }
 

@@ -57,8 +57,6 @@
         /* Color variants */
         .marker-laporan .marker-pin { background: #ef4444; }
         .marker-laporan .marker-icon { color: #ef4444; }
-        .marker-kegiatan_eksternal .marker-pin { background: #3b82f6; }
-        .marker-kegiatan_eksternal .marker-icon { color: #3b82f6; }
         .marker-kegiatan_internal .marker-pin { background: #10b981; }
         .marker-kegiatan_internal .marker-icon { color: #10b981; }
     </style>
@@ -66,6 +64,7 @@
 
 @push('scripts')
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 @endpush
 
@@ -92,13 +91,6 @@
                         </label>
 
                         <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm hover:bg-slate-50 transition-colors">
-                            <input type="checkbox" x-model="filters.kegiatan_eksternal" @change="renderMap()" class="w-4 h-4 text-blue-500 rounded border-slate-300 focus:ring-blue-500">
-                            <span class="text-sm font-semibold text-slate-700 flex items-center gap-1">
-                                <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Kegiatan Eksternal
-                            </span>
-                        </label>
-
-                        <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm hover:bg-slate-50 transition-colors">
                             <input type="checkbox" x-model="filters.kegiatan_internal" @change="renderMap()" class="w-4 h-4 text-emerald-500 rounded border-slate-300 focus:ring-emerald-500">
                             <span class="text-sm font-semibold text-slate-700 flex items-center gap-1">
                                 <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Kegiatan Internal
@@ -110,8 +102,14 @@
             </div>
 
             <!-- Kartu Peta (terpisah) -->
-            <div class="flex-1 bg-white border border-slate-200/80 rounded-2xl shadow-sm overflow-hidden flex flex-col">
+            <div class="flex-1 bg-white border border-slate-200/80 rounded-2xl shadow-sm overflow-hidden flex flex-col relative">
                 <div id="mainMap" class="w-full flex-1 map-container relative rounded-b-2xl"></div>
+                <button type="button" @click="screenshotPeta()" :disabled="screenshotLoading"
+                    title="Ambil screenshot peta pada tampilan saat ini"
+                    class="absolute top-3 right-3 z-[1000] flex items-center gap-2 rounded-xl bg-blue-700 px-3.5 py-2.5 text-sm font-semibold text-white shadow-md transition-colors hover:bg-blue-800 disabled:cursor-wait disabled:opacity-70">
+                    <span class="material-symbols-outlined text-[18px]" :class="screenshotLoading ? 'animate-spin' : ''" x-text="screenshotLoading ? 'progress_activity' : 'photo_camera'"></span>
+                    <span x-text="screenshotLoading ? 'Memproses...' : 'Screenshot Peta'"></span>
+                </button>
             </div>
         </div>
 
@@ -182,10 +180,10 @@
                 markers: [],
                 hotspots: [],
                 selectedItem: null,
+                screenshotLoading: false,
 
                 filters: {
                     laporan: true,
-                    kegiatan_eksternal: true,
                     kegiatan_internal: true
                 },
 
@@ -208,6 +206,7 @@
 
                     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                        crossOrigin: true,
                         maxZoom: 19
                     }).addTo(this.map);
 
@@ -221,6 +220,46 @@
 
                     this.renderMap();
                     this.initCharts();
+                },
+
+                // Mengambil screenshot peta sesuai tampilan/lokasi yang sedang aktif
+                async screenshotPeta() {
+                    if (this.screenshotLoading || !this.map) return;
+
+                    if (typeof html2canvas === 'undefined') {
+                        alert('Fitur screenshot belum siap. Muat ulang halaman dan coba lagi.');
+                        return;
+                    }
+
+                    this.screenshotLoading = true;
+
+                    try {
+                        const container = this.map.getContainer();
+                        await new Promise(resolve => setTimeout(resolve, 120));
+
+                        const scale = Math.max(window.devicePixelRatio || 1, 2);
+                        const canvas = await html2canvas(container, {
+                            useCORS: true,
+                            allowTaint: false,
+                            backgroundColor: '#ffffff',
+                            scale,
+                            logging: false,
+                        });
+
+                        const center = this.map.getCenter();
+                        const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+                        const link = document.createElement('a');
+                        link.href = canvas.toDataURL('image/png');
+                        link.download = `Peta_${center.lat.toFixed(4)}_${center.lng.toFixed(4)}_${stamp}.png`;
+                        document.body.appendChild(link);
+                        link.click();
+                        link.remove();
+                    } catch (error) {
+                        console.error('Gagal membuat screenshot peta:', error);
+                        alert('Gagal membuat screenshot peta. Silakan coba lagi.');
+                    } finally {
+                        this.screenshotLoading = false;
+                    }
                 },
 
                 // Muat laporan yang sudah selesai + menandai titik lokasi kejadian
@@ -279,7 +318,6 @@
                     this.visibleMarkers().forEach(({ item, offsetX, offsetY }) => {
                         let iconHtml = '';
                         if (item.type === 'laporan') iconHtml = 'campaign';
-                        if (item.type === 'kegiatan_eksternal') iconHtml = 'shield';
                         if (item.type === 'kegiatan_internal') iconHtml = 'groups';
 
                         let colorClass = this.getColorClass(item.type, false);
@@ -345,14 +383,12 @@
 
                 formatType(type) {
                     if (type === 'laporan') return 'Laporan/Aduan';
-                    if (type === 'kegiatan_eksternal') return 'Kegiatan Eksternal';
                     if (type === 'kegiatan_internal') return 'Kegiatan Internal';
                     return type;
                 },
 
                 getColorClass(type, isBg = false) {
                     if (type === 'laporan') return isBg ? 'bg-red-500' : 'bg-red-100 text-red-700';
-                    if (type === 'kegiatan_eksternal') return isBg ? 'bg-blue-500' : 'bg-blue-100 text-blue-700';
                     if (type === 'kegiatan_internal') return isBg ? 'bg-emerald-500' : 'bg-emerald-100 text-emerald-700';
                     return isBg ? 'bg-slate-500' : 'bg-slate-100 text-slate-700';
                 },
@@ -368,7 +404,6 @@
                 initCharts() {
                     const kategoriMap = {
                         'laporan': { label: 'Laporan/Aduan', color: '#ef4444' },
-                        'kegiatan_eksternal': { label: 'Kegiatan Eksternal', color: '#3b82f6' },
                         'kegiatan_internal': { label: 'Kegiatan Internal', color: '#10b981' },
                     };
                     const kategoriCounts = {};
@@ -396,7 +431,7 @@
                             maintainAspectRatio: false,
                             plugins: { legend: { display: false } },
                             scales: {
-                                y: { beginAtZero: true, ticks: { precision: 0, stepSize: 1 }, grid: { display: false } },
+                                y: { beginAtZero: true, ticks: { precision: 0, stepSize: 5 }, grid: { display: false } },
                                 x: { grid: { display: false } }
                             }
                         }
@@ -448,7 +483,7 @@
                             maintainAspectRatio: false,
                             plugins: { legend: { display: false } },
                             scales: {
-                                y: { beginAtZero: true, ticks: { precision: 0 }, grid: { borderDash: [2,2] } },
+                                y: { beginAtZero: true, ticks: { precision: 0, stepSize: 5 }, grid: { borderDash: [2,2] } },
                                 x: { grid: { display: false } }
                             }
                         }
@@ -476,7 +511,7 @@
                             maintainAspectRatio: false,
                             plugins: { legend: { display: false } },
                             scales: {
-                                x: { beginAtZero: true, ticks: { precision: 0, stepSize: 1 }, grid: { display: false } },
+                                x: { beginAtZero: true, ticks: { precision: 0, stepSize: 5 }, grid: { display: false } },
                                 y: { grid: { display: false } }
                             }
                         }

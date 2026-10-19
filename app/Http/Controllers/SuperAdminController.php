@@ -147,7 +147,7 @@ class SuperAdminController extends Controller
             ->map(fn (Activity $activity): array => [
                 'id' => 'K-'.$activity->id,
                 'type' => match ($activity->type) {
-                    ActivityType::External => 'kegiatan_eksternal',
+                    ActivityType::External => 'laporan',
                     ActivityType::Internal => 'kegiatan_internal',
                 },
                 'title' => $activity->name,
