@@ -1,38 +1,1283 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<mxfile host="app.diagrams.net" modified="2026-09-21T00:00:00.000Z" agent="Codex" version="24.7.17" type="device">
-  <diagram id="sipraja-erd" name="ERD SIPRAJA">
-    <mxGraphModel dx="1800" dy="1200" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2200" pageHeight="1600" math="0" shadow="0">
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" modified="2026-10-28T00:00:00.000Z" agent="Codex" version="24.7.17" type="device">
+  <diagram id="01-peta-domain" name="01 - Peta domain">
+    <mxGraphModel dx="2400" dy="1800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2400" pageHeight="1800" math="0" shadow="0">
       <root>
-        <mxCell id="0"/><mxCell id="1" parent="0"/>
-        <mxCell id="title" value="ERD SIPRAJA — AS-BUILT 21 SEPTEMBER 2026" style="text;html=0;fontSize=26;fontStyle=1;align=left;" vertex="1" parent="1"><mxGeometry x="40" y="20" width="1100" height="40" as="geometry"/></mxCell>
-        <mxCell id="note" value="Satu jenis laporan: lapor | reporter_nik nullable (bukan input publik) | tanpa organizational_units dan operational_zones" style="rounded=1;html=0;whiteSpace=wrap;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=14;" vertex="1" parent="1"><mxGeometry x="40" y="70" width="1500" height="55" as="geometry"/></mxCell>
-        <mxCell id="users" value="users&#xa;PK id&#xa;role, status&#xa;name, username, email" style="swimlane;html=0;startSize=28;rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="50" y="170" width="230" height="145" as="geometry"/></mxCell>
-        <mxCell id="guests" value="guest_accesses&#xa;PK id&#xa;token_hash [UQ]&#xa;last_used_at, expires_at" style="swimlane;html=0;startSize=28;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="50" y="390" width="230" height="145" as="geometry"/></mxCell>
-        <mxCell id="reports" value="reports&#xa;PK id | code [UQ]&#xa;FK guest_access_id?&#xa;FK created_by_user_id?&#xa;type = lapor&#xa;reporter_nik? (legacy)&#xa;phone, description, location&#xa;lat?, lng?, status, feedback" style="swimlane;html=0;startSize=28;rounded=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1"><mxGeometry x="380" y="300" width="280" height="250" as="geometry"/></mxCell>
-        <mxCell id="histories" value="report_status_histories&#xa;PK id&#xa;FK report_id&#xa;FK changed_by_user_id?&#xa;status, note, created_at" style="swimlane;html=0;startSize=28;rounded=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1"><mxGeometry x="760" y="170" width="270" height="175" as="geometry"/></mxCell>
-        <mxCell id="attachments" value="attachments&#xa;PK id&#xa;attachable_type + attachable_id&#xa;FK uploaded_by_user_id?&#xa;path, mime, size, audience" style="swimlane;html=0;startSize=28;rounded=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1"><mxGeometry x="760" y="420" width="270" height="175" as="geometry"/></mxCell>
-        <mxCell id="templates" value="activity_templates&#xa;PK id&#xa;name, category&#xa;default_description&#xa;is_active, sort_order" style="swimlane;html=0;startSize=28;rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="50" y="690" width="250" height="160" as="geometry"/></mxCell>
-        <mxCell id="activities" value="activities&#xa;PK id&#xa;FK report_id? [UQ]&#xa;FK activity_template_id?&#xa;FK created_by_user_id&#xa;FK evaluated_by_user_id?&#xa;name, type, category, date&#xa;description, result, location&#xa;lat, lng, evaluation" style="swimlane;html=0;startSize=28;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="390" y="650" width="290" height="270" as="geometry"/></mxCell>
-        <mxCell id="officers" value="officers&#xa;PK id&#xa;FK user_id? [UQ]&#xa;employee_number [UQ]&#xa;name, position&#xa;work_unit_name, unit_name&#xa;status, deleted_at" style="swimlane;html=0;startSize=28;rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1"><mxGeometry x="800" y="680" width="260" height="210" as="geometry"/></mxCell>
-        <mxCell id="pivot" value="activity_officer&#xa;PK id&#xa;FK activity_id&#xa;FK officer_id&#xa;assignment_role, notes&#xa;UQ(activity_id, officer_id)" style="swimlane;html=0;startSize=28;rounded=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1"><mxGeometry x="1180" y="670" width="270" height="185" as="geometry"/></mxCell>
-        <mxCell id="findings" value="activity_findings&#xa;PK id&#xa;FK activity_id&#xa;type, quantity, unit" style="swimlane;html=0;startSize=28;rounded=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1"><mxGeometry x="1180" y="920" width="250" height="145" as="geometry"/></mxCell>
-        <mxCell id="archives" value="archives&#xa;PK id&#xa;FK created_by_user_id&#xa;title, category&#xa;description, confidentiality&#xa;deleted_at" style="swimlane;html=0;startSize=28;rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="50" y="1050" width="250" height="185" as="geometry"/></mxCell>
-        <mxCell id="archivefiles" value="archive_files&#xa;PK id&#xa;FK archive_id&#xa;path, name, mime&#xa;extension, size" style="swimlane;html=0;startSize=28;rounded=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1"><mxGeometry x="390" y="1070" width="250" height="165" as="geometry"/></mxCell>
-        <mxCell id="audit" value="audit_logs&#xa;PK id&#xa;FK actor_user_id?&#xa;subject_type + subject_id?&#xa;module, action, description&#xa;old_values?, new_values?" style="swimlane;html=0;startSize=28;rounded=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1"><mxGeometry x="1160" y="1130" width="280" height="190" as="geometry"/></mxCell>
-        <mxCell id="notifications" value="notifications&#xa;PK uuid&#xa;notifiable_type + id&#xa;data, read_at" style="swimlane;html=0;startSize=28;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="1180" y="270" width="250" height="145" as="geometry"/></mxCell>
-        <mxCell id="e1" value="1:N" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;" edge="1" parent="1" source="guests" target="reports"><mxGeometry relative="1" as="geometry"/></mxCell>
-        <mxCell id="e2" value="1:N creator" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;" edge="1" parent="1" source="users" target="reports"><mxGeometry relative="1" as="geometry"/></mxCell>
-        <mxCell id="e3" value="1:N" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;" edge="1" parent="1" source="reports" target="histories"><mxGeometry relative="1" as="geometry"/></mxCell>
-        <mxCell id="e4" value="1:0..1" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;strokeWidth=2;" edge="1" parent="1" source="reports" target="activities"><mxGeometry relative="1" as="geometry"/></mxCell>
-        <mxCell id="e5" value="polymorphic" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;dashed=1;" edge="1" parent="1" source="reports" target="attachments"><mxGeometry relative="1" as="geometry"/></mxCell>
-        <mxCell id="e6" value="polymorphic" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;dashed=1;" edge="1" parent="1" source="activities" target="attachments"><mxGeometry relative="1" as="geometry"/></mxCell>
-        <mxCell id="e7" value="1:N" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;" edge="1" parent="1" source="templates" target="activities"><mxGeometry relative="1" as="geometry"/></mxCell>
-        <mxCell id="e8" value="1:N" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;" edge="1" parent="1" source="activities" target="pivot"><mxGeometry relative="1" as="geometry"/></mxCell>
-        <mxCell id="e9" value="1:N" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;" edge="1" parent="1" source="officers" target="pivot"><mxGeometry relative="1" as="geometry"/></mxCell>
-        <mxCell id="e10" value="1:N" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;" edge="1" parent="1" source="activities" target="findings"><mxGeometry relative="1" as="geometry"/></mxCell>
-        <mxCell id="e11" value="1:N" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;" edge="1" parent="1" source="archives" target="archivefiles"><mxGeometry relative="1" as="geometry"/></mxCell>
-        <mxCell id="e12" value="1:N" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;" edge="1" parent="1" source="users" target="notifications"><mxGeometry relative="1" as="geometry"/></mxCell>
-        <mxCell id="e13" value="actor" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;dashed=1;" edge="1" parent="1" source="users" target="audit"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="ERD SIPRAJA | Peta relasi domain" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=30;fontStyle=1;fontColor=#0F172A;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="55" y="32" width="2290" height="48" />
+        </mxCell>
+        <mxCell id="subtitle" value="13 tabel domain. Halaman 02–04 memuat seluruh kolom, FK, relasi akun, indeks, serta aturan hapus." style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=15;fontStyle=0;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="55" y="88" width="2290" height="50" />
+        </mxCell>
+        <mxCell id="footer" value="SIPRAJA  |  As-built 28 Oktober 2026  |  01 - Peta domain  |  Sumber: kode aplikasi dan migrasi sampai 19 Oktober 2026" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#64748B;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="55" y="1755" width="2290" height="28" />
+        </mxCell>
+        <mxCell id="users" value="users" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#1E40AF;swimlaneFillColor=#FFFFFF;strokeColor=#1E40AF;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="210" width="450" height="128" />
+        </mxCell>
+        <mxCell id="users-f0" value="PK id" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="12" y="47" width="426" height="24" />
+        </mxCell>
+        <mxCell id="users-f1" value="UQ username, UQ email?" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="12" y="71" width="426" height="24" />
+        </mxCell>
+        <mxCell id="users-f2" value="role, status, phone?" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="12" y="95" width="426" height="24" />
+        </mxCell>
+        <mxCell id="guest_accesses" value="guest_accesses" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#047857;swimlaneFillColor=#FFFFFF;strokeColor=#047857;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="620" width="450" height="128" />
+        </mxCell>
+        <mxCell id="guest_accesses-f0" value="PK id" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="guest_accesses">
+          <mxGeometry as="geometry" x="12" y="47" width="426" height="24" />
+        </mxCell>
+        <mxCell id="guest_accesses-f1" value="UQ token_hash" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="guest_accesses">
+          <mxGeometry as="geometry" x="12" y="71" width="426" height="24" />
+        </mxCell>
+        <mxCell id="guest_accesses-f2" value="last_used_at?, expires_at?" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="guest_accesses">
+          <mxGeometry as="geometry" x="12" y="95" width="426" height="24" />
+        </mxCell>
+        <mxCell id="reports" value="reports" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#B45309;swimlaneFillColor=#FFFFFF;strokeColor=#B45309;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="630" y="210" width="450" height="200" />
+        </mxCell>
+        <mxCell id="reports-f0" value="PK id, UQ code" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="reports">
+          <mxGeometry as="geometry" x="12" y="47" width="426" height="24" />
+        </mxCell>
+        <mxCell id="reports-f1" value="FK guest_access_id?" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="reports">
+          <mxGeometry as="geometry" x="12" y="71" width="426" height="24" />
+        </mxCell>
+        <mxCell id="reports-f2" value="FK created_by_user_id?" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="reports">
+          <mxGeometry as="geometry" x="12" y="95" width="426" height="24" />
+        </mxCell>
+        <mxCell id="reports-f3" value="FK assigned_admin_id?" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="reports">
+          <mxGeometry as="geometry" x="12" y="119" width="426" height="24" />
+        </mxCell>
+        <mxCell id="reports-f4" value="type=lapor, status" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="reports">
+          <mxGeometry as="geometry" x="12" y="143" width="426" height="24" />
+        </mxCell>
+        <mxCell id="reports-f5" value="feedback tersimpan pada laporan" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="reports">
+          <mxGeometry as="geometry" x="12" y="167" width="426" height="24" />
+        </mxCell>
+        <mxCell id="report_status_histories" value="report_status_histories" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#B45309;swimlaneFillColor=#FFFFFF;strokeColor=#B45309;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1210" y="210" width="450" height="152" />
+        </mxCell>
+        <mxCell id="report_status_histories-f0" value="PK id" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="report_status_histories">
+          <mxGeometry as="geometry" x="12" y="47" width="426" height="24" />
+        </mxCell>
+        <mxCell id="report_status_histories-f1" value="FK report_id" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="report_status_histories">
+          <mxGeometry as="geometry" x="12" y="71" width="426" height="24" />
+        </mxCell>
+        <mxCell id="report_status_histories-f2" value="FK changed_by_user_id?" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="report_status_histories">
+          <mxGeometry as="geometry" x="12" y="95" width="426" height="24" />
+        </mxCell>
+        <mxCell id="report_status_histories-f3" value="status, note?, created_at" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="report_status_histories">
+          <mxGeometry as="geometry" x="12" y="119" width="426" height="24" />
+        </mxCell>
+        <mxCell id="attachments" value="attachments" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#6D28D9;swimlaneFillColor=#FFFFFF;strokeColor=#6D28D9;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1810" y="210" width="450" height="152" />
+        </mxCell>
+        <mxCell id="attachments-f0" value="PK id" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="attachments">
+          <mxGeometry as="geometry" x="12" y="47" width="426" height="24" />
+        </mxCell>
+        <mxCell id="attachments-f1" value="attachable_type + attachable_id" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="attachments">
+          <mxGeometry as="geometry" x="12" y="71" width="426" height="24" />
+        </mxCell>
+        <mxCell id="attachments-f2" value="FK uploaded_by_user_id?" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="attachments">
+          <mxGeometry as="geometry" x="12" y="95" width="426" height="24" />
+        </mxCell>
+        <mxCell id="attachments-f3" value="file_path, audience" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="attachments">
+          <mxGeometry as="geometry" x="12" y="119" width="426" height="24" />
+        </mxCell>
+        <mxCell id="notifications" value="notifications" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#1E40AF;swimlaneFillColor=#FFFFFF;strokeColor=#1E40AF;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1810" y="650" width="450" height="128" />
+        </mxCell>
+        <mxCell id="notifications-f0" value="PK id : uuid" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="notifications">
+          <mxGeometry as="geometry" x="12" y="47" width="426" height="24" />
+        </mxCell>
+        <mxCell id="notifications-f1" value="notifiable_type + notifiable_id" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="notifications">
+          <mxGeometry as="geometry" x="12" y="71" width="426" height="24" />
+        </mxCell>
+        <mxCell id="notifications-f2" value="data, read_at?, created_at" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="notifications">
+          <mxGeometry as="geometry" x="12" y="95" width="426" height="24" />
+        </mxCell>
+        <mxCell id="activity_templates" value="activity_templates" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#047857;swimlaneFillColor=#FFFFFF;strokeColor=#047857;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="1030" width="450" height="128" />
+        </mxCell>
+        <mxCell id="activity_templates-f0" value="PK id" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activity_templates">
+          <mxGeometry as="geometry" x="12" y="47" width="426" height="24" />
+        </mxCell>
+        <mxCell id="activity_templates-f1" value="name, operational_category?" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activity_templates">
+          <mxGeometry as="geometry" x="12" y="71" width="426" height="24" />
+        </mxCell>
+        <mxCell id="activity_templates-f2" value="default_description?, is_active" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activity_templates">
+          <mxGeometry as="geometry" x="12" y="95" width="426" height="24" />
+        </mxCell>
+        <mxCell id="activities" value="activities" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#047857;swimlaneFillColor=#FFFFFF;strokeColor=#047857;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="630" y="890" width="450" height="200" />
+        </mxCell>
+        <mxCell id="activities-f0" value="PK id" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activities">
+          <mxGeometry as="geometry" x="12" y="47" width="426" height="24" />
+        </mxCell>
+        <mxCell id="activities-f1" value="FK/UQ report_id?" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activities">
+          <mxGeometry as="geometry" x="12" y="71" width="426" height="24" />
+        </mxCell>
+        <mxCell id="activities-f2" value="FK activity_template_id?" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activities">
+          <mxGeometry as="geometry" x="12" y="95" width="426" height="24" />
+        </mxCell>
+        <mxCell id="activities-f3" value="FK created_by_user_id" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activities">
+          <mxGeometry as="geometry" x="12" y="119" width="426" height="24" />
+        </mxCell>
+        <mxCell id="activities-f4" value="FK evaluated_by_user_id?" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activities">
+          <mxGeometry as="geometry" x="12" y="143" width="426" height="24" />
+        </mxCell>
+        <mxCell id="activities-f5" value="type, activity_date, evaluation" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activities">
+          <mxGeometry as="geometry" x="12" y="167" width="426" height="24" />
+        </mxCell>
+        <mxCell id="activity_personnel" value="activity_personnel" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#047857;swimlaneFillColor=#FFFFFF;strokeColor=#047857;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1210" y="810" width="450" height="152" />
+        </mxCell>
+        <mxCell id="activity_personnel-f0" value="PK id" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activity_personnel">
+          <mxGeometry as="geometry" x="12" y="47" width="426" height="24" />
+        </mxCell>
+        <mxCell id="activity_personnel-f1" value="FK activity_id" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activity_personnel">
+          <mxGeometry as="geometry" x="12" y="71" width="426" height="24" />
+        </mxCell>
+        <mxCell id="activity_personnel-f2" value="employee_nip [API, bukan FK]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activity_personnel">
+          <mxGeometry as="geometry" x="12" y="95" width="426" height="24" />
+        </mxCell>
+        <mxCell id="activity_personnel-f3" value="UQ(activity_id, employee_nip)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activity_personnel">
+          <mxGeometry as="geometry" x="12" y="119" width="426" height="24" />
+        </mxCell>
+        <mxCell id="activity_findings" value="activity_findings" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#047857;swimlaneFillColor=#FFFFFF;strokeColor=#047857;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1210" y="1170" width="450" height="128" />
+        </mxCell>
+        <mxCell id="activity_findings-f0" value="PK id" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activity_findings">
+          <mxGeometry as="geometry" x="12" y="47" width="426" height="24" />
+        </mxCell>
+        <mxCell id="activity_findings-f1" value="FK activity_id" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activity_findings">
+          <mxGeometry as="geometry" x="12" y="71" width="426" height="24" />
+        </mxCell>
+        <mxCell id="activity_findings-f2" value="type, quantity, unit" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activity_findings">
+          <mxGeometry as="geometry" x="12" y="95" width="426" height="24" />
+        </mxCell>
+        <mxCell id="archives" value="archives" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#6D28D9;swimlaneFillColor=#FFFFFF;strokeColor=#6D28D9;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="1430" width="450" height="152" />
+        </mxCell>
+        <mxCell id="archives-f0" value="PK id" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="archives">
+          <mxGeometry as="geometry" x="12" y="47" width="426" height="24" />
+        </mxCell>
+        <mxCell id="archives-f1" value="FK created_by_user_id" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="archives">
+          <mxGeometry as="geometry" x="12" y="71" width="426" height="24" />
+        </mxCell>
+        <mxCell id="archives-f2" value="title, operational_category" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="archives">
+          <mxGeometry as="geometry" x="12" y="95" width="426" height="24" />
+        </mxCell>
+        <mxCell id="archives-f3" value="confidentiality, deleted_at?" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="archives">
+          <mxGeometry as="geometry" x="12" y="119" width="426" height="24" />
+        </mxCell>
+        <mxCell id="archive_files" value="archive_files" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#6D28D9;swimlaneFillColor=#FFFFFF;strokeColor=#6D28D9;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="630" y="1430" width="450" height="128" />
+        </mxCell>
+        <mxCell id="archive_files-f0" value="PK id" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="archive_files">
+          <mxGeometry as="geometry" x="12" y="47" width="426" height="24" />
+        </mxCell>
+        <mxCell id="archive_files-f1" value="FK archive_id" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="archive_files">
+          <mxGeometry as="geometry" x="12" y="71" width="426" height="24" />
+        </mxCell>
+        <mxCell id="archive_files-f2" value="file_path, metadata, file_size" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="archive_files">
+          <mxGeometry as="geometry" x="12" y="95" width="426" height="24" />
+        </mxCell>
+        <mxCell id="audit_logs" value="audit_logs" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#334155;swimlaneFillColor=#FFFFFF;strokeColor=#334155;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1810" y="1170" width="450" height="152" />
+        </mxCell>
+        <mxCell id="audit_logs-f0" value="PK id" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="audit_logs">
+          <mxGeometry as="geometry" x="12" y="47" width="426" height="24" />
+        </mxCell>
+        <mxCell id="audit_logs-f1" value="FK actor_user_id?" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="audit_logs">
+          <mxGeometry as="geometry" x="12" y="71" width="426" height="24" />
+        </mxCell>
+        <mxCell id="audit_logs-f2" value="subject_type? + subject_id?" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="audit_logs">
+          <mxGeometry as="geometry" x="12" y="95" width="426" height="24" />
+        </mxCell>
+        <mxCell id="audit_logs-f3" value="module, action, old/new values" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="audit_logs">
+          <mxGeometry as="geometry" x="12" y="119" width="426" height="24" />
+        </mxCell>
+        <mxCell id="g-r" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=16;html=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;startArrow=ERzeroToOne;startFill=0;endArrow=ERzeroToMany;endFill=0;strokeColor=#64748B;strokeWidth=1.3;fontFamily=Arial;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="guest_accesses" target="reports">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="555" y="700" />
+              <mxPoint x="555" y="360" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="u-r" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=16;html=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;startArrow=ERzeroToOne;startFill=0;endArrow=ERzeroToMany;endFill=0;strokeColor=#64748B;strokeWidth=1.3;fontFamily=Arial;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="users" target="reports">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="r-h" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=16;html=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;startArrow=ERone;startFill=0;endArrow=ERzeroToMany;endFill=0;strokeColor=#64748B;strokeWidth=1.3;fontFamily=Arial;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="reports" target="report_status_histories">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="r-a" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=16;html=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;startArrow=ERzeroToOne;startFill=0;endArrow=ERzeroToOne;endFill=0;strokeColor=#64748B;strokeWidth=1.3;fontFamily=Arial;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="reports" target="activities">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="r-att" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=16;html=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;dashed=1;strokeColor=#64748B;strokeWidth=1.3;fontFamily=Arial;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="reports" target="attachments">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="850" y="160" />
+              <mxPoint x="2020" y="160" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a-att" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=16;html=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;endArrow=none;dashed=1;strokeColor=#64748B;strokeWidth=1.3;fontFamily=Arial;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="activities" target="attachments">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="1730" y="1000" />
+              <mxPoint x="1730" y="560" />
+              <mxPoint x="2020" y="560" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="t-a" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=16;html=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;startArrow=ERzeroToOne;startFill=0;endArrow=ERzeroToMany;endFill=0;strokeColor=#64748B;strokeWidth=1.3;fontFamily=Arial;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="activity_templates" target="activities">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="a-p" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=16;html=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;startArrow=ERone;startFill=0;endArrow=ERzeroToMany;endFill=0;strokeColor=#64748B;strokeWidth=1.3;fontFamily=Arial;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="activities" target="activity_personnel">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="1140" y="980" />
+              <mxPoint x="1140" y="900" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a-f" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=16;html=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;startArrow=ERone;startFill=0;endArrow=ERzeroToMany;endFill=0;strokeColor=#64748B;strokeWidth=1.3;fontFamily=Arial;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="activities" target="activity_findings">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="1140" y="1080" />
+              <mxPoint x="1140" y="1240" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ar-f" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=16;html=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;startArrow=ERone;startFill=0;endArrow=ERzeroToMany;endFill=0;strokeColor=#64748B;strokeWidth=1.3;fontFamily=Arial;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="archives" target="archive_files">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="overview-guide" value="BACA DIAGRAM&#10;Garis utuh + crow’s foot = FK fisik. Garis putus = polimorfik/referensi logis.&#10;? / [NULL] = opsional. UQ = unik. PK = primary key. FK = foreign key.&#10;Relasi users ke pembuat/evaluator/pengunggah/aktor dijabarkan di halaman detail.&#10;Tidak ada tabel data_year atau master officers lokal." style="rounded=1;arcSize=8;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=15;fontFamily=Arial;fontSize=14;fontColor=#334155;fillColor=#EFF6FF;strokeColor=#CBD5E1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1210" y="1450" width="1050" height="180" />
+        </mxCell>
+        <mxCell id="edge-caption-0" value="guest_access_id" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#334155;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="563.0" y="519.5" width="102.0" height="21" />
+        </mxCell>
+        <mxCell id="edge-caption-1" value="creator /&#10;assigned&#10;Admin" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#334155;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="520.2" y="217.0" width="60.0" height="51" />
+        </mxCell>
+        <mxCell id="edge-caption-2" value="report_id" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#334155;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1094.05" y="283.0" width="59.0" height="21" />
+        </mxCell>
+        <mxCell id="edge-caption-3" value="report_id UQ" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#334155;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="863.0" y="639.5" width="80.0" height="21" />
+        </mxCell>
+        <mxCell id="edge-caption-4" value="attachable [report]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#334155;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1381.0" y="166.0" width="108.0" height="21" />
+        </mxCell>
+        <mxCell id="edge-caption-5" value="attachable [activity]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#334155;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1348.5" y="996.0" width="113.0" height="21" />
+        </mxCell>
+        <mxCell id="edge-caption-6" value="activity_template_id" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#334155;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="444.0" y="995.1" width="118.0" height="21" />
+        </mxCell>
+        <mxCell id="edge-caption-7" value="activity_id" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#334155;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1131.1" y="859.0" width="64.0" height="21" />
+        </mxCell>
+        <mxCell id="edge-caption-8" value="activity_id" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#334155;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1068.0" y="1149.5" width="64.0" height="21" />
+        </mxCell>
+        <mxCell id="edge-caption-9" value="archive_id&#10;[CASCADE]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#334155;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="523.5" y="1464.0" width="75.0" height="36" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="02-laporan-dan-bukti" name="02 - Laporan dan bukti">
+    <mxGraphModel dx="2100" dy="1550" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2100" pageHeight="1550" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="ERD | Laporan, kepemilikan, status, dan lampiran" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=30;fontStyle=1;fontColor=#0F172A;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="55" y="32" width="1990" height="48" />
+        </mxCell>
+        <mxCell id="subtitle" value="Tipe mengikuti definisi migrasi Laravel; detail implementasi fisik dapat berbeda menurut engine database." style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=15;fontStyle=0;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="55" y="88" width="1990" height="50" />
+        </mxCell>
+        <mxCell id="footer" value="SIPRAJA  |  As-built 28 Oktober 2026  |  02 - Laporan dan bukti  |  Sumber: kode aplikasi dan migrasi sampai 19 Oktober 2026" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#64748B;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="55" y="1505" width="1990" height="28" />
+        </mxCell>
+        <mxCell id="users" value="users" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#1E40AF;swimlaneFillColor=#FFFFFF;strokeColor=#1E40AF;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="190" width="450" height="344" />
+        </mxCell>
+        <mxCell id="users-f0" value="PK id : bigint unsigned" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="12" y="47" width="426" height="24" />
+        </mxCell>
+        <mxCell id="users-f1" value="name : varchar(255)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="12" y="71" width="426" height="24" />
+        </mxCell>
+        <mxCell id="users-f2" value="UQ username : varchar(100)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="12" y="95" width="426" height="24" />
+        </mxCell>
+        <mxCell id="users-f3" value="UQ email : varchar(255) [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="12" y="119" width="426" height="24" />
+        </mxCell>
+        <mxCell id="users-f4" value="phone : varchar(25) [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="12" y="143" width="426" height="24" />
+        </mxCell>
+        <mxCell id="users-f5" value="email_verified_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="12" y="167" width="426" height="24" />
+        </mxCell>
+        <mxCell id="users-f6" value="password : varchar(255) [hash]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="12" y="191" width="426" height="24" />
+        </mxCell>
+        <mxCell id="users-f7" value="role : varchar(30)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="12" y="215" width="426" height="24" />
+        </mxCell>
+        <mxCell id="users-f8" value="status : varchar(30)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="12" y="239" width="426" height="24" />
+        </mxCell>
+        <mxCell id="users-f9" value="remember_token : varchar(100) [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="12" y="263" width="426" height="24" />
+        </mxCell>
+        <mxCell id="users-f10" value="created_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="12" y="287" width="426" height="24" />
+        </mxCell>
+        <mxCell id="users-f11" value="updated_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="12" y="311" width="426" height="24" />
+        </mxCell>
+        <mxCell id="guest_accesses" value="guest_accesses" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#047857;swimlaneFillColor=#FFFFFF;strokeColor=#047857;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="840" width="450" height="200" />
+        </mxCell>
+        <mxCell id="guest_accesses-f0" value="PK id : bigint unsigned" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="guest_accesses">
+          <mxGeometry as="geometry" x="12" y="47" width="426" height="24" />
+        </mxCell>
+        <mxCell id="guest_accesses-f1" value="UQ token_hash : char(64)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="guest_accesses">
+          <mxGeometry as="geometry" x="12" y="71" width="426" height="24" />
+        </mxCell>
+        <mxCell id="guest_accesses-f2" value="last_used_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="guest_accesses">
+          <mxGeometry as="geometry" x="12" y="95" width="426" height="24" />
+        </mxCell>
+        <mxCell id="guest_accesses-f3" value="expires_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="guest_accesses">
+          <mxGeometry as="geometry" x="12" y="119" width="426" height="24" />
+        </mxCell>
+        <mxCell id="guest_accesses-f4" value="created_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="guest_accesses">
+          <mxGeometry as="geometry" x="12" y="143" width="426" height="24" />
+        </mxCell>
+        <mxCell id="guest_accesses-f5" value="updated_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="guest_accesses">
+          <mxGeometry as="geometry" x="12" y="167" width="426" height="24" />
+        </mxCell>
+        <mxCell id="reports" value="reports" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#B45309;swimlaneFillColor=#FFFFFF;strokeColor=#B45309;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="660" y="190" width="510" height="608" />
+        </mxCell>
+        <mxCell id="reports-f0" value="PK id : bigint unsigned" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="reports">
+          <mxGeometry as="geometry" x="12" y="47" width="486" height="24" />
+        </mxCell>
+        <mxCell id="reports-f1" value="UQ code : varchar(30)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="reports">
+          <mxGeometry as="geometry" x="12" y="71" width="486" height="24" />
+        </mxCell>
+        <mxCell id="reports-f2" value="FK guest_access_id : bigint unsigned [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="reports">
+          <mxGeometry as="geometry" x="12" y="95" width="486" height="24" />
+        </mxCell>
+        <mxCell id="reports-f3" value="FK created_by_user_id : bigint unsigned [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="reports">
+          <mxGeometry as="geometry" x="12" y="119" width="486" height="24" />
+        </mxCell>
+        <mxCell id="reports-f4" value="FK assigned_admin_id : bigint unsigned [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="reports">
+          <mxGeometry as="geometry" x="12" y="143" width="486" height="24" />
+        </mxCell>
+        <mxCell id="reports-f5" value="type : varchar(30) [lapor]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="reports">
+          <mxGeometry as="geometry" x="12" y="167" width="486" height="24" />
+        </mxCell>
+        <mxCell id="reports-f6" value="category : varchar(50) [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="reports">
+          <mxGeometry as="geometry" x="12" y="191" width="486" height="24" />
+        </mxCell>
+        <mxCell id="reports-f7" value="source : varchar(30)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="reports">
+          <mxGeometry as="geometry" x="12" y="215" width="486" height="24" />
+        </mxCell>
+        <mxCell id="reports-f8" value="source_platform : varchar(30) [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="reports">
+          <mxGeometry as="geometry" x="12" y="239" width="486" height="24" />
+        </mxCell>
+        <mxCell id="reports-f9" value="reporter_name : varchar(255) [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="reports">
+          <mxGeometry as="geometry" x="12" y="263" width="486" height="24" />
+        </mxCell>
+        <mxCell id="reports-f10" value="reporter_phone : varchar(25)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="reports">
+          <mxGeometry as="geometry" x="12" y="287" width="486" height="24" />
+        </mxCell>
+        <mxCell id="reports-f11" value="description : text" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="reports">
+          <mxGeometry as="geometry" x="12" y="311" width="486" height="24" />
+        </mxCell>
+        <mxCell id="reports-f12" value="location_address : text" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="reports">
+          <mxGeometry as="geometry" x="12" y="335" width="486" height="24" />
+        </mxCell>
+        <mxCell id="reports-f13" value="latitude : decimal(10,7) [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="reports">
+          <mxGeometry as="geometry" x="12" y="359" width="486" height="24" />
+        </mxCell>
+        <mxCell id="reports-f14" value="longitude : decimal(10,7) [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="reports">
+          <mxGeometry as="geometry" x="12" y="383" width="486" height="24" />
+        </mxCell>
+        <mxCell id="reports-f15" value="status : varchar(30)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="reports">
+          <mxGeometry as="geometry" x="12" y="407" width="486" height="24" />
+        </mxCell>
+        <mxCell id="reports-f16" value="completed_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="reports">
+          <mxGeometry as="geometry" x="12" y="431" width="486" height="24" />
+        </mxCell>
+        <mxCell id="reports-f17" value="feedback_rating : tinyint unsigned [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="reports">
+          <mxGeometry as="geometry" x="12" y="455" width="486" height="24" />
+        </mxCell>
+        <mxCell id="reports-f18" value="feedback_comment : text [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="reports">
+          <mxGeometry as="geometry" x="12" y="479" width="486" height="24" />
+        </mxCell>
+        <mxCell id="reports-f19" value="feedback_submitted_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="reports">
+          <mxGeometry as="geometry" x="12" y="503" width="486" height="24" />
+        </mxCell>
+        <mxCell id="reports-f20" value="created_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="reports">
+          <mxGeometry as="geometry" x="12" y="527" width="486" height="24" />
+        </mxCell>
+        <mxCell id="reports-f21" value="updated_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="reports">
+          <mxGeometry as="geometry" x="12" y="551" width="486" height="24" />
+        </mxCell>
+        <mxCell id="reports-f22" value="deleted_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="reports">
+          <mxGeometry as="geometry" x="12" y="575" width="486" height="24" />
+        </mxCell>
+        <mxCell id="report_status_histories" value="report_status_histories" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#B45309;swimlaneFillColor=#FFFFFF;strokeColor=#B45309;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1340" y="190" width="660" height="200" />
+        </mxCell>
+        <mxCell id="report_status_histories-f0" value="PK id : bigint unsigned" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="report_status_histories">
+          <mxGeometry as="geometry" x="12" y="47" width="636" height="24" />
+        </mxCell>
+        <mxCell id="report_status_histories-f1" value="FK report_id : bigint unsigned" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="report_status_histories">
+          <mxGeometry as="geometry" x="12" y="71" width="636" height="24" />
+        </mxCell>
+        <mxCell id="report_status_histories-f2" value="FK changed_by_user_id : bigint unsigned [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="report_status_histories">
+          <mxGeometry as="geometry" x="12" y="95" width="636" height="24" />
+        </mxCell>
+        <mxCell id="report_status_histories-f3" value="status : varchar(30)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="report_status_histories">
+          <mxGeometry as="geometry" x="12" y="119" width="636" height="24" />
+        </mxCell>
+        <mxCell id="report_status_histories-f4" value="note : text [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="report_status_histories">
+          <mxGeometry as="geometry" x="12" y="143" width="636" height="24" />
+        </mxCell>
+        <mxCell id="report_status_histories-f5" value="created_at : timestamp" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="report_status_histories">
+          <mxGeometry as="geometry" x="12" y="167" width="636" height="24" />
+        </mxCell>
+        <mxCell id="attachments" value="attachments" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#6D28D9;swimlaneFillColor=#FFFFFF;strokeColor=#6D28D9;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1340" y="720" width="660" height="344" />
+        </mxCell>
+        <mxCell id="attachments-f0" value="PK id : bigint unsigned" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="attachments">
+          <mxGeometry as="geometry" x="12" y="47" width="636" height="24" />
+        </mxCell>
+        <mxCell id="attachments-f1" value="IDX attachable_type : varchar(50)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="attachments">
+          <mxGeometry as="geometry" x="12" y="71" width="636" height="24" />
+        </mxCell>
+        <mxCell id="attachments-f2" value="IDX attachable_id : bigint unsigned" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="attachments">
+          <mxGeometry as="geometry" x="12" y="95" width="636" height="24" />
+        </mxCell>
+        <mxCell id="attachments-f3" value="FK uploaded_by_user_id : bigint unsigned [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="attachments">
+          <mxGeometry as="geometry" x="12" y="119" width="636" height="24" />
+        </mxCell>
+        <mxCell id="attachments-f4" value="file_path : varchar(500)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="attachments">
+          <mxGeometry as="geometry" x="12" y="143" width="636" height="24" />
+        </mxCell>
+        <mxCell id="attachments-f5" value="original_name : varchar(255)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="attachments">
+          <mxGeometry as="geometry" x="12" y="167" width="636" height="24" />
+        </mxCell>
+        <mxCell id="attachments-f6" value="file_type : varchar(20)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="attachments">
+          <mxGeometry as="geometry" x="12" y="191" width="636" height="24" />
+        </mxCell>
+        <mxCell id="attachments-f7" value="mime_type : varchar(100)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="attachments">
+          <mxGeometry as="geometry" x="12" y="215" width="636" height="24" />
+        </mxCell>
+        <mxCell id="attachments-f8" value="file_size : bigint unsigned" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="attachments">
+          <mxGeometry as="geometry" x="12" y="239" width="636" height="24" />
+        </mxCell>
+        <mxCell id="attachments-f9" value="audience : varchar(20)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="attachments">
+          <mxGeometry as="geometry" x="12" y="263" width="636" height="24" />
+        </mxCell>
+        <mxCell id="attachments-f10" value="created_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="attachments">
+          <mxGeometry as="geometry" x="12" y="287" width="636" height="24" />
+        </mxCell>
+        <mxCell id="attachments-f11" value="updated_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="attachments">
+          <mxGeometry as="geometry" x="12" y="311" width="636" height="24" />
+        </mxCell>
+        <mxCell id="activities" value="activities" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#047857;swimlaneFillColor=#FFFFFF;strokeColor=#047857;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="660" y="1120" width="510" height="128" />
+        </mxCell>
+        <mxCell id="activities-f0" value="PK id" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activities">
+          <mxGeometry as="geometry" x="12" y="47" width="486" height="24" />
+        </mxCell>
+        <mxCell id="activities-f1" value="FK/UQ report_id : bigint [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activities">
+          <mxGeometry as="geometry" x="12" y="71" width="486" height="24" />
+        </mxCell>
+        <mxCell id="activities-f2" value="Detail lengkap: halaman 03" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activities">
+          <mxGeometry as="geometry" x="12" y="95" width="486" height="24" />
+        </mxCell>
+        <mxCell id="creator" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=16;html=0;exitX=1;exitY=0.2;exitDx=0;exitDy=0;entryX=0;entryY=0.08;entryDx=0;entryDy=0;startArrow=ERzeroToOne;startFill=0;endArrow=ERzeroToMany;endFill=0;strokeColor=#64748B;strokeWidth=1.3;fontFamily=Arial;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="users" target="reports">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="570" y="265" />
+              <mxPoint x="570" y="240" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="assignee" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=16;html=0;exitX=1;exitY=0.8;exitDx=0;exitDy=0;entryX=0;entryY=0.2;entryDx=0;entryDy=0;startArrow=ERzeroToOne;startFill=0;endArrow=ERzeroToMany;endFill=0;strokeColor=#64748B;strokeWidth=1.3;fontFamily=Arial;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="users" target="reports">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="610" y="470" />
+              <mxPoint x="610" y="350" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="guest" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=16;html=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.65;entryDx=0;entryDy=0;startArrow=ERzeroToOne;startFill=0;endArrow=ERzeroToMany;endFill=0;strokeColor=#64748B;strokeWidth=1.3;fontFamily=Arial;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="guest_accesses" target="reports">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="570" y="940" />
+              <mxPoint x="570" y="600" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="history" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=16;html=0;exitX=1;exitY=0.15;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;startArrow=ERone;startFill=0;endArrow=ERzeroToMany;endFill=0;strokeColor=#64748B;strokeWidth=1.3;fontFamily=Arial;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="reports" target="report_status_histories">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="changer" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=16;html=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;startArrow=ERzeroToOne;startFill=0;endArrow=ERzeroToMany;endFill=0;strokeColor=#64748B;strokeWidth=1.3;fontFamily=Arial;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="users" target="report_status_histories">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="280" y="155" />
+              <mxPoint x="1680" y="155" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="uploader" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=16;html=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;startArrow=ERzeroToOne;startFill=0;endArrow=ERzeroToMany;endFill=0;strokeColor=#64748B;strokeWidth=1.3;fontFamily=Arial;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="users" target="attachments">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="30" y="370" />
+              <mxPoint x="30" y="1090" />
+              <mxPoint x="2050" y="1090" />
+              <mxPoint x="2050" y="880" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="report-attachments" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=16;html=0;exitX=1;exitY=0.8;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;dashed=1;strokeColor=#64748B;strokeWidth=1.3;fontFamily=Arial;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="reports" target="attachments">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="1250" y="690" />
+              <mxPoint x="1250" y="860" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="report-completion" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=16;html=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;startArrow=ERzeroToOne;startFill=0;endArrow=ERzeroToOne;endFill=0;strokeColor=#64748B;strokeWidth=1.3;fontFamily=Arial;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="reports" target="activities">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="constraints" value="ATURAN LAPORAN&#10;Laporan publik -&gt; guest_access_id; laporan Admin -&gt; created_by_user_id.&#10;assigned_admin_id hanya boleh menunjuk Admin aktif (validasi aplikasi).&#10;NIK sudah dihapus. Tidak ada tabel feedback: rating/komentar ada di reports.&#10;Satu laporan maksimal satu kegiatan, termasuk kegiatan yang soft-deleted." style="rounded=1;arcSize=8;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=15;fontFamily=Arial;fontSize=14;fontColor=#334155;fillColor=#FFFBEB;strokeColor=#CBD5E1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="1180" width="450" height="270" />
+        </mxCell>
+        <mxCell id="status" value="STATUS DAN INDEKS&#10;submitted -&gt; received -&gt; verifying -&gt; in_progress -&gt; completed&#10;verifying -&gt; rejected (alasan wajib). Ini aturan aplikasi, bukan ENUM database.&#10;IDX reports: created_at; (guest_access_id,created_at); (status,created_at); (type,created_at).&#10;IDX history: (report_id,created_at). IDX attachments: (attachable_type,attachable_id)." style="rounded=1;arcSize=8;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=15;fontFamily=Arial;fontSize=14;fontColor=#334155;fillColor=#EFF6FF;strokeColor=#CBD5E1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="660" y="1350" width="1340" height="125" />
+        </mxCell>
+        <mxCell id="edge-caption-0" value="created_by_user_id&#10;[SET NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#334155;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="524.0" y="196.64" width="119.0" height="36" />
+        </mxCell>
+        <mxCell id="edge-caption-1" value="assigned_admin_id&#10;[SET NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#334155;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="518.0" y="423.2" width="118.0" height="36" />
+        </mxCell>
+        <mxCell id="edge-caption-2" value="guest_access_id [SET NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#334155;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="393.0" y="759.5" width="169.0" height="21" />
+        </mxCell>
+        <mxCell id="edge-caption-3" value="report_id [RESTRICT]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#334155;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1178.25" y="254.2" width="128.0" height="21" />
+        </mxCell>
+        <mxCell id="edge-caption-4" value="changed_by_user_id [SET NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#334155;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="883.5" y="161.0" width="193.0" height="21" />
+        </mxCell>
+        <mxCell id="edge-caption-5" value="uploaded_by_user_id [SET NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#334155;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="941.5" y="1063.0" width="197.0" height="21" />
+        </mxCell>
+        <mxCell id="edge-caption-6" value="Morph: attachable_type=report" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#334155;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1065.0" y="824.0" width="177.0" height="21" />
+        </mxCell>
+        <mxCell id="edge-caption-7" value="report_id [UQ, RESTRICT]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#334155;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="923.0" y="948.5" width="152.0" height="21" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="03-kegiatan-dan-personel" name="03 - Kegiatan dan personel">
+    <mxGraphModel dx="2200" dy="1650" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2200" pageHeight="1650" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="ERD | Kegiatan, personel e-Profil, temuan, dan evaluasi" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=30;fontStyle=1;fontColor=#0F172A;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="55" y="32" width="2090" height="48" />
+        </mxCell>
+        <mxCell id="subtitle" value="Evaluasi berada pada activities; NIP personel merujuk layanan luar dan tidak mempunyai FK ke pegawai lokal." style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=15;fontStyle=0;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="55" y="88" width="2090" height="50" />
+        </mxCell>
+        <mxCell id="footer" value="SIPRAJA  |  As-built 28 Oktober 2026  |  03 - Kegiatan dan personel  |  Sumber: kode aplikasi dan migrasi sampai 19 Oktober 2026" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#64748B;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="55" y="1605" width="2090" height="28" />
+        </mxCell>
+        <mxCell id="activities" value="activities" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#047857;swimlaneFillColor=#FFFFFF;strokeColor=#047857;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="650" y="190" width="540" height="560" />
+        </mxCell>
+        <mxCell id="activities-f0" value="PK id : bigint unsigned" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activities">
+          <mxGeometry as="geometry" x="12" y="47" width="516" height="24" />
+        </mxCell>
+        <mxCell id="activities-f1" value="FK/UQ report_id : bigint unsigned [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activities">
+          <mxGeometry as="geometry" x="12" y="71" width="516" height="24" />
+        </mxCell>
+        <mxCell id="activities-f2" value="FK activity_template_id : bigint unsigned [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activities">
+          <mxGeometry as="geometry" x="12" y="95" width="516" height="24" />
+        </mxCell>
+        <mxCell id="activities-f3" value="FK created_by_user_id : bigint unsigned" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activities">
+          <mxGeometry as="geometry" x="12" y="119" width="516" height="24" />
+        </mxCell>
+        <mxCell id="activities-f4" value="FK evaluated_by_user_id : bigint unsigned [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activities">
+          <mxGeometry as="geometry" x="12" y="143" width="516" height="24" />
+        </mxCell>
+        <mxCell id="activities-f5" value="name : varchar(255)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activities">
+          <mxGeometry as="geometry" x="12" y="167" width="516" height="24" />
+        </mxCell>
+        <mxCell id="activities-f6" value="type : varchar(30) [internal/external]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activities">
+          <mxGeometry as="geometry" x="12" y="191" width="516" height="24" />
+        </mxCell>
+        <mxCell id="activities-f7" value="category : varchar(255) [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activities">
+          <mxGeometry as="geometry" x="12" y="215" width="516" height="24" />
+        </mxCell>
+        <mxCell id="activities-f8" value="activity_date : date" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activities">
+          <mxGeometry as="geometry" x="12" y="239" width="516" height="24" />
+        </mxCell>
+        <mxCell id="activities-f9" value="start_time : time [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activities">
+          <mxGeometry as="geometry" x="12" y="263" width="516" height="24" />
+        </mxCell>
+        <mxCell id="activities-f10" value="description : text [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activities">
+          <mxGeometry as="geometry" x="12" y="287" width="516" height="24" />
+        </mxCell>
+        <mxCell id="activities-f11" value="handling_result : text [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activities">
+          <mxGeometry as="geometry" x="12" y="311" width="516" height="24" />
+        </mxCell>
+        <mxCell id="activities-f12" value="location_address : text" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activities">
+          <mxGeometry as="geometry" x="12" y="335" width="516" height="24" />
+        </mxCell>
+        <mxCell id="activities-f13" value="latitude : decimal(10,7)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activities">
+          <mxGeometry as="geometry" x="12" y="359" width="516" height="24" />
+        </mxCell>
+        <mxCell id="activities-f14" value="longitude : decimal(10,7)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activities">
+          <mxGeometry as="geometry" x="12" y="383" width="516" height="24" />
+        </mxCell>
+        <mxCell id="activities-f15" value="evaluation_notes : text [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activities">
+          <mxGeometry as="geometry" x="12" y="407" width="516" height="24" />
+        </mxCell>
+        <mxCell id="activities-f16" value="evaluation_obstacles : text [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activities">
+          <mxGeometry as="geometry" x="12" y="431" width="516" height="24" />
+        </mxCell>
+        <mxCell id="activities-f17" value="evaluated_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activities">
+          <mxGeometry as="geometry" x="12" y="455" width="516" height="24" />
+        </mxCell>
+        <mxCell id="activities-f18" value="created_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activities">
+          <mxGeometry as="geometry" x="12" y="479" width="516" height="24" />
+        </mxCell>
+        <mxCell id="activities-f19" value="updated_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activities">
+          <mxGeometry as="geometry" x="12" y="503" width="516" height="24" />
+        </mxCell>
+        <mxCell id="activities-f20" value="deleted_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activities">
+          <mxGeometry as="geometry" x="12" y="527" width="516" height="24" />
+        </mxCell>
+        <mxCell id="activity_templates" value="activity_templates" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#047857;swimlaneFillColor=#FFFFFF;strokeColor=#047857;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="190" width="450" height="248" />
+        </mxCell>
+        <mxCell id="activity_templates-f0" value="PK id : bigint unsigned" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activity_templates">
+          <mxGeometry as="geometry" x="12" y="47" width="426" height="24" />
+        </mxCell>
+        <mxCell id="activity_templates-f1" value="name : varchar(255)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activity_templates">
+          <mxGeometry as="geometry" x="12" y="71" width="426" height="24" />
+        </mxCell>
+        <mxCell id="activity_templates-f2" value="operational_category : varchar(50) [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activity_templates">
+          <mxGeometry as="geometry" x="12" y="95" width="426" height="24" />
+        </mxCell>
+        <mxCell id="activity_templates-f3" value="default_description : text [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activity_templates">
+          <mxGeometry as="geometry" x="12" y="119" width="426" height="24" />
+        </mxCell>
+        <mxCell id="activity_templates-f4" value="is_active : boolean [default true]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activity_templates">
+          <mxGeometry as="geometry" x="12" y="143" width="426" height="24" />
+        </mxCell>
+        <mxCell id="activity_templates-f5" value="sort_order : smallint unsigned" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activity_templates">
+          <mxGeometry as="geometry" x="12" y="167" width="426" height="24" />
+        </mxCell>
+        <mxCell id="activity_templates-f6" value="created_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activity_templates">
+          <mxGeometry as="geometry" x="12" y="191" width="426" height="24" />
+        </mxCell>
+        <mxCell id="activity_templates-f7" value="updated_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activity_templates">
+          <mxGeometry as="geometry" x="12" y="215" width="426" height="24" />
+        </mxCell>
+        <mxCell id="users" value="users" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#1E40AF;swimlaneFillColor=#FFFFFF;strokeColor=#1E40AF;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="650" width="450" height="128" />
+        </mxCell>
+        <mxCell id="users-f0" value="PK id : bigint unsigned" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="12" y="47" width="426" height="24" />
+        </mxCell>
+        <mxCell id="users-f1" value="name, username, role, status" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="12" y="71" width="426" height="24" />
+        </mxCell>
+        <mxCell id="users-f2" value="Detail lengkap: halaman 02" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="12" y="95" width="426" height="24" />
+        </mxCell>
+        <mxCell id="reports" value="reports" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#B45309;swimlaneFillColor=#FFFFFF;strokeColor=#B45309;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="1020" width="450" height="128" />
+        </mxCell>
+        <mxCell id="reports-f0" value="PK id : bigint unsigned" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="reports">
+          <mxGeometry as="geometry" x="12" y="47" width="426" height="24" />
+        </mxCell>
+        <mxCell id="reports-f1" value="assigned_admin_id : bigint [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="reports">
+          <mxGeometry as="geometry" x="12" y="71" width="426" height="24" />
+        </mxCell>
+        <mxCell id="reports-f2" value="Detail lengkap: halaman 02" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="reports">
+          <mxGeometry as="geometry" x="12" y="95" width="426" height="24" />
+        </mxCell>
+        <mxCell id="activity_personnel" value="activity_personnel" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#047857;swimlaneFillColor=#FFFFFF;strokeColor=#047857;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1370" y="190" width="720" height="248" />
+        </mxCell>
+        <mxCell id="activity_personnel-f0" value="PK id : bigint unsigned" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activity_personnel">
+          <mxGeometry as="geometry" x="12" y="47" width="696" height="24" />
+        </mxCell>
+        <mxCell id="activity_personnel-f1" value="FK activity_id : bigint unsigned" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activity_personnel">
+          <mxGeometry as="geometry" x="12" y="71" width="696" height="24" />
+        </mxCell>
+        <mxCell id="activity_personnel-f2" value="employee_nip : varchar(50)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activity_personnel">
+          <mxGeometry as="geometry" x="12" y="95" width="696" height="24" />
+        </mxCell>
+        <mxCell id="activity_personnel-f3" value="assignment_role : varchar(150) [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activity_personnel">
+          <mxGeometry as="geometry" x="12" y="119" width="696" height="24" />
+        </mxCell>
+        <mxCell id="activity_personnel-f4" value="notes : text [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activity_personnel">
+          <mxGeometry as="geometry" x="12" y="143" width="696" height="24" />
+        </mxCell>
+        <mxCell id="activity_personnel-f5" value="created_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activity_personnel">
+          <mxGeometry as="geometry" x="12" y="167" width="696" height="24" />
+        </mxCell>
+        <mxCell id="activity_personnel-f6" value="updated_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activity_personnel">
+          <mxGeometry as="geometry" x="12" y="191" width="696" height="24" />
+        </mxCell>
+        <mxCell id="activity_personnel-f7" value="UQ (activity_id, employee_nip)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activity_personnel">
+          <mxGeometry as="geometry" x="12" y="215" width="696" height="24" />
+        </mxCell>
+        <mxCell id="activity_findings" value="activity_findings" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#047857;swimlaneFillColor=#FFFFFF;strokeColor=#047857;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1370" y="650" width="450" height="224" />
+        </mxCell>
+        <mxCell id="activity_findings-f0" value="PK id : bigint unsigned" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activity_findings">
+          <mxGeometry as="geometry" x="12" y="47" width="426" height="24" />
+        </mxCell>
+        <mxCell id="activity_findings-f1" value="FK activity_id : bigint unsigned" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activity_findings">
+          <mxGeometry as="geometry" x="12" y="71" width="426" height="24" />
+        </mxCell>
+        <mxCell id="activity_findings-f2" value="type : varchar(20)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activity_findings">
+          <mxGeometry as="geometry" x="12" y="95" width="426" height="24" />
+        </mxCell>
+        <mxCell id="activity_findings-f3" value="quantity : int unsigned" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activity_findings">
+          <mxGeometry as="geometry" x="12" y="119" width="426" height="24" />
+        </mxCell>
+        <mxCell id="activity_findings-f4" value="unit : varchar(20)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activity_findings">
+          <mxGeometry as="geometry" x="12" y="143" width="426" height="24" />
+        </mxCell>
+        <mxCell id="activity_findings-f5" value="created_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activity_findings">
+          <mxGeometry as="geometry" x="12" y="167" width="426" height="24" />
+        </mxCell>
+        <mxCell id="activity_findings-f6" value="updated_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="activity_findings">
+          <mxGeometry as="geometry" x="12" y="191" width="426" height="24" />
+        </mxCell>
+        <mxCell id="attachments" value="attachments" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#6D28D9;swimlaneFillColor=#FFFFFF;strokeColor=#6D28D9;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1370" y="1060" width="450" height="200" />
+        </mxCell>
+        <mxCell id="attachments-f0" value="PK id" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="attachments">
+          <mxGeometry as="geometry" x="12" y="47" width="426" height="24" />
+        </mxCell>
+        <mxCell id="attachments-f1" value="attachable_type = activity" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="attachments">
+          <mxGeometry as="geometry" x="12" y="71" width="426" height="24" />
+        </mxCell>
+        <mxCell id="attachments-f2" value="attachable_id = activities.id" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="attachments">
+          <mxGeometry as="geometry" x="12" y="95" width="426" height="24" />
+        </mxCell>
+        <mxCell id="attachments-f3" value="FK uploaded_by_user_id?" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="attachments">
+          <mxGeometry as="geometry" x="12" y="119" width="426" height="24" />
+        </mxCell>
+        <mxCell id="attachments-f4" value="audience: internal / public" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="attachments">
+          <mxGeometry as="geometry" x="12" y="143" width="426" height="24" />
+        </mxCell>
+        <mxCell id="attachments-f5" value="Detail lengkap: halaman 02" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="attachments">
+          <mxGeometry as="geometry" x="12" y="167" width="426" height="24" />
+        </mxCell>
+        <mxCell id="external-eprofil" value="&lt;&lt;external system&gt;&gt;&#10;API e-Profil" style="swimlane;html=0;horizontal=1;startSize=55;rounded=0;fillColor=#B45309;swimlaneFillColor=#FFFFFF;strokeColor=#B45309;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1370" y="1430" width="720" height="141" />
+        </mxCell>
+        <mxCell id="external-eprofil-f0" value="NIP, nama, jabatan" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="external-eprofil">
+          <mxGeometry as="geometry" x="12" y="60" width="696" height="24" />
+        </mxCell>
+        <mxCell id="external-eprofil-f1" value="Sumber eksternal; bukan tabel SIPRAJA" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="external-eprofil">
+          <mxGeometry as="geometry" x="12" y="84" width="696" height="24" />
+        </mxCell>
+        <mxCell id="external-eprofil-f2" value="Referensi employee_nip; tanpa FK lokal" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="external-eprofil">
+          <mxGeometry as="geometry" x="12" y="108" width="696" height="24" />
+        </mxCell>
+        <mxCell id="template" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=16;html=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;startArrow=ERzeroToOne;startFill=0;endArrow=ERzeroToMany;endFill=0;strokeColor=#64748B;strokeWidth=1.3;fontFamily=Arial;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="activity_templates" target="activities">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="creator" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=16;html=0;exitX=1;exitY=0.3;exitDx=0;exitDy=0;entryX=0;entryY=0.35;entryDx=0;entryDy=0;startArrow=ERone;startFill=0;endArrow=ERzeroToMany;endFill=0;strokeColor=#64748B;strokeWidth=1.3;fontFamily=Arial;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="users" target="activities">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="evaluator" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=16;html=0;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.6;entryDx=0;entryDy=0;startArrow=ERzeroToOne;startFill=0;endArrow=ERzeroToMany;endFill=0;strokeColor=#64748B;strokeWidth=1.3;fontFamily=Arial;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="users" target="activities">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="580" y="810" />
+              <mxPoint x="580" y="720" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="report-activity" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=16;html=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.85;entryDx=0;entryDy=0;startArrow=ERzeroToOne;startFill=0;endArrow=ERzeroToOne;endFill=0;strokeColor=#64748B;strokeWidth=1.3;fontFamily=Arial;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="reports" target="activities">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="570" y="1090" />
+              <mxPoint x="570" y="800" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="personnel" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=16;html=0;exitX=1;exitY=0.2;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;startArrow=ERone;startFill=0;endArrow=ERzeroToMany;endFill=0;strokeColor=#64748B;strokeWidth=1.3;fontFamily=Arial;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="activities" target="activity_personnel">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="findings" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=16;html=0;exitX=1;exitY=0.7;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;startArrow=ERone;startFill=0;endArrow=ERzeroToMany;endFill=0;strokeColor=#64748B;strokeWidth=1.3;fontFamily=Arial;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="activities" target="activity_findings">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="activity-files" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=16;html=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;dashed=1;strokeColor=#64748B;strokeWidth=1.3;fontFamily=Arial;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="activities" target="attachments">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="920" y="980" />
+              <mxPoint x="1270" y="980" />
+              <mxPoint x="1270" y="1190" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nip-api" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=16;html=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;endArrow=open;endFill=0;dashed=1;strokeColor=#64748B;strokeWidth=1.3;fontFamily=Arial;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="activity_personnel" target="external-eprofil">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="2140" y="350" />
+              <mxPoint x="2140" y="1520" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rules" value="VALIDASI DAN INDEKS&#10;Internal: kategori wajib dari nama template aktif. External: dibuat saat laporan selesai.&#10;Tanggal kegiatan menentukan tahun data; tanggal selesai tidak boleh sesudah hari ini.&#10;Personel minimal 1 saat pembuatan; UQ kegiatan + NIP. Temuan maksimal 50 baris.&#10;Dokumentasi internal opsional (total 3); penyelesaian wajib 1–3 foto @ 5 MB.&#10;IDX activities: activity_date dan (type,activity_date). Nullable skema tidak selalu berarti form opsional." style="rounded=1;arcSize=8;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=15;fontFamily=Arial;fontSize=14;fontColor=#334155;fillColor=#EFF6FF;strokeColor=#CBD5E1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="1300" width="1130" height="245" />
+        </mxCell>
+        <mxCell id="edge-caption-0" value="activity_template_id [SET NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#334155;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="387.0" y="451.7" width="185.0" height="21" />
+        </mxCell>
+        <mxCell id="edge-caption-1" value="created_by_user_id [RESTRICT]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#334155;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="384.0" y="526.7" width="188.0" height="21" />
+        </mxCell>
+        <mxCell id="edge-caption-2" value="evaluated_by_user_id [SET NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#334155;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="373.0" y="612.5" width="199.0" height="21" />
+        </mxCell>
+        <mxCell id="edge-caption-3" value="report_id [UQ, RESTRICT]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#334155;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="578.0" y="934.5" width="152.0" height="21" />
+        </mxCell>
+        <mxCell id="edge-caption-4" value="activity_id [RESTRICT]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#334155;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1200.0" y="275.0" width="133.0" height="21" />
+        </mxCell>
+        <mxCell id="edge-caption-5" value="activity_id [CASCADE]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#334155;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1288.0" y="598.5" width="132.0" height="21" />
+        </mxCell>
+        <mxCell id="edge-caption-6" value="Morph: attachable_type=activity" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#334155;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1004.0" y="953.0" width="182.0" height="21" />
+        </mxCell>
+        <mxCell id="edge-caption-7" value="employee_nip -&gt; NIP API (bukan FK)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#334155;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1922.0" y="924.5" width="210.0" height="21" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="04-arsip-audit-notifikasi" name="04 - Arsip audit notifikasi">
+    <mxGraphModel dx="2100" dy="1500" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2100" pageHeight="1500" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="ERD | Arsip, audit aktivitas, dan notifikasi" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=30;fontStyle=1;fontColor=#0F172A;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="55" y="32" width="1990" height="48" />
+        </mxCell>
+        <mxCell id="subtitle" value="Akses berkas melalui route terotorisasi. Audit hanya dibuat untuk aksi yang memanggil AuditLog::create()." style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=15;fontStyle=0;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="55" y="88" width="1990" height="50" />
+        </mxCell>
+        <mxCell id="footer" value="SIPRAJA  |  As-built 28 Oktober 2026  |  04 - Arsip audit notifikasi  |  Sumber: kode aplikasi dan migrasi sampai 19 Oktober 2026" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#64748B;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="55" y="1455" width="1990" height="28" />
+        </mxCell>
+        <mxCell id="users" value="users" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#1E40AF;swimlaneFillColor=#FFFFFF;strokeColor=#1E40AF;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="190" width="450" height="344" />
+        </mxCell>
+        <mxCell id="users-f0" value="PK id : bigint unsigned" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="12" y="47" width="426" height="24" />
+        </mxCell>
+        <mxCell id="users-f1" value="name : varchar(255)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="12" y="71" width="426" height="24" />
+        </mxCell>
+        <mxCell id="users-f2" value="UQ username : varchar(100)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="12" y="95" width="426" height="24" />
+        </mxCell>
+        <mxCell id="users-f3" value="UQ email : varchar(255) [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="12" y="119" width="426" height="24" />
+        </mxCell>
+        <mxCell id="users-f4" value="phone : varchar(25) [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="12" y="143" width="426" height="24" />
+        </mxCell>
+        <mxCell id="users-f5" value="email_verified_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="12" y="167" width="426" height="24" />
+        </mxCell>
+        <mxCell id="users-f6" value="password : varchar(255) [hash]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="12" y="191" width="426" height="24" />
+        </mxCell>
+        <mxCell id="users-f7" value="role : varchar(30)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="12" y="215" width="426" height="24" />
+        </mxCell>
+        <mxCell id="users-f8" value="status : varchar(30)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="12" y="239" width="426" height="24" />
+        </mxCell>
+        <mxCell id="users-f9" value="remember_token : varchar(100) [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="12" y="263" width="426" height="24" />
+        </mxCell>
+        <mxCell id="users-f10" value="created_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="12" y="287" width="426" height="24" />
+        </mxCell>
+        <mxCell id="users-f11" value="updated_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="12" y="311" width="426" height="24" />
+        </mxCell>
+        <mxCell id="archives" value="archives" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#6D28D9;swimlaneFillColor=#FFFFFF;strokeColor=#6D28D9;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="680" y="190" width="530" height="272" />
+        </mxCell>
+        <mxCell id="archives-f0" value="PK id : bigint unsigned" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="archives">
+          <mxGeometry as="geometry" x="12" y="47" width="506" height="24" />
+        </mxCell>
+        <mxCell id="archives-f1" value="FK created_by_user_id : bigint unsigned" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="archives">
+          <mxGeometry as="geometry" x="12" y="71" width="506" height="24" />
+        </mxCell>
+        <mxCell id="archives-f2" value="title : varchar(255)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="archives">
+          <mxGeometry as="geometry" x="12" y="95" width="506" height="24" />
+        </mxCell>
+        <mxCell id="archives-f3" value="operational_category : varchar(150)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="archives">
+          <mxGeometry as="geometry" x="12" y="119" width="506" height="24" />
+        </mxCell>
+        <mxCell id="archives-f4" value="description : text [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="archives">
+          <mxGeometry as="geometry" x="12" y="143" width="506" height="24" />
+        </mxCell>
+        <mxCell id="archives-f5" value="confidentiality : varchar(30)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="archives">
+          <mxGeometry as="geometry" x="12" y="167" width="506" height="24" />
+        </mxCell>
+        <mxCell id="archives-f6" value="created_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="archives">
+          <mxGeometry as="geometry" x="12" y="191" width="506" height="24" />
+        </mxCell>
+        <mxCell id="archives-f7" value="updated_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="archives">
+          <mxGeometry as="geometry" x="12" y="215" width="506" height="24" />
+        </mxCell>
+        <mxCell id="archives-f8" value="deleted_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="archives">
+          <mxGeometry as="geometry" x="12" y="239" width="506" height="24" />
+        </mxCell>
+        <mxCell id="archive_files" value="archive_files" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#6D28D9;swimlaneFillColor=#FFFFFF;strokeColor=#6D28D9;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1390" y="190" width="600" height="272" />
+        </mxCell>
+        <mxCell id="archive_files-f0" value="PK id : bigint unsigned" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="archive_files">
+          <mxGeometry as="geometry" x="12" y="47" width="576" height="24" />
+        </mxCell>
+        <mxCell id="archive_files-f1" value="FK archive_id : bigint unsigned" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="archive_files">
+          <mxGeometry as="geometry" x="12" y="71" width="576" height="24" />
+        </mxCell>
+        <mxCell id="archive_files-f2" value="file_path : varchar(500)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="archive_files">
+          <mxGeometry as="geometry" x="12" y="95" width="576" height="24" />
+        </mxCell>
+        <mxCell id="archive_files-f3" value="original_name : varchar(255)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="archive_files">
+          <mxGeometry as="geometry" x="12" y="119" width="576" height="24" />
+        </mxCell>
+        <mxCell id="archive_files-f4" value="mime_type : varchar(100)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="archive_files">
+          <mxGeometry as="geometry" x="12" y="143" width="576" height="24" />
+        </mxCell>
+        <mxCell id="archive_files-f5" value="file_extension : varchar(20)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="archive_files">
+          <mxGeometry as="geometry" x="12" y="167" width="576" height="24" />
+        </mxCell>
+        <mxCell id="archive_files-f6" value="file_size : bigint unsigned" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="archive_files">
+          <mxGeometry as="geometry" x="12" y="191" width="576" height="24" />
+        </mxCell>
+        <mxCell id="archive_files-f7" value="created_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="archive_files">
+          <mxGeometry as="geometry" x="12" y="215" width="576" height="24" />
+        </mxCell>
+        <mxCell id="archive_files-f8" value="updated_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="archive_files">
+          <mxGeometry as="geometry" x="12" y="239" width="576" height="24" />
+        </mxCell>
+        <mxCell id="audit_logs" value="audit_logs" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#334155;swimlaneFillColor=#FFFFFF;strokeColor=#334155;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="680" y="760" width="530" height="344" />
+        </mxCell>
+        <mxCell id="audit_logs-f0" value="PK id : bigint unsigned" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="audit_logs">
+          <mxGeometry as="geometry" x="12" y="47" width="506" height="24" />
+        </mxCell>
+        <mxCell id="audit_logs-f1" value="FK actor_user_id : bigint unsigned [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="audit_logs">
+          <mxGeometry as="geometry" x="12" y="71" width="506" height="24" />
+        </mxCell>
+        <mxCell id="audit_logs-f2" value="subject_type : varchar(50) [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="audit_logs">
+          <mxGeometry as="geometry" x="12" y="95" width="506" height="24" />
+        </mxCell>
+        <mxCell id="audit_logs-f3" value="subject_id : bigint unsigned [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="audit_logs">
+          <mxGeometry as="geometry" x="12" y="119" width="506" height="24" />
+        </mxCell>
+        <mxCell id="audit_logs-f4" value="module : varchar(50)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="audit_logs">
+          <mxGeometry as="geometry" x="12" y="143" width="506" height="24" />
+        </mxCell>
+        <mxCell id="audit_logs-f5" value="action : varchar(50)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="audit_logs">
+          <mxGeometry as="geometry" x="12" y="167" width="506" height="24" />
+        </mxCell>
+        <mxCell id="audit_logs-f6" value="description : text" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="audit_logs">
+          <mxGeometry as="geometry" x="12" y="191" width="506" height="24" />
+        </mxCell>
+        <mxCell id="audit_logs-f7" value="old_values : json [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="audit_logs">
+          <mxGeometry as="geometry" x="12" y="215" width="506" height="24" />
+        </mxCell>
+        <mxCell id="audit_logs-f8" value="new_values : json [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="audit_logs">
+          <mxGeometry as="geometry" x="12" y="239" width="506" height="24" />
+        </mxCell>
+        <mxCell id="audit_logs-f9" value="ip_address : varchar(45) [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="audit_logs">
+          <mxGeometry as="geometry" x="12" y="263" width="506" height="24" />
+        </mxCell>
+        <mxCell id="audit_logs-f10" value="user_agent : text [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="audit_logs">
+          <mxGeometry as="geometry" x="12" y="287" width="506" height="24" />
+        </mxCell>
+        <mxCell id="audit_logs-f11" value="created_at : timestamp" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="audit_logs">
+          <mxGeometry as="geometry" x="12" y="311" width="506" height="24" />
+        </mxCell>
+        <mxCell id="notifications" value="notifications" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#1E40AF;swimlaneFillColor=#FFFFFF;strokeColor=#1E40AF;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1390" y="850" width="600" height="248" />
+        </mxCell>
+        <mxCell id="notifications-f0" value="PK id : uuid" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="notifications">
+          <mxGeometry as="geometry" x="12" y="47" width="576" height="24" />
+        </mxCell>
+        <mxCell id="notifications-f1" value="type : varchar(255)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="notifications">
+          <mxGeometry as="geometry" x="12" y="71" width="576" height="24" />
+        </mxCell>
+        <mxCell id="notifications-f2" value="IDX notifiable_type : varchar(255)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="notifications">
+          <mxGeometry as="geometry" x="12" y="95" width="576" height="24" />
+        </mxCell>
+        <mxCell id="notifications-f3" value="IDX notifiable_id : bigint unsigned" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="notifications">
+          <mxGeometry as="geometry" x="12" y="119" width="576" height="24" />
+        </mxCell>
+        <mxCell id="notifications-f4" value="data : text" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="notifications">
+          <mxGeometry as="geometry" x="12" y="143" width="576" height="24" />
+        </mxCell>
+        <mxCell id="notifications-f5" value="read_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="notifications">
+          <mxGeometry as="geometry" x="12" y="167" width="576" height="24" />
+        </mxCell>
+        <mxCell id="notifications-f6" value="created_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="notifications">
+          <mxGeometry as="geometry" x="12" y="191" width="576" height="24" />
+        </mxCell>
+        <mxCell id="notifications-f7" value="updated_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="notifications">
+          <mxGeometry as="geometry" x="12" y="215" width="576" height="24" />
+        </mxCell>
+        <mxCell id="archive-owner" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=16;html=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;startArrow=ERone;startFill=0;endArrow=ERzeroToMany;endFill=0;strokeColor=#64748B;strokeWidth=1.3;fontFamily=Arial;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="users" target="archives">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="archive-files" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=16;html=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;startArrow=ERone;startFill=0;endArrow=ERzeroToMany;endFill=0;strokeColor=#64748B;strokeWidth=1.3;fontFamily=Arial;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="archives" target="archive_files">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="audit-actor" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=16;html=0;exitX=1;exitY=0.7;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;startArrow=ERzeroToOne;startFill=0;endArrow=ERzeroToMany;endFill=0;strokeColor=#64748B;strokeWidth=1.3;fontFamily=Arial;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="users" target="audit_logs">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="570" y="440" />
+              <mxPoint x="570" y="910" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="notify-user" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=16;html=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;endArrow=none;dashed=1;strokeColor=#64748B;strokeWidth=1.3;fontFamily=Arial;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="users" target="notifications">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="280" y="1370" />
+              <mxPoint x="1690" y="1370" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="archive-rules" value="ARSIP&#10;Skema: 0..N file per arsip. Form: 1–5 file; maksimal 20 MB per file.&#10;Kategori disimpan pada operational_category (varchar 150).&#10;Arsip baru hanya untuk tahun berjalan. Daftar/akses mengikuti created_at.&#10;IDX: created_at dan (operational_category,created_at)." style="rounded=1;arcSize=8;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=15;fontFamily=Arial;fontSize=14;fontColor=#334155;fillColor=#FFFBEB;strokeColor=#CBD5E1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="760" width="450" height="300" />
+        </mxCell>
+        <mxCell id="audit-rules" value="AUDIT&#10;subject_type + subject_id adalah referensi logis, bukan FK / morphTo model.&#10;old_values/new_values hanya field yang dipilih controller, bukan semua kolom.&#10;IDX: created_at; (module,created_at); (subject_type,subject_id)." style="rounded=1;arcSize=8;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=15;fontFamily=Arial;fontSize=14;fontColor=#334155;fillColor=#FFFBEB;strokeColor=#CBD5E1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="680" y="1190" width="530" height="150" />
+        </mxCell>
+        <mxCell id="notification-rules" value="NOTIFIKASI&#10;Penerima laporan baru: Admin/Super Admin aktif.&#10;Payload data berupa text pada skema, dibaca sebagai array oleh model Laravel.&#10;Tahun tampilan dan jumlah belum dibaca mengikuti created_at.&#10;Notifikasi database terpisah dari pengiriman WhatsApp." style="rounded=1;arcSize=8;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=15;fontFamily=Arial;fontSize=14;fontColor=#334155;fillColor=#EFF6FF;strokeColor=#CBD5E1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1390" y="1210" width="600" height="170" />
+        </mxCell>
+        <mxCell id="edge-caption-0" value="created_by_user_id&#10;[RESTRICT]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#334155;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="522.75" y="320.0" width="119.0" height="36" />
+        </mxCell>
+        <mxCell id="edge-caption-1" value="archive_id [CASCADE]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#334155;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1232.5" y="299.0" width="135.0" height="21" />
+        </mxCell>
+        <mxCell id="edge-caption-2" value="actor_user_id [SET NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#334155;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="578.0" y="664.5" width="152.0" height="21" />
+        </mxCell>
+        <mxCell id="edge-caption-3" value="Morph: notifiable_type + notifiable_id" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#334155;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="879.5" y="1376.0" width="211.0" height="21" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="05-infrastruktur-laravel" name="05 - Infrastruktur Laravel">
+    <mxGraphModel dx="2300" dy="1500" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2300" pageHeight="1500" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="ERD | Tabel pendukung Laravel" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=30;fontStyle=1;fontColor=#0F172A;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="55" y="32" width="2190" height="48" />
+        </mxCell>
+        <mxCell id="subtitle" value="Tabel bawaan dipisahkan dari domain. Halaman ini tidak menyatakan semua fitur framework sedang dipakai." style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=15;fontStyle=0;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="55" y="88" width="2190" height="50" />
+        </mxCell>
+        <mxCell id="footer" value="SIPRAJA  |  As-built 28 Oktober 2026  |  05 - Infrastruktur Laravel  |  Sumber: kode aplikasi dan migrasi sampai 19 Oktober 2026" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=12;fontStyle=0;fontColor=#64748B;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="55" y="1455" width="2190" height="28" />
+        </mxCell>
+        <mxCell id="sessions" value="sessions" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#334155;swimlaneFillColor=#FFFFFF;strokeColor=#334155;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="190" width="490" height="200" />
+        </mxCell>
+        <mxCell id="sessions-f0" value="PK id : varchar(255)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="sessions">
+          <mxGeometry as="geometry" x="12" y="47" width="466" height="24" />
+        </mxCell>
+        <mxCell id="sessions-f1" value="IDX user_id : bigint [NULL, no FK]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="sessions">
+          <mxGeometry as="geometry" x="12" y="71" width="466" height="24" />
+        </mxCell>
+        <mxCell id="sessions-f2" value="ip_address : varchar(45) [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="sessions">
+          <mxGeometry as="geometry" x="12" y="95" width="466" height="24" />
+        </mxCell>
+        <mxCell id="sessions-f3" value="user_agent : text [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="sessions">
+          <mxGeometry as="geometry" x="12" y="119" width="466" height="24" />
+        </mxCell>
+        <mxCell id="sessions-f4" value="payload : longtext" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="sessions">
+          <mxGeometry as="geometry" x="12" y="143" width="466" height="24" />
+        </mxCell>
+        <mxCell id="sessions-f5" value="IDX last_activity : int" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="sessions">
+          <mxGeometry as="geometry" x="12" y="167" width="466" height="24" />
+        </mxCell>
+        <mxCell id="password_reset_tokens" value="password_reset_tokens" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#334155;swimlaneFillColor=#FFFFFF;strokeColor=#334155;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="650" y="190" width="620" height="128" />
+        </mxCell>
+        <mxCell id="password_reset_tokens-f0" value="PK email : varchar(255)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="password_reset_tokens">
+          <mxGeometry as="geometry" x="12" y="47" width="596" height="24" />
+        </mxCell>
+        <mxCell id="password_reset_tokens-f1" value="token : varchar(255)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="password_reset_tokens">
+          <mxGeometry as="geometry" x="12" y="71" width="596" height="24" />
+        </mxCell>
+        <mxCell id="password_reset_tokens-f2" value="created_at : timestamp [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="password_reset_tokens">
+          <mxGeometry as="geometry" x="12" y="95" width="596" height="24" />
+        </mxCell>
+        <mxCell id="cache" value="cache" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#334155;swimlaneFillColor=#FFFFFF;strokeColor=#334155;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1420" y="190" width="370" height="128" />
+        </mxCell>
+        <mxCell id="cache-f0" value="PK key : varchar(255)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="cache">
+          <mxGeometry as="geometry" x="12" y="47" width="346" height="24" />
+        </mxCell>
+        <mxCell id="cache-f1" value="value : mediumtext" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="cache">
+          <mxGeometry as="geometry" x="12" y="71" width="346" height="24" />
+        </mxCell>
+        <mxCell id="cache-f2" value="IDX expiration : bigint" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="cache">
+          <mxGeometry as="geometry" x="12" y="95" width="346" height="24" />
+        </mxCell>
+        <mxCell id="cache_locks" value="cache_locks" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#334155;swimlaneFillColor=#FFFFFF;strokeColor=#334155;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1840" y="190" width="370" height="128" />
+        </mxCell>
+        <mxCell id="cache_locks-f0" value="PK key : varchar(255)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="cache_locks">
+          <mxGeometry as="geometry" x="12" y="47" width="346" height="24" />
+        </mxCell>
+        <mxCell id="cache_locks-f1" value="owner : varchar(255)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="cache_locks">
+          <mxGeometry as="geometry" x="12" y="71" width="346" height="24" />
+        </mxCell>
+        <mxCell id="cache_locks-f2" value="IDX expiration : bigint" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="cache_locks">
+          <mxGeometry as="geometry" x="12" y="95" width="346" height="24" />
+        </mxCell>
+        <mxCell id="jobs" value="jobs" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#334155;swimlaneFillColor=#FFFFFF;strokeColor=#334155;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="740" width="490" height="224" />
+        </mxCell>
+        <mxCell id="jobs-f0" value="PK id : bigint unsigned" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="jobs">
+          <mxGeometry as="geometry" x="12" y="47" width="466" height="24" />
+        </mxCell>
+        <mxCell id="jobs-f1" value="IDX queue : varchar(255)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="jobs">
+          <mxGeometry as="geometry" x="12" y="71" width="466" height="24" />
+        </mxCell>
+        <mxCell id="jobs-f2" value="payload : longtext" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="jobs">
+          <mxGeometry as="geometry" x="12" y="95" width="466" height="24" />
+        </mxCell>
+        <mxCell id="jobs-f3" value="attempts : smallint unsigned" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="jobs">
+          <mxGeometry as="geometry" x="12" y="119" width="466" height="24" />
+        </mxCell>
+        <mxCell id="jobs-f4" value="reserved_at : int unsigned [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="jobs">
+          <mxGeometry as="geometry" x="12" y="143" width="466" height="24" />
+        </mxCell>
+        <mxCell id="jobs-f5" value="available_at : int unsigned" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="jobs">
+          <mxGeometry as="geometry" x="12" y="167" width="466" height="24" />
+        </mxCell>
+        <mxCell id="jobs-f6" value="created_at : int unsigned" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="jobs">
+          <mxGeometry as="geometry" x="12" y="191" width="466" height="24" />
+        </mxCell>
+        <mxCell id="job_batches" value="job_batches" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#334155;swimlaneFillColor=#FFFFFF;strokeColor=#334155;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="650" y="740" width="620" height="296" />
+        </mxCell>
+        <mxCell id="job_batches-f0" value="PK id : varchar(255)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="job_batches">
+          <mxGeometry as="geometry" x="12" y="47" width="596" height="24" />
+        </mxCell>
+        <mxCell id="job_batches-f1" value="name : varchar(255)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="job_batches">
+          <mxGeometry as="geometry" x="12" y="71" width="596" height="24" />
+        </mxCell>
+        <mxCell id="job_batches-f2" value="total_jobs : int" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="job_batches">
+          <mxGeometry as="geometry" x="12" y="95" width="596" height="24" />
+        </mxCell>
+        <mxCell id="job_batches-f3" value="pending_jobs : int" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="job_batches">
+          <mxGeometry as="geometry" x="12" y="119" width="596" height="24" />
+        </mxCell>
+        <mxCell id="job_batches-f4" value="failed_jobs : int" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="job_batches">
+          <mxGeometry as="geometry" x="12" y="143" width="596" height="24" />
+        </mxCell>
+        <mxCell id="job_batches-f5" value="failed_job_ids : longtext" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="job_batches">
+          <mxGeometry as="geometry" x="12" y="167" width="596" height="24" />
+        </mxCell>
+        <mxCell id="job_batches-f6" value="options : mediumtext [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="job_batches">
+          <mxGeometry as="geometry" x="12" y="191" width="596" height="24" />
+        </mxCell>
+        <mxCell id="job_batches-f7" value="cancelled_at : int [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="job_batches">
+          <mxGeometry as="geometry" x="12" y="215" width="596" height="24" />
+        </mxCell>
+        <mxCell id="job_batches-f8" value="created_at : int" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="job_batches">
+          <mxGeometry as="geometry" x="12" y="239" width="596" height="24" />
+        </mxCell>
+        <mxCell id="job_batches-f9" value="finished_at : int [NULL]" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="job_batches">
+          <mxGeometry as="geometry" x="12" y="263" width="596" height="24" />
+        </mxCell>
+        <mxCell id="failed_jobs" value="failed_jobs" style="swimlane;html=0;horizontal=1;startSize=42;rounded=0;fillColor=#334155;swimlaneFillColor=#FFFFFF;strokeColor=#334155;fontColor=#FFFFFF;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=12;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1420" y="740" width="790" height="224" />
+        </mxCell>
+        <mxCell id="failed_jobs-f0" value="PK id : bigint unsigned" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="failed_jobs">
+          <mxGeometry as="geometry" x="12" y="47" width="766" height="24" />
+        </mxCell>
+        <mxCell id="failed_jobs-f1" value="UQ uuid : varchar(255)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="failed_jobs">
+          <mxGeometry as="geometry" x="12" y="71" width="766" height="24" />
+        </mxCell>
+        <mxCell id="failed_jobs-f2" value="connection : varchar(255)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="failed_jobs">
+          <mxGeometry as="geometry" x="12" y="95" width="766" height="24" />
+        </mxCell>
+        <mxCell id="failed_jobs-f3" value="queue : varchar(255)" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="failed_jobs">
+          <mxGeometry as="geometry" x="12" y="119" width="766" height="24" />
+        </mxCell>
+        <mxCell id="failed_jobs-f4" value="payload : longtext" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="failed_jobs">
+          <mxGeometry as="geometry" x="12" y="143" width="766" height="24" />
+        </mxCell>
+        <mxCell id="failed_jobs-f5" value="exception : longtext" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="failed_jobs">
+          <mxGeometry as="geometry" x="12" y="167" width="766" height="24" />
+        </mxCell>
+        <mxCell id="failed_jobs-f6" value="failed_at : timestamp" style="text;html=0;whiteSpace=wrap;overflow=hidden;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontStyle=0;fontColor=#334155;" vertex="1" parent="failed_jobs">
+          <mxGeometry as="geometry" x="12" y="191" width="766" height="24" />
+        </mxCell>
+        <mxCell id="session-note" value="sessions.user_id adalah indeks biasa, tanpa foreign key dalam migrasi.&#10;Sesi juga menyimpan pilihan tahun, status verifikasi OTP, dan percakapan AI.&#10;OTP/kode rate limit disimpan lewat cache; bukan password_reset_tokens." style="rounded=1;arcSize=8;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=15;fontFamily=Arial;fontSize=14;fontColor=#334155;fillColor=#EFF6FF;strokeColor=#CBD5E1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="480" width="1210" height="160" />
+        </mxCell>
+        <mxCell id="reset-note" value="password_reset_tokens masih dibuat oleh migrasi dan dirujuk config/auth.php.&#10;Belum ada alur lupa password email di SIPRAJA.&#10;Ganti password lewat Profil/Manajemen User langsung memperbarui users.password." style="rounded=1;arcSize=8;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=15;fontFamily=Arial;fontSize=14;fontColor=#334155;fillColor=#FFFBEB;strokeColor=#CBD5E1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1420" y="480" width="790" height="160" />
+        </mxCell>
+        <mxCell id="framework-note" value="CATATAN INFRASTRUKTUR&#10;Tidak ada FK antar jobs, job_batches, dan failed_jobs pada migrasi. Jangan menggambar relasi fisik yang tidak didefinisikan.&#10;Queue/cache/session mengikuti driver konfigurasi; keberadaan tabel tidak membuktikan ada job atau reset token aktif.&#10;Tabel migrations adalah pencatat migrasi framework dan tidak dimasukkan sebagai entitas bisnis." style="rounded=1;arcSize=8;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=15;fontFamily=Arial;fontSize=14;fontColor=#334155;fillColor=#EFF6FF;strokeColor=#CBD5E1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="1250" width="2150" height="170" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>

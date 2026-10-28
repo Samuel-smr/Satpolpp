@@ -1,48 +1,66 @@
 PENJELASAN SEQUENCE DIAGRAM SIPRAJA
-Pembaruan: 21 September 2026
+Pembaruan: 27 Oktober 2026 | Acuan kode: 503d836
 
-ALUR 1 — PELAPOR BERTANYA KEPADA ASISTEN AI
-1. Pelapor membuka halaman Lapor.
-2. Browser mengirim message dan maksimal delapan riwayat pesan ke POST /lapor/asisten-ai.
-3. AskAiAssistantRequest memvalidasi panjang, role riwayat, dan bentuk payload.
-4. Rate limiter membatasi sepuluh permintaan per menit.
-5. AiAssistantController memanggil GeminiAssistant.
-6. GeminiAssistant membaca key/model dari config, memanggil Google Gemini dengan timeout dan retry terbatas.
-7. Jawaban Bahasa Indonesia dikembalikan ke browser.
-8. Jika provider gagal, controller mengembalikan 503 dengan pesan aman; secret dan detail provider tidak ditampilkan.
+ALUR 1 — KONSULTASI AI
+1. Browser mengirim message saja ke POST /lapor/asisten-ai (maksimal 600 karakter).
+2. Form Request menolak history, model, alat, instruksi, dan alamat API browser.
+3. Throttle IP/global dan session lock membatasi permintaan.
+4. Controller mengambil delapan pesan terakhir dari sesi bila belum 30 menit
+   tidak aktif, meredaksi pola sensitif, lalu memanggil GeminiAssistant.
+5. Service memakai konfigurasi server dan timeout/retry terbatas.
+6. Controller menyimpan riwayat baru dan mengembalikan answer sebagai teks biasa.
+7. Provider gagal/AI nonaktif menghasilkan 503 pesan aman; warga tetap mengirim
+   laporan sendiri melalui form. Pembatasan penggunaan menghasilkan 429.
 
-ALUR 2 — WARGA MENGIRIM LAPORAN
-1. Pelapor mengisi satu form Lapor tanpa pilihan jenis dan tanpa NIK.
-2. StoreGuestReportRequest memvalidasi telepon, nama opsional, deskripsi, lokasi, koordinat, dan foto.
-3. PelaporController memperoleh/membuat GuestAccess.
-4. Sistem membuat Report bertipe lapor dengan status submitted.
-5. Sistem membuat ReportStatusHistory awal dan menyimpan lampiran.
-6. Admin aktif menerima notifikasi.
-7. Pelapor memperoleh kode laporan; token tamu tetap di browser.
+ALUR 2 — OTP DAN LAPORAN WARGA
+1. Pelapor meminta OTP dengan telepon melalui POST /lapor/otp.
+2. OtpService membatasi kirim ulang 60 detik dan menyimpan kode lima menit di cache.
+3. WhatsAppService mengirim via bot lokal; kegagalan kirim menghapus kode aktif.
+4. POST /lapor/otp/verify memeriksa kode; verifikasi berhasil disimpan 15 menit
+   pada sesi untuk nomor tersebut, bukan izin universal lintas browser.
+5. Warga mengirim telepon, deskripsi, alamat teks, persetujuan, dan foto opsional.
+   Tidak ada nama, NIK, pilihan jenis lama, atau input koordinat pada form publik.
+6. Sistem memvalidasi verifikasi dan menyimpan GuestAccess/Report(type=lapor,
+   status=submitted), history, dan lampiran. assigned_admin_id awalnya kosong.
+7. Notifikasi database dikirim ke Admin/Super Admin aktif; WhatsApp konfirmasi
+   kepada pelapor dan pemberitahuan kepada Admin aktif yang memiliki nomor.
+8. Browser menerima kode laporan dan cookie HttpOnly sipraja_guest_token.
 
-ALUR 3 — ADMIN MENANGANI LAPORAN
-1. Admin membuka daftar dan detail Report.
-2. Admin memajukan status satu tahap melalui ReportStatusController.
-3. Sistem memeriksa status awal, menyimpan status baru, riwayat, dan audit.
-4. Saat in_progress, Admin membuka form penyelesaian.
-5. CompleteReportController memvalidasi petugas aktif, hasil, lokasi, dan bukti.
-6. Dalam transaksi, sistem membuat Activity eksternal, menghubungkan Officer dan Attachment, lalu menandai Report completed.
-7. Pelapor dapat melihat hasil dan mengirim feedback satu kali.
+ALUR 3 — PENUGASAN, STATUS, DAN PENYELESAIAN
+1. Pengguna internal memilih tahun data melalui PUT /data-year.
+2. Super Admin membuka Manajemen Pengaduan/detail pada tahun tersebut.
+3. PATCH /super-admin/pengaduan/{code}/assignment memvalidasi Admin aktif atau
+   nilai kosong, mengunci laporan, menyimpan assigned_admin_id, dan menulis audit.
+4. Admin penanggung jawab membuka laporan. Gate menolak perubahan oleh Admin
+   lain; detail laporan dapat dibaca bersama sesuai tahun.
+5. Status awal diperiksa di dalam transaksi: submitted → received → verifying
+   → in_progress. Riwayat dan audit disimpan; WhatsApp dikirim sesudah transaksi.
+6. Alternatif saat verifying: alasan wajib → rejected → riwayat/audit/WhatsApp.
+7. Saat in_progress, form penyelesaian mengambil pegawai e-Profil melalui API.
+   Tanggal harus dalam tahun terpilih dan paling lambat hari ini; hasil, lokasi,
+   koordinat, minimal satu NIP, dan satu sampai tiga foto penanganan wajib.
+8. Transaksi mengunci laporan, memeriksa otorisasi/status/duplikasi, membuat
+   Activity external, ActivityPersonnel, temuan opsional, lampiran, status
+   completed, waktu selesai, koordinat laporan, riwayat, dan audit.
+9. WhatsApp hasil penanganan dan tautan SKM dicoba setelah transaksi selesai.
+   Kegagalan notifikasi dicatat tanpa membatalkan data yang tersimpan.
+10. Warga dengan token browser yang sesuai melihat status dan memberi feedback
+    sekali setelah selesai. Kode saja tidak memberikan akses ke laporan.
 
-ALUR 4 — SUPER ADMIN MEMANTAU PERSEBARAN
-1. Super Admin membuka dashboard.
-2. SuperAdminController mengambil statistik serta titik Report/Activity berkoordinat.
-3. Dashboard merender kartu, grafik, dan peta pada halaman yang sama.
-4. Super Admin dapat membuka detail yang diizinkan dari konteks dashboard.
-5. Tidak ada navigasi atau endpoint halaman Peta terpisah.
+ALUR 4 — DASHBOARD DAN PETA
+1. SuperAdminController memakai tahun sesi untuk statistik, audit terbaru,
+   Report dan Activity berkoordinat; jumlah akun/e-Profil bersifat global.
+2. Dashboard merender kartu, grafik, dan peta pada halaman yang sama.
+3. Checkbox peta mengubah jenis penanda yang ditampilkan di browser.
+4. Muat ulang halaman untuk data terbaru. Tidak ada menu Peta terpisah.
 
-ALUR 5 — PENGELOLAAN KEGIATAN INTERNAL
-1. Admin/Super Admin membuka form kegiatan.
-2. StoreInternalActivityRequest memvalidasi data, koordinat, petugas, temuan, dan dokumentasi.
-3. ActivityController menyimpan Activity internal beserta relasi dalam transaksi.
-4. Perubahan dan penghapusan mengikuti validasi, otorisasi, soft delete, serta audit.
-
-CATATAN
-- OperationalZone dan OrganizationalUnit tidak terlibat dalam alur mana pun.
-- Laporan tidak bercabang menjadi Darurat atau Informasi & Pengaduan.
-- API key Gemini hanya digunakan oleh backend.
+ALUR 5 — KEGIATAN, PERSONEL, DAN EKSPOR
+1. Admin/Super Admin mengambil pilihan nama/NIP/jabatan dari EprofilService.
+2. Form internal memvalidasi kategori, tanggal dalam tahun terpilih, lokasi,
+   personel, temuan, dan dokumentasi; transaksi menyimpan Activity/personnel.
+3. Pada pembacaan, NIP diselesaikan ke direktori e-Profil; bila tak ditemukan,
+   label Pegawai tidak tersedia ditampilkan. Edit dapat mempertahankan NIP lama.
+4. Filter daftar/tahun membentuk dataset seluruh hasil ekspor, lintas pagination.
+5. Browser menghasilkan Excel/PDF/Word; PDF/Word mengambil foto melalui route
+   internal terotorisasi, termasuk bukti publik laporan terkait.
+6. Evaluasi eksternal hanya dapat diubah Admin penanggung jawab laporan asal.

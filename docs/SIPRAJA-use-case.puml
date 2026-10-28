@@ -1,54 +1,70 @@
 @startuml
-title Use Case SIPRAJA — As-Built 21 September 2026
+title Use Case SIPRAJA — As-Built 27 Oktober 2026
 left to right direction
 actor Pelapor
 actor Admin
 actor "Super Admin" as SuperAdmin
-
+actor "API e-Profil" as Eprofil
+actor "Bot WhatsApp" as WA
+actor "Google Gemini" as Gemini
+actor "Survei SKM" as SKM
 rectangle SIPRAJA {
-  usecase "Membuat laporan\n(satu jenis, tanpa NIK)" as UC1
-  usecase "Berkonsultasi dengan\nAsisten AI" as UC2
-  usecase "Melihat status sendiri" as UC3
-  usecase "Memberi feedback" as UC4
-
-  usecase "Melihat dan menangani laporan" as UC5
-  usecase "Menyelesaikan laporan" as UC6
-  usecase "Mengelola kegiatan\ndan evaluasi" as UC7
-  usecase "Mengelola arsip" as UC8
-  usecase "Melihat feedback\ndan notifikasi" as UC9
-
-  usecase "Melihat dashboard\ndan peta persebaran" as UC10
-  usecase "Melihat detail laporan\nsecara baca-saja" as UC11
-  usecase "Mengelola akun Admin" as UC12
-  usecase "Mengelola petugas" as UC13
-  usecase "Memantau audit" as UC14
-  usecase "Mengelola profil" as UC15
+  usecase "Verifikasi WhatsApp / OTP" as OTP
+  usecase "Membuat laporan\n(tanpa NIK)" as Report
+  usecase "Panduan / draf Asisten AI" as AI
+  usecase "Melihat status sendiri\n(token browser)" as Status
+  usecase "Penilaian laporan selesai" as Feedback
+  usecase "Membuka survei SKM" as Survey
+  usecase "Pilih tahun data" as Year
+  usecase "Baca daftar/detail laporan" as Read
+  usecase "Catat laporan kanal lain" as Create
+  usecase "Tetapkan/ganti/kosongkan\nAdmin penanggung jawab" as Assign
+  usecase "Proses / tolak / selesaikan / hapus\nlaporan penugasan sendiri" as Process
+  usecase "Kegiatan internal + personel" as Activity
+  usecase "Evaluasi kegiatan\n(eksternal: Admin penanggung jawab)" as Evaluate
+  usecase "Ekspor kegiatan\nExcel / PDF / Word" as Export
+  usecase "Arsip + baca feedback" as Archive
+  usecase "Dashboard + peta persebaran" as Dashboard
+  usecase "Kelola akun Admin" as Users
+  usecase "Baca direktori pegawai e-Profil" as Employees
+  usecase "Monitoring audit" as Audit
+  usecase "Profil / pencarian / notifikasi" as Common
 }
-
-Pelapor -- UC1
-Pelapor -- UC2
-Pelapor -- UC3
-Pelapor -- UC4
-
-Admin -- UC5
-Admin -- UC6
-Admin -- UC7
-Admin -- UC8
-Admin -- UC9
-Admin -- UC15
-
-SuperAdmin -- UC7
-SuperAdmin -- UC9
-SuperAdmin -- UC10
-SuperAdmin -- UC11
-SuperAdmin -- UC12
-SuperAdmin -- UC13
-SuperAdmin -- UC14
-SuperAdmin -- UC15
-
-note bottom of SIPRAJA
-  Tidak tersedia: pilihan jenis laporan lama,
-  input NIK warga, organisasi/wilayah,
-  menu Peta terpisah, dan fitur Aset.
+Pelapor -- OTP
+Pelapor -- Report
+Pelapor -- AI
+Pelapor -- Status
+Pelapor -- Feedback
+Pelapor -- Survey
+Report .> OTP : <<include>>
+WA -- OTP
+WA -- Report
+WA -- Process
+Gemini -- AI
+SKM -- Survey
+Admin -- Year
+Admin -- Read
+Admin -- Create
+Admin -- Process
+Admin -- Activity
+Admin -- Evaluate
+Admin -- Export
+Admin -- Archive
+Admin -- Common
+SuperAdmin -- Year
+SuperAdmin -- Read
+SuperAdmin -- Assign
+SuperAdmin -- Activity
+SuperAdmin -- Export
+SuperAdmin -- Dashboard
+SuperAdmin -- Users
+SuperAdmin -- Employees
+SuperAdmin -- Audit
+SuperAdmin -- Common
+Eprofil -- Employees
+Eprofil -- Activity
+note bottom of Assign
+  Super Admin assigns active Admin, without processing report status.
+  Internal data follows selected year; user directory is global.
 end note
 @enduml

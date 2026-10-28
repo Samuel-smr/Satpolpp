@@ -1,77 +1,122 @@
 PENJELASAN CLASS DIAGRAM SIPRAJA
-Pembaruan: 21 September 2026
+Pembaruan: 28 Oktober 2026 | Acuan kode: 503d836
 
-1. LAPIS AKTOR DAN AKSES
+PANDUAN HALAMAN DRAW.IO
+File SIPRAJA-class.drawio memiliki sembilan tab:
+01 - Peta model domain: model inti, relasi, dan multiplicity ringkas.
+02 - Model laporan: atribut/method User, GuestAccess, Report,
+     ReportStatusHistory, Attachment, dan enum ReportStatus.
+03 - Model kegiatan: atribut/method Activity, ActivityTemplate,
+     ActivityPersonnel, ActivityFinding, Employee, dan enum kegiatan/temuan.
+04 - Model administrasi: User, Archive, ArchiveFile, AuditLog,
+     DatabaseNotification Laravel, NewReportNotification, dan role akun.
+05 - Controller pelaporan: autentikasi, pelaporan publik/internal, AI,
+     penugasan, status, penyelesaian, serta akses bukti laporan.
+06 - Controller operasional: seluruh controller kegiatan, evaluasi, arsip,
+     akun, profil, notifikasi, pencarian, pegawai, tahun, dan lampiran kegiatan.
+07 - Service tahun dan akses: OtpService, WhatsAppService, GeminiAssistant,
+     EprofilService, DataYear, middleware, provider/gate, serta sistem luar.
+08 - Validasi Form Request: seluruh kelas request dan pewarisan khusus
+     UpdateInternalActivityRequest terhadap StoreInternalActivityRequest.
+09 - Seluruh tabel dan relasi: satu kanvas berisi seluruh 21 tabel database
+     SIPRAJA, seluruh 182 kolomnya, tipe fisik, PK/FK/UQ/indeks, nullability,
+     default, dan relasi lengkap, termasuk tabel pendukung serta migrations.
 
-Pelapor
-- Aktor tamu, bukan model akun.
-- Memakai GuestAccess untuk kepemilikan laporan di browser.
-- Membuat Report, melihat status miliknya, memberi feedback, dan memakai Asisten AI.
+Tab 09 menggunakan metadata database lokal polpp (MySQL) yang dibaca pada
+28 Oktober 2026, bukan hanya daftar atribut model. Seluruh 15 foreign key fisik
+digambar dengan garis utuh dan kardinalitas. Sepuluh referensi logis, morph,
+konfigurasi, atau API memakai garis putus dan tidak dianggap sebagai FK fisik.
+API e-Profil ditampilkan sebagai sistem luar dan tidak dihitung sebagai tabel.
+Tabel tanpa FK tetap ditampilkan tanpa dibuatkan relasi database tambahan.
+Gunakan zoom/pan pada tab 09 karena seluruh tabel ditempatkan dalam satu kanvas.
 
-Admin dan Super Admin
-- Keduanya direpresentasikan oleh model User dengan enum UserRole.
-- Middleware role membatasi route dan tindakan.
-- Admin menangani Report; Super Admin berfokus pada dashboard, user, officer, kegiatan, dan monitoring.
+Pilih tab di bagian bawah editor Draw.io. class simple.drawio merupakan
+ringkasan model; gunakan SIPRAJA-class.drawio untuk seluruh detail.
+Setiap atribut, method, dan label relasi dapat diedit sebagai elemen Draw.io.
 
-2. KELAS LAPORAN
+NOTASI
+- Atribut model adalah atribut dinamis Eloquent, bukan deklarasi properti PHP
+  public yang ditulis satu per satu. Tipe mengikuti casts bila tersedia.
+- + public, # protected, - private. (...) menyingkat daftar parameter method.
+- Garis utuh menunjukkan asosiasi; angka menunjukkan multiplicity data.
+- Panah putus menunjukkan dependency. Relasi morph diberi label secara khusus.
+- Kelas framework dan sistem luar diberi stereotype agar tidak disangka kelas
+  App atau tabel lokal. Pewarisan dasar yang berulang diterangkan pada catatan.
+- Halaman ringkasan memilih atribut/method inti; halaman model detail memuat
+  seluruh atribut dari skema. Tidak semua enum pendukung digambar ulang pada
+  setiap halaman; tipe enum tetap tertulis pada atribut yang menggunakannya.
+- Tab 09 merupakan tampilan struktur tabel pada berkas class diagram; tipe
+  atributnya adalah tipe database, bukan visibility atau tipe properti PHP.
+  PK = primary key, FK = foreign key, UQ = unik, IDX = indeks, NN = NOT NULL,
+  NULL = boleh kosong, AI = auto increment. Default dan indeks gabungan juga
+  ditampilkan. Tabel framework bukan kelas model aplikasi baru.
 
-PelaporController
-- Menampilkan form, menyimpan laporan tunggal bertipe lapor, menampilkan status, dan menyimpan feedback.
+1. AKSES DAN TAHUN DATA
+User mewakili akun Admin/Super Admin dengan role dan status. Gate access-admin,
+access-super-admin, serta manage-report membatasi tindakan. Admin penanggung
+jawab aktif saja yang dapat mengubah laporan. Semua Admin dapat membaca laporan
+tahun terpilih; Super Admin mengatur penugasan tanpa memproses status.
+DataYear membaca pilihan tahun dari sesi dan membatasi query tanggal.
+DataYearController menyimpan pilihan; EnsureSelectedDataYear memeriksa objek
+Report/Activity/Archive pada route agar sesuai tahun. Tidak ada model Tahun.
 
-AiAssistantController + AskAiAssistantRequest + GeminiAssistant
-- Memvalidasi pesan/riwayat, meneruskan percakapan ke Gemini dari server, dan mengembalikan JSON aman.
-- API key tidak pernah dikirim ke browser.
+2. LAPORAN DAN KOMUNIKASI
+PelaporController: OTP, laporan warga, token browser, status, dan feedback.
+StoreGuestReportRequest: WhatsApp terverifikasi, deskripsi, lokasi teks,
+foto opsional, dan persetujuan. Form publik tidak meminta nama/NIK/koordinat.
+OtpService: kode lima menit, verifikasi 15 menit pada sesi, jeda kirim 60 detik.
+WhatsAppService: OTP, konfirmasi laporan publik, pemberitahuan Admin aktif,
+status/penolakan, dan hasil selesai dengan tautan SKM.
+AiAssistantController + AskAiAssistantRequest + GeminiAssistant: pesan maksimal
+600 karakter, riwayat server delapan pesan/30 menit, pembatasan penggunaan,
+API key server, dan respons aman. Payload history dari browser dilarang.
+AdminReportController: laporan kanal lain dan soft delete terotorisasi.
+ReportAssignmentController + AssignReportRequest: Super Admin menetapkan Admin
+aktif atau mengosongkan penugasan, dengan transaksi dan audit.
+ReportStatusController: transisi satu tahap dan penolakan hanya saat verifying.
+CompleteReportController: transaksi penyelesaian in_progress dan satu kegiatan
+eksternal, NIP personel, temuan, bukti, riwayat, dan audit.
+Report: guestAccess(), createdByUser(), assignedAdmin(), statusHistories(),
+attachments(), activity(). Kolom reporter_nik sudah dihapus.
 
-AdminReportController
-- Membuat laporan yang dicatat Admin dan melakukan soft delete.
+3. KEGIATAN DAN PERSONEL
+ActivityController mengelola kegiatan internal Admin/Super Admin.
+ActivityEvaluationController mengelola evaluasi Admin; kegiatan eksternal
+memerlukan kewenangan atas laporan terkait.
+Activity mempunyai template, pembuat/evaluator, report opsional, personnel(),
+findings(), dan attachments(). Atribut officers merupakan accessor hasil
+resolusi e-Profil, bukan relasi belongsToMany ke model Officer lokal.
+ActivityPersonnel menyimpan employee_nip, peran, dan catatan pada kegiatan.
+EprofilService mengambil direktori pegawai melalui API, menyelesaikan referensi
+NIP menjadi Employee, dan menyediakan peringatan jika API gagal. Employee adalah
+objek nilai readonly berisi employee_number, name, position; bukan model Eloquent.
+NIP unik per kegiatan, tanpa FK ke tabel pegawai lokal. Nama/jabatan tidak disalin
+ke master lokal. Personel yang tidak tersedia ditampilkan dengan label pengganti.
 
-ReportStatusController
-- Memajukan status laporan sesuai urutan yang diizinkan.
+4. ADMINISTRASI DAN EKSPOR
+AdminController menyediakan dashboard, daftar/detail laporan, kegiatan,
+dataset ekspor, dan feedback sesuai tahun data.
+SuperAdminController: dashboard/peta, akun Admin, dan monitoring audit.
+OfficerController hanya menampilkan direktori baca-saja melalui EprofilService.
+ArchiveController mengelola Archive/ArchiveFile, maksimal lima file per arsip.
+ProfileController mendukung identitas, nomor WhatsApp, dan password sendiri.
+NotificationController mengelola notifikasi database per akun/tahun.
+GlobalSearchController mencari laporan/kegiatan sesuai role dan tahun.
+Ekspor Excel/PDF/Word dilakukan pada halaman kegiatan memakai dataset server
+dan route lampiran terotorisasi; bukan kelas model ekspor baru.
 
-CompleteReportController
-- Menyelesaikan laporan in_progress dan membuat Activity eksternal terkait.
+NewReportNotification adalah kelas notifikasi aplikasi dengan channel database.
+DatabaseNotification berasal dari Laravel dan diakses melalui trait Notifiable
+pada User, bukan model Notification yang ditambahkan pada app/Models.
+AuditLog tidak mempunyai subject(): MorphTo; subject_type/subject_id merupakan
+referensi logis. Pencatatan dipanggil controller untuk aksi yang telah dipasangi
+audit, belum mencakup pembuatan laporan, login/logout, atau CRUD akun.
 
-Report
-- Model inti laporan; mempunyai GuestAccess/User opsional, riwayat status, lampiran, dan Activity opsional.
-- reporter_nik nullable, terenkripsi bila terisi, dan tidak digunakan pada form warga.
-
-3. KELAS KEGIATAN
-
-ActivityController
-- CRUD kegiatan internal untuk Admin/Super Admin.
-
-ActivityEvaluationController
-- Menambah, memperbarui, dan menghapus data evaluasi pada Activity.
-
-Activity
-- Mempunyai template opsional, pembuat, evaluator opsional, petugas, temuan, dan lampiran.
-- Activity eksternal mempunyai satu Report; Activity internal tidak mempunyai Report.
-
-Officer
-- Petugas yang dapat ditugaskan ke banyak Activity.
-- Tidak mempunyai relasi OrganizationalUnit atau OperationalZone.
-
-4. KELAS ADMINISTRASI
-
-ArchiveController mengelola Archive dan ArchiveFile.
-OfficerController mengelola Officer.
-SuperAdminController mengelola dashboard, akun Admin, monitoring, dan asset alerts.
-AdminController menyediakan dashboard/list/detail laporan, kegiatan, dan feedback.
-ProfileController mengelola profil akun sendiri.
-NotificationController mengelola notifikasi database.
-GlobalSearchController menyediakan pencarian sesuai role.
-
-5. KELAS YANG DIHAPUS
-
-- OrganizationalUnit
-- OperationalZone
-- OrganizationalUnitController
-- UpsertOrganizationalUnitRequest
-- OrganizationalUnitType
-- Asset
-- AssetController
-- StoreAssetRequest
-- AssetCategory
-- AssetCondition
-
-Diagram kelas tidak boleh lagi menampilkan ketergantungan Officer terhadap unit organisasi atau wilayah operasional.
+5. RELASI UTAMA
+GuestAccess 1:N Report; User 1:N Report sebagai pembuat atau penanggung jawab;
+Report 1:N ReportStatusHistory; Report 1:0..1 Activity;
+Activity 1:N ActivityPersonnel dan ActivityFinding;
+Report/Activity 1:N Attachment secara polimorfik;
+Archive 1:N ArchiveFile. Tabel/method historis tidak berarti fitur masih aktif.
+Officer, activity_officer, OrganizationalUnit, OperationalZone, dan Asset tidak
+lagi menjadi model/tabel aktif. Diagram menampilkan e-Profil sebagai dependensi luar.

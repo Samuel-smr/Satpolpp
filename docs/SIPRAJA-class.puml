@@ -1,11 +1,11 @@
 @startuml
-title Class Diagram SIPRAJA — As-Built 21 September 2026
+title Class Diagram SIPRAJA — As-Built 27 Oktober 2026
 skinparam classAttributeIconSize 0
 hide empty members
-
 class User {
   role: admin | super_admin
-  status
+  status: active | blocked
+  phone: nullable
 }
 class GuestAccess {
   token_hash
@@ -14,67 +14,97 @@ class GuestAccess {
 class Report {
   code
   type: lapor
-  reporter_nik: nullable legacy
-  status
-  location
-  feedback
+  assigned_admin_id: nullable
+  status: ReportStatus
+  + assignedAdmin()
+  + forDataYear()
 }
 class ReportStatusHistory
 class Attachment
 class ActivityTemplate
 class Activity {
   type: internal | external
-  category
-  location
-  handling_result
+  activity_date
   evaluation
+  + personnel()
+  # officers(): Attribute
+  + forDataYear()
+}
+class ActivityPersonnel {
+  employee_nip
+  assignment_role
+  notes
 }
 class ActivityFinding
-class Officer {
+class Employee <<readonly value object>> {
   employee_number
+  name
   position
-  work_unit_name
-  unit_name
-  status
 }
+class EprofilService <<service>>
+class "API e-Profil" as Eprofil <<external>>
 class Archive
 class ArchiveFile
 class AuditLog
-
+class DataYear <<support>>
+class DataYearController
+class EnsureSelectedDataYear <<middleware>>
 class PelaporController
 class AdminReportController
+class ReportAssignmentController
 class ReportStatusController
 class CompleteReportController
 class ActivityController
+class ActivityEvaluationController
 class AiAssistantController
 class GeminiAssistant <<service>>
+class OtpService <<service>>
+class WhatsAppService <<service>>
 
-GuestAccess "1" -- "0..*" Report
-User "0..1" -- "0..*" Report : created by
+GuestAccess "0..1" -- "0..*" Report
+User "0..1" -- "0..*" Report : creator
+User "0..1" -- "0..*" Report : assigned Admin
 Report "1" -- "0..*" ReportStatusHistory
-Report "1" -- "0..1" Activity : completion
+Report "0..1" -- "0..1" Activity : completion
 Report "1" .. "0..*" Attachment : polymorphic
 ActivityTemplate "0..1" -- "0..*" Activity
-User "1" -- "0..*" Activity : creator/evaluator
-Activity "0..*" -- "0..*" Officer
+User "1" -- "0..*" Activity : creator
+User "0..1" -- "0..*" Activity : evaluator
+Activity "1" -- "0..*" ActivityPersonnel
+ActivityPersonnel ..> EprofilService : resolve NIP
+EprofilService ..> Eprofil : authenticated API
+EprofilService ..> Employee : creates
 Activity "1" -- "0..*" ActivityFinding
 Activity "1" .. "0..*" Attachment : polymorphic
-Archive "1" -- "1..*" ArchiveFile
+User "1" -- "0..*" Archive : creator
+Archive "1" -- "0..*" ArchiveFile
 User "0..1" -- "0..*" AuditLog : actor
-
+DataYearController ..> DataYear : session year
+EnsureSelectedDataYear ..> DataYear
+DataYear ..> Report : created_at
+DataYear ..> Activity : activity_date
 PelaporController ..> Report
+PelaporController ..> OtpService
+PelaporController ..> WhatsAppService
+OtpService ..> WhatsAppService
 AdminReportController ..> Report
-ReportStatusController ..> Report
+ReportAssignmentController ..> Report : Super Admin assigns
+ReportStatusController ..> Report : assigned Admin
+ReportStatusController ..> WhatsAppService
 CompleteReportController ..> Report
 CompleteReportController ..> Activity
+CompleteReportController ..> EprofilService
+CompleteReportController ..> WhatsAppService
 ActivityController ..> Activity
-AiAssistantController ..> GeminiAssistant
+ActivityEvaluationController ..> Activity : gate evaluate-activity
+AiAssistantController ..> GeminiAssistant : server session history
 
-note bottom
-  Dihapus dari sistem aktif:
-  - Darurat dan Informasi & Pengaduan
-  - input NIK publik
-  - OrganizationalUnit dan OperationalZone
-  - Asset serta peringatan kendaraan
+note bottom of ActivityPersonnel
+  Unique(activity_id, employee_nip).
+  NIP references external directory, no local employee FK.
+end note
+note bottom of Report
+  reporter_nik removed. Processing requires assigned active Admin.
+  Rejection only from verifying; completion creates one Activity.
 end note
 @enduml

@@ -1,89 +1,87 @@
 PENJELASAN USE CASE SIPRAJA
-Pembaruan: 21 September 2026
+Pembaruan: 28 Oktober 2026 | Acuan kode: 503d836
 
-AKTOR: PELAPOR
+PANDUAN HALAMAN DRAW.IO
+File SIPRAJA-use-case.drawio memiliki enam tab:
+01 - Peta aktor dan modul: ringkasan pembagian kewenangan tiga aktor utama.
+02 - Warga dan integrasi: P01–P05, OTP, draf AI, penilaian, Gemini/WhatsApp/SKM.
+03 - Akses internal bersama: I01–I08 untuk Admin dan Super Admin, termasuk
+     dashboard sesuai peran, autentikasi, tahun, pencarian, notifikasi, profil.
+04 - Penugasan dan pengaduan: A03–A08 serta S02; perbedaan membaca, menugaskan,
+     dan memproses laporan digambar terpisah.
+05 - Kegiatan evaluasi arsip: K01–K05 (rincian A09/A11/S05), personel e-Profil,
+     evaluasi, arsip, dan feedback khusus Admin.
+06 - Pengawasan Super Admin: S01–S04/S06, operasi akun, direktori, dan monitoring.
 
-P01 — Membuat laporan
-Prasyarat : Tidak perlu login.
-Alur      : Buka Lapor, isi telepon/nama opsional/deskripsi/lokasi/foto, lalu kirim.
-Aturan    : Hanya satu jenis lapor; NIK tidak diminta.
-Hasil     : Report berstatus submitted, kode laporan, guest token, riwayat awal, notifikasi Admin.
+Pilih tab di bagian bawah editor untuk membaca rincian. Pengguna Internal adalah
+generalisasi diagram untuk Admin/Super Admin, bukan role baru dalam database.
+Asosiasi aktor memakai garis tanpa panah. Generalisasi menunjuk ke aktor induk.
+Panah putus <<include>> menunjuk langkah yang selalu menjadi bagian use case;
+<<extend>> menunjuk use case dasar yang mendapat tambahan opsional.
+Penilaian memperluas tampilan status hanya jika laporan selesai dan belum dinilai.
+Penggunaan draf memperluas pembuatan laporan hanya jika warga memilih draf AI.
+Layanan luar ditempatkan di luar batas SIPRAJA.
 
-P02 — Berkonsultasi dengan Asisten AI
-Prasyarat : Halaman Lapor terbuka.
-Alur      : Kirim pertanyaan atau detail kejadian secara bertahap; minta draf bila informasi cukup.
-Aturan    : Jangan kirim data sensitif; rate limit, timeout, dan validasi berlaku.
-Hasil     : Jawaban panduan/draf atau pesan aman bila provider tidak tersedia.
+Kode P/A/S mempertahankan pemetaan penjelasan di bawah; I dan K merinci fitur
+bersama agar relasi tidak menumpuk pada satu halaman.
 
-P03 — Melihat status laporan sendiri
-Prasyarat : Laporan terikat pada guest token browser.
-Alur      : Buka Status dan pilih/masukkan kode yang dimiliki.
-Hasil     : Status, riwayat, dan informasi penanganan yang diizinkan tampil.
+AKTOR: WARGA / PELAPOR
+P01 Membuat laporan: tanpa login; verifikasi WhatsApp lewat OTP, isi deskripsi,
+    alamat, persetujuan, dan foto opsional. Nama/NIK/koordinat tidak diminta.
+    Hasil: laporan lapor/submitted, riwayat, kode, token browser, dan notifikasi.
+P02 Asisten AI: kirim pesan maksimal 600 karakter, riwayat dikelola server;
+    panduan/draf perlu diperiksa dan dikirim melalui form oleh warga.
+P03 Melihat status: hanya laporan yang terkait token browser; kode saja tidak
+    membuka akses lintas perangkat. Pemilih tahun internal tidak berlaku.
+P04 Memberi feedback: laporan completed dan belum dinilai; rating 1–5,
+    komentar opsional 2.000 karakter, satu kali per laporan.
+P05 Survey Kepuasan: membuka SKM eksternal melalui halaman/QR atau tautan
+    WhatsApp penyelesaian; terpisah dari penilaian per laporan di SIPRAJA.
 
-P04 — Memberikan feedback
-Prasyarat : Laporan selesai dan belum diberi feedback.
-Alur      : Isi rating dan komentar opsional lalu kirim.
-Hasil     : Feedback tersimpan satu kali.
+ADMIN
+A01 Login/profil: akun aktif; identitas, nomor WhatsApp opsional, password sendiri.
+A02 Pilih tahun: dialog awal atau tombol Data [tahun]; cakupan laporan, kegiatan,
+    evaluasi, arsip, feedback, notifikasi, pencarian, dan ekspor menyesuaikan.
+A03 Baca laporan: daftar/detail/bukti seluruh laporan pada tahun terpilih.
+A04 Catat kanal lain: hanya tahun berjalan; Online/Offline, telepon dan titik peta
+    wajib, nama opsional, tanpa NIK/OTP. Belum ditugaskan setelah dibuat.
+A05 Proses laporan: harus Admin aktif penanggung jawab; submitted → received
+    → verifying → in_progress, satu tahap setiap tindakan, dengan riwayat/audit.
+A06 Tolak laporan: hanya saat verifying, alasan wajib; hasil rejected dan WhatsApp.
+A07 Selesaikan: hanya in_progress; hasil, tanggal, lokasi, personel e-Profil,
+    minimal satu foto wajib. Activity eksternal tunggal dan status completed.
+    WhatsApp hasil/SKM dikirim setelah data tersimpan.
+A08 Hapus laporan: soft delete, hanya penanggung jawab; riwayat/berkas untuk audit.
+A09 Kegiatan internal: CRUD, tanggal tahun terpilih, lokasi, NIP personel, temuan,
+    dokumentasi maksimal tiga foto. Data pegawai bersumber dari e-Profil.
+A10 Evaluasi: internal dapat dikelola Admin; eksternal hanya penanggung jawab
+    laporan terkait. Satu data evaluasi per kegiatan, dapat diubah/dihapus.
+A11 Ekspor kegiatan: Excel/PDF/Word seluruh hasil filter dan tahun terpilih;
+    PDF/Word memuat dokumentasi kegiatan dan bukti publik laporan terkait.
+A12 Arsip/feedback/notifikasi: arsip multi-file (baru hanya tahun berjalan),
+    membaca penilaian warga, menandai notifikasi sendiri sebagai dibaca.
 
-AKTOR: ADMIN
+SUPER ADMIN
+S01 Dashboard/peta: statistik tahun terpilih dan titik berkoordinat dalam satu
+    halaman; akun dan jumlah pegawai merupakan data global.
+S02 Manajemen Pengaduan: membaca daftar/detail dan menetapkan, mengganti, atau
+    mengosongkan Admin penanggung jawab. Pilihan terbatas Admin aktif; diaudit.
+    Tidak mengubah status, menolak, menyelesaikan, atau menghapus laporan.
+S03 Akun Admin: tambah/edit, nomor WhatsApp opsional, blokir/aktifkan/hapus sesuai
+    pembatasan akun; pembuatan akun tidak mengubah master pegawai e-Profil.
+S04 Manajemen Petugas: membaca nama/NIP/jabatan dari e-Profil; koreksi di sumber,
+    tanpa tambah/edit/status/hapus pegawai lokal.
+S05 Kegiatan internal dan ekspor: CRUD dan Excel/PDF/Word seperti akses kegiatan
+    yang tersedia untuk Admin; tidak mempunyai modul evaluasi Admin tersendiri.
+S06 Monitoring: meninjau audit termasuk penugasan sesuai tahun data.
+S07 Tahun data, profil, pencarian, dan notifikasi: sesuai cakupan peran.
 
-A01 — Login dan mengelola profil
-Hasil     : Sesi role Admin aktif; akun diblokir ditolak.
+SISTEM LUAR
+- Google Gemini menyediakan jawaban untuk Asisten AI melalui server.
+- e-Profil menyediakan direktori pegawai; NIP disimpan di activity_personnel.
+- Bot WhatsApp mengirim OTP dan notifikasi; SKM menyediakan survei eksternal.
+- Kegagalan notifikasi non-OTP tidak membatalkan data yang sudah tersimpan.
 
-A02 — Melihat dan mencari laporan
-Alur      : Gunakan daftar, filter, pencarian, dan detail.
-Hasil     : Laporan aktif serta bukti yang diizinkan terlihat.
-
-A03 — Mencatat laporan kanal lain
-Alur      : Isi sumber online/offline, kontak, deskripsi, lokasi, dan bukti.
-Aturan    : Jenis selalu lapor; NIK nullable/tidak wajib.
-
-A04 — Memajukan status
-Alur      : submitted → received → verifying → in_progress.
-Aturan    : Satu tahap, status awal diverifikasi, riwayat dan audit dicatat.
-
-A05 — Menyelesaikan laporan
-Prasyarat : Status in_progress.
-Alur      : Isi kegiatan penanganan, petugas, hasil, lokasi, dan bukti.
-Hasil     : Activity eksternal terbentuk dan Report menjadi completed.
-
-A06 — Mengelola kegiatan internal
-Alur      : Tambah, lihat, edit, soft delete, petugas, temuan, dan dokumentasi.
-
-A07 — Mengelola evaluasi dan arsip
-Hasil     : Data operasional tersimpan dan tindakan penting diaudit.
-
-A08 — Melihat feedback dan notifikasi
-Hasil     : Admin mengetahui laporan baru serta penilaian layanan.
-
-AKTOR: SUPER ADMIN
-
-S01 — Melihat dashboard dan peta persebaran
-Alur      : Buka dashboard; statistik, grafik, dan peta tampil terpadu.
-Aturan    : Tidak ada menu Peta terpisah.
-
-S02 — Melihat detail laporan
-Aturan    : Baca-saja; Super Admin tidak memajukan atau menyelesaikan laporan.
-
-S03 — Mengelola akun Admin
-Alur      : Tambah, edit, blokir/aktifkan, atau hapus akun selain akun sendiri sesuai validasi.
-
-S04 — Mengelola petugas
-Alur      : Tambah/edit data petugas, ubah status, atau hapus.
-Aturan    : Tidak ada pilihan unit organisasi atau zona operasional.
-
-S05 — Mengelola kegiatan internal
-Alur      : Sama seperti akses kegiatan internal yang diberikan kepada Admin.
-
-S06 — Memantau audit
-Alur      : Buka Monitoring dan tinjau aktivitas terbaru serta tren.
-
-USE CASE YANG DIHAPUS
-
-- Memilih Lapor Darurat.
-- Memilih Informasi & Pengaduan.
-- Memasukkan NIK pada laporan warga.
-- Membuka menu Peta terpisah.
-- CRUD unit organisasi.
-- CRUD zona operasional.
-- CRUD aset serta peringatan pajak/servis kendaraan.
+KOMPONEN LAMA
+Tidak ada pilihan jenis laporan lama, NIK laporan (termasuk kolom database),
+CRUD pegawai lokal, organisasi/zona, Aset, atau halaman Peta terpisah.

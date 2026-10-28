@@ -1,66 +1,91 @@
 @startuml
-title SQ01 — Konsultasi Asisten AI
+title SQ01 — Asisten AI dengan Riwayat Sesi Server
 actor Pelapor
 boundary "UI Lapor" as UI
 control AiAssistantController as AIC
 control GeminiAssistant as GA
+database "Sesi server" as Session
 participant "Google Gemini" as Gemini
-
 Pelapor -> UI : Tulis pertanyaan/detail kejadian
-UI -> AIC : POST /lapor/asisten-ai\nmessage + history
-AIC -> AIC : Validasi + rate limit
-AIC -> GA : ask(message, history)
-GA -> Gemini : generateContent\nAPI key dari server
+UI -> AIC : POST /lapor/asisten-ai\nmessage saja (maks. 600 karakter)
+AIC -> AIC : Validasi, throttle, session lock\nTolak history/model/tools dari browser
+AIC -> Session : Ambil maks. 8 pesan (<30 menit tidak aktif)
+AIC -> GA : ask(redactedMessage, serverHistory)
+GA -> Gemini : generateContent (konfigurasi server)
 alt sukses
-  Gemini --> GA : jawaban Bahasa Indonesia
-  GA --> AIC : answer
-  AIC --> UI : 200 JSON
-  UI --> Pelapor : Panduan/draf
-else timeout, 429, atau 5xx
-  GA -> Gemini : retry terbatas
+  Gemini --> GA : Jawaban Bahasa Indonesia
+  GA --> AIC : Teks jawaban
+  AIC -> Session : Simpan maks. 8 pesan + waktu
+  AIC --> UI : 200 answer, private/no-store
+else provider gagal atau AI nonaktif
   AIC --> UI : 503 pesan aman
 end
 @enduml
 
 @startuml
-title SQ02 — Laporan Masyarakat hingga Selesai
+title SQ02 — OTP, Laporan, Penugasan, dan Penyelesaian
 actor Pelapor
-boundary "Form Lapor" as UI
 control PelaporController as PC
-database Database as DB
-actor Admin
+control OtpService as OTP
+participant "WhatsAppService / bot lokal" as WA
+database "Database / cache / sesi" as DB
+actor "Super Admin" as SA
+control ReportAssignmentController as RAC
+actor "Admin penanggung jawab" as Admin
 control ReportStatusController as RSC
 control CompleteReportController as CRC
-
-Pelapor -> UI : Isi satu jenis Lapor\ntanpa NIK
-UI -> PC : POST /lapor
-PC -> PC : Validasi input
-PC -> DB : Simpan GuestAccess/Report(type=lapor)\nHistory + Attachment
-PC -> DB : Notifikasi Admin aktif
-PC --> UI : Kode laporan
-
-Admin -> RSC : Majukan status satu tahap
-RSC -> DB : submitted → received → verifying → in_progress
-Admin -> CRC : Lengkapi hasil, petugas, lokasi, bukti
-CRC -> DB : Transaksi Activity eksternal\nOfficer + Attachment + Report completed
-Pelapor -> PC : Lihat status dan kirim feedback
-PC -> DB : Simpan feedback sekali
+participant "API e-Profil" as EP
+Pelapor -> PC : POST /lapor/otp (telepon)
+PC -> OTP : issue + send
+OTP -> DB : Cache OTP 5 menit, jeda 60 detik
+OTP -> WA : Kirim OTP
+Pelapor -> PC : POST /lapor/otp/verify
+PC -> OTP : verify
+OTP -> DB : Verifikasi sesi 15 menit
+Pelapor -> PC : POST /lapor\ntelepon, deskripsi, lokasi, foto?, persetujuan
+PC -> PC : Validasi verifikasi sesi
+PC -> DB : Transaksi GuestAccess + Report submitted\nHistory + Attachment, belum ditugaskan
+PC -> DB : Notifikasi Admin/Super Admin aktif
+PC -> WA : Konfirmasi pelapor + Admin aktif dengan nomor
+PC --> Pelapor : Kode laporan + cookie token
+SA -> RAC : PATCH assignment pada tahun terpilih
+RAC -> DB : Validasi Admin aktif, lock Report\nassigned_admin_id + audit
+Admin -> RSC : Proses satu tahap (tahun sesuai)
+RSC -> DB : Gate + lock + status awal\nsubmitted → received → verifying
+alt ditolak dari verifying
+  RSC -> DB : rejected + alasan + riwayat/audit
+  RSC -> WA : Status ditolak + alasan
+else dilanjutkan
+  RSC -> DB : in_progress + riwayat/audit
+  RSC -> WA : Pembaruan status
+  Admin -> CRC : Hasil, tanggal, lokasi, NIP, foto
+  CRC -> EP : Ambil NIP valid
+  CRC -> DB : Gate + lock + cek status/duplikasi\nActivity external + activity_personnel\nTemuan? + foto + completed + audit
+  CRC -> WA : Hasil selesai + tautan SKM
+  Pelapor -> PC : Status dengan token + feedback sekali
+  PC -> DB : Verifikasi kepemilikan/completed, simpan rating
+end
+note over WA,DB
+Notifikasi non-OTP dicoba setelah data tersimpan.
+Kegagalan kirim tidak membatalkan transaksi.
+end note
 @enduml
 
 @startuml
-title SQ03 — Dashboard Super Admin dengan Peta Terpadu
-actor "Super Admin" as SA
-control SuperAdminController as SC
-database "Reports + Activities + Audit" as DB
-boundary Dashboard as UI
-
-SA -> SC : GET /super-admin/dashboard
-SC -> DB : Statistik, audit terbaru,\ntitik berkoordinat
-DB --> SC : Dataset dashboard
-SC --> UI : Kartu + grafik + peta
-UI --> SA : Dashboard terpadu
-note over SA,UI
-Tidak ada menu Peta terpisah,
-Manajemen Organisasi, atau peringatan Aset.
-end note
+title SQ03 — Tahun Data, Dashboard, dan Ekspor
+actor "Pengguna internal" as User
+control DataYearController as DYC
+database "Sesi tahun / database" as DB
+control "SuperAdminController / AdminController" as C
+boundary "Dashboard / daftar kegiatan" as UI
+User -> DYC : PUT /data-year (tahun tersedia)
+DYC -> DB : Simpan data_year dalam sesi
+DYC --> User : Redirect dashboard sesuai role
+User -> C : Buka dashboard/kegiatan
+C -> DB : Query tahun created_at / activity_date\nFilter daftar dan dataset ekspor seluruh halaman
+C --> UI : Statistik, peta / kegiatan + dataset ekspor
+User -> UI : Ekspor Excel / PDF / Word
+UI -> C : Ambil foto lewat route autentikasi dan tahun
+C --> UI : Foto kegiatan + bukti publik laporan terkait
+UI --> User : Berkas xlsx / pdf / docx
 @enduml

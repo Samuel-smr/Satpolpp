@@ -1,101 +1,85 @@
 DAFTAR FITUR SIPRAJA — KONDISI AKTUAL
-Pembaruan: 21 September 2026
+Pembaruan: 27 Oktober 2026 | Acuan kode: 503d836
 
-1. PELAPOR / WARGA
-
-- Mengakses aplikasi tanpa login.
-- Mengirim satu jenis laporan, yaitu Lapor.
-- Mengisi nomor telepon, nama opsional, deskripsi, lokasi, titik peta, dan foto pendukung.
-- Tidak memasukkan NIK. Kolom NIK di database hanya dipertahankan nullable untuk data lama.
-- Bertanya kepada Asisten AI di halaman Lapor.
-- Meminta AI menyusun deskripsi berdasarkan percakapan berkelanjutan.
-- Menerima kode laporan dan token akses tamu.
-- Melihat status dan riwayat laporan miliknya.
-- Memberi rating dan komentar setelah laporan selesai.
+1. WARGA / PELAPOR
+- Tanpa akun; form tunggal Lapor tanpa nama, NIK, atau pemilihan koordinat.
+- Nomor WhatsApp wajib diverifikasi dengan OTP enam angka: berlaku lima menit,
+  kirim ulang setelah 60 detik, verifikasi sesi berlaku 15 menit.
+- Deskripsi wajib (5.000 karakter), alamat wajib (1.000 karakter), persetujuan
+  kebenaran data, dan foto opsional maksimal tiga JPG/JPEG/PNG/WEBP @ 5 MB.
+- Asisten AI membantu panduan/draf; pengiriman tetap dilakukan warga sendiri.
+- Kode laporan dan konfirmasi WhatsApp setelah laporan tersimpan.
+- Status/riwayat hanya untuk laporan milik token browser, tanpa login.
+- Penilaian sekali setelah selesai: rating 1–5 dan komentar opsional 2.000 karakter.
+- Survey Kepuasan membuka survei SKM eksternal, terpisah dari rating per laporan.
 
 2. ADMIN
-
-Umum:
-- Login dengan username/email dan kata sandi.
-- Melihat dashboard, notifikasi, pencarian global, dan profil.
-- Menandai notifikasi satu per satu atau seluruhnya sebagai dibaca.
-
-Laporan:
-- Melihat, mencari, memfilter, dan membuka detail laporan.
-- Mencatat laporan dari kanal online atau offline tanpa mewajibkan NIK.
-- Memajukan status: dibuat, diterima, diverifikasi, ditindaklanjuti, selesai.
-- Menghapus laporan secara soft delete.
-- Menyelesaikan laporan dengan hasil penanganan, lokasi, petugas, dan bukti.
-- Penyelesaian otomatis membuat satu kegiatan eksternal yang terkait.
-
-Kegiatan:
-- Melihat dan memfilter kegiatan internal maupun eksternal.
-- Menambah, mengubah, dan menghapus kegiatan internal.
-- Menentukan lokasi, petugas, temuan, dokumentasi, dan hasil.
-- Melihat/menghapus lampiran internal sesuai otorisasi.
-- Mengevaluasi kegiatan.
-
-Operasional lain:
-- Mengelola folder arsip dan beberapa file arsip.
-- Melihat feedback masyarakat.
-- Mengubah profil dan kata sandi sendiri.
+- Login akun aktif, memilih tahun data, dashboard, pencarian, notifikasi, profil.
+- Membaca seluruh pengaduan tahun terpilih, mencari/filter, membuka bukti/detail.
+- Mencatat laporan Online/Offline pada tahun berjalan: nama opsional, nomor
+  telepon dan titik peta wajib; tanpa NIK dan tanpa OTP pada form Admin.
+- Penanganan hanya oleh Admin yang ditugaskan Super Admin: menerima, memverifikasi,
+  menindaklanjuti, menyelesaikan, atau soft delete laporan.
+- Menolak hanya saat verifikasi, dengan alasan wajib.
+- Penyelesaian membuat satu kegiatan eksternal, hasil, lokasi, referensi NIP
+  pegawai e-Profil, temuan opsional, dan bukti penanganan satu sampai tiga foto.
+- Status, penolakan, serta penyelesaian memicu WhatsApp; pesan selesai memuat SKM.
+- CRUD kegiatan internal, personel e-Profil, lokasi, temuan, dan dokumentasi.
+- Evaluasi kegiatan internal; evaluasi eksternal hanya untuk laporan penugasannya.
+- Ekspor seluruh hasil filter kegiatan/tahun ke Excel, PDF, dan Word (.docx).
+  PDF/Word memuat foto kegiatan dan bukti publik laporan terkait.
+- Arsip multi-file (maksimal lima @ 20 MB), feedback warga, profil/password,
+  nomor WhatsApp opsional, dan notifikasi database.
 
 3. SUPER ADMIN
+- Dashboard statistik tahunan dan peta persebaran terpadu.
+- Manajemen Pengaduan: daftar/detail dan memilih Admin penanggung jawab aktif.
+- Mengganti/mengosongkan penugasan melalui Simpan Penugasan; perubahan diaudit.
+- Tidak memajukan status, menolak, menyelesaikan, atau menghapus laporan.
+- CRUD kegiatan internal dan ekspor Excel/PDF/Word sesuai tahun/filter.
+- Mengelola akun Admin: tambah/edit, nomor WhatsApp opsional, blokir/aktifkan,
+  hapus sesuai aturan; bukan membuat akun pegawai e-Profil otomatis.
+- Manajemen Petugas adalah direktori baca-saja nama/NIP/jabatan dari e-Profil.
+  Tidak ada CRUD pegawai di SIPRAJA.
+- Monitoring audit, pencarian, notifikasi, profil/password, dan tahun data.
 
-- Melihat dashboard statistik dan peta persebaran dalam satu halaman.
-- Melihat detail laporan melalui konteks yang tersedia secara baca-saja.
-- Melihat dan mengelola kegiatan internal.
-- Mengelola akun Admin: tambah, ubah, blokir/aktifkan, dan hapus sesuai aturan.
-- Mengelola petugas: tambah, ubah, status, dan hapus.
-- Melihat monitoring audit aktivitas.
-- Melihat notifikasi serta mengubah profil/kata sandi sendiri.
-- Tidak mempunyai menu Peta terpisah.
-- Tidak mempunyai Manajemen Organisasi.
-- Tidak mengubah status atau menyelesaikan laporan.
+4. TAHUN DATA
+- Dipilih pada dialog awal sesi internal atau tombol Data [tahun].
+- Laporan/feedback, arsip, audit, dan notifikasi mengikuti tahun created_at.
+- Kegiatan/evaluasi mengikuti activity_date; ekspor dan peta juga mengikuti tahun.
+- Data tahun lain harus dibuka setelah memilih tahun yang sesuai.
+- Laporan Admin dan arsip baru memerlukan tahun berjalan; tanggal kegiatan
+  harus berada dalam tahun terpilih. Akun/e-Profil tidak dibatasi tahun.
+- Pelacakan warga memakai token browser, tanpa filter tahun internal.
 
-4. ASISTEN AI
+5. ASISTEN AI
+- POST /lapor/asisten-ai: message maksimal 600 karakter, history browser dilarang.
+- Riwayat delapan pesan pada sesi server, kedaluwarsa 30 menit tidak aktif.
+- Konfigurasi server: AI_ENABLED, AI_API_KEY, AI_MODEL, AI_BASE_URL,
+  AI_HOURLY_LIMIT, AI_DAILY_LIMIT. Model default kode: gemini-3.5-flash.
+- Rate limit default 10/IP/menit, 30 global/menit, 60/IP/jam, 1.000 global/hari.
+- Timeout/retry terbatas, session lock, redaksi pola sensitif, validasi jawaban,
+  teks biasa; tidak memiliki akses CRUD atau mengirim laporan sendiri.
 
-- Endpoint publik: POST /lapor/asisten-ai.
-- Provider: Google Gemini; model default gemini-3.1-flash-lite.
-- API key hanya berada di server melalui AI_API_KEY.
-- Pesan maksimal 600 karakter; riwayat maksimal 8 pesan.
-- Rate limit 10 permintaan per menit.
-- Bahasa utama Indonesia dan jawaban diarahkan pada pelaporan SIPRAJA.
-- Tidak meminta NIK, kata sandi, rekening, atau data sensitif.
-- Memiliki timeout dan retry terbatas; kegagalan provider dikembalikan sebagai pesan aman.
+6. INTEGRASI DAN DATA
+- e-Profil memakai api_eprofil/token_eprofil; master pegawai tetap di luar SIPRAJA.
+- activity_personnel menyimpan activity_id dan employee_nip unik per kegiatan,
+  bukan salinan master atau FK ke tabel pegawai lokal.
+- WhatsApp memakai bot lokal; WHATSAPP_BOT_URL/WHATSAPP_BOT_TOKEN di Laravel,
+  WA_BOT_TOKEN pada bot; SKM_SURVEY_URL untuk tautan survei.
+- Notifikasi database laporan baru untuk Admin/Super Admin aktif. Laporan publik
+  juga memicu WhatsApp untuk pelapor serta Admin aktif dengan nomor terisi.
+- Kegagalan notifikasi non-OTP tidak membatalkan data yang sudah tersimpan.
+- Model utama: User, GuestAccess, Report, ReportStatusHistory, Attachment,
+  ActivityTemplate, Activity, ActivityPersonnel, ActivityFinding, Archive,
+  ArchiveFile, AuditLog; notifikasi memakai model database Laravel.
 
-5. MODEL DATA UTAMA
+7. KOMPONEN LAMA
+- Pilihan Darurat/Informasi & Pengaduan, fitur Aset, organisasi/zona operasional,
+  dan menu Peta terpisah sudah dihapus.
+- Kolom reports.reporter_nik sudah dihapus; bukan lagi kolom legacy nullable.
+- officers/activity_officer sudah diganti activity_personnel dan direktori e-Profil.
 
-- User: akun Admin/Super Admin.
-- GuestAccess: token akses pelapor.
-- Report: laporan tunggal bertipe lapor, status, lokasi, feedback.
-- ReportStatusHistory: riwayat perubahan status.
-- Attachment: lampiran polimorfik laporan/kegiatan.
-- ActivityTemplate: template kegiatan.
-- Activity: kegiatan internal atau eksternal.
-- ActivityFinding: daftar temuan kegiatan.
-- Officer: data petugas tanpa relasi organisasi/wilayah.
-- ActivityOfficer: penugasan petugas pada kegiatan.
-- Archive dan ArchiveFile: arsip multi-file.
-- AuditLog: aktivitas penting sistem.
-- Notification: notifikasi database Laravel.
-
-6. FITUR YANG SUDAH DIHAPUS
-
-- Pilihan Lapor Darurat.
-- Pilihan Informasi & Pengaduan.
-- Input NIK pada form warga.
-- Menu Peta terpisah pada Super Admin.
-- Manajemen Organisasi.
-- Tabel operational_zones dan organizational_units.
-- Relasi organizational_unit_id dan operational_zone_id pada officers.
-- Fitur Aset, menu Aset, peringatan kendaraan, dan tabel assets.
-
-Sumber acuan:
-- routes/web.php
-- app/Http/Controllers
-- app/Http/Requests
-- app/Models
-- database/migrations
-- resources/views
-- tests/Feature
+Sumber: routes/web.php, controller/request/gate, model/migrasi, resources/views,
+config/services.php, public/js/activity-word-export.js, wa-bot/server.js,
+dan tests/Feature. Status ini berdasarkan kode, bukan uji koneksi produksi.

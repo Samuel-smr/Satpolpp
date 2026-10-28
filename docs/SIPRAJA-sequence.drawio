@@ -1,16 +1,117 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<mxfile host="app.diagrams.net" version="24.7.17" type="device">
-<diagram id="ai" name="01 - Asisten AI"><mxGraphModel dx="1500" dy="900" grid="1" page="1" pageWidth="1800" pageHeight="1200"><root><mxCell id="0"/><mxCell id="1" parent="0"/>
-<mxCell id="t" value="SEQUENCE 01 — ASISTEN AI PADA HALAMAN LAPOR" style="text;html=0;fontSize=25;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="40" y="20" width="1100" height="40" as="geometry"/></mxCell>
-<mxCell id="a" value="Pelapor" style="rounded=1;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="60" y="130" width="180" height="55" as="geometry"/></mxCell><mxCell id="b" value="UI Lapor" style="rounded=1;html=0;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="350" y="130" width="180" height="55" as="geometry"/></mxCell><mxCell id="c" value="AiAssistantController" style="rounded=1;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="650" y="130" width="240" height="55" as="geometry"/></mxCell><mxCell id="d" value="GeminiAssistant" style="rounded=1;html=0;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="1020" y="130" width="210" height="55" as="geometry"/></mxCell><mxCell id="e" value="Gemini API" style="rounded=1;html=0;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="1360" y="130" width="190" height="55" as="geometry"/></mxCell>
-<mxCell id="box" value="1. Pelapor mengirim message&#xa;2. UI menyertakan riwayat maksimal 8 pesan&#xa;3. Form Request + throttle memvalidasi&#xa;4. Service memakai API key dari config server&#xa;5. Gemini menjawab Bahasa Indonesia&#xa;6. Controller mengembalikan answer JSON&#xa;&#xa;Alternatif: timeout/429/5xx → retry terbatas → 503 pesan aman" style="rounded=1;html=0;whiteSpace=wrap;align=left;verticalAlign=top;spacing=18;fontSize=16;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1"><mxGeometry x="160" y="280" width="1280" height="340" as="geometry"/></mxCell>
-<mxCell id="m1" value="message" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;" edge="1" parent="1" source="a" target="b"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="m2" value="POST /lapor/asisten-ai" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;" edge="1" parent="1" source="b" target="c"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="m3" value="ask(message, history)" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;" edge="1" parent="1" source="c" target="d"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="m4" value="generateContent" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;" edge="1" parent="1" source="d" target="e"><mxGeometry relative="1" as="geometry"/></mxCell>
-</root></mxGraphModel></diagram>
-<diagram id="report" name="02 - Laporan"><mxGraphModel dx="1500" dy="900" grid="1" page="1" pageWidth="1800" pageHeight="1200"><root><mxCell id="0"/><mxCell id="1" parent="0"/>
-<mxCell id="t" value="SEQUENCE 02 — KIRIM DAN TANGANI LAPORAN" style="text;html=0;fontSize=25;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="40" y="20" width="1100" height="40" as="geometry"/></mxCell>
-<mxCell id="a" value="Pelapor" style="rounded=1;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="70" y="130" width="180" height="55" as="geometry"/></mxCell><mxCell id="b" value="PelaporController" style="rounded=1;html=0;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="390" y="130" width="220" height="55" as="geometry"/></mxCell><mxCell id="c" value="Database" style="rounded=1;html=0;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="740" y="130" width="190" height="55" as="geometry"/></mxCell><mxCell id="d" value="Admin" style="rounded=1;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="1080" y="130" width="180" height="55" as="geometry"/></mxCell><mxCell id="e" value="CompleteReportController" style="rounded=1;html=0;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="1370" y="130" width="260" height="55" as="geometry"/></mxCell>
-<mxCell id="box" value="1. POST /lapor (tanpa NIK dan tanpa pilihan jenis)&#xa;2. Validasi lalu simpan Report type=lapor, status=submitted&#xa;3. Simpan history/lampiran dan kirim notifikasi Admin&#xa;4. Admin memajukan submitted → received → verifying → in_progress&#xa;5. Admin menyelesaikan laporan&#xa;6. Transaksi membuat Activity eksternal + Officer + bukti&#xa;7. Report menjadi completed&#xa;8. Pelapor melihat status dan mengirim feedback" style="rounded=1;html=0;whiteSpace=wrap;align=left;verticalAlign=top;spacing=18;fontSize=16;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1"><mxGeometry x="160" y="280" width="1350" height="380" as="geometry"/></mxCell>
-<mxCell id="m1" value="form Lapor" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;" edge="1" parent="1" source="a" target="b"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="m2" value="save" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;" edge="1" parent="1" source="b" target="c"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="m3" value="handle status" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;" edge="1" parent="1" source="d" target="c"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="m4" value="complete" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;" edge="1" parent="1" source="d" target="e"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="m5" value="transaction" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;" edge="1" parent="1" source="e" target="c"><mxGeometry relative="1" as="geometry"/></mxCell>
-</root></mxGraphModel></diagram>
-<diagram id="dashboard" name="03 - Dashboard Super Admin"><mxGraphModel dx="1300" dy="800" grid="1" page="1" pageWidth="1600" pageHeight="1000"><root><mxCell id="0"/><mxCell id="1" parent="0"/><mxCell id="t" value="SEQUENCE 03 — DASHBOARD + PETA SUPER ADMIN" style="text;html=0;fontSize=25;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="40" y="20" width="1100" height="40" as="geometry"/></mxCell><mxCell id="a" value="Super Admin" style="rounded=1;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="100" y="150" width="220" height="60" as="geometry"/></mxCell><mxCell id="b" value="SuperAdminController@dashboard" style="rounded=1;html=0;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="520" y="150" width="320" height="60" as="geometry"/></mxCell><mxCell id="c" value="Reports + Activities" style="rounded=1;html=0;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="1040" y="150" width="260" height="60" as="geometry"/></mxCell><mxCell id="box" value="GET /super-admin/dashboard → statistik + titik berkoordinat → render kartu, grafik, dan peta dalam satu halaman. Tidak ada route/menu Peta terpisah." style="rounded=1;html=0;whiteSpace=wrap;align=center;fontSize=18;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1"><mxGeometry x="170" y="340" width="1050" height="150" as="geometry"/></mxCell><mxCell id="m1" value="dashboard" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;" edge="1" parent="1" source="a" target="b"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="m2" value="query statistik + koordinat" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;" edge="1" parent="1" source="b" target="c"><mxGeometry relative="1" as="geometry"/></mxCell></root></mxGraphModel></diagram>
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" version="24.7.17" type="device" modified="2026-10-27T00:00:00.000Z">
+  <diagram id="ai" name="01 - Asisten AI">
+    <mxGraphModel dx="1500" dy="900" grid="1" page="1" pageWidth="1800" pageHeight="1300">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="t" value="SEQUENCE 01 — ASISTEN AI PADA HALAMAN LAPOR" style="text;html=0;fontSize=25;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="1100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="a" value="Pelapor" style="rounded=1;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="130" width="180" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="b" value="UI Lapor" style="rounded=1;html=0;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="130" width="180" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="c" value="AiAssistantController" style="rounded=1;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="650" y="130" width="240" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="d" value="GeminiAssistant" style="rounded=1;html=0;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="130" width="210" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="e" value="Gemini API" style="rounded=1;html=0;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1360" y="130" width="190" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="box" value="1. Browser mengirim message saja (maks. 600 karakter)&#10;2. Validasi menolak history/model/tools browser; throttle + session lock&#10;3. Server mengambil riwayat sesi: maks. 8 pesan, &lt;30 menit tidak aktif&#10;4. Service meredaksi pola sensitif; memakai konfigurasi API server&#10;5. Gemini menjawab; controller menyimpan riwayat terbaru&#10;6. JSON answer berupa teks biasa; pengiriman laporan oleh warga&#10;Alternatif: rate limit 429; provider gagal/AI nonaktif -&gt; 503 pesan aman" style="rounded=1;html=0;whiteSpace=wrap;align=left;verticalAlign=top;spacing=18;fontSize=16;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="160" y="280" width="1280" height="340" as="geometry" />
+        </mxCell>
+        <mxCell id="m1" value="message" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;" edge="1" parent="1" source="a" target="b">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m2" value="POST /lapor/asisten-ai" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;" edge="1" parent="1" source="b" target="c">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m3" value="ask(message, serverHistory)" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;" edge="1" parent="1" source="c" target="d">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m4" value="generateContent" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;" edge="1" parent="1" source="d" target="e">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="report" name="02 - Laporan">
+    <mxGraphModel dx="1500" dy="900" grid="1" page="1" pageWidth="1800" pageHeight="1300">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="t" value="SEQUENCE 02 — KIRIM DAN TANGANI LAPORAN" style="text;html=0;fontSize=25;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="1100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="a" value="Pelapor" style="rounded=1;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="70" y="130" width="180" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="b" value="PelaporController" style="rounded=1;html=0;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="390" y="130" width="220" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="c" value="Database" style="rounded=1;html=0;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="740" y="130" width="190" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="d" value="Admin penanggung jawab" style="rounded=1;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="130" width="180" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="e" value="CompleteReportController" style="rounded=1;html=0;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1370" y="130" width="260" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="box" value="1. Minta/verifikasi OTP WhatsApp pada sesi browser&#10;2. POST /lapor: telepon, deskripsi, alamat, foto?, persetujuan&#10;3. Transaksi Report lapor/submitted, GuestAccess, history, lampiran&#10;4. Notifikasi DB Admin/Super Admin; WhatsApp pelapor/Admin aktif&#10;5. Super Admin menugaskan Admin aktif pada tahun terpilih; audit&#10;6. Gate: hanya penanggung jawab proses submitted -&gt; received -&gt; verifying&#10;7. Alternatif verifying -&gt; rejected + alasan; lanjut -&gt; in_progress&#10;8. Validasi NIP API e-Profil, tanggal tahun terpilih, hasil, lokasi, foto&#10;9. Transaksi Activity external + activity_personnel + foto + completed + audit&#10;10. WhatsApp hasil/SKM; warga melihat status token dan menilai sekali" style="rounded=1;html=0;whiteSpace=wrap;align=left;verticalAlign=top;spacing=18;fontSize=16;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="160" y="280" width="1350" height="480" as="geometry" />
+        </mxCell>
+        <mxCell id="m1" value="form Lapor" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;" edge="1" parent="1" source="a" target="b">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m2" value="save" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;" edge="1" parent="1" source="b" target="c">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m3" value="handle status" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;" edge="1" parent="1" source="d" target="c">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m4" value="complete" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;" edge="1" parent="1" source="d" target="e">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m5" value="transaction" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;" edge="1" parent="1" source="e" target="c">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="dashboard" name="03 - Dashboard Super Admin">
+    <mxGraphModel dx="1300" dy="800" grid="1" page="1" pageWidth="1600" pageHeight="1300">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="t" value="SEQUENCE 03 — DASHBOARD + PETA SUPER ADMIN" style="text;html=0;fontSize=25;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="1100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="a" value="Super Admin" style="rounded=1;html=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="150" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="b" value="SuperAdminController@dashboard" style="rounded=1;html=0;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="150" width="320" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="c" value="Reports + Activities" style="rounded=1;html=0;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1040" y="150" width="260" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="box" value="Pilih tahun melalui PUT /data-year -&gt; sesi -&gt; dashboard.&#10;Statistik, titik koordinat, dan audit dibatasi tahun; akun/e-Profil global.&#10;Peta terpadu: Laporan/Aduan (termasuk eksternal) dan Kegiatan Internal.&#10;Muat ulang halaman untuk data terbaru; tidak ada menu Peta terpisah." style="rounded=1;html=0;whiteSpace=wrap;align=center;fontSize=18;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="170" y="340" width="1050" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="m1" value="dashboard" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;" edge="1" parent="1" source="a" target="b">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m2" value="query statistik + koordinat" style="edgeStyle=orthogonalEdgeStyle;html=0;endArrow=block;" edge="1" parent="1" source="b" target="c">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
 </mxfile>
