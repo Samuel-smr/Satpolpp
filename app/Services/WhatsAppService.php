@@ -26,9 +26,13 @@ class WhatsAppService
             throw new RuntimeException('WhatsApp local bot URL is not configured.');
         }
 
-        $response = Http::acceptJson()
-            ->connectTimeout(5)
-            ->timeout(15)
+        $response = Http::withHeaders([
+                'ngrok-skip-browser-warning' => 'true',
+                'User-Agent' => 'Laravel-SIPRAJA',
+            ])
+            ->acceptJson()
+            ->connectTimeout(10)
+            ->timeout(30)
             ->when(
                 (string) config('services.whatsapp.bot_token') !== '',
                 fn ($request) => $request->withToken((string) config('services.whatsapp.bot_token'))
